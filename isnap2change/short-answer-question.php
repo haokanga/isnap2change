@@ -149,19 +149,16 @@
 						<?php
 							} $lastSAQID = $currentSAQID;?>
                                 <!--Input text box-->
-                                <textarea rows="4" cols="50">                                 
-                                </textarea>
+                                <textarea rows="4" cols="50">Please input your answer here</textarea>
 						<?php
 								if(($i+1)==sizeof($rows)){ ?>
 										</div>	
 								</div>
 								
 						<?php  	} else {
-									$nextSAQID = $rows[$i+1] -> SAQID;
-									
-									if($nextSAQID != $currentSAQID){ ?>
-												</div>	
-										</div>
+                                    { ?>
+                                </div>	
+                            </div>
 						<?php		}
 									
 								} 
