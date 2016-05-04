@@ -97,7 +97,7 @@
 					<input type="radio" name="usertype" value="teacher"> Teacher
 					<br><br>
 					<label>Username  :</label><input type="text" name="username" class="box"/><br/><br/>
-					<label>Password  :</label><input type="password" name="password" class="box" /><br/><br/>
+					<label>Password  :</label><input type="password" name="password" class="box"/><br/><br/>
 					<input type="submit" name='submit' value="Submit" class='submit'/><br />
 				</form>
 			</div>

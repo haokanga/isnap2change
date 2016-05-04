@@ -25,6 +25,33 @@
 
 	$lastSAQID = -1;
 
+    session_start();
+    require_once("connection.php");
+    //$StudentID = $_SESSION['userid'];
+    if(isset($_SESSION['userid'])){
+		$StudentID = $_SESSION['userid'];
+	}else{
+        echo "This is DEBUG_MODE with hard_code StudentID = 1";
+        $StudentID = 1;
+    }    
+    $Answer = $_POST["Answer"];
+    $SAQID = $_POST["SAQID"];
+    
+    $conn = db_connect();   
+
+    for($i=0; $i<count($Answer); $i++) {
+        echo $SAQID[$i]."<br>";   
+        echo $Answer[$i]."<br>";
+        $insertStudentSql = "REPLACE INTO SAQ_Question_Record(StudentID, SAQID, Answer)
+							     VALUES (?,?,?);";			
+		$insertStudentSql = $conn->prepare($insertStudentSql);
+			
+		if(! $insertStudentSql -> execute(array($StudentID, $SAQID[$i], $Answer[$i]))){
+			echo "<script language=\"javascript\">  alert(\"Error occurred to submit your answer. Report this bug to reseachers.\"); </script>";
+		}
+    }
+    
+    db_close($conn);
 ?>
 
 <html>
@@ -88,7 +115,7 @@
     <body>
 
         <nav class="navbar navbar-default navbar-fixed-top">
-        <form method="post" action="short-answer-question-submission.php">
+        <form method="post" action="<?php echo $_SERVER['PHP_SELF'];?>">
             <div class="container-fluid">
                 <!-- Brand and toggle get grouped for better mobile display -->
                 <div class="navbar-header">
@@ -146,8 +173,9 @@
 										<div class="panel-body">
 						<?php
 							} $lastSAQID = $currentSAQID;?>
-                                <!--Input text box-->
-                                <textarea rows="4" cols="50" name="SAQ_answer_<?php echo $i;?>">Please input your answer here</textarea>
+                                <!--Short Answer Question Input TextBox-->
+                                <input type="hidden" name="SAQID[]" value="<?php echo $currentSAQID ?>"/>
+                                <textarea rows="4" cols="50" name="Answer[]">Please input your answer here</textarea>
 						<?php
 								if(($i+1)==sizeof($rows)){ ?>
 										</div>	
