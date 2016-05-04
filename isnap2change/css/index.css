@@ -1,0 +1,27 @@
+/*
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+*/
+/* 
+    Created on : 29/04/2016, 2:02:19 PM
+    Author     : Shivangi
+*/
+body
+{
+    background-image: url('2.jpg');
+    background-repeat: no-repeat;
+    font-family: 'Raleway', sans-serif;
+   
+}
+
+.panel-body
+{
+    font-size:initial;
+}
+
+.panel-heading
+{
+    font-family: 'Raleway', sans-serif;
+    font-size:large;
+}

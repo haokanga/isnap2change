@@ -22,7 +22,12 @@
 							     VALUES (?,?,?,?,?,?,?,?);";
 			
 			$insertStudentSql = $conn->prepare($insertStudentSql);
-			$insertStudentSql -> execute(array($username, md5($password), $fname, $lname, $gender, $dob, 0, $classid));
+			
+			if($insertStudentSql -> execute(array($username, md5($password), $fname, $lname, $gender, $dob, 0, $classid))){
+				echo "<script language=\"javascript\">  alert(\"You have successfully signed up!\"); </script>";	
+			} else {
+				echo "<script language=\"javascript\">  alert(\"You have failed sign up!\"); </script>";
+			}
 			
 			db_close($conn);
 			
@@ -34,7 +39,12 @@
 							     VALUES (?,?,?,?,?);";
 								 
 			$insertTeacherQuery = db_connect() -> prepare($insertTeacherSql);
-			$insertTeacherQuery -> execute(array($username, md5($password), $fname, $lname, $classid));
+			
+			if($insertTeacherQuery -> execute(array($username, md5($password), $fname, $lname, $classid))){
+				echo "<script language=\"javascript\">  alert(\"You have successfully signed up!\"); </script>";
+			} else {
+				echo "<script language=\"javascript\">  alert(\"You have failed sign up!\"); </script>";
+			}
 			
 			db_close($conn);
 			
@@ -80,7 +90,7 @@ function validUsername(){
                 document.getElementById("txtHint").innerHTML = xmlhttp.responseText;
             }
         };
-        xmlhttp.open("GET", "signup-control.php?username="+username+"&&type="+type+"&&action="+"VALIDUSERNAME", true);
+        xmlhttp.open("GET", "signup-control.php?username="+username+"&type="+type+"&action="+"VALIDUSERNAME", true);
         xmlhttp.send();
 	}
 	
