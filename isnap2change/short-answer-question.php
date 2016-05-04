@@ -3,7 +3,7 @@
 	require_once('connection.php');
 	
 	$rows = "";
-	$currentMCQID = "";
+	$currentSAQID = "";
 	
 	if ($_SERVER["REQUEST_METHOD"] == "POST") {
 		
@@ -13,24 +13,22 @@
 		
 		echo $quizid;
 		
-		$mcqSql = "SELECT MCQID, Question, Content 
-				   FROM   MCQ_Section NATURAL JOIN MCQ_Question
-									  NATURAL JOIN `Option`
+		$SAQSql = "SELECT SAQID, Question
+				   FROM   SAQ_Section NATURAL JOIN SAQ_Question
 				   WHERE  QuizID = ?
-				   ORDER BY MCQID, Content";
+				   ORDER BY SAQID";
 							
-		$mcqQuery = $conn->prepare($mcqSql);
-		$mcqQuery->execute(array($quizid));
+		$SAQQuery = $conn->prepare($SAQSql);
+		$SAQQuery->execute(array($quizid));
 		
-		$rows = $mcqQuery->fetchAll(PDO::FETCH_OBJ);
+		$rows = $SAQQuery->fetchAll(PDO::FETCH_OBJ);
 		
 		echo count($rows);
-	//	$num_rows = count($rows);
 		
 		
 	}
 
-	$lastMCQID = -1;
+	$lastSAQID = -1;
 
 ?>
 
@@ -140,33 +138,28 @@
                 <div class="col-md-8" style="opacity:0.9;">
 				<?php for($i=0; $i<count($rows); $i++) {
 					
-						//	echo $rows[$i]['MCQID'];
+						//	echo $rows[$i]['SAQID'];
 							
-							$currentMCQID = $rows[$i] -> MCQID;
+							$currentSAQID = $rows[$i] -> SAQID;
 							
-							if($currentMCQID != $lastMCQID){ ?>
+							if($currentSAQID != $lastSAQID){ ?>
 								<div class="panel panel-default">
 									<div class="panel-heading"><b><i><?php echo $rows[$i] -> Question;?></i></b></div>
 										<div class="panel-body">
 						<?php
-							} $lastMCQID = $currentMCQID;?>
-						
-											<div class="radio">
-											<label>
-												<input type="radio" name="optionsRadios" id="optionsRadios1" value="option1">
-												<b><i><?php echo $rows[$i] -> Content;?></i></b>
-											</label>
-											</div>
-							
+							} $lastSAQID = $currentSAQID;?>
+                                <!--Input text box-->
+                                <textarea rows="4" cols="50">                                 
+                                </textarea>
 						<?php
 								if(($i+1)==sizeof($rows)){ ?>
 										</div>	
 								</div>
 								
 						<?php  	} else {
-									$nextMCQID = $rows[$i+1] -> MCQID;
+									$nextSAQID = $rows[$i+1] -> SAQID;
 									
-									if($nextMCQID != $currentMCQID){ ?>
+									if($nextSAQID != $currentSAQID){ ?>
 												</div>	
 										</div>
 						<?php		}
