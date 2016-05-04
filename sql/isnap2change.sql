@@ -339,7 +339,7 @@ INSERT IGNORE INTO Topic(TopicName) VALUES('Introduction');
 
 
 # Example to insert MCQ section with multiple questions
-INSERT IGNORE INTO Quiz(Week,QuizType,TopicID) VALUES(1,'MCQ',5);
+INSERT IGNORE INTO Quiz(Week,QuizType,TopicID) VALUES(1,'MCQ',2);
 SET @QUIZ_LAST_INSERT_ID = LAST_INSERT_ID();
 INSERT IGNORE INTO MCQ_Section(QuizID,Points,Questionnaires) VALUES(@QUIZ_LAST_INSERT_ID,30,1);
 INSERT IGNORE INTO MCQ_Question(Question, CorrectChoice, Explanation, QuizID) VALUES('Which of these breakfast foods will provide you with the most energy?', 'B', 'Whole grains take your body longer to digest, giving you energy all morning!', @QUIZ_LAST_INSERT_ID);
@@ -478,6 +478,9 @@ The top layer, which is the smallest layer, is the layer you should me eating th
 (my own words)
 Source: The Healthy Living Pyramid. Nutrition Australia. [Accessed 28/04/2016 http://www.nutritionaustralia.org/national/resource/healthy-living-pyramid]',1);
 INSERT IGNORE INTO Learning_Material(Content,QuizID) VALUES('https://www.youtube.com/watch?v=1ey0EDVjyeY&index=89&list=PLIGEVr8ox1oGsi-XcwSjudMi_uCPxGzSs',2);
+INSERT IGNORE INTO Learning_Material(Content,QuizID) VALUES('
+For your age group it is recommended that you get at least 60 minutes of exercise every day. Having regular exercise has many benefits including reducing the likelihood of cardiovascular disease, maintaining a healthy body weight, improving motor-neuron skills and has been linked to decreasing the symptoms of depression and anxiety. ',4);
+
 
 INSERT IGNORE INTO Game(Description,Week,Points,TopicID) VALUES('Fruit Ninja',1,10,5);
 INSERT IGNORE INTO Game(Description,Week,Points,TopicID) VALUES('Candy Crush',1,10,5);

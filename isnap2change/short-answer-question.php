@@ -1,39 +1,36 @@
 <?php
-	
+
 	require_once('connection.php');
+	
+	$rows = "";
+	$currentMCQID = "";
 	
 	if ($_SERVER["REQUEST_METHOD"] == "POST") {
 		
-			$conn = db_connect();
+		$conn = db_connect();
 			
-			$quizid = $_POST["quizid"];
-			$quiztype = $_POST["quiztype"];
-			
-			$materialPreSql = "SELECT COUNT(*) 
-							   FROM   Learning_Material
-							   WHERE  QuizID = ?";
+	    $quizid = $_POST["quizid"];
+		
+		echo $quizid;
+		
+		$mcqSql = "SELECT MCQID, Question, Content 
+				   FROM   MCQ_Section NATURAL JOIN MCQ_Question
+									  NATURAL JOIN `Option`
+				   WHERE  QuizID = ?
+				   ORDER BY MCQID, Content";
 							
-			$materialPreQuery = $conn->prepare($materialPreSql);
-			$materialPreQuery->execute(array($quizid));
-			
-			if($materialPreQuery->fetchColumn() != 1){
-				
-			}
-			
-			$materialSql = "SELECT Content, TopicName 
-							FROM   Learning_Material NATURAL JOIN Quiz
-									  NATURAL JOIN Topic
-							WHERE  QuizID = ?";
-							
-			$materialQuery = $conn->prepare($materialSql);
-			$materialQuery->execute(array($quizid));
-			$materialRes = $materialQuery->fetch(PDO::FETCH_OBJ);
-			
-			db_close($conn);	
-			
-			
-			
+		$mcqQuery = $conn->prepare($mcqSql);
+		$mcqQuery->execute(array($quizid));
+		
+		$rows = $mcqQuery->fetchAll(PDO::FETCH_OBJ);
+		
+		echo count($rows);
+	//	$num_rows = count($rows);
+		
+		
 	}
+
+	$lastMCQID = -1;
 
 ?>
 
@@ -46,7 +43,7 @@
         </script>
         <link href='https://fonts.googleapis.com/css?family=Raleway:400italic|Open+Sans' rel='stylesheet' type='text/css'>
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
-
+        <link href='https://fonts.googleapis.com/css?family=Droid+Sans' rel='stylesheet' type='text/css'>
         <!-- Optional theme -->
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap-theme.min.css" integrity="sha384-fLW2N01lMqjakBkx3l/M9EahuwpSfeNvV63J5ezn3uZzapT0u7EYsXMjQV+0En5r" crossorigin="anonymous">
         <link rel="stylesheet" href="css/index.css" type="text/css">
@@ -92,20 +89,6 @@
                 $("#scrollB").hide();
                 $("#panel3").show();
             }
-			
-			function beginQuiz()
-			{
-				<?php if($quiztype == "MCQ"){ ?>
-							document.getElementById("formQuizBegin").setAttribute("action", "multiple-choice-question.php");
-				<?php	  }
-					  
-					  if($quiztype == "SAQ"){ ?>
-						  document.getElementById("formQuizBegin").setAttribute("action", "short-answer-question.php");
-				<?php	 } ?>
-					
-				document.getElementById("formQuizBegin").submit();
-				
-			}
         </script>
     </head>
 
@@ -121,28 +104,26 @@
                         <span class="icon-bar"></span>
                         <span class="icon-bar"></span>
                     </button>
-                    <a class="navbar-brand" href="#"><span class="glyphicon glyphicon-flash"></span> Quiz</a>
+                    <a class="navbar-brand" href="#"><span class="glyphicon glyphicon-flash"></span>Quiz</a>
                 </div>
-                <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1" style="padding-top:10px;">
+                <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1" style="padding-top:15px;">
                     <div class="row">
-                        <!--          <div class="col-md-9">
-                                  <div class="progress">
-                                        <div class="progress-bar progress-bar-success progress-bar-striped active" role="progressbar" aria-valuenow="40" aria-valuemin="0" aria-valuemax="100" style="width: 40%">
-                                            <span class="sr-only">40% Complete (success)</span>
-                                            4/10
-                                        </div>
-                                    </div>
+                        <div class="col-md-9">
+                            <div class="progress">
+                                <div class="progress-bar progress-bar-success progress-bar-striped active" role="progressbar" aria-valuenow="40" aria-valuemin="0" aria-valuemax="100" style="width: 40%">
+                                    <span class="sr-only">40% Complete (success)</span>
+                                    4/10
                                 </div>
-                                <div class ="col-md-1">
-                                    <span class="glyphicon glyphicon-time"></span>
-                                    <div id="timer_div" ></div>
-                                </div> -->
-                        <div class="col-md-offset-11">
-						<form id="formQuizBegin" method=post>
-                            <button type="button" onclick="beginQuiz()" class="btn btn-success">BEGIN</button>   
-							<input  type=hidden name="quizid" value=<?php echo $quizid; ?>></input>
-                        </form>
-						</div>
+                            </div>
+                        </div>
+                        <div class ="col-md-1">
+                            <span class="glyphicon glyphicon-time"></span>
+                            <div id="timer_div" ></div>
+                        </div>
+                        <div class="col-md-1">
+
+                            <button type="button" onclick="return changePanel2();" class="btn btn-success">SUBMIT</button>                      
+                        </div>
                     </div>
                 </div>
 
@@ -155,20 +136,46 @@
                           <button class="btn btn-primary" type="button" onclick="return changePanel2();" ><span class="glyphicon glyphicon-check"></span> Track Progress</button>
                       </div> -->
                 </div>
-                <div class="col-md-8">
-                    <div class="panel panel-default" id="panel1" style="opacity:0.8;color:firebrick;">
-                         <div class="panel-body">
-                            
-                             <blockquote class="blockquote-reverse" style="border-right: 5px solid #58a6da;">
-                             <h2><i><?php echo $materialRes->TopicName?></i></h2>
-                             
-                            <i><?php echo $materialRes->Content?></i>
-                             
-                             </blockquote>
-                            
-                        </div>
-                    </div>                     
+				
+                <div class="col-md-8" style="opacity:0.9;">
+				<?php for($i=0; $i<count($rows); $i++) {
+					
+						//	echo $rows[$i]['MCQID'];
+							
+							$currentMCQID = $rows[$i] -> MCQID;
+							
+							if($currentMCQID != $lastMCQID){ ?>
+								<div class="panel panel-default">
+									<div class="panel-heading"><b><i><?php echo $rows[$i] -> Question;?></i></b></div>
+										<div class="panel-body">
+						<?php
+							} $lastMCQID = $currentMCQID;?>
+						
+											<div class="radio">
+											<label>
+												<input type="radio" name="optionsRadios" id="optionsRadios1" value="option1">
+												<b><i><?php echo $rows[$i] -> Content;?></i></b>
+											</label>
+											</div>
+							
+						<?php
+								if(($i+1)==sizeof($rows)){ ?>
+										</div>	
+								</div>
+								
+						<?php  	} else {
+									$nextMCQID = $rows[$i+1] -> MCQID;
+									
+									if($nextMCQID != $currentMCQID){ ?>
+												</div>	
+										</div>
+						<?php		}
+									
+								} 
+							
+						}?>
                 </div>
+				
             </div>
         </div>
     </body>

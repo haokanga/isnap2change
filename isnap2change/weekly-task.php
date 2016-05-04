@@ -22,11 +22,11 @@
 		$quizNum = $quizNumQuery->fetchColumn();
 		
 		if($quizNum!=0){
-			$quizIDSql = "SELECT QuizID, QuizType
+			$quizIDSql = "SELECT QuizID, QuizType, TopicID
 						  FROM   Quiz 
 					      WHERE  Week = ?
 					      AND NOT EXISTS
-						 (SELECT QuizID, QuizType
+						 (SELECT QuizID, QuizType, TopicID
 						  FROM   Quiz_Record NATURAL JOIN Quiz
 						  WHERE  StudentID = ? AND	Week = ?)
 						  ORDER BY QuizID
@@ -69,6 +69,7 @@ function startQuiz(){
 <button type=button onclick="startQuiz()" onclick="startQuiz()"> Quiz </button>
 <input  type=hidden name="quizid" value=<?php echo $quizIDRes->QuizID; ?>></input>
 <input  type=hidden name="quiztype" value=<?php echo $quizIDRes->QuizType; ?>></input>
+<input  type=hidden name="topicid" value=<?php echo $quizIDRes->TopicID; ?>></input>
 </form>
 </div>
 </body>
