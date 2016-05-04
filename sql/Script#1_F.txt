@@ -1,0 +1,92 @@
+DROP Table Skill       CASCADE CONSTRAINTS;
+DROP Table Training    CASCADE CONSTRAINTS;
+DROP Table Department  CASCADE CONSTRAINTS;
+DROP Table Employee    CASCADE CONSTRAINTS;
+DROP Table Client      CASCADE CONSTRAINTS;
+DROP Table Project     CASCADE CONSTRAINTS;
+DROP Table Assignment  CASCADE CONSTRAINTS;
+
+CREATE TABLE Employee
+(Emp_Num     	CHAR(4),
+ Lname       	VARCHAR2(25),
+ Fname       	VARCHAR2(25),
+ DOB         	DATE,
+ Hire_Date   	DATE,
+ Super_ID    	CHAR(4),
+ Dept_Code   	CHAR(4),
+ CONSTRAINT  	Employee_Emp_Num_PK   PRIMARY KEY (Emp_Num),
+ CONSTRAINT  	Employee_Super_ID_FK  FOREIGN KEY (Super_ID)  REFERENCES Employee (Emp_Num),
+ CONSTRAINT  	Employee_Hire_Date_CK CHECK(Hire_Date > DOB),
+ CONSTRAINT  	Employee_Emp_Num_CK   CHECK(Emp_Num != Super_ID));		
+
+CREATE TABLE Skill
+(Code        	CHAR(4),
+ Name        	VARCHAR2(25),
+ Category    	VARCHAR2(20),
+ CONSTRAINT  	Skill_Code_PK PRIMARY KEY (Code));
+
+CREATE TABLE Training 
+(Train_Num    	CHAR(4),
+ Code         	CHAR(4),
+ Emp_Num      	CHAR(4),
+ Name         	VARCHAR2(50),
+ Date_Acquired  DATE,
+ Comments       VARCHAR2(50),
+ CONSTRAINT     Training_Train_Num_PK PRIMARY KEY (Train_Num),
+ CONSTRAINT     Training_Code_FK      FOREIGN KEY (Code)  	REFERENCES Skill (Code),
+ CONSTRAINT     Training_Emp_Num_FK   FOREIGN KEY (Emp_Num) REFERENCES Employee (Emp_Num));
+				
+CREATE TABLE 	Department
+(Dept_Code   	CHAR(4),
+ Name        	VARCHAR2(25),
+ Location    	VARCHAR2(50),
+ Phone       	CHAR(12),
+ Manager_ID  	CHAR(4),
+ CONSTRAINT  	Department_Dept_Code_PK	PRIMARY KEY (Dept_Code),
+ CONSTRAINT  	Department_Manager_ID_FK   FOREIGN KEY (Manager_ID) REFERENCES Employee (Emp_Num));
+
+CREATE TABLE Client
+(Client_ID		CHAR(4),
+ Name			VARCHAR2(25),
+ Street			VARCHAR2(25),
+ City			VARCHAR2(25),
+ State			CHAR(2),
+ Zip			CHAR(5), 
+ Industry		VARCHAR2(25),
+ Web_Address	VARCHAR2(100),
+ Phone			CHAR(12),
+ Contact_Name	VARCHAR2(25),
+ CONSTRAINT 	CLient_ClientID_PK PRIMARY KEY (Client_ID));
+ 
+CREATE TABLE Project 
+(Proj_NUMBER	CHAR(4),
+ Name			VARCHAR2(20),
+ Start_Date		DATE,
+ Total_Cost		NUMBER(9,2),
+ Dept_Code		CHAR(4),
+ Client_ID		CHAR(4),
+ Code			CHAR(4),
+ CONSTRAINT 	Project_ProjNUMBER_PK PRIMARY KEY (Proj_NUMBER),
+ CONSTRAINT 	Project_DeptCode_FK FOREIGN KEY (Dept_Code) REFERENCES Department (Dept_Code),
+ CONSTRAINT 	Project_ClientID_FK FOREIGN KEY (Client_ID) REFERENCES Client (Client_ID),
+ CONSTRAINT 	Project_Code_FK FOREIGN KEY (Code) REFERENCES Skill (Code));
+
+CREATE TABLE Assignment 
+(Assign_Num		CHAR(4),
+ Proj_NUMBER	CHAR(4),
+ Emp_Num		CHAR(4),
+ Date_Assigned	DATE,
+ Date_Ended		DATE, 
+ Hours_Used		NUMBER(5),
+ CONSTRAINT 	Assignment_AssignNum_PK PRIMARY KEY (Assign_Num),
+ CONSTRAINT 	Assignment_ProjNUMBER_FK FOREIGN KEY (Proj_NUMBER) REFERENCES Project (Proj_NUMBER),
+ CONSTRAINT 	Assignment_EmpNum_FK FOREIGN KEY (Emp_Num) REFERENCES Employee(Emp_Num),
+ CONSTRAINT 	Assignment_ValidDate_CK CHECK (Date_Ended>=Date_Assigned),
+ CONSTRAINT 	Assignment_SameMonth_CK CHECK (EXTRACT(year FROM Date_Assigned)=EXTRACT(year FROM Date_Ended) AND 
+											   EXTRACT(month FROM Date_Assigned)=EXTRACT(month FROM Date_Ended)),
+ CONSTRAINT 	Assignment_CannotExceed_CK CHECK (Date_Ended-Date_Assigned<=25));
+
+ALTER TABLE Employee
+  ADD CONSTRAINT Employee_Dept_Code_FK FOREIGN KEY (Dept_Code) REFERENCES Department (Dept_Code);
+
+COMMIT;

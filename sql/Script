@@ -1,0 +1,99 @@
+DROP TABLE `Quiz_Question`;
+DROP TABLE `Option`;
+DROP TABLE `Quiz_Question_Record`;
+DROP TABLE `Short_Answer_Section`;  
+DROP TABLE `Short_Answer_Section_Record`;
+DROP TABLE `Short_Answer_Question`;
+DROP TABLE `Short_Answer_Question_Record`;
+DROP TABLE `Bonus`;
+DROP TABLE `Bonus_Record`;
+DROP TABLE `Bonus_Task`;
+DROP TABLE `Bonus_Task_Record`;
+
+
+CREATE TABLE `Quiz_Question` 
+(QuestionID		MEDIUMINT AUTO_INCREMENT,
+ Question   	TEXT,
+ CorrectChoice 	CHAR(1),
+ QuizID         MEDIUMINT,
+ CONSTRAINT  	Quiz_Question_QuestionID_PK   PRIMARY KEY (QuestionID),
+ CONSTRAINT  	Quiz_Question_QuizID_FK  	  FOREIGN KEY (Quiz_ID)  REFERENCES Quiz (Quiz_ID));
+
+CREATE TABLE `Option` 
+(OptionID		MEDIUMINT AUTO_INCREMENT,
+ Content  		TEXT,
+ QuestionID     MEDIUMINT,
+ CONSTRAINT  	Option_OptionID_PK    PRIMARY KEY (OptionID),
+ CONSTRAINT  	Option_QuestionID_FK  FOREIGN KEY (QuestionID)  REFERENCES Quiz_Question (QuestionID));
+
+CREATE TABLE `Quiz_Question_Record`
+(StudentID		MEDIUMINT,
+ QuestionID    	MEDIUMINT,
+ Choice   		CHAR(1),
+ CONSTRAINT     Quiz_Question_Record_PK PRIMARY KEY (StudentID, QuestionID), 
+ CONSTRAINT    	Quiz_Question_Record_StudentID_FK	FOREIGN KEY (StudentID)   REFERENCES Student (StudentID),
+ CONSTRAINT    	Quiz_Question_Record_QuestionID_FK	FOREIGN KEY (QuestionID)  REFERENCES Quiz_Question (QuestionID));
+
+CREATE TABLE `Short_Answer_Section`
+(ShortAnswerID	MEDIUMINT AUTO_INCREMENT,
+ Week			INT,
+ CONSTRAINT     Short_Answer_Section_ShortAnswerID_PK	PRIMARY KEY (ShortAnswerID));
+
+CREATE TABLE `Short_Answer_Section_Record`
+(ShortAnswerID	MEDIUMINT,
+ StudentID      MEDIUMINT, 
+ Finished       BOOLEAN,
+ CONSTRAINT     Short_Answer_Section_Record_PK			     		PRIMARY KEY (ShortAnswerID, StudentID),
+ CONSTRAINT     Short_Answer_Section_Record_ShortAnswerID_FK		FOREIGN KEY (ShortAnswerID)   	REFERENCES Short_Answer_Section (ShortAnswerID),
+ CONSTRAINT     Short_Answer_Section_Record_StudentID_FK        	FOREIGN KEY (StudentID) 		REFERENCES Student (StudentID));
+
+CREATE TABLE `Short_Answer_Question`
+(SAQID			MEDIUMINT AUTO_INCREMENT,
+ Question   	TEXT,
+ Points			INT,
+ ShortAnswerID  MEDIUMINT
+ CONSTRAINT     Short_Answer_Question_SAQID_PK					PRIMARY KEY (SAQID),
+ CONSTRAINT     Short_Answer_Question_ShortAnswerID_FK			FOREIGN KEY (ShortAnswerID)   	REFERENCES Short_Answer_Section (ShortAnswerID));
+
+ CREATE TABLE `Short_Answer_Question_Record`
+ (StudentID     MEDIUMINT,
+  SAQID         MEDIUMINT,
+  Answer        TEXT,
+  Feedback      TEXT,
+  Grading       INT,
+  CONSTRAINT    Short_Answer_Question_Record_PK				   PRIMARY KEY (StudentID, SAQID),
+  CONSTRAINT    Short_Answer_Question_Record_StudentID_FK      FOREIGN KEY (StudentID) 			REFERENCES Student (StudentID),
+  CONSTRAINT    Short_Answer_Question_Record_SAQID_FK          FOREIGN KEY (SAQID)      		REFERENCES Short_Answer_Question (SAQID));
+
+ CREATE TABLE `Bonus`
+ (BonusID		MEDIUMINT AUTO_INCREMENT,
+  Week          INT,
+  CONSTRAINT    Bonus_BonusID_PK           PRIMARY KEY (BonusID));
+
+CREATE TABLE `Bonus_Record`
+(BonusID       MEDIUMINT,
+ StudentID     MEDIUMINT,
+ Finished      BOOLEAN,
+ CONSTRAINT    Bonus_Record_PK 				PRIMARY KEY (BonusID, StudentID),
+ CONSTRAINT    Bonus_Record_BonusID_FK		FOREIGN KEY (BonusID) 	REFERENCES Bonus (BonusID),
+ CONSTRAINT    Bonus_Record_StudentID_FK 	FOREIGH KEY (StudentID) REFERENCES Student (StudentID));
+
+CREATE TABLE `Bonus_Task`
+(BonusQuestionID	MEDIUMINT AUTO_INCREMENT,
+ Question     	    TEXT,
+ Points       	    INT,
+ BonusID            MEDIUMINT,
+ CONSTRAINT         Bonus_Task_BonusQuestionID_PK   PRIMARY KEY (BonusQuestionID),
+ CONSTRAINT         Bonus_Task_BonusID_FK           FOREIGN KEY (BonusID) 	REFERENCES Bonus (BonusID));
+
+CREATE TABLE `Bonus_Task_Record`
+(StudentID    		MEDIUMINT,
+ BonusQuestionID 	MEDIUMINT,
+ Answer             TEXT,
+ Feedback           TEXT,
+ Grading            INT,
+ CONSTRAINT         Bonus_Task_Record_PK				PRIMARY KEY (StudentID, BonusQuestionID),
+ CONSTRAINT         Bonus_Task_Record_StudentID	 	    FOREIGN KEY (StudentID) 		REFERENCES Student (StudentID),
+ CONSTRAINT         Bonus_Task_Record_BonusQuestionID   FOREIGN KEY (BonusQuestionID) 	REFERENCES Bonus_Task (BonusQuestionID));
+
+
