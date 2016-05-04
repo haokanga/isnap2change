@@ -11,8 +11,6 @@
 			
 	    $quizid = $_POST["quizid"];
 		
-		echo $quizid;
-		
 		$SAQSql = "SELECT SAQID, Question
 				   FROM   SAQ_Section NATURAL JOIN SAQ_Question
 				   WHERE  QuizID = ?
@@ -21,10 +19,7 @@
 		$SAQQuery = $conn->prepare($SAQSql);
 		$SAQQuery->execute(array($quizid));
 		
-		$rows = $SAQQuery->fetchAll(PDO::FETCH_OBJ);
-		
-		echo count($rows);
-		
+		$rows = $SAQQuery->fetchAll(PDO::FETCH_OBJ);	
 		
 	}
 
@@ -93,6 +88,7 @@
     <body>
 
         <nav class="navbar navbar-default navbar-fixed-top">
+        <form method="post" action="short-answer-question-submission.php">
             <div class="container-fluid">
                 <!-- Brand and toggle get grouped for better mobile display -->
                 <div class="navbar-header">
@@ -119,8 +115,10 @@
                             <div id="timer_div" ></div>
                         </div>
                         <div class="col-md-1">
-
-                            <button type="button" onclick="return changePanel2();" class="btn btn-success">SUBMIT</button>                      
+                            <!--
+                            <button type="button" onclick="return changePanel2();" class="btn btn-success">SUBMIT</button>
+                            -->
+                            <input type="submit" name="submit" value="SUBMIT" id="submit"/>                            
                         </div>
                     </div>
                 </div>
@@ -144,12 +142,12 @@
 							
 							if($currentSAQID != $lastSAQID){ ?>
 								<div class="panel panel-default">
-									<div class="panel-heading"><b><i><?php echo $rows[$i] -> Question;?></i></b></div>
+									<div class="panel-heading"><b><i><?php echo ($i+1).". ".$rows[$i] -> Question;?></i></b></div>
 										<div class="panel-body">
 						<?php
 							} $lastSAQID = $currentSAQID;?>
                                 <!--Input text box-->
-                                <textarea rows="4" cols="50">Please input your answer here</textarea>
+                                <textarea rows="4" cols="50" name="SAQ_answer_<?php echo $i;?>">Please input your answer here</textarea>
 						<?php
 								if(($i+1)==sizeof($rows)){ ?>
 										</div>	
@@ -168,5 +166,6 @@
 				
             </div>
         </div>
+        </form>
     </body>
 </html>
