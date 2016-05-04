@@ -10,7 +10,7 @@ and open the template in the editor.
 body
 {
     background-image: url('2.jpg');
-    background-repeat: no-repeat;
+    background-repeat: repeat-y;
     font-family: 'Raleway', sans-serif;
    
 }
