@@ -1,6 +1,7 @@
 <?php
 
-	require_once('connection.php');
+	session_start();
+    require_once("connection.php");
 	
 	$rows = "";
 	$currentSAQID = "";
@@ -8,30 +9,22 @@
 	if ($_SERVER["REQUEST_METHOD"] == "POST") {
 		
 		$conn = db_connect();
-			
 	    $quizid = $_POST["quizid"];
-		
 		$SAQSql = "SELECT SAQID, Question
 				   FROM   SAQ_Section NATURAL JOIN SAQ_Question
 				   WHERE  QuizID = ?
 				   ORDER BY SAQID";
-							
 		$SAQQuery = $conn->prepare($SAQSql);
 		$SAQQuery->execute(array($quizid));
-		
-		$rows = $SAQQuery->fetchAll(PDO::FETCH_OBJ);	
-		
+		$rows = $SAQQuery->fetchAll(PDO::FETCH_OBJ);
 	}
 
 	$lastSAQID = -1;
-
-    session_start();
-    require_once("connection.php");
-    //$StudentID = $_SESSION['userid'];
+    
     if(isset($_SESSION['userid'])){
 		$StudentID = $_SESSION['userid'];
 	}else{
-        echo "This is DEBUG_MODE with hard_code StudentID = 1";
+        echo "This is DEBUG_MODE with hard-code StudentID = 1";
         $StudentID = 1;
     }    
     $Answer = $_POST["Answer"];
@@ -49,8 +42,7 @@
 		if(! $insertStudentSql -> execute(array($StudentID, $SAQID[$i], $Answer[$i]))){
 			echo "<script language=\"javascript\">  alert(\"Error occurred to submit your answer. Report this bug to reseachers.\"); </script>";
 		}
-    }
-    
+    }    
     db_close($conn);
 ?>
 
@@ -161,12 +153,8 @@
                 </div>
 				
                 <div class="col-md-8" style="opacity:0.9;">
-				<?php for($i=0; $i<count($rows); $i++) {
-					
-						//	echo $rows[$i]['SAQID'];
-							
+				<?php for($i=0; $i<count($rows); $i++) {							
 							$currentSAQID = $rows[$i] -> SAQID;
-							
 							if($currentSAQID != $lastSAQID){ ?>
 								<div class="panel panel-default">
 									<div class="panel-heading"><b><i><?php echo ($i+1).". ".$rows[$i] -> Question;?></i></b></div>
