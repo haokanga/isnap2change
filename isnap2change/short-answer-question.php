@@ -26,13 +26,14 @@
 	}else{
         echo "This is DEBUG_MODE with hard-code StudentID = 1";
         $StudentID = 1;
-    }    
+    }
+
+    $SAQID = $_POST["SAQID"];    
     $Answer = $_POST["Answer"];
-    $SAQID = $_POST["SAQID"];
     
     $conn = db_connect();   
 
-    for($i=0; $i<count($Answer); $i++) {
+    for($i=0; $i<count($SAQID); $i++) {
         echo $SAQID[$i]."<br>";   
         echo $Answer[$i]."<br>";
         $insertStudentSql = "REPLACE INTO SAQ_Question_Record(StudentID, SAQID, Answer)
