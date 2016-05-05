@@ -25,6 +25,17 @@
 							WHERE  MCQID = ?";
 			
 			$mcqGradeQuery = $conn->prepare($mcqGradeSql);
+            
+            $threshold = count($MCQIDArr)*0.8;
+            $score = 0;
+            //SQL UPDATE STATEMENT
+            for($i=0; $i<count($MCQIDArr); $i++){
+                $sql = $conn->prepare('SELECT COUNT(*) FROM MCQ_Question WHERE `MCQID` = BINARY :mcqid AND `CorrectChoice` = BINARY :correctchoice');
+                $sql->bindParam(':mcqid', $MCQIDArr[$i]);
+                $sql->bindParam(':correctchoice', $answerArr[$i]);
+                $sql->execute();
+            }
+            $score += $sql->fetchColumn();
 			
 			for($i=0; $i<count($MCQIDArr); $i++){
 							
@@ -48,14 +59,8 @@
 							}
 							";
 							
-					} else {                        
-                            $threshold = count($MCQIDArr)*0.8;
-                            //SQL UPDATE STATEMENT
-                            $sql = $conn->prepare('SELECT COUNT(*) FROM MCQ_Question WHERE `MCQID` = BINARY :mcqid AND `CorrectChoice` = BINARY :correctchoice');
-                            $sql->bindParam(':mcqid', $MCQIDArr[$i]);
-                            $sql->bindParam(':correctchoice', $answerArr[$i]);
-                            $sql->execute();
-                            if ($sql->fetchColumn() >= $threshold) {
+					} else {
+                            if ($score >= $threshold) {
                                 //SQL UPDATE STATEMENT
                                 $update_stmt = "REPLACE INTO MCQ_Question_Record(StudentID, MCQID, Choice)
                                              VALUES (?,?,?);";			
