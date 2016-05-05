@@ -28,23 +28,23 @@
         $studentID = 1;
     }
 
-    $saqid = $_POST["saqid"];    
-    $answer = $_POST["answer"];
-    
-    $conn = db_connect();   
-
-    for($i=0; $i<count($saqid); $i++) {
-        //echo $saqid[$i]."<br>";   
-        //echo $answer[$i]."<br>";
-        $insertStudentSql = "REPLACE INTO SAQ_Question_Record(StudentID, SAQID, Answer)
-							     VALUES (?,?,?);";			
-		$insertStudentSql = $conn->prepare($insertStudentSql);
-			
-		if(! $insertStudentSql -> execute(array($studentID, $saqid[$i], htmlspecialchars($answer[$i])))){
-			echo "<script language=\"javascript\">  alert(\"Error occurred to submit your answer. Report this bug to reseachers.\"); </script>";
-		}
-    }    
-    db_close($conn);
+    if(isset($_POST['answer'])){
+        $saqid = $_POST["saqid"];    
+        $answer = $_POST["answer"];        
+        $conn = db_connect();   
+        for($i=0; $i<count($saqid); $i++) {
+            //echo $saqid[$i]."<br>";   
+            //echo $answer[$i]."<br>";
+            $insertStudentSql = "REPLACE INTO SAQ_Question_Record(StudentID, SAQID, Answer)
+                                     VALUES (?,?,?);";			
+            $insertStudentSql = $conn->prepare($insertStudentSql);
+                
+            if(! $insertStudentSql -> execute(array($studentID, $saqid[$i], htmlspecialchars($answer[$i])))){
+                echo "<script language=\"javascript\">  alert(\"Error occurred to submit your answer. Report this bug to reseachers.\"); </script>";
+            }
+        }    
+        db_close($conn);
+    }
 ?>
 
 <html>
@@ -158,7 +158,7 @@
 							$currentsaqid = $rows[$i] -> SAQID;
 							if($currentsaqid != $lastsaqid){ ?>
 								<div class="panel panel-default">
-									<div class="panel-heading"><b><i><?php echo ($i+1).". ".security_check_text($rows[$i] -> Question); ?></i></b></div>
+									<div class="panel-heading"><b><i><?php echo ($i+1).". ".htmlspecialchars($rows[$i] -> Question); ?></i></b></div>
 										<div class="panel-body">
 						<?php
 							} $lastsaqid = $currentsaqid;?>
