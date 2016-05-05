@@ -71,7 +71,7 @@ function validToken(){
                 document.getElementById("signupForm").innerHTML = xmlhttp.responseText;
             }
         };
-        xmlhttp.open("GET", "signup-control.php?token="+token+"&&action="+"VALIDTOKEN", true);
+        xmlhttp.open("GET", "signup-control.php?token="+token+"&action="+"VALIDTOKEN", true);
         xmlhttp.send();
 	}
 }

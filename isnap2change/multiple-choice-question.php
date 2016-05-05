@@ -2,35 +2,36 @@
 
 	require_once('connection.php');
 	
-	$rows = "";
-	$currentMCQID = "";
-	
 	if ($_SERVER["REQUEST_METHOD"] == "POST") {
 		
 		$conn = db_connect();
+		
+		if(isset($_POST['quizid'])){
 			
-	    $quizid = $_POST["quizid"];
+			$quizid = $_POST["quizid"];
 		
-		echo $quizid;
+			$mcqSql = "SELECT MCQID, Question, Content 
+					   FROM   MCQ_Section NATURAL JOIN MCQ_Question
+										  NATURAL JOIN `Option`
+					   WHERE  QuizID = ?
+					   ORDER BY MCQID, Content";
+								
+			$mcqQuery = $conn->prepare($mcqSql);
+			$mcqQuery->execute(array($quizid));
+			
+			$rows = $mcqQuery->fetchAll(PDO::FETCH_OBJ);
+			
+			$lastMCQID = -1;
+			$questionIndex = 1;
+			$MCQIDArray = "";
+			
+		} else {
+			
+		}
 		
-		$mcqSql = "SELECT MCQID, Question, Content 
-				   FROM   MCQ_Section NATURAL JOIN MCQ_Question
-									  NATURAL JOIN `Option`
-				   WHERE  QuizID = ?
-				   ORDER BY MCQID, Content";
-							
-		$mcqQuery = $conn->prepare($mcqSql);
-		$mcqQuery->execute(array($quizid));
-		
-		$rows = $mcqQuery->fetchAll(PDO::FETCH_OBJ);
-		
-		echo count($rows);
-	//	$num_rows = count($rows);
-		
+	} else {
 		
 	}
-
-	$lastMCQID = -1;
 
 ?>
 
@@ -89,6 +90,46 @@
                 $("#scrollB").hide();
                 $("#panel3").show();
             }
+			
+			function submitQuiz()
+			{
+				var answerArr = [];
+				var MCQIDArr = document.getElementById("hiddenMCQIDArray").value.split(',');
+				
+				for(i = 0; i < MCQIDArr.length; i++){
+					
+					var options = document.getElementsByName(MCQIDArr[i]);
+					
+					for(j = 0; j < options.length; j++){
+						if(options[j].checked == true){
+							answerArr[i] = options[j].value;
+						}
+					}
+
+				}
+				
+				var xmlhttp = new XMLHttpRequest();
+				xmlhttp.onreadystatechange = function() {
+					if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
+						document.getElementById("ajax_responses").innerHTML = xmlhttp.responseText;
+		//				eval(document.getElementById("txtHint").text());
+					}
+				};
+				
+				xmlhttp.open("POST", "multiple-choice-question-feedback.php", true);
+				xmlhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+				xmlhttp.send("MCQIDArr="+JSON.stringify(MCQIDArr)+"&answerArr="+JSON.stringify(answerArr));
+		
+		/*
+				$.post("multiple-choice-question-feedback.php",{data : "MCQIDArr="+JSON.stringify(MCQIDArr)+"&answerArr="+JSON.stringify(answerArr)}, function(response){
+				$("#ajax_responses").html(response);
+				$("#ajax_responses").find("script").each(function(){
+					eval($(this).text());
+				});
+				});
+		*/	
+			}
+			
         </script>
     </head>
 
@@ -122,7 +163,7 @@
                         </div>
                         <div class="col-md-1">
 
-                            <button type="button" onclick="return changePanel2();" class="btn btn-success">SUBMIT</button>                      
+                            <button type="button" onclick="return submitQuiz();" class="btn btn-success">SUBMIT</button>                      
                         </div>
                     </div>
                 </div>
@@ -140,21 +181,19 @@
                 <div class="col-md-8" style="opacity:0.9;">
 				<?php for($i=0; $i<count($rows); $i++) {
 					
-						//	echo $rows[$i]['MCQID'];
-							
 							$currentMCQID = $rows[$i] -> MCQID;
 							
 							if($currentMCQID != $lastMCQID){ ?>
 								<div class="panel panel-default">
-									<div class="panel-heading"><b><i><?php echo $rows[$i] -> Question;?></i></b></div>
+									<div class="panel-heading"><b><i><?php echo $questionIndex.". ".htmlspecialchars($rows[$i]->Question); $questionIndex++; $MCQIDArray = $MCQIDArray.($rows[$i]->MCQID).',';?></i></b></div>
 										<div class="panel-body">
 						<?php
 							} $lastMCQID = $currentMCQID;?>
 						
 											<div class="radio">
 											<label>
-												<input type="radio" name="optionsRadios" id="optionsRadios1" value="option1">
-												<b><i><?php echo $rows[$i] -> Content;?></i></b>
+												<input type="radio" name="<?php echo $rows[$i] -> MCQID;?>" value="<?php echo htmlspecialchars($rows[$i]->Content);?>">
+												<p name="<?php echo 'txt'.$rows[$i] -> MCQID;?>"><b><i><?php echo $rows[$i] -> Content;?></i></b></p>
 											</label>
 											</div>
 							
@@ -175,7 +214,8 @@
 							
 						}?>
                 </div>
-				
+				<input type=hidden id="hiddenMCQIDArray" value="<?php echo substr($MCQIDArray, 0, strlen($MCQIDArray)-1); ?>">
+				<div id="ajax_responses"></div>
             </div>
         </div>
     </body>
