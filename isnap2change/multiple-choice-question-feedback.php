@@ -1,6 +1,14 @@
-<?php
-	
-	require_once('connection.php');
+<?php	
+	session_start();
+    require_once("connection.php");	
+    //echo "<script language=\"javascript\">  console.log(\"SUBMISSION.\"); </script>";    
+    if(isset($_SESSION['userid'])){
+        $studentID = $_SESSION['userid'];
+        //echo "<script language=\"javascript\">  console.log(\"This is DEBUG_MODE with SESSION studentID = ".$studentID.".\"); </script>";
+    }else{
+        //echo "<script language=\"javascript\">  console.log(\"This is DEBUG_MODE with hard-code studentID = 1.\"); </script>";
+        $studentID = 1;
+    }
 	
 	if($_SERVER["REQUEST_METHOD"] == "POST"){
 		
@@ -39,14 +47,39 @@
 					for(j = 0; j < options.length; j++){ ";
 						
 					if(!isset($answerArr[$i])){
-						
 						echo "
 							if(options[j].value == \"".$mcqGradeRes->CorrectChoice."\"){
 								contents[j].style.background=\"#00ff00\";
 							}
 							";
 							
-					} else {
+					} else {                        
+                            $threshold = count($MCQIDArr)*0.8;
+                            //SQL UPDATE STATEMENT
+                            $sql = $conn->prepare('SELECT COUNT(*) FROM MCQ_Question WHERE `MCQID` = BINARY :mcqid AND `CorrectChoice` = BINARY :correctchoice');
+                            $sql->bindParam(':mcqid', $MCQIDArr[$i]);
+                            $sql->bindParam(':correctchoice', $answerArr[$i]);
+                            $sql->execute();
+                            if ($sql->fetchColumn() >= $threshold) {
+                                //SQL UPDATE STATEMENT
+                                $update_stmt = "REPLACE INTO MCQ_Question_Record(StudentID, MCQID, Choice)
+                                             VALUES (?,?,?);";			
+                                $update_stmt = $conn->prepare($update_stmt);                            
+                                if(! $update_stmt -> execute(array($studentID, $MCQIDArr[$i], $answerArr[$i]))){
+                                    echo "<script language=\"javascript\">  alert(\"Error occurred to submit your answer. Report this bug to reseachers.\"); </script>";
+                                }
+                            } else{
+                                //DEMO CODE to check the if-else structure
+                                /*
+                                $update_stmt = "REPLACE INTO MCQ_Question_Record(StudentID, MCQID, Choice)
+                                             VALUES (?,?,?);";			
+                                $update_stmt = $conn->prepare($update_stmt);                            
+                                if(! $update_stmt -> execute(array($studentID, $MCQIDArr[$i], "WRONG"))){
+                                    echo "<script language=\"javascript\">  alert(\"Error occurred to submit your answer. Report this bug to reseachers.\"); </script>";
+                                }
+                                */
+                                
+                            }
 							
 							if($mcqGradeRes->CorrectChoice == $answerArr[$i]){
 							

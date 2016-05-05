@@ -18,11 +18,11 @@
         for($i=0; $i<count($saqid); $i++) {
             //echo $saqid[$i]."<br>";   
             //echo $answer[$i]."<br>";
-            $insertStudentSql = "REPLACE INTO SAQ_Question_Record(StudentID, SAQID, Answer)
+            $update_stmt = "REPLACE INTO SAQ_Question_Record(StudentID, SAQID, Answer)
                                      VALUES (?,?,?);";			
-            $insertStudentSql = $conn->prepare($insertStudentSql);
+            $update_stmt = $conn->prepare($update_stmt);
                 
-            if(! $insertStudentSql -> execute(array($studentID, $saqid[$i], htmlspecialchars($answer[$i])))){
+            if(! $update_stmt -> execute(array($studentID, $saqid[$i], htmlspecialchars($answer[$i])))){
                 echo "<script language=\"javascript\">  alert(\"Error occurred to submit your answer. Report this bug to reseachers.\"); </script>";
             }
         }    
