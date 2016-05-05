@@ -44,6 +44,9 @@
             }
         }    
         db_close($conn);
+        echo "<script language=\"javascript\">  console.log(\"SUBMISSION.\"); </script>";
+    }else{
+        echo "<script language=\"javascript\">  console.log(\"JUMP FROM LEARNING MATERIALS.\"); </script>";
     }
 ?>
 
