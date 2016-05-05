@@ -26,7 +26,7 @@
 			
 			$mcqGradeQuery = $conn->prepare($mcqGradeSql);
             
-            $threshold = count($MCQIDArr)*0.8;
+            $threshold = count($MCQIDArr)*0.2;
             $score = 0;
             //SQL UPDATE STATEMENT
             for($i=0; $i<count($MCQIDArr); $i++){
@@ -34,8 +34,8 @@
                 $sql->bindParam(':mcqid', $MCQIDArr[$i]);
                 $sql->bindParam(':correctchoice', $answerArr[$i]);
                 $sql->execute();
-            }
-            $score += $sql->fetchColumn();
+                $score += $sql->fetchColumn();
+            }          
 			
 			echo "<script>";
 
@@ -58,6 +58,19 @@
 					for(j = 0; j < options.length; j++){ ";
 						
 					if(!isset($answerArr[$i])){
+                        if ($score >= $threshold) {
+                                //SQL UPDATE STATEMENT
+                                $update_stmt = "REPLACE INTO MCQ_Question_Record(StudentID, MCQID, Choice)
+                                             VALUES (?,?,?);";			
+                                $update_stmt = $conn->prepare($update_stmt);                            
+                                if(! $update_stmt -> execute(array($studentID, $MCQIDArr[$i], null))){
+                                    echo "<script language=\"javascript\">  alert(\"Error occurred to submit your answer. Report this bug to reseachers.\"); </script>";
+                                }
+                        } else{                                
+                        }
+                        
+                        
+                        
 						echo "
 							if(options[j].value == \"".$mcqGradeRes->CorrectChoice."\"){
 								contents[j].style.background=\"#00ff00\";
