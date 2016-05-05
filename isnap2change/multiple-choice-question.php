@@ -216,14 +216,14 @@
 							
 							if($currentMCQID != $lastMCQID){ ?>
 								<div class="panel panel-default">
-									<div class="panel-heading"><b><i><?php echo $questionIndex.". ".htmlspecialchars($rows[$i]->Question); $questionIndex++; $MCQIDArray = $MCQIDArray.($rows[$i]->MCQID).',';?></i></b></div>
+									<div class="panel-heading"><b><i><?php echo $questionIndex.". ".$rows[$i]->Question; $questionIndex++; $MCQIDArray = $MCQIDArray.($rows[$i]->MCQID).',';?></i></b></div>
 										<div class="panel-body">
 						<?php
 							} $lastMCQID = $currentMCQID;?>
 						
 											<div class="radio">
 											<label>
-												<input type="radio" name="<?php echo $rows[$i] -> MCQID;?>" value="<?php echo htmlspecialchars($rows[$i]->Content);?>">
+												<input type="radio" name="<?php echo $rows[$i] -> MCQID;?>" value="<?php echo $rows[$i]->Content;?>">
 												<p name="<?php echo 'txt'.$rows[$i] -> MCQID;?>"><b><i><?php echo $rows[$i] -> Content;?></i></b></p>
 											</label>
 											</div>
