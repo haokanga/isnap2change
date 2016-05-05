@@ -1,6 +1,14 @@
-<?php
-	
-	require_once('connection.php');
+<?php	
+	session_start();
+    require_once("connection.php");	
+    //echo "<script language=\"javascript\">  console.log(\"SUBMISSION.\"); </script>";    
+    if(isset($_SESSION['userid'])){
+        $studentID = $_SESSION['userid'];
+        //echo "<script language=\"javascript\">  console.log(\"This is DEBUG_MODE with SESSION studentID = ".$studentID.".\"); </script>";
+    }else{
+        //echo "<script language=\"javascript\">  console.log(\"This is DEBUG_MODE with hard-code studentID = 1.\"); </script>";
+        $studentID = 1;
+    }
 	
 	if($_SERVER["REQUEST_METHOD"] == "POST"){
 		
@@ -34,7 +42,14 @@
 					for(j = 0; j < options.length; j++){ ";
 						
 					if(!isset($answerArr[$i])){
-						
+                        
+                        //SQL UPDATE STATEMENT
+						$update_stmt = "REPLACE INTO MCQ_Question_Record(StudentID, MCQID, Choice)
+                                     VALUES (?,?,?);";			
+                        $update_stmt = $conn->prepare($update_stmt);                            
+                        if(! $update_stmt -> execute(array($studentID, $MCQIDArr[$i], $answerArr[$i]))){
+                            echo "<script language=\"javascript\">  alert(\"Error occurred to submit your answer. Report this bug to reseachers.\"); </script>";
+                        }
 						echo "
 							if(options[j].value == ".$mcqGradeRes->CorrectChoice."){
 								contents[j].style.background=\"#00ff00\";
