@@ -1,34 +1,17 @@
 <?php
 
 	session_start();
-    require_once("connection.php");
-	
-	$rows = "";
-	$currentsaqid = "";
-	
-	if ($_SERVER["REQUEST_METHOD"] == "POST") {
-		
-		$conn = db_connect();
-	    $quizid = $_POST["quizid"];
-		$saqsql = "SELECT SAQID, Question
-				   FROM   SAQ_Section NATURAL JOIN SAQ_Question
-				   WHERE  QuizID = ?
-				   ORDER BY SAQID";
-		$saqquery = $conn->prepare($saqsql);
-		$saqquery->execute(array($quizid));
-		$rows = $saqquery->fetchAll(PDO::FETCH_OBJ);
-	}
-
-	$lastsaqid = -1;
-    
+    require_once("connection.php");	
+        
     if(isset($_SESSION['userid'])){
-		$studentID = $_SESSION['userid'];
-	}else{
-        echo "This is DEBUG_MODE with hard-code studentID = 1";
+        $studentID = $_SESSION['userid'];
+        echo "<script language=\"javascript\">  console.log(\"This is DEBUG_MODE with SESSION studentID = ".$studentID.".\"); </script>";
+    }else{
+        echo "<script language=\"javascript\">  console.log(\"This is DEBUG_MODE with hard-code studentID = 1.\"); </script>";
         $studentID = 1;
     }
-
-    if(isset($_POST['answer'])){
+    
+    if(isset($_SESSION['userid']) && isset($_POST['answer']) && isset($_POST['saqid'])){
         $saqid = $_POST["saqid"];    
         $answer = $_POST["answer"];        
         $conn = db_connect();   
@@ -45,8 +28,27 @@
         }    
         db_close($conn);
         echo "<script language=\"javascript\">  console.log(\"SUBMISSION.\"); </script>";
-    }else{
+    }else if(isset($_SESSION['userid']) && !isset($_POST['answer']) && !isset($_POST['saqid'])){{
         echo "<script language=\"javascript\">  console.log(\"JUMP FROM LEARNING MATERIALS.\"); </script>";
+        $rows = "";
+        $currentsaqid = "";
+        
+        if ($_SERVER["REQUEST_METHOD"] == "POST") {
+            
+            $conn = db_connect();
+            $quizid = $_POST["quizid"];
+            $saqsql = "SELECT SAQID, Question
+                       FROM   SAQ_Section NATURAL JOIN SAQ_Question
+                       WHERE  QuizID = ?
+                       ORDER BY SAQID";
+            $saqquery = $conn->prepare($saqsql);
+            $saqquery->execute(array($quizid));
+            $rows = $saqquery->fetchAll(PDO::FETCH_OBJ);
+        }
+
+        $lastsaqid = -1;
+    } else {
+        //todo: error handling
     }
 ?>
 
