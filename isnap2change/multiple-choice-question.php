@@ -91,6 +91,33 @@
                 $("#panel3").show();
             }
 			
+			function parseScript(strcode) {
+				var scripts = new Array();         // Array which will store the script's code
+  
+				// Strip out tags
+				while(strcode.indexOf("<script") > -1 || strcode.indexOf("</script") > -1) {
+					var s = strcode.indexOf("<script");
+					var s_e = strcode.indexOf(">", s);
+					var e = strcode.indexOf("</script", s);
+					var e_e = strcode.indexOf(">", e);
+    
+					// Add to scripts array
+					scripts.push(strcode.substring(s_e+1, e));
+					// Strip from strcode
+					strcode = strcode.substring(0, s) + strcode.substring(e_e+1);
+			  }
+			  
+			  // Loop through every script collected and eval it
+			  for(var i=0; i<scripts.length; i++) {
+				try {
+				  eval(scripts[i]);
+				}
+				catch(ex) {
+				  // do what you want here when a script fails
+				}
+			  }
+			}
+			
 			function submitQuiz()
 			{
 				var answerArr = [];
@@ -111,7 +138,9 @@
 				var xmlhttp = new XMLHttpRequest();
 				xmlhttp.onreadystatechange = function() {
 					if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
-						document.getElementById("ajax_responses").innerHTML = xmlhttp.responseText;
+		//				document.getElementById("ajax_responses").innerHTML = xmlhttp.responseText;
+						parseScript(xmlhttp.responseText);
+		//				eval(document.getElementById("ajax_responses").innerHTML);
 		//				eval(document.getElementById("txtHint").text());
 					}
 				};
@@ -129,6 +158,8 @@
 				});
 		*/	
 			}
+			
+			
 			
         </script>
     </head>
