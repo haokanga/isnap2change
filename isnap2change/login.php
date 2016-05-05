@@ -15,8 +15,8 @@
 	if(isset($_POST['submit'])){
 		$errMsg = '';
 		//username and password
-		$username = trim($_POST['username']);
-		$password = trim($_POST['password']);
+		$username = security_check_text($_POST['username']);
+		$password = security_check_text($_POST['password']);
 		$usertype = $_POST['usertype'];
 		$tablename = "";
 		$idcolumnname = "";
@@ -35,9 +35,6 @@
 		
 		if($username == '')
 			$errMsg .= 'You must enter your Username<br>';
-		else {
-    		$username = security_check_input($_POST["username"]);
-  		}
 		
 		if($password == '')
 			$errMsg .= 'You must enter your Password<br>';
@@ -71,7 +68,7 @@
 	}
 
 	//check input security to prevent malformed data/html injection
-	function security_check_input($data) {
+	function security_check_text($data) {
 	  $data = trim($data);
 	  $data = stripslashes($data);
 	  $data = htmlspecialchars($data);
@@ -92,7 +89,7 @@
 			?>
 			<div style="background-color:#006D9C; color:#FFFFFF; padding:3px;"><b>Login</b></div>
 			<div style="margin:30px">
-				<form method="post" action="<?php echo $_SERVER['PHP_SELF'];?>">
+				<form method="post" action="<?php echo $_SERVER['PHP_SELF']; ?>">
 					<input type="radio" name="usertype" value="student" checked> Student
 					<input type="radio" name="usertype" value="teacher"> Teacher
 					<br><br>

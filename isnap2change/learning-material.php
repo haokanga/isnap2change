@@ -160,9 +160,9 @@
                          <div class="panel-body">
                             
                              <blockquote class="blockquote-reverse" style="border-right: 5px solid #58a6da;">
-                             <h2><i><?php echo $materialRes->TopicName?></i></h2>
+                             <h2><i><?php echo htmlspecialchars($materialRes->TopicName) ?></i></h2>
                              
-                            <i><?php echo $materialRes->Content?></i>
+                            <i><?php echo htmlspecialchars($materialRes->Content) ?></i>
                              
                              </blockquote>
                             

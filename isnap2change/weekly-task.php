@@ -68,7 +68,7 @@ function startQuiz(){
 <?php echo $quizNum ?>
 <button type=button onclick="startQuiz()" onclick="startQuiz()"> Quiz </button>
 <input  type=hidden name="quizid" value=<?php echo $quizIDRes->QuizID; ?>></input>
-<input  type=hidden name="quiztype" value=<?php echo $quizIDRes->QuizType; ?>></input>
+<input  type=hidden name="quiztype" value=<?php echo htmlspecialchars($quizIDRes->QuizType); ?>></input>
 <input  type=hidden name="topicid" value=<?php echo $quizIDRes->TopicID; ?>></input>
 </form>
 </div>

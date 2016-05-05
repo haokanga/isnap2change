@@ -4,43 +4,43 @@
     require_once("connection.php");
 	
 	$rows = "";
-	$currentSAQID = "";
+	$currentsaqid = "";
 	
 	if ($_SERVER["REQUEST_METHOD"] == "POST") {
 		
 		$conn = db_connect();
 	    $quizid = $_POST["quizid"];
-		$SAQSql = "SELECT SAQID, Question
+		$saqsql = "SELECT SAQID, Question
 				   FROM   SAQ_Section NATURAL JOIN SAQ_Question
 				   WHERE  QuizID = ?
 				   ORDER BY SAQID";
-		$SAQQuery = $conn->prepare($SAQSql);
-		$SAQQuery->execute(array($quizid));
-		$rows = $SAQQuery->fetchAll(PDO::FETCH_OBJ);
+		$saqquery = $conn->prepare($saqsql);
+		$saqquery->execute(array($quizid));
+		$rows = $saqquery->fetchAll(PDO::FETCH_OBJ);
 	}
 
-	$lastSAQID = -1;
+	$lastsaqid = -1;
     
     if(isset($_SESSION['userid'])){
-		$StudentID = $_SESSION['userid'];
+		$studentID = $_SESSION['userid'];
 	}else{
-        echo "This is DEBUG_MODE with hard-code StudentID = 1";
-        $StudentID = 1;
+        echo "This is DEBUG_MODE with hard-code studentID = 1";
+        $studentID = 1;
     }
 
-    $SAQID = $_POST["SAQID"];    
-    $Answer = $_POST["Answer"];
+    $saqid = $_POST["saqid"];    
+    $answer = $_POST["answer"];
     
     $conn = db_connect();   
 
-    for($i=0; $i<count($SAQID); $i++) {
-        echo $SAQID[$i]."<br>";   
-        echo $Answer[$i]."<br>";
+    for($i=0; $i<count($saqid); $i++) {
+        //echo $saqid[$i]."<br>";   
+        //echo $answer[$i]."<br>";
         $insertStudentSql = "REPLACE INTO SAQ_Question_Record(StudentID, SAQID, Answer)
 							     VALUES (?,?,?);";			
 		$insertStudentSql = $conn->prepare($insertStudentSql);
 			
-		if(! $insertStudentSql -> execute(array($StudentID, $SAQID[$i], $Answer[$i]))){
+		if(! $insertStudentSql -> execute(array($studentID, $saqid[$i], htmlspecialchars($answer[$i])))){
 			echo "<script language=\"javascript\">  alert(\"Error occurred to submit your answer. Report this bug to reseachers.\"); </script>";
 		}
     }    
@@ -108,7 +108,7 @@
     <body>
 
         <nav class="navbar navbar-default navbar-fixed-top">
-        <form method="post" action="<?php echo $_SERVER['PHP_SELF'];?>">
+        <form method="post" action="<?php echo $_SERVER['PHP_SELF']; ?>">
             <div class="container-fluid">
                 <!-- Brand and toggle get grouped for better mobile display -->
                 <div class="navbar-header">
@@ -155,16 +155,16 @@
 				
                 <div class="col-md-8" style="opacity:0.9;">
 				<?php for($i=0; $i<count($rows); $i++) {							
-							$currentSAQID = $rows[$i] -> SAQID;
-							if($currentSAQID != $lastSAQID){ ?>
+							$currentsaqid = $rows[$i] -> SAQID;
+							if($currentsaqid != $lastsaqid){ ?>
 								<div class="panel panel-default">
-									<div class="panel-heading"><b><i><?php echo ($i+1).". ".$rows[$i] -> Question;?></i></b></div>
+									<div class="panel-heading"><b><i><?php echo ($i+1).". ".security_check_text($rows[$i] -> Question); ?></i></b></div>
 										<div class="panel-body">
 						<?php
-							} $lastSAQID = $currentSAQID;?>
+							} $lastsaqid = $currentsaqid;?>
                                 <!--Short Answer Question Input TextBox-->
-                                <input type="hidden" name="SAQID[]" value="<?php echo $currentSAQID ?>"/>
-                                <textarea rows="4" cols="50" name="Answer[]">Please input your answer here</textarea>
+                                <input type="hidden" name="saqid[]" value="<?php echo $currentsaqid ?>"/>
+                                <textarea rows="4" cols="50" name="answer[]">Please input your answer here</textarea>
 						<?php
 								if(($i+1)==sizeof($rows)){ ?>
 										</div>	
