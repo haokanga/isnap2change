@@ -18,6 +18,11 @@
 			
 			$mcqGradeQuery = $conn->prepare($mcqGradeSql);
 			
+			echo "<script>";
+
+		//	echo "alert(\"This is a test.\");";
+			
+			
 			for($i=0; $i<count($MCQIDArr); $i++){
 							
 				$mcqGradeQuery->execute(array($MCQIDArr[$i]));	
@@ -25,7 +30,7 @@
 				
 				$MCQContents = 'txt'.$MCQIDArr[$i];
 				
-				echo "<script> 
+				echo "
 					
 					var options = document.getElementsByName(\"".$MCQIDArr[$i]."\");
 					
@@ -36,7 +41,7 @@
 					if(!isset($answerArr[$i])){
 						
 						echo "
-							if(options[j].value == ".$mcqGradeRes->CorrectChoice."){
+							if(options[j].value == \"".$mcqGradeRes->CorrectChoice."\"){
 								contents[j].style.background=\"#00ff00\";
 							}
 							";
@@ -58,18 +63,17 @@
 											contents[j].style.background=\"#ff0000\";
 										}
 							
-										if(options[j].value == ".$mcqGradeRes->CorrectChoice."){
+										if(options[j].value == \"".$mcqGradeRes->CorrectChoice."\"){
 											contents[j].style.background=\"#00ff00\";
 										}
 									";
 							}	
 						}
 						
-					echo "} </script>";
-						
-					
-						
+					echo "}";	
 			}
+			
+			echo "</script>";
 					
 				
 		}
