@@ -152,7 +152,7 @@ CREATE TABLE IF NOT EXISTS `MCQ_Section` (
 CREATE TABLE IF NOT EXISTS `MCQ_Question` (
     MCQID MEDIUMINT AUTO_INCREMENT,
     Question TEXT,
-    CorrectChoice CHAR(1),
+    CorrectChoice TEXT NOT NULL,
     Explanation TEXT,
     QuizID MEDIUMINT,
     CONSTRAINT MCQ_Question_MCQID_PK PRIMARY KEY (MCQID),
@@ -174,7 +174,7 @@ CREATE TABLE IF NOT EXISTS `Option` (
 CREATE TABLE IF NOT EXISTS `MCQ_Question_Record` (
     StudentID MEDIUMINT,
     MCQID MEDIUMINT,
-    Choice CHAR(1),
+    Choice TEXT,
     CONSTRAINT MCQ_Question_Record_PK PRIMARY KEY (StudentID , MCQID),
     CONSTRAINT MCQ_Question_Record_StudentID_FK FOREIGN KEY (StudentID)
         REFERENCES Student (StudentID)
