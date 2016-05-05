@@ -28,7 +28,7 @@
         }    
         db_close($conn);
         echo "<script language=\"javascript\">  console.log(\"SUBMISSION.\"); </script>";
-    }else if(!isset($_POST['answer']) && !isset($_POST['saqid'])){{
+    }else if(!isset($_POST['answer']) && !isset($_POST['saqid'])){
         echo "<script language=\"javascript\">  console.log(\"JUMP FROM LEARNING MATERIALS.\"); </script>";
         $rows = "";
         $currentsaqid = "";

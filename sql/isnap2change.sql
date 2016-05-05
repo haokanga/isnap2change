@@ -1,4 +1,5 @@
 #mysql -uroot -p.kHdGCD2Un%P
+#mysql -uroot -p.kHdGCD2Un%P < isnap2change.sql
 CREATE DATABASE IF NOT EXISTS isnap2changedb;
 USE isnap2changedb;
 
