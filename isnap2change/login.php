@@ -1,12 +1,11 @@
 <?php
+    //if true, echo debug output in dev mode, else production mode
+	$DEBUG_MODE = true;
+    
 	session_start();
     require_once("connection.php");
-    
     $conn;
-    
-	//if true, echo debug output in dev mode, else production mode
-	$DEBUG_MODE = true;
-   
+       
     if($DEBUG_MODE) {
     	echo "DEBUG_MODE<br>";
     }
