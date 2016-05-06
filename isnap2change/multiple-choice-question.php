@@ -1,5 +1,8 @@
 <?php
+    //if true, echo debug output in dev mode, else production mode
+	$DEBUG_MODE = true;
 
+    session_start();
 	require_once('connection.php');
 	
 	if ($_SERVER["REQUEST_METHOD"] == "POST") {
@@ -9,7 +12,9 @@
 		if(isset($_POST['quizid'])){
 			
 			$quizid = $_POST["quizid"];
-		
+            //save quizid to _SESSION
+            $_SESSION['quizid'] = $quizid;
+            
 			$mcqSql = "SELECT MCQID, Question, Content 
 					   FROM   MCQ_Section NATURAL JOIN MCQ_Question
 										  NATURAL JOIN `Option`
