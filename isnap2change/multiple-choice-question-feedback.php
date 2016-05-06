@@ -49,9 +49,10 @@
             if($DEBUG_MODE){
                 echo "<script language=\"javascript\">  console.log(\"Score: $score\"); </script>";
             }
-            //UPDATE Quiz_Record
+            
+            //SQL UPDATE STATEMENT
             if ($score >= $threshold) {
-                //SQL UPDATE STATEMENT
+                //UPDATE Quiz_Record
                 $update_stmt = "REPLACE INTO Quiz_Record(QuizID, StudentID)
                      VALUES (?,?);";			
                 $update_stmt = $conn->prepare($update_stmt);                            
@@ -60,47 +61,29 @@
                 } else{ 
                     echo "<script language=\"javascript\">  console.log(\"Quiz Passed\"); </script>";
                 }
-            }else{
-                //todo: if failed the quiz
-            }
-            
-            //UPDATE MCQ_Question_Record
-            for($i=0; $i<count($MCQIDArr); $i++){
-                if(!isset($answerArr[$i])){
-                    if ($score >= $threshold) {
-                        //SQL UPDATE STATEMENT
+                //UPDATE MCQ_Question_Record
+                for($i=0; $i<count($MCQIDArr); $i++){
+                    if(!isset($answerArr[$i])){
+                        //SQL UPDATE STATEMENT with Choice (assigned)
                         $update_stmt = "REPLACE INTO MCQ_Question_Record(StudentID, MCQID, Choice)
                                      VALUES (?,?,?);";			
                         $update_stmt = $conn->prepare($update_stmt);                            
                         if(! $update_stmt -> execute(array($studentid, $MCQIDArr[$i], null))){
                             echo "<script language=\"javascript\">  alert(\"Error occurred to submit your answer. Report this bug to reseachers.\"); </script>";
-                        }
-                    } else{                                
-                        
-                    }
-                } else{                    
-                    if ($score >= $threshold) {
-                        //SQL UPDATE STATEMENT
+                        }                    
+                    } else{ 
+                        //SQL UPDATE STATEMENT with Choice (null)
                         $update_stmt = "REPLACE INTO MCQ_Question_Record(StudentID, MCQID, Choice)
                                      VALUES (?,?,?);";			
                         $update_stmt = $conn->prepare($update_stmt);                            
                         if(! $update_stmt -> execute(array($studentid, $MCQIDArr[$i], $answerArr[$i]))){
                             echo "<script language=\"javascript\">  alert(\"Error occurred to submit your answer. Report this bug to reseachers.\"); </script>";
                         }
-                    } else{
-                        //DEMO CODE to check the if-else structure
-                        /*
-                        $update_stmt = "REPLACE INTO MCQ_Question_Record(StudentID, MCQID, Choice)
-                                     VALUES (?,?,?);";			
-                        $update_stmt = $conn->prepare($update_stmt);                            
-                        if(! $update_stmt -> execute(array($studentid, $MCQIDArr[$i], "WRONG"))){
-                            echo "<script language=\"javascript\">  alert(\"Error occurred to submit your answer. Report this bug to reseachers.\"); </script>";
-                        }
-                        */                        
-                    }
-                }                
-            }
-            
+                    }                
+                }
+            }else{
+                //todo: if failed the quiz
+            } 
 			
 			echo "<script>";
             
