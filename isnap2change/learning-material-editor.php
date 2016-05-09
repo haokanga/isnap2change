@@ -7,7 +7,8 @@
         $conn = db_connect();
         $content = $_POST['richcontenttextarea'];
         $materialid = 3;   
-        $quizid = 4;        
+        $quizid = 4;
+        echo "<h2>Preview</h2>";       
 		echo $content;
         
         $update_stmt = "REPLACE INTO Learning_Material(MaterialID,Content,QuizID)
@@ -52,7 +53,11 @@
 </head>
 <body>
 <form method="post" action="<?php echo $_SERVER['PHP_SELF']; ?>">
-  <textarea name="richcontenttextarea"><p style="text-align: center; font-size: 15px;"><img title="TinyMCE Logo" src="//www.tinymce.com/images/glyph-tinymce@2x.png" alt="TinyMCE Logo" width="110" height="97" />
+  <textarea name="richcontenttextarea">
+  
+  <!-- TinyMCE demo 
+  
+  <p style="text-align: center; font-size: 15px;"><img title="TinyMCE Logo" src="//www.tinymce.com/images/glyph-tinymce@2x.png" alt="TinyMCE Logo" width="110" height="97" />
   </p>
   <h1 style="text-align: center;">Welcome to the TinyMCE editor demo!</h1>
   <p>Please try out the features provided in this full featured example.</p>
@@ -94,6 +99,10 @@
   <h2>Finally ...</h2>
   <p>Don't forget to check out our other product <a href="http://www.plupload.com" target="_blank">Plupload</a>, your ultimate upload solution featuring HTML5 upload support.</p>
   <p>Thanks for supporting TinyMCE! We hope it helps you and your users create great content.<br>All the best from the TinyMCE team.</p>
+  -->
+  <h3>Physical Activity is Good!</h3>
+  <p>For your age group it is recommended that you get <strong>at least 60 minutes</strong> of exercise every day. Having regular exercise has many benefits including reducing the likelihood of cardiovascular disease, maintaining a healthy body weight, improving motor-neuron skills and has been linked to decreasing the symptoms of depression and anxiety.</p>
+  <p style="text-align: center;"><img class="alignnone size-full wp-image-52" src="https://cmudream.files.wordpress.com/2015/12/sc1-620x.jpg" alt="SC1-620x" width="620" height="349" /></p>  
 </textarea>
 <input type="submit" name='submit' value="Submit" class='submit'/><br />
 </form>

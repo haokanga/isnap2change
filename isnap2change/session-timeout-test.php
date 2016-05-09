@@ -12,7 +12,7 @@
     */
     
     session_start();
-    $idletime=5;//after n seconds the user gets logged out
+    $idletime=36000;//after n seconds the user gets logged out
     if (isset($_SESSION['timestamp']) && time()-$_SESSION['timestamp']>$idletime){
         session_destroy();
         session_unset();
