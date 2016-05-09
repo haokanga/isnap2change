@@ -112,6 +112,7 @@ function validUsername(){
 
 <button type=button onclick="validToken()"> Valid </button>
 <form id="signupForm" action=signup.php method=post></form>
+<input type="submit" name='submit' value="Submit" class='submit'/>
 </div>
 
 </body>

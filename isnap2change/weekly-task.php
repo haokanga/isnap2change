@@ -37,11 +37,11 @@
 	if($quizNum!=0){
 		$quizIDSql = "SELECT QuizID, QuizType
 					  FROM   Quiz 
-					  WHERE  Week = 1
+					  WHERE  Week = ?
 					  AND QuizID NOT IN
 					 (SELECT QuizID
 					  FROM   Quiz_Record NATURAL JOIN Quiz
-					  WHERE  StudentID = 1 AND	Week = 1)
+					  WHERE  StudentID = ? AND	Week = ?)
 					  ORDER BY QuizID
 					  LIMIT 1";
 					
