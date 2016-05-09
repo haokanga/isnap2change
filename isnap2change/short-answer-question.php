@@ -169,7 +169,7 @@
 							} $lastsaqid = $currentsaqid;?>
                                 <!--Short Answer Question Input TextBox-->
                                 <input type="hidden" name="saqid[]" value="<?php echo $currentsaqid ?>"/>
-                                <textarea rows="4" cols="50" name="answer[]">Please input your answer here</textarea>
+                                <textarea rows="4" cols="50" name="answer[]" placeholder='Please input your answer here'></textarea>
 						<?php
 								if(($i+1)==sizeof($rows)){ ?>
 										</div>	
