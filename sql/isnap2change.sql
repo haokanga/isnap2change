@@ -480,7 +480,7 @@ The top layer, which is the smallest layer, is the layer you should me eating th
 Source: The Healthy Living Pyramid. Nutrition Australia. [Accessed 28/04/2016 http://www.nutritionaustralia.org/national/resource/healthy-living-pyramid]',1);
 INSERT IGNORE INTO Learning_Material(Content,QuizID) VALUES('https://www.youtube.com/watch?v=1ey0EDVjyeY&index=89&list=PLIGEVr8ox1oGsi-XcwSjudMi_uCPxGzSs',2);
 INSERT IGNORE INTO Learning_Material(Content,QuizID) VALUES('
-<p>You haven not added the learning materials for this quiz. Go to <a href="learning-material-editor.php">Learning Material Editor</a> to edit it.</p>',4);
+<p>Learning materials for this quiz has not been added.',4);
 
 
 INSERT IGNORE INTO Game(Description,Week,Points,TopicID) VALUES('Fruit Ninja',1,10,5);
