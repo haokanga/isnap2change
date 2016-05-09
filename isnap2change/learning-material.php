@@ -1,39 +1,50 @@
 <?php
-	
+	session_start();
 	require_once('connection.php');
 	
+	if(!isset($_SESSION["studentid"])){
+		
+	}
+		
 	if ($_SERVER["REQUEST_METHOD"] == "POST") {
 		
-			$conn = db_connect();
+		if(isset($_POST["quizid"]) && isset($_POST["quiztype"]) && isset($_POST["week"])){
 			
 			$quizid = $_POST["quizid"];
 			$quiztype = $_POST["quiztype"];
-			
-			$materialPreSql = "SELECT COUNT(*) 
-							   FROM   Learning_Material
-							   WHERE  QuizID = ?";
-							
-			$materialPreQuery = $conn->prepare($materialPreSql);
-			$materialPreQuery->execute(array($quizid));
-			
-			if($materialPreQuery->fetchColumn() != 1){
+			$week = $_POST["week"];
 				
-			}
+		} else {
 			
-			$materialSql = "SELECT Content, TopicName 
-							FROM   Learning_Material NATURAL JOIN Quiz
-									  NATURAL JOIN Topic
-							WHERE  QuizID = ?";
-							
-			$materialQuery = $conn->prepare($materialSql);
-			$materialQuery->execute(array($quizid));
-			$materialRes = $materialQuery->fetch(PDO::FETCH_OBJ);
-			
-			db_close($conn);	
-			
-			
-			
+		}
+	
+	} else {
+		
 	}
+	
+	$conn = db_connect();
+	
+	$materialPreSql = "SELECT COUNT(*) 
+					   FROM   Learning_Material
+					   WHERE  QuizID = ?";
+							
+	$materialPreQuery = $conn->prepare($materialPreSql);
+	$materialPreQuery->execute(array($quizid));
+			
+	if($materialPreQuery->fetchColumn() != 1){
+				
+	}
+			
+	$materialSql = "SELECT Content, TopicName 
+					FROM   Learning_Material NATURAL JOIN Quiz
+									         NATURAL JOIN Topic
+					WHERE  QuizID = ?";
+							
+	$materialQuery = $conn->prepare($materialSql);
+	$materialQuery->execute(array($quizid));
+	$materialRes = $materialQuery->fetch(PDO::FETCH_OBJ);
+	
+	db_close($conn);
 
 ?>
 
@@ -141,6 +152,8 @@
 						<form id="formQuizBegin" method=post>
                             <button type="button" onclick="beginQuiz()" class="btn btn-success">BEGIN</button>   
 							<input  type=hidden name="quizid" value=<?php echo $quizid; ?>></input>
+							<input  type=hidden name="quiztype" value=<?php echo $quiztype; ?>></input>
+							<input  type=hidden name="week" value=<?php echo $week; ?>></input>
                         </form>
 						</div>
                     </div>

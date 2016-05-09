@@ -1,35 +1,20 @@
 <?php
-    //if true, echo debug output in dev mode, else production mode
-	$DEBUG_MODE = true;
 
     session_start();
 	require_once('connection.php');
 	
+	if(!isset($_SESSION["studentid"])){
+		
+	}
+	
 	if ($_SERVER["REQUEST_METHOD"] == "POST") {
 		
-		$conn = db_connect();
-		
-		if(isset($_POST['quizid'])){
+		if(isset($_POST["quizid"]) && isset($_POST["quiztype"]) && isset($_POST["week"])){
 			
 			$quizid = $_POST["quizid"];
-            //save quizid to _SESSION
-            $_SESSION['quizid'] = $quizid;
-            
-			$mcqSql = "SELECT MCQID, Question, Content 
-					   FROM   MCQ_Section NATURAL JOIN MCQ_Question
-										  NATURAL JOIN `Option`
-					   WHERE  QuizID = ?
-					   ORDER BY MCQID, Content";
-								
-			$mcqQuery = $conn->prepare($mcqSql);
-			$mcqQuery->execute(array($quizid));
-			
-			$rows = $mcqQuery->fetchAll(PDO::FETCH_OBJ);
-			
-			$lastMCQID = -1;
-			$questionIndex = 1;
-			$MCQIDArray = "";
-			
+			$quiztype = $_POST["quiztype"];
+			$week = $_POST["week"];
+          
 		} else {
 			
 		}
@@ -37,6 +22,25 @@
 	} else {
 		
 	}
+	
+	$conn = db_connect();
+	
+	$mcqSql = "SELECT MCQID, Question, Content 
+			   FROM   MCQ_Section NATURAL JOIN MCQ_Question
+								  NATURAL JOIN `Option`
+			   WHERE  QuizID = ?
+			   ORDER BY MCQID, Content";
+								
+	$mcqQuery = $conn->prepare($mcqSql);
+	$mcqQuery->execute(array($quizid));
+			
+	$rows = $mcqQuery->fetchAll(PDO::FETCH_OBJ);
+			
+	$lastMCQID = -1;
+	$questionIndex = 1;
+	$MCQIDArray = "";
+	
+	db_close($conn);
 
 ?>
 
@@ -61,12 +65,14 @@
         <script>
             //timer
             $(document).ready(function () {
-                var seconds_left = 60;
+                var seconds_left = 20;
                 var interval = setInterval(function () {
                     document.getElementById('timer_div').innerHTML = --seconds_left;
                     if (seconds_left <= 0)
                     {
-                        document.getElementById('timer_div').innerHTML = "Time is up!";
+						alert("Time is up!");
+						submitQuiz();
+                       // document.getElementById('timer_div').innerHTML = "Time is up!";
                         clearInterval(interval);
                     }
                 }, 1000);
@@ -143,28 +149,17 @@
 				var xmlhttp = new XMLHttpRequest();
 				xmlhttp.onreadystatechange = function() {
 					if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
-		//				document.getElementById("ajax_responses").innerHTML = xmlhttp.responseText;
 						parseScript(xmlhttp.responseText);
-		//				eval(document.getElementById("ajax_responses").innerHTML);
-		//				eval(document.getElementById("txtHint").text());
+					} else {
+						
 					}
 				};
 				
 				xmlhttp.open("POST", "multiple-choice-question-feedback.php", true);
 				xmlhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-				xmlhttp.send("MCQIDArr="+JSON.stringify(MCQIDArr)+"&answerArr="+JSON.stringify(answerArr));
+				xmlhttp.send("MCQIDArr="+JSON.stringify(MCQIDArr)+"&answerArr="+JSON.stringify(answerArr)+"&quizid="+<?php echo $quizid;?>);
 		
-		/*
-				$.post("multiple-choice-question-feedback.php",{data : "MCQIDArr="+JSON.stringify(MCQIDArr)+"&answerArr="+JSON.stringify(answerArr)}, function(response){
-				$("#ajax_responses").html(response);
-				$("#ajax_responses").find("script").each(function(){
-					eval($(this).text());
-				});
-				});
-		*/	
 			}
-			
-			
 			
         </script>
     </head>
@@ -251,7 +246,14 @@
 						}?>
                 </div>
 				<input type=hidden id="hiddenMCQIDArray" value="<?php echo substr($MCQIDArray, 0, strlen($MCQIDArray)-1); ?>">
-				<div id="ajax_responses"></div>
+				<form id="hiddenReturnQuiz" action="learning-material.php" method=post>
+					<input  type=hidden name="quizid" value=<?php echo $quizid; ?>></input>
+					<input  type=hidden name="quiztype" value=<?php echo $quiztype; ?>></input>
+					<input  type=hidden name="week" value=<?php echo $week; ?>></input>
+				</form>
+				<form id="hiddenReturnTask" action="weekly-task.php" method=post>
+					<input  type=hidden name="week" value=<?php echo $week; ?>></input>
+				</form>
             </div>
         </div>
     </body>
