@@ -21,6 +21,7 @@
                         echo "<script language=\"javascript\">  console.log(\"Game Record Submitted. gameid: $gameid  studentid: $studentid\"); </script>";
                     }
                 }
+                db_close($conn);
             }else{
                 echo "<script language=\"javascript\">  console.log(\"You have not logged in.\"); </script>";
                 if($DEBUG_MODE) {
@@ -37,6 +38,7 @@
                             echo "<script language=\"javascript\">  console.log(\"Game Record Submitted. gameid: $gameid  studentid: $studentid\"); </script>";
                         }
                     }
+                    db_close($conn);
                 }
             }            
         }

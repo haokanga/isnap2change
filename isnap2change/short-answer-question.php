@@ -44,6 +44,7 @@
             $saqquery = $conn->prepare($saqsql);
             $saqquery->execute(array($quizid));
             $rows = $saqquery->fetchAll(PDO::FETCH_OBJ);
+            db_close($conn);
         }
 
         $lastsaqid = -1;
