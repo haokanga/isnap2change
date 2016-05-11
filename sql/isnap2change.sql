@@ -232,8 +232,9 @@ CREATE TABLE IF NOT EXISTS `Game` (
 CREATE TABLE IF NOT EXISTS `Game_Record` (
     GameID MEDIUMINT,
     StudentID MEDIUMINT,
+    `Level` TINYINT DEFAULT 0,
     Score INT,
-    CONSTRAINT Game_Record_PK PRIMARY KEY (GameID , StudentID),
+    CONSTRAINT Game_Record_PK PRIMARY KEY (GameID , StudentID, `Level`),
     CONSTRAINT Game_Record_GameID_FK FOREIGN KEY (GameID)
         REFERENCES Game (GameID)
         ON DELETE CASCADE ON UPDATE CASCADE,
@@ -487,13 +488,13 @@ INSERT IGNORE INTO Learning_Material(Content,QuizID) VALUES('
 INSERT IGNORE INTO Game(Description,Week,Points,TopicID) VALUES('Fruit Ninja',1,10,5);
 INSERT IGNORE INTO Game(Description,Week,Points,TopicID) VALUES('Candy Crush',1,10,5);
 
-INSERT IGNORE INTO Game_Record(GameID,StudentID,Score) VALUES(1,2,30);
-INSERT IGNORE INTO Game_Record(GameID,StudentID,Score) VALUES(1,3,30);
-INSERT IGNORE INTO Game_Record(GameID,StudentID,Score) VALUES(1,4,30);
-INSERT IGNORE INTO Game_Record(GameID,StudentID,Score) VALUES(2,2,35);
-INSERT IGNORE INTO Game_Record(GameID,StudentID,Score) VALUES(2,3,30);
-INSERT IGNORE INTO Game_Record(GameID,StudentID,Score) VALUES(2,4,30);
-INSERT IGNORE INTO Game_Record(GameID,StudentID,Score) VALUES(2,5,40);
+INSERT IGNORE INTO Game_Record(GameID,StudentID,`Level`,Score) VALUES(1,2,1,30);
+INSERT IGNORE INTO Game_Record(GameID,StudentID,`Level`,Score) VALUES(1,3,1,30);
+INSERT IGNORE INTO Game_Record(GameID,StudentID,`Level`,Score) VALUES(1,4,1,30);
+INSERT IGNORE INTO Game_Record(GameID,StudentID,`Level`,Score) VALUES(2,2,1,35);
+INSERT IGNORE INTO Game_Record(GameID,StudentID,`Level`,Score) VALUES(2,3,1,30);
+INSERT IGNORE INTO Game_Record(GameID,StudentID,`Level`,Score) VALUES(2,4,1,30);
+INSERT IGNORE INTO Game_Record(GameID,StudentID,`Level`,Score) VALUES(2,5,1,40);
 
 # Example to add Bonus and tasks
 INSERT IGNORE INTO Bonus(Week) VALUES(1);
