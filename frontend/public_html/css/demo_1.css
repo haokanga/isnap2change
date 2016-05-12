@@ -1,0 +1,61 @@
+/*
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+*/
+/* 
+    Created on : 09/05/2016, 10:15:53 AM
+    Author     : Shivangi
+*/
+
+
+.infopage
+{
+    background-image: url('b1.jpg');
+    background-repeat: repeat;
+    background-attachment : fixed;
+    padding: 10px !important;  
+    font-family: 'Raleway', sans-serif;   
+}
+
+.head
+{
+    height: 97%;
+    max-height: 97%;   
+    font-family: 'Raleway', sans-serif;  
+    
+}
+
+.hidden
+{
+     opacity:0;
+}
+
+.visible
+{
+     opacity:1;
+}
+
+body
+{
+    height: 100vh;
+    min-height: 100vh; 
+    
+    overflow-y: auto;
+}
+
+.h1, h1
+{
+    font-size: 50px;
+    text-align: center;
+}
+
+::-webkit-scrollbar 
+{
+ display: none;
+}
+
+p
+{
+    font-size:large;
+}
