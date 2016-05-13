@@ -66,6 +66,12 @@ body
     color: yellow;
 }
 
+.last>.btn
+{
+    border: 1px solid grey;
+    color: yellow;
+}
+
 
 .btn-default
 {
