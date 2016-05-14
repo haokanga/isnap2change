@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<!--
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+-->
+<html>
+    <head>
+        <title>Quiz</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="stylesheet" type="text/css" href="css/quiz.css" />
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
+        <link href='https://fonts.googleapis.com/css?family=Raleway:400|Open+Sans' rel='stylesheet' type='text/css'>
+        <link href='https://maxcdn.bootstrapcdn.com/font-awesome/4.6.2/css/font-awesome.min.css' rel='stylesheet' type='text/css'>
+        <script type="text/javascript" src="js/jquery-1.12.3.js"></script>
+    </head>
+    <body>
+         <script>
+            $(document).ready(function ()
+            {
+                $(".options").find(".btn").click(function () {
+                    $(".options").find(".btn").removeClass("active");
+                    $(this).addClass("active");
+                    alert($(this).val());
+                   
+                });
+                
+                 $(".next").find(".btn").click(function () {
+                    $("#panel1").addClass("hidden");
+                    $("#panel2").removeClass("hidden");
+                });
+                
+                $(".back").find(".btn").click(function () {
+                    $("#panel2").addClass("hidden");
+                    $("#panel1").removeClass("hidden");
+                });
+
+            });
+        </script>
+        <header class="navbar navbar-static-top bs-docs-nav">
+
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+                </button>
+                <a class="navbar-brand" href="#">QUIZ</a>
+
+            </div>
+
+        </header>
+
+        <div class="content"> 
+
+           
+                <div class="panel panel-default">
+                    <div class="panel-body">
+                        <div class="ques" style="font-size: xx-large; font-weight: 600; color:black;">
+                            Which of these breakfast foods will provide you with the most energy and is very healthy for you?
+                        </div>
+                        <br>
+                        <div class="options" style="color:white;">
+                            <button type="button" class="btn btn-default btn-lg btn-block"><input type="radio" name="radio1" id="radio8" />
+                        <label for="radio8"> Candy bar
+                        </label></button>
+                            <button type="button" class="btn btn-default btn-lg btn-block">
+                                <input type="radio" name="radio1" id="radio8" />
+                        <label for="radio9"> Whole grain cereal or oatmeal 
+                        </label></button>
+                                
+                            <button type="button" class="btn btn-default btn-lg btn-block">
+                                 <input type="radio" name="radio1" id="radio8" />
+                        <label for="radio10"> Potato chips
+                        </label></button>
+                            <button type="button" class="btn btn-default btn-lg btn-block">
+                                <input type="radio" name="radio1" id="radio8" />
+                        <label for="radio11"> Quinoa
+                        </label></button>
+                        </div>
+                        
+                        <br>
+                        <br>
+
+                        <div class="back"  style="text-align: center;">
+                            <a class="btn btn-default" href="#" role="button" style="padding-top:8px;"><span class="glyphicon glyphicon-chevron-left"></span></a>
+                            <a class="btn btn-default" href="#" role="button" style="padding-top:8px;"><span class="glyphicon glyphicon-chevron-right"></span></a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        
+    </body>
+</html>

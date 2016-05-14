@@ -1,0 +1,141 @@
+/*
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+*/
+/* 
+    Created on : 13/05/2016, 12:54:00 PM
+    Author     : Shivangi
+*/
+
+
+.content:before
+{
+    content: "";
+    position: fixed;
+    left: 0;
+    right: 0;
+    z-index: -1;
+    display: block;
+    background-image: url('bg5.jpg');
+    height: 100vh;
+
+    -webkit-filter: blur(5px);
+    -moz-filter: blur(5px);
+    -o-filter: blur(5px);
+    -ms-filter: blur(5px);
+    filter: blur(5px);
+}
+
+.content 
+{
+    position: fixed;
+    left: 0;
+    right: 0;
+    z-index: 0;
+    margin-left: 20px;
+    margin-right: 20px;
+}
+
+body
+{
+    font-family: 'Raleway', sans-serif;
+}
+
+.bs-docs-nav
+{
+    background-color: white;
+    margin-bottom: 0 !important;
+    border-bottom : 0 !important;
+}
+
+.panel, .btn-lg
+{
+    border-radius: 0 !important;
+    color: white;
+    font-family: 'Raleway', sans-serif;
+}
+
+.options>.btn-default:hover
+{
+    background-color: white;
+}
+
+.options>.btn-default:focus
+{
+    background-color: white;
+}
+
+.options>.btn-default.active, .options>.btn-default:active
+{
+    background-color: white;
+}
+
+.options>.btn-default
+{
+    text-align: left;
+    font-family: 'Raleway', sans-serif;
+    background-color: rgba(0,0,0,0);
+    border: none;
+    border: 0px solid #eee;
+    border-bottom-color: black;
+    border-bottom-width: 0.8px; 
+}
+
+.panel-body
+{
+    padding: 0px !important;
+}
+
+label
+{
+    color: dimgray;
+}
+
+.panel, .panel-default
+{
+    background-color: rgba(0, 0, 0, 0) !important;
+    border: none !important;
+    position: absolute;
+    left: 20%;
+    transform: translateY(15%);
+    width: 60%;
+    color: white;
+
+}
+
+/* Customizing radio buttons */
+
+input[type=radio] 
+{
+    display: none;
+}
+
+label 
+{
+    cursor: pointer;
+}
+
+input[type=radio] + label:before 
+{
+    font-family:'FontAwesome';
+    display: inline-block;
+}
+
+input[type=radio] + label:before 
+{
+    content:"\f10c";
+    color: dimgray;
+    cursor: pointer;
+}
+
+input[type=radio] + label:before 
+{
+    letter-spacing: 5px;
+}
+
+input[type=radio]:checked + label:before 
+{
+    content:"\f111";
+    color: dimgray; /* Remove this if you remove the 3 Last Rules of the CSS */
+}

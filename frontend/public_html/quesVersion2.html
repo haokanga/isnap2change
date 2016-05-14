@@ -11,7 +11,6 @@ and open the template in the editor.
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <link href='https://fonts.googleapis.com/css?family=Raleway:400italic|Open+Sans' rel='stylesheet' type='text/css'>
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
-        <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css" rel="stylesheet" />
         <link rel="stylesheet" href="css/ver2.css" type="text/css">
         <script type="text/javascript" src="js/jquery-1.12.3.js"></script>
     </head>
@@ -22,32 +21,61 @@ and open the template in the editor.
                 $(".options").find(".btn").click(function () {
                     $(".options").find(".btn").removeClass("active");
                     $(this).addClass("active");
+                    alert($(this).val());
+                   
                 });
                 
                  $(".next").find(".btn").click(function () {
                     $("#panel1").addClass("hidden");
                     $("#panel2").removeClass("hidden");
                 });
+                
+                $(".back").find(".btn").click(function () {
+                    $("#panel2").addClass("hidden");
+                    $("#panel1").removeClass("hidden");
+                });
 
             });
         </script>
 
         <div class="row" style="position: fixed;">              
-            <div class="col-md-2 sidebar bar">
+            <div class="col-md-1 sidebar bar">
                 <img src="css/l2.jpg" alt="" class="img-circle" style="height: 70px; display: block;
                      margin: 0 auto; padding-top:15px;">
                 <ul class="list-group lg" >
-                    <li class="list-group-item" style="margin-top:25px;">
-                        <input type="radio" name="radio1" id="radio1" />
-                        <label for="radio1">INFORMATION
-                        </label>
+                    <li class="list-group-item" style="margin-top:25px; color:turquoise;">
+                       <button type="button" class="btn btn-default" style="color:turquoise;font-weight: bold;">i</button>
+                        
                     </li>
-                    <li class="list-group-item" style="margin-top:10px;">
-                        <input type="radio" name="radio1" id="radio2" />
-                        <label for="radio2">QUESTION 1
-                        </label>
+                    <li class="list-group-item">
+                       <button type="button" class="btn btn-default">1</button>
                     </li>
-                    <li class="list-group-item" style="margin-top:10px;">
+                    <li class="list-group-item">
+                        <button type="button" class="btn btn-default">2</button>
+                    </li>
+                    <li class="list-group-item">
+                       <button type="button" class="btn btn-default">3</button>
+                    </li>
+                    <li class="list-group-item">
+                       <button type="button" class="btn btn-default">4</button>
+                    </li>
+                    <li class="list-group-item">
+                       <button type="button" class="btn btn-default">5</button>
+                    </li>
+                    <li class="list-group-item" >
+                       <button type="button" class="btn btn-default">6</button>
+                    </li>
+                    <li class="list-group-item">
+                       <button type="button" class="btn btn-default">7</button>
+                    </li>
+                    <li class="list-group-item">
+                       <button type="button" class="btn btn-default">8</button>
+                    </li>
+                    <li class="list-group-item">
+                       <button type="button" class="btn btn-default">9</button>
+                    </li>
+                    
+                  <!--  <li class="list-group-item" style="margin-top:10px;">
                         <input type="radio" name="radio1" id="radio3" />
                         <label for="radio3">QUESTION 2
                         </label>
@@ -91,14 +119,14 @@ and open the template in the editor.
                         <input type="radio" name="radio1" id="radio11" />
                         <label for="radio11">QUESTION 10
                         </label>
-                    </li>
+                    </li>     -->
                 </ul>
             </div>
 
-            <div class="col-md-offset-1 col-md-8 question" style="text-align:center;" id="panel1">
+            <div class="col-md-offset-2 col-md-7 question" style="text-align:center;" id="panel1">
                 <div class="panel panel-default">
                     <div class="panel-body">
-                        <div class="ques" style="font-size: x-large; color:yellow;">
+                        <div class="ques" style="font-size: x-large; color:black;">
                             Which of these breakfast foods will provide you with the most energy and is very healthy for you?
                         </div>
                         <br>
@@ -109,17 +137,20 @@ and open the template in the editor.
                             <button type="button" class="btn btn-default btn-lg btn-block">Quiche</button>
                         </div>
                         <br>
-                        <div class="next">
+                        
+                            <div class="back">
                             <a class="btn btn-default" href="#" role="button" style="padding-top:8px;"><span class="glyphicon glyphicon-chevron-left"></span></a>
+                          
+                          
                             <a class="btn btn-default" href="#" role="button" style="padding-top:8px;"><span class="glyphicon glyphicon-chevron-right"></span></a>
-                        </div>
+                            </div>
                     </div>
                 </div>
             </div>
-            <div class="col-md-offset-1 col-md-8 question hidden" style="text-align:center;" id="panel2">
+            <div class="col-md-offset-2 col-md-7 question hidden" style="text-align:center;" id="panel2">
                   <div class="panel panel-default" >
                     <div class="panel-body">
-                        <div class="ques" style="font-size: x-large; color:yellow;">
+                        <div class="ques" style="font-size: x-large; color:black;">
                             Which type of food should you have more of each day?
                         </div>
                         <br>
@@ -130,13 +161,17 @@ and open the template in the editor.
                             <button type="button" class="btn btn-default btn-lg btn-block">Quiche</button>
                         </div>
                         <br>
-                        <div class="next">
-                            <a class="btn btn-default" href="#" role="button" style="padding-top:8px;"><span class="glyphicon glyphicon-chevron-left"></span></a>
-                            <a class="btn btn-default" href="#" role="button" style="padding-top:8px;"><span class="glyphicon glyphicon-chevron-right"></span></a>
-                        </div>
+                        <div class="row" style="padding-top:8px;">
+                         
+                            <a class="btn btn-default" href="#" role="button"><span class="glyphicon glyphicon-chevron-left"></span></a>
+                           
+                           
+                            <a class="btn btn-default" href="#" role="button"><span class="glyphicon glyphicon-chevron-right"></span></a>
+                            
                     </div>
                 </div>               
             </div>
+                </div>
             
             <div class="col-md-1"></div>
             
