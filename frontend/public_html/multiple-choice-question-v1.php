@@ -25,11 +25,20 @@
 	
 	$conn = db_connect();
 	
+	$quesNumSql = "SELECT Count(*)
+				   FROM   MCQ_Question
+				   WHERE  QuizID = ?";
+	
+	$quesNumQuery = $conn->prepare($quesNumSql);
+	$quesNumQuery->execute(array($quizid));
+	
+	$quesNum = $quesNumQuery->fetchColumn();
+	
 	$mcqSql = "SELECT MCQID, Question, Content
 			   FROM   MCQ_Section NATURAL JOIN MCQ_Question
 								  NATURAL JOIN `Option`
 			   WHERE  QuizID = ?
-			   ORDER BY MCQID, Content";
+			   ORDER BY MCQID";
 								
 	$mcqQuery = $conn->prepare($mcqSql);
 	$mcqQuery->execute(array($quizid));
@@ -79,6 +88,15 @@
 					index--;
                     $("#panel"+index).removeClass("hidden");
 					$("#hiddenIndex").val(index);
+                });
+				
+				$(".opt").find(".btn").click(function () {					
+					var index = $(this).val();
+					var currentIndex = $("#hiddenIndex").val();
+					$("#panel"+currentIndex).addClass("hidden");
+                    $("#panel"+index).removeClass("hidden");
+					$("#hiddenIndex").val(index);
+
                 });
 
             });
@@ -166,12 +184,12 @@
 
                     </li>
 					
-					<?php 
-					for($i=0; $i<count($rows); $i++) { ?>
+			<?php 
+					for($i=0; $i<$quesNum; $i++) { ?>
 						<li class="list-group-item">
-							<button type="button" class="btn btn-default completed"><?php echo $i++;?></button>
+							<button type="button" class="btn btn-default completed" value="<?php echo $i+1;?>"><?php echo $i+1;?></button>
 						</li>
-					<?php } ?>
+			<?php   } ?>
 					
                
 
