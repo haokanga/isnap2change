@@ -7,7 +7,7 @@
         $conn = db_connect();
         $content = $_POST['richcontenttextarea'];
         $materialid = 3;   
-        $quizid = 4;
+        $quizid = 1;
         echo "<h2>Preview</h2>";       
 		echo $content;
         

@@ -10,7 +10,7 @@
 //	if ($_SERVER["REQUEST_METHOD"] == "POST") {
 		
 //		if(isset($_POST["quizid"]) && isset($_POST["quiztype"]) && isset($_POST["week"])){
-			$quizid = $_GET["quizid"];
+//			$quizid = $_GET["quizid"];
 //			$quizid = $_POST["quizid"];
 //			$quiztype = $_POST["quiztype"];
 //			$week = $_POST["week"];
@@ -22,8 +22,30 @@
 //	} else {
 		
 //	}
+
+	$quizid = $_POST["quizid"];
 	
 	$conn = db_connect();
+	
+	$materialPreSql = "SELECT COUNT(*) 
+					   FROM   Learning_Material
+					   WHERE  QuizID = ?";
+							
+	$materialPreQuery = $conn->prepare($materialPreSql);
+	$materialPreQuery->execute(array($quizid));
+			
+	if($materialPreQuery->fetchColumn() != 1){
+				
+	}
+			
+	$materialSql = "SELECT Content, TopicName 
+					FROM   Learning_Material NATURAL JOIN Quiz
+									         NATURAL JOIN Topic
+					WHERE  QuizID = ?";
+							
+	$materialQuery = $conn->prepare($materialSql);
+	$materialQuery->execute(array($quizid));
+	$materialRes = $materialQuery->fetch(PDO::FETCH_OBJ);
 	
 	$quesNumSql = "SELECT Count(*)
 				   FROM   MCQ_Question
@@ -68,36 +90,49 @@
         <script>
             $(document).ready(function ()
             {
+				$("#button1").addClass("highlight");
+
                 $(".options").find(".btn").click(function () {
 					var index = $("#hiddenIndex").val();
 					$("#panel"+index).find(".btn").removeClass("active");
                     $(this).addClass("active");
+					$("#button"+index).addClass("completed");
                 });
                 
                  $(".next").click(function () {
                     var index = $("#hiddenIndex").val();
 					$("#panel"+index).addClass("hidden");
+					$("#button"+index).removeClass("highlight");
 					index++;
                     $("#panel"+index).removeClass("hidden");
 					$("#hiddenIndex").val(index);
+					$("#button"+index).addClass("highlight");
                 });
 
 				$(".last").click(function () {
                     var index = $("#hiddenIndex").val();
 					$("#panel"+index).addClass("hidden");
+					$("#button"+index).removeClass("highlight");
 					index--;
                     $("#panel"+index).removeClass("hidden");
-					$("#hiddenIndex").val(index);
+					$("#hiddenIndex").val(index);					
+					$("#button"+index).addClass("highlight");
                 });
 				
-				$(".opt").find(".btn").click(function () {					
+				$(".opt").find(".btn").click(function () {						
 					var index = $(this).val();
+					$(this).addClass("highlight");
 					var currentIndex = $("#hiddenIndex").val();
+					$("#button"+currentIndex).removeClass("highlight");
 					$("#panel"+currentIndex).addClass("hidden");
                     $("#panel"+index).removeClass("hidden");
 					$("#hiddenIndex").val(index);
 
                 });
+
+				//feedback button
+				// if the answer is correct for question 1 - $("#button1").addClass("correct");
+				//  if the answer is incorrect for question 1 - $("#button1").addClass("wrong");
 
             });
 			
@@ -166,13 +201,10 @@
                 <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
                 </button>
                 <a class="navbar-brand" href="#">QUIZ</a>
-				</div>
-				<div class="nav navbar-nav navbar-btn navbar-right" style="margin-right:22px;">				
+			</div>
+			<div class="nav navbar-nav navbar-btn navbar-right" style="margin-right:22px;">				
 				<button type="button" onclick="return submitQuiz();" class="btn btn-success">SUBMIT</button> 
-				</div>
-
-            
-
+			</div>
         </header>
 		
 		<div class="content"> 
@@ -180,15 +212,16 @@
 
                 <ul class="list-group lg opt" style="max-height: 89vh; overflow-y: auto;">
                     <li class="list-group-item" style="color:turquoise;">
-                        <button type="button" class="btn btn-default" style="color:turquoise;font-weight: bold;">i</button>
+                        <button type="button" class="btn btn-default" style="color:turquoise;font-weight: bold;" value="0">i</button>
 
                     </li>
 					
 			<?php 
 					for($i=0; $i<$quesNum; $i++) { ?>
 						<li class="list-group-item">
-							<button type="button" class="btn btn-default completed" value="<?php echo $i+1;?>"><?php echo $i+1;?></button>
+							<button type="button" class="btn btn-default" id="button<?php echo $i+1;?>" value="<?php echo $i+1;?>"><?php echo $i+1;?></button>
 						</li>
+						
 			<?php   } ?>
 					
                
@@ -197,7 +230,24 @@
                 </ul>
             </div>
 
-			
+		<div class="info hidden" style="padding-top:10px; padding-bottom:10px;" id="panel0">
+                <div class="panel panel-default">
+                    <div class="panel-body">
+                        <div class="myHeader" style="text-align:center;">
+                            <div class="page-header" style="color: black;">
+                                <h1> 
+                                    <i><?php echo $materialRes->TopicName; ?></i>
+                                </h1> 
+                            </div>
+                            <div class="para" style="padding-left:15px; padding-right:15px;">
+                                <div style="color:black; text-align:center;">
+                                     <?php echo $materialRes->Content; ?>
+                                </div> 
+                            </div>
+                        </div>
+                    </div>
+                </div>
+        </div>
 
 		<?php for($i=0; $i<count($rows); $i++) {
 			
