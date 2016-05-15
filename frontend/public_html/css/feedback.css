@@ -29,7 +29,7 @@ and open the template in the editor.
 
 .content 
 {
-    position: fixed;
+    position: absolute;
     left: 0;
     right: 0;
     z-index: 0;
@@ -80,8 +80,6 @@ body
     border: 0px solid #eee;
     border-bottom-color: black;
     border-bottom-width: 0.8px; 
-    white-space:normal !important;
-    max-width: 100%;
 }
 
 .panel-body
@@ -94,7 +92,7 @@ label
     color: dimgray;
 }
 
-.panel, .panel-default
+.myques>.panel
 {
     background-color: rgba(0, 0, 0, 0) !important;
     border: none !important;
@@ -106,9 +104,28 @@ label
 
 }
 
+.info
+{
+    border: none !important;
+    position: absolute;
+    left: 19%;
+    width: 70%;
+    color: black;
+    opacity: 0.9;
+    overflow-y: auto;
+}
+
+li>.btn
+{
+    background-color: dimgrey;
+    color: white;
+    font-family: 'Raleway', sans-serif;
+    
+}
+
 .correct
 {
-     background-color:turquoise !important;
+     background-color:lightseagreen !important;
      color:white !important;
 }
 
@@ -116,6 +133,18 @@ label
 {
      background-color:salmon !important;
      color:white !important;
+}
+
+/*.sidebar
+{
+    overflow-y: auto;
+    max-height: 80vh;
+    
+}*/
+
+.lg>li
+{
+    border: none !important;
 }
 
 /* Customizing radio buttons */
@@ -152,4 +181,32 @@ input[type=radio]:checked + label:before
 {
     content:"\f111";
     color: dimgray; /* Remove this if you remove the 3 Last Rules of the CSS */
+}
+
+/* Customize scrollbar */
+
+::-webkit-scrollbar 
+{
+    width: 6px;
+}
+ 
+/* Track */
+::-webkit-scrollbar-track 
+{
+    -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3); 
+    -webkit-border-radius: 10px;
+    border-radius: 10px;
+}
+ 
+/* Handle */
+::-webkit-scrollbar-thumb 
+{
+    -webkit-border-radius: 10px;
+    border-radius: 10px;
+    background: grey; 
+    -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.5); 
+}
+::-webkit-scrollbar-thumb:window-inactive 
+{
+	background: white;
 }
