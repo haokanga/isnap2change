@@ -127,10 +127,11 @@
 						
 				} else {							
 						if($mcqGradeRes->CorrectChoice == $answerArr[$i]){
-						
+							
 							echo "
 									if($(this).hasClass(\"active\")){
 										$(this).addClass(\"correct\");
+										$(\"#button\"+".($i+1).").addClass(\"correct\");
 									}
 								 ";
 								 
@@ -143,6 +144,7 @@
 						
 									if($(this).val() == \"".$mcqGradeRes->CorrectChoice."\"){
 										$(this).addClass(\"correct\");
+										$(\"#button\"+".($i+1).").addClass(\"wrong\");
 									}
 								";
 						}	

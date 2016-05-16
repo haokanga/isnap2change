@@ -66,14 +66,13 @@
 			{
 				<?php if($quiztype == "MCQ"){ ?>
 							document.getElementById("formQuizBegin").setAttribute("action", "multiple-choice-question.php");
-				<?php	  }
+				<?php }
 					  
 					  if($quiztype == "SAQ"){ ?>
 						  document.getElementById("formQuizBegin").setAttribute("action", "short-answer-question.php");
-				<?php	 } ?>
+				<?php } ?>
 					
 				document.getElementById("formQuizBegin").submit();
-				
 			}
         </script>
         
