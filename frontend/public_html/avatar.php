@@ -30,6 +30,10 @@
 function startWeeklyTask(){
 	document.getElementById("quiz").submit();	
 }
+
+function checkProgress() {
+	
+}
 </script>
 </head>
 <body>
@@ -48,7 +52,7 @@ function startWeeklyTask(){
 <br>
 <div align="center">
 	<button type=button> Check Progress </button>
-	<button type=button> Check Scoreboard </button>
+	<button type=button onclick="checkProgress()"> Check Scoreboard </button>
 </div>
 </body>
 </html>
