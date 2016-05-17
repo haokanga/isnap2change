@@ -2,34 +2,46 @@
 
 	session_start();
     require_once("connection.php");	
-        
+    //set userid    
     if(isset($_SESSION['userid'])){
-        $studentID = $_SESSION['userid'];
-        echo "<script language=\"javascript\">  console.log(\"This is DEBUG_MODE with SESSION studentID = ".$studentID.".\"); </script>";
+        $studentid = $_SESSION['userid'];
+        echo "<script language=\"javascript\">  console.log(\"This is DEBUG_MODE with SESSION studentID = ".$studentid.".\"); </script>";
     }else{
         echo "<script language=\"javascript\">  console.log(\"This is DEBUG_MODE with hard-code studentID = 1.\"); </script>";
-        $studentID = 1;
+        $studentid = 1;
     }
-    
-    if(isset($_POST['answer']) && isset($_POST['saqid'])){
+    //if submission
+    if(isset($_POST['answer']) && isset($_POST['saqid']) && isset($_POST['quizid'])){
+        $quizid = $_POST["quizid"];
         $saqid = $_POST["saqid"];    
         $answer = $_POST["answer"];        
-        $conn = db_connect();   
+        $conn = db_connect();
+        $score = 0;
         for($i=0; $i<count($saqid); $i++) {
-            //echo $saqid[$i]."<br>";   
-            //echo $answer[$i]."<br>";
-            $update_stmt = "REPLACE INTO SAQ_Question_Record(StudentID, SAQID, Answer)
-                                     VALUES (?,?,?);";			
-            $update_stmt = $conn->prepare($update_stmt);
-                
-            if(! $update_stmt -> execute(array($studentID, $saqid[$i], htmlspecialchars($answer[$i])))){
+            $update_stmt = "INSERT INTO SAQ_Question_Record(StudentID, SAQID, Answer)
+                                     VALUES (?,?,?) ON DUPLICATE KEY UPDATE Answer = ?";			
+            $update_stmt = $conn->prepare($update_stmt);                
+            if(! $update_stmt -> execute(array($studentid, $saqid[$i], htmlspecialchars($answer[$i]), htmlspecialchars($answer[$i])))){
                 echo "<script language=\"javascript\">  alert(\"Error occurred to submit your answer. Report this bug to reseachers.\"); </script>";
             }
-        }    
+            $scoreSql = "SELECT Points FROM SAQ_Question WHERE SAQID = ?";
+            $scoreQuery = $conn->prepare($scoreSql);
+            $scoreQuery->execute(array($saqid[$i]));
+            $scoreResult = $scoreQuery->fetch(PDO::FETCH_OBJ);
+            $score += $scoreResult->Points;
+        }
+        $update_stmt = "INSERT INTO Quiz_Record(QuizID, StudentID, `Status`, Score)
+                                     VALUES (?,?,?,?) ON DUPLICATE KEY UPDATE Score = ?";			
+        $update_stmt = $conn->prepare($update_stmt);                
+        if(! $update_stmt -> execute(array($quizid, $studentid, "UNGRADED", $score, $score))){
+            echo "<script language=\"javascript\">  alert(\"Error occurred to update your score. Report this bug to reseachers.\"); </script>";
+        }
         db_close($conn);
         echo "<script language=\"javascript\">  console.log(\"SUBMISSION.\"); </script>";
-    }else if(!isset($_POST['answer']) && !isset($_POST['saqid'])){
-        echo "<script language=\"javascript\">  console.log(\"JUMP FROM LEARNING MATERIALS.\"); </script>";
+    }
+    //if jump from learning materials    
+    else if(!isset($_POST['answer']) && !isset($_POST['saqid'])){
+        echo "<script language=\"javascript\">  console.log(\"Jump from learning materials.\"); </script>";
         $rows = "";
         $currentsaqid = "";
         
@@ -115,6 +127,7 @@
 
         <nav class="navbar navbar-default navbar-fixed-top">
         <form method="post" action="<?php echo $_SERVER['PHP_SELF']; ?>">
+        <input  type=hidden name="quizid" value=<?php echo $quizid; ?>></input>
             <div class="container-fluid">
                 <!-- Brand and toggle get grouped for better mobile display -->
                 <div class="navbar-header">

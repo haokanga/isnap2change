@@ -19,7 +19,7 @@
 			$dob = $_POST["dob"];
 			
 			$insertStudentSql = "INSERT INTO Student(Username, `Password`, FName, LName, Gender, DOB, Score, ClassID)
-							     VALUES (?,?,?,?,?,?,?,?);";
+							     VALUES (?,?,?,?,?,?,?,?)";
 			
 			$insertStudentSql = $conn->prepare($insertStudentSql);
 			
@@ -36,7 +36,7 @@
 		
 		if($type == "TEACHER"){
 			$insertTeacherSql = "INSERT INTO Teacher(Username, `Password`, fname, lname, ClassID)
-							     VALUES (?,?,?,?,?);";
+							     VALUES (?,?,?,?,?)";
 								 
 			$insertTeacherQuery = db_connect() -> prepare($insertTeacherSql);
 			

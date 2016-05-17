@@ -40,7 +40,7 @@
     {
         global $studentid, $DEBUG_MODE;
         $conn = db_connect();
-        $retrieveScoreSql = "SELECT Username, Score FROM Student WHERE ClassID = (SELECT ClassID FROM STUDENT WHERE StudentID = ?) ORDER BY Score DESC, Username;";
+        $retrieveScoreSql = "SELECT Username, Score FROM Student WHERE ClassID = (SELECT ClassID FROM STUDENT WHERE StudentID = ?) ORDER BY Score DESC, Username";
         $retrieveScoreQuery = $conn->prepare($retrieveScoreSql);
         $retrieveScoreQuery->execute(array($studentid));
         $count = 0;

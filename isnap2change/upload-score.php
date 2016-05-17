@@ -31,7 +31,7 @@
         global $gameid, $studentid, $score, $highscore;
         $conn = db_connect();
         $update_stmt = "INSERT INTO Game_Record(GameID,StudentID,`Level`,Score)
-                     VALUES (?,?,?,?) ON DUPLICATE KEY UPDATE Score = ?;";			
+                     VALUES (?,?,?,?) ON DUPLICATE KEY UPDATE Score = ?";			
         $update_stmt = $conn->prepare($update_stmt);
         for($level=1; $level<=count($score); $level++){
             if($score[$level-1]>$highscore[$level-1]){
