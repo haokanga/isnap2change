@@ -43,6 +43,7 @@
         <button type=button onclick="startQuiz()"> Quiz '.$count.'</button>
         <input  type=hidden name="quizid" value='.$quizResult["QuizID"].'></input>
         <input  type=hidden name="quiztype" value='.$quizResult["QuizType"].'></input>
+        <input  type=hidden name="week" value='.$week.'></input>
         </form>';
     }
 	db_close($conn);	

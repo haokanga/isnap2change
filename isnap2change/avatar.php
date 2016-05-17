@@ -1,14 +1,16 @@
 <?php
-
+    //if true, echo debug output in dev mode, else production mode
+	$DEBUG_MODE = false;
 	session_start();
 	//$studentid = 1;
-	$_SESSION["studentid"] = 1;
-
+    if($DEBUG_MODE){
+        $_SESSION["studentid"] = 1;
+    }
 ?>
 
 <html>
 <head>
-<script src="https://code.jquery.com/jquery-1.10.2.js"></script>
+<script type="text/javascript" src="js/jquery-1.12.3.js"></script>
 <script>
 
 

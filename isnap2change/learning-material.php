@@ -1,7 +1,11 @@
 <?php
+    //if true, echo debug output in dev mode, else production mode
+	$DEBUG_MODE = true;
 	session_start();
 	require_once('connection.php');
-	
+	if($DEBUG_MODE){
+        echo "<script language=\"javascript\">  console.log(\"This is DEBUG_MODE with SESSION quizid = ".$_POST["quizid"]." quiztype = ".$_POST["quiztype"]." week = ".$_POST["week"].".\"); </script>";
+    }	
 	if(!isset($_SESSION["studentid"])){
 		
 	}
@@ -13,7 +17,7 @@
 			$quizid = $_POST["quizid"];
 			$quiztype = $_POST["quiztype"];
 			$week = $_POST["week"];
-				
+			
 		} else {
 			
 		}
