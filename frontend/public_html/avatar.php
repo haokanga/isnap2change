@@ -9,15 +9,14 @@
 <html>
 <head>
 <script>
-function startWeeklyTask1(){
-	
-	document.getElementById("weeklytask1").submit();
-	
+function startWeeklyTask(){
+    document.getElementById("quiz").submit();
+}	
+function startWeeklyTask1(){	
+	document.getElementById("weeklytask1").submit();	
 }
-function startWeeklyTask3(){
-	
-	document.getElementById("weeklytask3").submit();
-	
+function startWeeklyTask3(){	
+	document.getElementById("weeklytask3").submit();	
 }
 
 </script>

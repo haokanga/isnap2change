@@ -20,6 +20,10 @@ function startWeeklyTask3(){
 	
 }
 
+function scoreboard(){	
+	document.getElementById("scoreboard").submit();	
+}
+
 </script>
 </head>
 <body>
@@ -51,7 +55,7 @@ function startWeeklyTask3(){
 <div align="center">
 	<button type=button> Check Progress </button>
     <form id="scoreboard" action=scoreboard.php method=post>
-	<button type=button> Check Scoreboard </button>
+	<button type=button onclick="scoreboard()"> Check Scoreboard </button>
     </form>
 </form>
 </div>

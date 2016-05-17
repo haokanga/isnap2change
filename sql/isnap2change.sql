@@ -112,7 +112,6 @@ CREATE TABLE IF NOT EXISTS `Quiz` (
     Week TINYINT,
     QuizType ENUM('MCQ', 'SAQ'),    
     TopicID MEDIUMINT,
-    Status ENUM('UNFINISHED', 'UNGRADED', 'GRADED') DEFAULT 'UNFINISHED',
     CONSTRAINT Quiz_QuizID_PK PRIMARY KEY (QuizID),
     CONSTRAINT Quiz_TopicID_FK FOREIGN KEY (TopicID)
         REFERENCES Topic (TopicID)
@@ -121,7 +120,9 @@ CREATE TABLE IF NOT EXISTS `Quiz` (
 
 CREATE TABLE IF NOT EXISTS `Quiz_Record` (
     QuizID MEDIUMINT,
-    StudentID MEDIUMINT,
+    StudentID MEDIUMINT,    
+    Status ENUM('UNGRADED', 'GRADED'),
+    Score MEDIUMINT DEFAULT 0,
     CONSTRAINT Quiz_Record_PK PRIMARY KEY (QuizID , StudentID),
     CONSTRAINT Quiz_Record_QuizID_FK FOREIGN KEY (QuizID)
         REFERENCES Quiz (QuizID)
