@@ -1,57 +1,50 @@
 <?php
-	
+    //if true, echo debug output in dev mode, else production mode
+	$DEBUG_MODE = true;
 	session_start();
-	require_once('connection.php');
-	
+	require_once('connection.php');	
 	if(isset($_SESSION["studentid"])){
 		$studentid = $_SESSION["studentid"];
 	} else {
 		
-	}
-	
-	if ($_SERVER["REQUEST_METHOD"] == "POST") {
-		
+	}	
+	if ($_SERVER["REQUEST_METHOD"] == "POST") {		
 		if(isset($_POST["week"])){
 			$week = $_POST["week"];
 		} else {
 			
-		}
-		
+		}		
 	} else {
 		
 	}
 	
 	$conn = db_connect();
-	
-	$quizNumSql = "SELECT (SELECT COUNT(*)
-				   FROM   Quiz WHERE  Week = ?) - COUNT(*) 
-				   FROM   Quiz_Record NATURAL JOIN Quiz
-				   WHERE  StudentID = ? 
-				   AND	  Week = ?";
-		
-	$quizNumQuery = $conn->prepare($quizNumSql);
-	$quizNumQuery->execute(array($week, $studentid, $week));
-		
-	$quizNum = $quizNumQuery->fetchColumn();
-		
-	if($quizNum!=0){
-		$quizIDSql = "SELECT QuizID, QuizType
-					  FROM   Quiz 
-					  WHERE  Week = ?
-					  AND QuizID NOT IN
-					 (SELECT QuizID
-					  FROM   Quiz_Record NATURAL JOIN Quiz
-					  WHERE  StudentID = ? AND	Week = ?)
-					  ORDER BY QuizID
-					  LIMIT 1";
-					
-		$quizIDQuery = $conn->prepare($quizIDSql);
-		$quizIDQuery->execute(array($week, $studentid, $week));
-		
-		$quizIDRes = $quizIDQuery->fetch(PDO::FETCH_OBJ);
-					
-	} 
-		
+    /**
+    $quizIDSql = "SELECT QuizID, QuizType
+                  FROM   Quiz 
+                  WHERE  Week = ?
+                  AND QuizID NOT IN
+                 (SELECT QuizID
+                  FROM   Quiz_Record NATURAL JOIN Quiz
+                  WHERE  StudentID = ? AND	Week = ?)
+                  ORDER BY QuizID
+                  LIMIT 1";
+    */
+    $quizSql = "SELECT Quiz.QuizID, QuizType, `Status` FROM Quiz LEFT JOIN (SELECT * FROM Quiz_Record WHERE StudentID = ?) Student_Quiz_Record ON Quiz.QuizID = Student_Quiz_Record.QuizID WHERE Week = ? ORDER BY Quiz.QuizID";    
+    $quizQuery = $conn->prepare($quizSql);
+    $quizQuery->execute(array($studentid, $week)); 
+    $count = 0;
+    while($quizResult = $quizQuery->fetch(PDO::FETCH_ASSOC)){
+        $count++;
+        if($DEBUG_MODE){
+            echo "<script language=\"javascript\">  console.log(\"[SUCCESS] studentid: $studentid week:$week QuizID:".$quizResult["QuizID"]." QuizType:".$quizResult["QuizType"]."\"); </script>";
+        }
+        echo '<form id="quiz" action=learning-material.php method=post>
+        <button type=button onclick="startQuiz()"> Quiz '.$count.'</button>
+        <input  type=hidden name="quizid" value='.$quizResult["QuizID"].'></input>
+        <input  type=hidden name="quiztype" value='.$quizResult["QuizType"].'></input>
+        </form>';
+    }
 	db_close($conn);	
 	
 ?>
@@ -59,27 +52,21 @@
 <html>
 <head>
 <script>
-function startQuiz(){
-	
-	document.getElementById("quiz").submit();
-	
-	
+function startQuiz(){	
+	document.getElementById("quiz").submit();	
 }
-
-
-
 </script>
 </head>
 <body>
+<!--
 <div id="a" align="center">
 <form id="quiz" action=learning-material.php method=post>
-<?php echo $quizNum ?>
 <button type=button onclick="startQuiz()"> Quiz </button>
-<p><?php echo $week;?></p>
 <input  type=hidden name="quizid" value=<?php echo $quizIDRes->QuizID; ?>></input>
 <input  type=hidden name="quiztype" value=<?php echo $quizIDRes->QuizType; ?>></input>
 <input  type=hidden name="week" value=<?php echo $week; ?>></input>
 </form>
 </div>
+-->
 </body>
 </html>

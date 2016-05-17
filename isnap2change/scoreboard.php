@@ -49,7 +49,7 @@
         while($retrieveScoreResult = $retrieveScoreQuery->fetch(PDO::FETCH_ASSOC)){
             $count++;
             if($DEBUG_MODE){
-                echo "<script language=\"javascript\">  console.log(\"[SUCCESS] Game Record Found. studentid: $studentid username:".$retrieveScoreResult['Username']." score:".$retrieveScoreResult['Score']."\"); </script>";
+                echo "<script language=\"javascript\">  console.log(\"[SUCCESS] Score Record Found. studentid: $studentid username:".$retrieveScoreResult['Username']." score:".$retrieveScoreResult['Score']."\"); </script>";
             }
             echo '<div class="rTableRow"><div class="rTableCell">'.$count.'</div> <div class="rTableCell">'.$retrieveScoreResult["Username"].'</div> <div class="rTableCell">'.$retrieveScoreResult["Score"].'</div> </div>';
         }
