@@ -29,6 +29,8 @@
                 $studentid = 1;
                 echo "<script language=\"javascript\">  console.log(\"This is DEBUG_MODE with TEST studentid = ".$studentid.".\"); </script>";
                 $scoreArray = retrieve_scoreboard_data(); 
+            } else {
+                echo "You have not logged in.";
             }                
         }          
     } else {
