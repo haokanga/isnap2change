@@ -30,6 +30,8 @@
                   ORDER BY QuizID
                   LIMIT 1";
     */
+    
+    //quiz
     $quizSql = "SELECT Quiz.QuizID, QuizType, `Status` FROM Quiz LEFT JOIN (SELECT * FROM Quiz_Record WHERE StudentID = ?) Student_Quiz_Record ON Quiz.QuizID = Student_Quiz_Record.QuizID WHERE Week = ? ORDER BY Quiz.QuizID";    
     $quizQuery = $conn->prepare($quizSql);
     $quizQuery->execute(array($studentid, $week)); 
@@ -43,6 +45,17 @@
         <button type=button onclick="startQuiz()"> Quiz '.$count.'</button>
         <input  type=hidden name="quizid" value='.$quizResult["QuizID"].'></input>
         <input  type=hidden name="quiztype" value='.$quizResult["QuizType"].'></input>
+        <input  type=hidden name="week" value='.$week.'></input>
+        </form>';
+    }
+    //game
+    $gameSql = "SELECT * FROM Game";    
+    $gameQuery = $conn->prepare($gameSql);
+    $gameQuery->execute(); 
+    while($gameResult = $gameQuery->fetch(PDO::FETCH_ASSOC)){
+        echo '<form id="game" method=post>
+        <button type=button onclick=""> '.$gameResult["Description"].'</button>
+        <input  type=hidden name="gameid" value='.$gameResult["GameID"].'></input>
         <input  type=hidden name="week" value='.$week.'></input>
         </form>';
     }
