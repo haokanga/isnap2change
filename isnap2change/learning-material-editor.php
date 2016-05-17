@@ -6,7 +6,7 @@
 	if(isset($_POST['richcontenttextarea'])){
         $conn = db_connect();
         $content = $_POST['richcontenttextarea'];
-        $materialid = 3;   
+        $materialid = 1;   
         $quizid = 1;
         echo "<h2>Preview</h2>";       
 		echo $content;
