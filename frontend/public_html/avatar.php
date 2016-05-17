@@ -50,7 +50,6 @@ function startWeeklyTask3(){
 <div align="center">
 	<button type=button> Check Progress </button>
     <form id="scoreboard" action=scoreboard.php method=post>
-	<button type=button> Check Scoreboard </button>
     </form>
 </form>
 </div>
