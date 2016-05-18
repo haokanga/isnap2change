@@ -49,21 +49,21 @@
 			$status = $quizResult["Status"];
 			
 			if($quizResult["QuizType"]=="MCQ"){
-				echo '<form id="quiz" action=multiple-choice-question.php method=post>';
+				echo '<form id="quiz'.$quizResult["QuizID"].'" action=multiple-choice-question.php method=post>';
 			}
 			
 			if($quizResult["QuizType"]=="SAQ"){
-				echo '<form id="quiz" action=short-answer-question.php method=post>';
+				echo '<form id="quiz'.$quizResult["QuizID"].'" action=short-answer-question.php method=post>';
 			}
 			
 		} else {
 			
 			$status = "UNANSWERED";
 				
-			echo '<form id="quiz" action=learning-material.php method=post>';
+			echo '<form id="quiz'.$quizResult["QuizID"].'" action=learning-material.php method=post>';
 		}
 		
-        echo '<button type=button onclick="startQuiz()"> Quiz '.$count.'</button>
+        echo '<button type=button onclick="startQuiz('.$quizResult["QuizID"].')"> Quiz '.$count.'</button>
 			  <input  type=hidden name="quizid" value='.$quizResult["QuizID"].'></input>
 			  <input  type=hidden name="quiztype" value='.$quizResult["QuizType"].'></input>
 			  <input  type=hidden name="week" value='.$week.'></input>
@@ -88,8 +88,8 @@
 <html>
 <head>
 <script>
-function startQuiz(){	
-	document.getElementById("quiz").submit();	
+function startQuiz(quizid){	
+	document.getElementById("quiz"+quizid).submit();	
 }
 </script>
 </head>
