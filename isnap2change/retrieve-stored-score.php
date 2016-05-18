@@ -11,8 +11,8 @@
         if(isset($_GET["command"]) && isset($_GET["gameid"])){
             $gameid = $_GET["gameid"];
             if($_GET["command"] == "retrieve" && $gameid == 1){
-                if(isset($_SESSION['userid'])){
-                    $studentid = $_SESSION['userid'];
+                if(isset($_SESSION['studentid'])){
+                    $studentid = $_SESSION['studentid'];
                     echo "<script language=\"javascript\">  console.log(\"This is DEBUG_MODE with SESSION studentid = ".$studentid.".\"); </script>";
                     $scoreArray = retrieve_data(); 
                 }else{

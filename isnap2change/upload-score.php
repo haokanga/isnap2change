@@ -11,8 +11,8 @@
         if(isset($_GET["score"]) && isset($_GET["gameid"])){
             $score = $_GET["score"];
             $gameid = $_GET["gameid"];
-            if(isset($_SESSION['userid'])){
-                $studentid = $_SESSION['userid'];
+            if(isset($_SESSION['studentid'])){
+                $studentid = $_SESSION['studentid'];
                 echo "<script language=\"javascript\">  console.log(\"This is DEBUG_MODE with SESSION studentid = ".$studentid.".\"); </script>";
                 $highscore = retrieve_data();
                 upload_score();

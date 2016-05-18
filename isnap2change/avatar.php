@@ -4,7 +4,7 @@
 	session_start();
 	//$studentid = 1;
     if($DEBUG_MODE){
-        $_SESSION["userid"] = 1;
+        $_SESSION["studentid"] = 1;
     }
 ?>
 

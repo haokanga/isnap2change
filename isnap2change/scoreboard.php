@@ -17,8 +17,8 @@
     session_start(); 
 	require_once('connection.php');
     if ($_SERVER["REQUEST_METHOD"] == "POST") {    
-        if(isset($_SESSION['userid'])){
-            $studentid = $_SESSION['userid'];
+        if(isset($_SESSION['studentid'])){
+            $studentid = $_SESSION['studentid'];
             if($DEBUG_MODE){
                 echo "<script language=\"javascript\">  console.log(\"This is DEBUG_MODE with SESSION studentid = ".$studentid.".\"); </script>";
             }

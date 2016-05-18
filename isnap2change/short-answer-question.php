@@ -3,8 +3,8 @@
 	session_start();
     require_once("connection.php");	
     //set userid    
-    if(isset($_SESSION['userid'])){
-        $studentid = $_SESSION['userid'];
+    if(isset($_SESSION['studentid'])){
+        $studentid = $_SESSION['studentid'];
         echo "<script language=\"javascript\">  console.log(\"This is DEBUG_MODE with SESSION studentID = ".$studentid.".\"); </script>";
     }else{
         echo "<script language=\"javascript\">  console.log(\"This is DEBUG_MODE with hard-code studentID = 1.\"); </script>";

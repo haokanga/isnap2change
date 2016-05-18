@@ -3,8 +3,8 @@
 	$DEBUG_MODE = true;
 	session_start();
 	require_once('connection.php');	
-	if(isset($_SESSION["userid"])){
-		$studentid = $_SESSION["userid"];
+	if(isset($_SESSION["studentid"])){
+		$studentid = $_SESSION["studentid"];
 	} else {
 		
 	}	
