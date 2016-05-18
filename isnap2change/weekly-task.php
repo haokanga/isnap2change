@@ -59,6 +59,7 @@
 			  <input  type=hidden name="quizid" value='.$quizResult["QuizID"].'></input>
 			  <input  type=hidden name="quiztype" value='.$quizResult["QuizType"].'></input>
 			  <input  type=hidden name="week" value='.$week.'></input>
+			  <input type=hidden name="status" value='.$quizResult["Status"].'></input>
 			  </form>';
     }
     //game
