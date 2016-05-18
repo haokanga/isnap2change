@@ -3,7 +3,7 @@
     session_start();
 	require_once('connection.php');
 	
-	if(!isset($_SESSION["studentid"])){
+	if(!isset($_SESSION["userid"])){
 		
 	}
 	

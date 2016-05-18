@@ -9,8 +9,8 @@
         echo "<script language=\"javascript\">  console.log(\"SUBMISSION.\"); </script>";
     }
 	
-	if(isset($_SESSION["studentid"])){
-		$studentid = $_SESSION["studentid"];
+	if(isset($_SESSION["userid"])){
+		$studentid = $_SESSION["userid"];
 	} else {
 		
 	}

@@ -6,7 +6,7 @@
 	if($DEBUG_MODE){
         echo "<script language=\"javascript\">  console.log(\"This is DEBUG_MODE with SESSION quizid = ".$_POST["quizid"]." quiztype = ".$_POST["quiztype"]." week = ".$_POST["week"].".\"); </script>";
     }	
-	if(!isset($_SESSION["studentid"])){
+	if(!isset($_SESSION["userid"])){
 		
 	}
 		
