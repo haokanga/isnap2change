@@ -205,6 +205,11 @@
 
 			}
 			
+			function goBack()
+			{
+				document.getElementById("goBack").submit();
+			}
+			
 			
         </script>
 		
@@ -218,11 +223,14 @@
 			<div class="nav navbar-nav navbar-btn navbar-right" style="margin-right:22px;">
 				<?php
 						if($status == "GRADED"){ ?>
-							<button type="button" onclick="return submitQuiz();" class="btn btn-success">GO BACK</button> 
+						<form id="goBack" method=post action=weekly-task.php>
+							 <button type="button" onclick="return goBack()" class="btn btn-success">GO BACK</button> 
+							 <input type=hidden name="week" value=<?php echo $week; ?>></input>
+						</form>
 				<?php	}
 					
 						if($status == "UNANSWERED"){ ?>
-							<button type="button" onclick="" class="btn btn-success">SUBMIT</button> 
+							<button type="button" onclick="return submitQuiz();" class="btn btn-success">SUBMIT</button> 
 				<?php	} ?>
 					
 			</div>
