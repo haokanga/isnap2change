@@ -3,7 +3,9 @@
     session_start();
 	require_once('connection.php');
 	
-	if(!isset($_SESSION["studentid"])){
+	if(isset($_SESSION["studentid"])){
+		$studentid = $_SESSION["studentid"];
+	} else {
 		
 	}
 	
@@ -65,17 +67,16 @@
 	   $mcqQuery->execute(array($studentid, $quizid));
 	}
 	
-	if($status == ""){
-		
-	}
-	$mcqSql = "SELECT MCQID, Question, Content
-			   FROM   MCQ_Section NATURAL JOIN MCQ_Question
+	if($status == "UNANSWERED"){
+		$mcqSql = "SELECT MCQID, Question, Content
+				   FROM   MCQ_Section NATURAL JOIN MCQ_Question
 								  NATURAL JOIN `Option`
-			   WHERE  QuizID = ?
-			   ORDER BY MCQID";
+			       WHERE  QuizID = ?
+			       ORDER BY MCQID";
 								
-	$mcqQuery = $conn->prepare($mcqSql);
-	$mcqQuery->execute(array($quizid));
+		$mcqQuery = $conn->prepare($mcqSql);
+		$mcqQuery->execute(array($quizid));
+	}
 			
 	$rows = $mcqQuery->fetchAll(PDO::FETCH_OBJ);
 			
@@ -198,7 +199,7 @@
 					}
 				};
 				
-				xmlhttp.open("POST", "multiple-choice-question-feedback-v1.php", true);
+				xmlhttp.open("POST", "multiple-choice-question-feedback.php", true);
 				xmlhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
 				xmlhttp.send("MCQIDArr="+JSON.stringify(MCQIDArr)+"&answerArr="+JSON.stringify(answerArr)+"&quizid="+<?php echo $quizid;?>);
 
@@ -214,8 +215,16 @@
                 </button>
                 <a class="navbar-brand" href="#">QUIZ</a>
 			</div>
-			<div class="nav navbar-nav navbar-btn navbar-right" style="margin-right:22px;">				
-				<button type="button" onclick="return submitQuiz();" class="btn btn-success">SUBMIT</button> 
+			<div class="nav navbar-nav navbar-btn navbar-right" style="margin-right:22px;">
+				<?php
+						if($status == "GRADED"){ ?>
+							<button type="button" onclick="return submitQuiz();" class="btn btn-success">GO BACK</button> 
+				<?php	}
+					
+						if($status == "UNANSWERED"){ ?>
+							<button type="button" onclick="" class="btn btn-success">SUBMIT</button> 
+				<?php	} ?>
+					
 			</div>
         </header>
 		
@@ -280,8 +289,44 @@
 		<?php
 			} $lastMCQID = $currentMCQID;?>
 								
-								<button type="button" class="btn btn-default btn-lg btn-block" name="<?php echo $rows[$i]->MCQID;?>" value="<?php echo $rows[$i]->Content;?>">
-								<input type="radio"/><label><?php echo $rows[$i]->Content;?></label></button>
+						<?php
+								if($status == "GRADED"){
+									if(!isset($rows[$i]->Choice)){ 
+										if($rows[$i]->Content == $rows[$i]->CorrectChoice){
+											echo "<button type=\"button\" class=\"btn btn-default btn-lg btn-block correct\"";
+										} else { 
+											echo "<button type=\"button\" class=\"btn btn-default btn-lg btn-block\"";
+										} 
+									} else { 
+										if($rows[$i]->CorrectChoice == $rows[$i]->Choice){
+											if($rows[$i]->Content == $rows[$i]->CorrectChoice){
+												echo "<script>$(\"#button\"+".($questionIndex-1).").addClass(\"correct\");</script>";
+												echo "<button type=\"button\" class=\"btn btn-default btn-lg btn-block correct\"";
+											} else {
+												echo "<button type=\"button\" class=\"btn btn-default btn-lg btn-block\"";
+											}
+										} else {
+											if($rows[$i]->Content == $rows[$i]->CorrectChoice){ 
+												echo "<button type=\"button\" class=\"btn btn-default btn-lg btn-block correct\"";
+											} else if($rows[$i]->Content == $rows[$i]->Choice){
+												echo "<script>$(\"#button\"+".($questionIndex-1).").addClass(\"wrong\");</script>";
+												echo "<button type=\"button\" class=\"btn btn-default btn-lg btn-block wrong\"";
+											} else {
+												echo "<button type=\"button\" class=\"btn btn-default btn-lg btn-block\"";
+											}
+										}
+									}  ?>
+									
+									name="<?php echo $rows[$i]->MCQID;?>" value="<?php echo $rows[$i]->Content;?>">
+									<input type="radio"/><label><?php echo $rows[$i]->Content;?></label><br><?php echo $rows[$i]->Explanation; ?></button>
+									
+						<?php	}
+						
+								if($status == "UNANSWERED"){  ?>
+										<button type="button" class="btn btn-default btn-lg btn-block" name="<?php echo $rows[$i]->MCQID;?>" value="<?php echo $rows[$i]->Content;?>">
+										<input type="radio"/><label><?php echo $rows[$i]->Content;?></label></button>
+						<?php	} ?>
+								
 			
 		<?php
 			  if(($i+1)==sizeof($rows)){ ?>

@@ -15,6 +15,8 @@
 		
 	}
 	
+	$DEBUG_MODE = true;
+	require_once("connection.php");
 	if($_SERVER["REQUEST_METHOD"] == "POST"){
 		
 		if(isset($_POST['MCQIDArr']) && isset($_POST['answerArr']) && isset($_POST['quizid'])){
@@ -30,12 +32,7 @@
 	}
 	
 	$conn = db_connect();
-	
-	$mcqGradeSql = "SELECT CorrectChoice
-					FROM   MCQ_Question
-					WHERE  MCQID = ?";			
-			
-	$mcqGradeQuery = $conn->prepare($mcqGradeSql);            
+	        
     $threshold = count($MCQIDArr)*0.2;
     $score = 0;
             
@@ -53,11 +50,21 @@
             
 	//SQL UPDATE STATEMENT
 	if ($score >= $threshold) {
+		
+		$score_sql = "SELECT Points 
+					  FROM MCQ_Section
+					  WHERE QuizID = ?;";
+					  
+		$score_query = $conn -> prepare($score_sql);  
+		$score_query -> execute(array($quizid));	
+		$score_res = $score_query -> fetch(PDO::FETCH_OBJ);		
+		
 		//UPDATE Quiz_Record
-		$update_stmt = "REPLACE INTO Quiz_Record(QuizID, StudentID)
-			 VALUES (?,?);";			
+		$status = "GRADED";
+		$update_stmt = "REPLACE INTO Quiz_Record(QuizID, StudentID, Status, Score)
+			 VALUES (?,?,?,?);";			
 		$update_stmt = $conn->prepare($update_stmt);                            
-		if(! $update_stmt -> execute(array($quizid, $studentid))){
+		if(! $update_stmt -> execute(array($quizid, $studentid, $status, $score_res -> Points))){
 			echo "<script language=\"javascript\">  alert(\"Error occurred to submit your answer. Report this bug to reseachers.\"); </script>";
 		} else{ 
 			echo "<script language=\"javascript\">  console.log(\"Quiz Passed\"); </script>";
@@ -83,6 +90,18 @@
 			}                
 		}
 		
+		$mcqGradeSql = "SELECT CorrectChoice
+						FROM   MCQ_Question
+						WHERE  MCQID = ?";			
+			
+		$mcqGradeQuery = $conn->prepare($mcqGradeSql);    
+		
+		$mcqExplanationSql = "SELECT Explanation, Content
+							  FROM   `Option`
+							  WHERE   MCQID = ?";	
+		
+		$mcqExplanationQuery = $conn->prepare($mcqExplanationSql);   
+		
 		echo "<script> alert(\"Congratulations! You have passed this quiz. The result is: ".$score."/".count($MCQIDArr).".\")  </script>";
 		
 		echo "<script>";
@@ -92,47 +111,55 @@
 			$mcqGradeQuery->execute(array($MCQIDArr[$i]));	
 			$mcqGradeRes = $mcqGradeQuery->fetch(PDO::FETCH_OBJ);
 			
-			$MCQContents = 'txt'.$MCQIDArr[$i];
+			$mcqExplanationQuery->execute(array($MCQIDArr[$i]));	
+			$mcqExplanationRes = $mcqExplanationQuery->fetchAll(PDO::FETCH_OBJ);
 			
 			echo "
 				
-				var options = document.getElementsByName(\"".$MCQIDArr[$i]."\");
+				$(\"button[name='".$MCQIDArr[$i]."']\").each(function(){ ";
 				
-				var contents = document.getElementsByName(\"".$MCQContents."\");
-				
-				for(j = 0; j < options.length; j++){ ";
+				foreach($mcqExplanationRes as $row){
+						echo "
+							if($(this).val() == \"".$row->Content."\"){
+								$(this).append(\"<br>\");
+								$(this).append(\"".$row->Explanation."\");
+							}
+						";
+				}
 					
 				if(!isset($answerArr[$i])){
 					echo "
-						if(options[j].value == \"".$mcqGradeRes->CorrectChoice."\"){
-							contents[j].style.background=\"#00ff00\";
+						if($(this).val() == \"".$mcqGradeRes->CorrectChoice."\"){
+							$(this).addClass(\"correct\");
 						}
 						";
 						
 				} else {							
 						if($mcqGradeRes->CorrectChoice == $answerArr[$i]){
-						
+							
 							echo "
-									if(options[j].checked == true){
-										contents[j].style.background=\"#00ff00\";
+									if($(this).hasClass(\"active\")){
+										$(this).addClass(\"correct\");
+										$(\"#button\"+".($i+1).").addClass(\"correct\");
 									}
 								 ";
 								 
 						} else {
 						
 							echo "
-									if(options[j].checked == true){
-										contents[j].style.background=\"#ff0000\";
+									if($(this).hasClass(\"active\")){
+										$(this).addClass(\"wrong\");
 									}
 						
-									if(options[j].value == \"".$mcqGradeRes->CorrectChoice."\"){
-										contents[j].style.background=\"#00ff00\";
+									if($(this).val() == \"".$mcqGradeRes->CorrectChoice."\"){
+										$(this).addClass(\"correct\");
+										$(\"#button\"+".($i+1).").addClass(\"wrong\");
 									}
 								";
 						}	
 					}
 					
-				echo "}";	
+				echo "});";	
 		}
 		
 		echo "</script>";
