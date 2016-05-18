@@ -7,7 +7,8 @@
 		$studentid = $_SESSION["studentid"];
 	} else {
 		
-	}	
+	}
+    	
 	if ($_SERVER["REQUEST_METHOD"] == "POST") {		
 		if(isset($_POST["week"])){
 			$week = $_POST["week"];

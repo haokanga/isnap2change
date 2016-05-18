@@ -51,11 +51,21 @@
             
 	//SQL UPDATE STATEMENT
 	if ($score >= $threshold) {
+		
+		$score_sql = "SELECT Points 
+					  FROM MCQ_Section
+					  WHERE QuizID = ?;";
+					  
+		$score_query = $conn -> prepare($score_sql);  
+		$score_query -> execute(array($quizid));	
+		$score_res = $score_query -> fetch(PDO::FETCH_OBJ);		
+		
 		//UPDATE Quiz_Record
-		$update_stmt = "REPLACE INTO Quiz_Record(QuizID, StudentID)
-			 VALUES (?,?);";			
+		$status = "GRADED";
+		$update_stmt = "REPLACE INTO Quiz_Record(QuizID, StudentID, Status, Score)
+			 VALUES (?,?,?,?);";			
 		$update_stmt = $conn->prepare($update_stmt);                            
-		if(! $update_stmt -> execute(array($quizid, $studentid))){
+		if(! $update_stmt -> execute(array($quizid, $studentid, $status, $score_res -> Points))){
 			echo "<script language=\"javascript\">  alert(\"Error occurred to submit your answer. Report this bug to reseachers.\"); </script>";
 		} else{ 
 			echo "<script language=\"javascript\">  console.log(\"Quiz Passed\"); </script>";
