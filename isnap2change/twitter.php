@@ -1,5 +1,6 @@
 <html>
 <head>
+<script type="text/javascript" src="js/instafeed.min.js"></script>
 </head>
 <body>
     <!--Facebook Page Plugin JavaScript SDK -->
@@ -46,5 +47,16 @@
     <!--Twitter Widget Search-->
     <a class="twitter-timeline" href="https://twitter.com/hashtag/Trump2016" data-widget-id="732759547232714752">#Trump2016 Tweets</a>
     <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+"://platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
-</body>
+
+    
+    <div id="instafeed"></div>
+    <script type="text/javascript">
+    var feed = new Instafeed({
+        get: 'tagged',
+        tagName: 'awesome',
+        clientId: '8f72a8bd53ca4c7881724feda7959875'
+    });
+    feed.run();
+    </script>
+    </body>
 </html>
