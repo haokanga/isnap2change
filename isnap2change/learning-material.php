@@ -104,6 +104,9 @@
 						<form id="formQuizBegin" method=post>
                             <button type="button" onclick="beginQuiz()" class="btn btn-default btn-lg btn-block" style="background-color:darkseagreen;">BEGIN QUIZ </button>
 							<input  type=hidden name="quizid" value=<?php echo $quizid; ?>></input>
+                            <input  type=hidden name="quiztype" value=<?php echo $quiztype; ?>></input>
+							<input  type=hidden name="week" value=<?php echo $week; ?>></input>
+                            <input  type=hidden name="status" value=<?php echo $status; ?>></input>
                            <!--
 						   implement logic 
 						   -->
