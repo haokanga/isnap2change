@@ -45,6 +45,9 @@
         }
 		
 		if(isset($quizResult["Status"])){
+			
+			$status = $quizResult["Status"];
+			
 			if($quizResult["QuizType"]=="MCQ"){
 				echo '<form id="quiz" action=multiple-choice-question.php method=post>';
 			}
@@ -53,13 +56,18 @@
 				echo '<form id="quiz" action=short-answer-question.php method=post>';
 			}
 			
-		} else echo '<form id="quiz" action=learning-material.php method=post>';
+		} else {
+			
+			$status = "UNANSWERED";
+				
+			echo '<form id="quiz" action=learning-material.php method=post>';
+		}
 		
         echo '<button type=button onclick="startQuiz()"> Quiz '.$count.'</button>
 			  <input  type=hidden name="quizid" value='.$quizResult["QuizID"].'></input>
 			  <input  type=hidden name="quiztype" value='.$quizResult["QuizType"].'></input>
 			  <input  type=hidden name="week" value='.$week.'></input>
-			  <input type=hidden name="status" value='.$quizResult["Status"].'></input>
+			  <input type=hidden name="status" value='.$status.'></input>
 			  </form>';
     }
     //game

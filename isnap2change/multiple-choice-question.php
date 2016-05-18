@@ -9,10 +9,11 @@
 	
 	if ($_SERVER["REQUEST_METHOD"] == "POST") {
 		
-		if(isset($_POST["quizid"]) && isset($_POST["quiztype"]) && isset($_POST["week"])){
+		if(isset($_POST["quizid"]) && isset($_POST["quiztype"]) && isset($_POST["week"]) && isset($_POST["status"])){
 			$quizid = $_POST["quizid"];
 			$quiztype = $_POST["quiztype"];
-			$week = $_POST["week"];          
+			$week = $_POST["week"];
+			$status = $_POST["status"];
 		} else {
 			
 		}
@@ -52,6 +53,21 @@
 	
 	$quesNum = $quesNumQuery->fetchColumn();
 	
+	if($status == "GRADED"){
+		$mcqSql = "SELECT MCQID, Question, Content, CorrectChoice, Choice, Explanation
+				   FROM   MCQ_Section NATURAL JOIN MCQ_Question
+									  NATURAL JOIN `Option`
+									  NATURAL JOIN MCQ_Question_Record
+					WHERE StudentID = ? AND QuizID = ?
+					ORDER BY MCQID";
+								
+	   $mcqQuery = $conn->prepare($mcqSql);
+	   $mcqQuery->execute(array($studentid, $quizid));
+	}
+	
+	if($status == ""){
+		
+	}
 	$mcqSql = "SELECT MCQID, Question, Content
 			   FROM   MCQ_Section NATURAL JOIN MCQ_Question
 								  NATURAL JOIN `Option`
