@@ -121,7 +121,7 @@ CREATE TABLE IF NOT EXISTS `Quiz` (
 CREATE TABLE IF NOT EXISTS `Quiz_Record` (
     QuizID MEDIUMINT,
     StudentID MEDIUMINT,    
-    Status ENUM('UNGRADED', 'GRADED') DEFAULT 'GRADED',
+    `Status` ENUM('UNGRADED', 'GRADED') DEFAULT 'GRADED',
     Score MEDIUMINT DEFAULT 0,
     CONSTRAINT Quiz_Record_PK PRIMARY KEY (QuizID , StudentID),
     CONSTRAINT Quiz_Record_QuizID_FK FOREIGN KEY (QuizID)
@@ -224,11 +224,7 @@ CREATE TABLE IF NOT EXISTS `Game` (
     Description TEXT,
     Week TINYINT,
     Points MEDIUMINT,
-    TopicID MEDIUMINT,
-    CONSTRAINT Game_GameID_PK PRIMARY KEY (GameID),
-    CONSTRAINT Game_TopicID_FK FOREIGN KEY (TopicID)
-        REFERENCES Topic (TopicID)
-        ON DELETE CASCADE ON UPDATE CASCADE
+    CONSTRAINT Game_GameID_PK PRIMARY KEY (GameID)
 )  ENGINE=INNODB;
 
 CREATE TABLE IF NOT EXISTS `Game_Record` (
@@ -480,8 +476,8 @@ INSERT IGNORE INTO Learning_Material(Content,QuizID) VALUES('
 <p>Learning materials for this quiz has not been added.',4);
 
 
-INSERT IGNORE INTO Game(Description,Week,Points,TopicID) VALUES('Fruit Ninja',1,10,5);
-INSERT IGNORE INTO Game(Description,Week,Points,TopicID) VALUES('Candy Crush',1,10,5);
+INSERT IGNORE INTO Game(Description,Week,Points) VALUES('Fruit Ninja',1,10);
+INSERT IGNORE INTO Game(Description,Week,Points) VALUES('Candy Crush',1,10);
 
 INSERT IGNORE INTO Game_Record(GameID,StudentID,`Level`,Score) VALUES(1,2,1,30);
 INSERT IGNORE INTO Game_Record(GameID,StudentID,`Level`,Score) VALUES(1,3,1,30);

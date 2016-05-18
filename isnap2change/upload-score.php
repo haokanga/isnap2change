@@ -11,8 +11,8 @@
         if(isset($_GET["score"]) && isset($_GET["gameid"])){
             $score = $_GET["score"];
             $gameid = $_GET["gameid"];
-            if(isset($_SESSION['userid'])){
-                $studentid = $_SESSION['userid'];
+            if(isset($_SESSION['studentid'])){
+                $studentid = $_SESSION['studentid'];
                 echo "<script language=\"javascript\">  console.log(\"This is DEBUG_MODE with SESSION studentid = ".$studentid.".\"); </script>";
                 $highscore = retrieve_data();
                 upload_score();
@@ -31,7 +31,7 @@
         global $gameid, $studentid, $score, $highscore;
         $conn = db_connect();
         $update_stmt = "INSERT INTO Game_Record(GameID,StudentID,`Level`,Score)
-                     VALUES (?,?,?,?) ON DUPLICATE KEY UPDATE Score = ?;";			
+                     VALUES (?,?,?,?) ON DUPLICATE KEY UPDATE Score = ?";			
         $update_stmt = $conn->prepare($update_stmt);
         for($level=1; $level<=count($score); $level++){
             if($score[$level-1]>$highscore[$level-1]){
