@@ -178,6 +178,9 @@
 			
 			function submitQuiz()
 			{
+				
+				$(".btn-block").attr("disabled","disabled");
+				
 				var MCQIDArr = document.getElementById("hiddenMCQIDArray").value.split(',');
 				var answerArr = new Array(MCQIDArr.length);	
 					
@@ -230,7 +233,10 @@
 				<?php	}
 					
 						if($status == "UNANSWERED"){ ?>
-							<button type="button" onclick="return submitQuiz();" class="btn btn-success">SUBMIT</button> 
+						<form id="goBack" method=post action=weekly-task.php>
+							<button id="back-btn" type="button" onclick="return submitQuiz();" class="btn btn-success">SUBMIT</button> 
+							<input type=hidden name="week" value=<?php echo $week; ?>></input>
+						</form>
 				<?php	} ?>
 					
 			</div>
@@ -325,7 +331,7 @@
 										}
 									}  ?>
 									
-									name="<?php echo $rows[$i]->MCQID;?>" value="<?php echo $rows[$i]->Content;?>">
+									name="<?php echo $rows[$i]->MCQID;?>" value="<?php echo $rows[$i]->Content;?>" disabled>
 									<input type="radio"/><label><?php echo $rows[$i]->Content;?></label><br><?php echo $rows[$i]->Explanation; ?></button>
 									
 						<?php	}
@@ -374,6 +380,17 @@
 			  
             <input type="hidden" id="hiddenIndex" value="1">
 			<input type=hidden id="hiddenMCQIDArray" value="<?php echo substr($MCQIDArray, 0, strlen($MCQIDArray)-1); ?>">
+			
+			<form id="hiddenReturnQuiz" action="learning-material.php" method=post>
+					<input  type=hidden name="quizid" value=<?php echo $quizid; ?>></input>
+					<input  type=hidden name="quiztype" value=<?php echo $quiztype; ?>></input>
+					<input  type=hidden name="week" value=<?php echo $week; ?>></input>
+					<input  type=hidden name="status" value=<?php echo $status; ?>></input>
+			</form>
+			
+			<form id="hiddenReturnTask" action="weekly-task.php" method=post>
+					<input  type=hidden name="week" value=<?php echo $week; ?>></input>
+			</form>
 		</div>
         </div>
     </body>

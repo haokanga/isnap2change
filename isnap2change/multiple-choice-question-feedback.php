@@ -104,6 +104,10 @@
 		
 		echo "<script> alert(\"Congratulations! You have passed this quiz. The result is: ".$score."/".count($MCQIDArr).".\")  </script>";
 		
+		echo "<script>
+					$(\"#back-btn\").text('GO BACK');
+					$(\"#back-btn\").attr(\"onclick\",\"goBack()\"); </script>";
+		
 		echo "<script>";
 		
 		for($i=0; $i<count($MCQIDArr); $i++){
