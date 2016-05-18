@@ -41,7 +41,7 @@
     }
     //if jump from learning materials    
     else if(!isset($_POST['answer']) && !isset($_POST['saqid'])){
-        echo "<script language=\"javascript\">  console.log(\"Jump from learning materials.\"); </script>";
+        echo "<script language=\"javascript\">  console.log(\"Jump from weekly tasks/learning materials.\"); </script>";
         $rows = "";
         $currentsaqid = "";
         
