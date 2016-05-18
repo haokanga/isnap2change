@@ -12,12 +12,11 @@
 		
 	if ($_SERVER["REQUEST_METHOD"] == "POST") {
 		
-		if(isset($_POST["quizid"]) && isset($_POST["quiztype"]) && isset($_POST["week"])){
-			
+		if(isset($_POST["quizid"]) && isset($_POST["quiztype"]) && isset($_POST["week"]) && isset($_POST["status"])){			
 			$quizid = $_POST["quizid"];
 			$quiztype = $_POST["quiztype"];
 			$week = $_POST["week"];
-			
+			$status = $_POST["status"];
 		} else {
 			
 		}
@@ -158,6 +157,7 @@
 							<input  type=hidden name="quizid" value=<?php echo $quizid; ?>></input>
 							<input  type=hidden name="quiztype" value=<?php echo $quiztype; ?>></input>
 							<input  type=hidden name="week" value=<?php echo $week; ?>></input>
+                            <input  type=hidden name="status" value=<?php echo $status; ?>></input>
                         </form>
 						</div>
                     </div>
