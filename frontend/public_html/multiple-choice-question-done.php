@@ -1,29 +1,9 @@
 <?php
 
-//    session_start();
-	require_once('connection.php');
-/*	
-	if(!isset($_SESSION["studentid"])){
-		
-	}
-*/	
-//	if ($_SERVER["REQUEST_METHOD"] == "POST") {
-		
-//		if(isset($_POST["quizid"]) && isset($_POST["quiztype"]) && isset($_POST["week"])){
-//			$quizid = $_GET["quizid"];
-//			$quizid = $_POST["quizid"];
-//			$quiztype = $_POST["quiztype"];
-//			$week = $_POST["week"];
-          
-//		} else {
-			
-//		}
-		
-//	} else {
-		
-//	}
-
-	$quizid = $_POST["quizid"];
+	require_once("connection.php");
+	
+	$quizid = 1;
+	$studentid = 1;
 	
 	$conn = db_connect();
 	
@@ -53,17 +33,17 @@
 	
 	$quesNumQuery = $conn->prepare($quesNumSql);
 	$quesNumQuery->execute(array($quizid));
-	
 	$quesNum = $quesNumQuery->fetchColumn();
 	
-	$mcqSql = "SELECT MCQID, Question, Content
+	$mcqSql = "SELECT MCQID, Question, Content, CorrectChoice, Choice, Explanation
 			   FROM   MCQ_Section NATURAL JOIN MCQ_Question
-								  NATURAL JOIN `Option`
-			   WHERE  QuizID = ?
-			   ORDER BY MCQID";
+				                  NATURAL JOIN `Option`
+                                  NATURAL JOIN MCQ_Question_Record
+               WHERE StudentID = ? AND QuizID = ?
+               ORDER BY MCQID";
 								
 	$mcqQuery = $conn->prepare($mcqSql);
-	$mcqQuery->execute(array($quizid));
+	$mcqQuery->execute(array($studentid, $quizid));
 			
 	$rows = $mcqQuery->fetchAll(PDO::FETCH_OBJ);
 			
@@ -130,67 +110,8 @@
 
                 });
 
-				//feedback button
-				// if the answer is correct for question 1 - $("#button1").addClass("correct");
-				//  if the answer is incorrect for question 1 - $("#button1").addClass("wrong");
-
             });
 			
-			function parseScript(strcode) {
-				var scripts = new Array();         // Array which will store the script's code
-  
-				// Strip out tags
-				while(strcode.indexOf("<script") > -1 || strcode.indexOf("</script") > -1) {
-					var s = strcode.indexOf("<script");
-					var s_e = strcode.indexOf(">", s);
-					var e = strcode.indexOf("</script", s);
-					var e_e = strcode.indexOf(">", e);
-    
-					// Add to scripts array
-					scripts.push(strcode.substring(s_e+1, e));
-					// Strip from strcode
-					strcode = strcode.substring(0, s) + strcode.substring(e_e+1);
-			  }
-			  
-			  // Loop through every script collected and eval it
-			  for(var i=0; i<scripts.length; i++) {
-				try {
-				  eval(scripts[i]);
-				}
-				catch(ex) {
-				  // do what you want here when a script fails
-				}
-			  }
-			}
-			
-			function submitQuiz()
-			{
-				var MCQIDArr = document.getElementById("hiddenMCQIDArray").value.split(',');
-				var answerArr = new Array(MCQIDArr.length);	
-					
-				$(".options").each(function(i) {
-					$(this).find(".btn").each(function() {
-						if($(this).hasClass("active")){
-							answerArr[i]=$(this).val();
-						}
-					});
-				});
-				
-				var xmlhttp = new XMLHttpRequest();
-				
-				xmlhttp.onreadystatechange = function() {
-					if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
-						parseScript(xmlhttp.responseText);
-					} else {
-						
-					}
-				};
-				
-				xmlhttp.open("POST", "multiple-choice-question-feedback-v1.php", true);
-				xmlhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-				xmlhttp.send("MCQIDArr="+JSON.stringify(MCQIDArr)+"&answerArr="+JSON.stringify(answerArr)+"&quizid="+<?php echo $quizid;?>);
-
-			}
 			
 			
         </script>
@@ -267,10 +188,38 @@
 							<div class="options">
 		<?php
 			} $lastMCQID = $currentMCQID;?>
+							
+							<?php 
+								if(!isset($rows[$i]->Choice)){ 
+									if($rows[$i]->Content == $rows[$i]->CorrectChoice){
+										echo "<button type=\"button\" class=\"btn btn-default btn-lg btn-block correct\"";
+									} else { 
+										echo "<button type=\"button\" class=\"btn btn-default btn-lg btn-block\"";
+									} 
+								} else { 
+									if($rows[$i]->CorrectChoice == $rows[$i]->Choice){
+										if($rows[$i]->Content == $rows[$i]->CorrectChoice){
+											echo "<script>$(\"#button\"+".($questionIndex-1).").addClass(\"correct\");</script>";
+											echo "<button type=\"button\" class=\"btn btn-default btn-lg btn-block correct\"";
+										} else {
+											echo "<button type=\"button\" class=\"btn btn-default btn-lg btn-block\"";
+										}
+									} else {
+										if($rows[$i]->Content == $rows[$i]->CorrectChoice){ 
+											echo "<button type=\"button\" class=\"btn btn-default btn-lg btn-block correct\"";
+										} else if($rows[$i]->Content == $rows[$i]->Choice){
+											echo "<script>$(\"#button\"+".($questionIndex-1).").addClass(\"wrong\");</script>";
+											echo "<button type=\"button\" class=\"btn btn-default btn-lg btn-block wrong\"";
+										} else {
+											echo "<button type=\"button\" class=\"btn btn-default btn-lg btn-block\"";
+										}
+									}
+								}
+						?>
 								
-								<button type="button" class="btn btn-default btn-lg btn-block" name="<?php echo $rows[$i]->MCQID;?>" value="<?php echo $rows[$i]->Content;?>">
-								<input type="radio"/><label><?php echo $rows[$i]->Content;?></label></button>
-			
+								name="<?php echo $rows[$i]->MCQID;?>" value="<?php echo $rows[$i]->Content;?>">
+								<input type="radio"/><label><?php echo $rows[$i]->Content;?></label><br><?php echo $rows[$i]->Explanation; ?></button>
+								
 		<?php
 			  if(($i+1)==sizeof($rows)){ ?>
 							</div>
@@ -313,4 +262,6 @@
         </div>
     </body>
 </html>
+
+
 
