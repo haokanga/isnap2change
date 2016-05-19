@@ -1,19 +1,21 @@
 <?php
-
+	session_start();
 	require_once("connection.php");
 	
+	if(isset($_SESSION["studentid"])){
+		$studentid = $_SESSION["studentid"];
+	} else {
+		
+	}
+	
 	$conn = db_connect();
-	
-	$studentid = 1;
-	
+		
 	$progressSql = "SELECT TopicName, QuizType, `Status`, Score
 					FROM Quiz NATURAL JOIN Topic
 							  LEFT    JOIN (SELECT * FROM Quiz_Record WHERE StudentID = ?) Quiz_Record_1 ON Quiz.QuizID = Quiz_Record_1.QuizID
 					WHERE Week = ?
 					ORDER BY TopicID";
-								
-	//db_close($conn);
-
+							
 ?>
 
 <html>

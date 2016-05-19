@@ -14,7 +14,7 @@
     if(isset($_POST['answer']) && isset($_POST['saqid']) && isset($_POST['quizid'])){
         $quizid = $_POST["quizid"];
         $saqid = $_POST["saqid"];    
-        $answer = $_POST["answer"];        
+        $answer = $_POST["answer"];      
         $conn = db_connect();
         $score = 0;
         for($i=0; $i<count($saqid); $i++) {
@@ -38,28 +38,37 @@
         }
         db_close($conn);
         echo "<script language=\"javascript\">  console.log(\"SUBMISSION.\"); </script>";
+        $saqresult = null;
     }
-    //if jump from learning materials    
-    else if(!isset($_POST['answer']) && !isset($_POST['saqid'])){
-        echo "<script language=\"javascript\">  console.log(\"Jump from learning materials.\"); </script>";
-        $rows = "";
-        $currentsaqid = "";
-        
-        if ($_SERVER["REQUEST_METHOD"] == "POST") {
-            
+    //if Jump from weekly tasks/learning materials
+    else if(!isset($_POST['answer']) && !isset($_POST['saqid']) && isset($_POST["status"])){
+        echo "<script language=\"javascript\">  console.log(\"Jump from weekly tasks/learning materials.\"); </script>";
+        $saqresult = "";
+        $currentsaqid = "";    
+        if ($_SERVER["REQUEST_METHOD"] == "POST") {            
             $conn = db_connect();
-            $quizid = $_POST["quizid"];
+            $quizid = $_POST["quizid"];                  
+            $status = $_POST["status"];
             $saqsql = "SELECT SAQID, Question
                        FROM   SAQ_Section NATURAL JOIN SAQ_Question
                        WHERE  QuizID = ?
                        ORDER BY SAQID";
             $saqquery = $conn->prepare($saqsql);
             $saqquery->execute(array($quizid));
-            $rows = $saqquery->fetchAll(PDO::FETCH_OBJ);
+            $saqresult = $saqquery->fetchAll(PDO::FETCH_OBJ);
+            
+            $lastsaqid = -1;
+            if($status == "UNGRADED" || $status == "GRADED"){
+                $saq_question_record_sql = "SELECT StudentID, SAQID, Answer, Feedback, Grading
+                       FROM   SAQ_Question_Record NATURAL JOIN SAQ_Question
+                       WHERE  QuizID = ?
+                       ORDER BY SAQID";
+                $saq_question_record_query = $conn->prepare($saq_question_record_sql);
+                $saq_question_record_query->execute(array($quizid));
+                $saq_question_record_result = $saq_question_record_query->fetchAll(PDO::FETCH_OBJ);
+            }
             db_close($conn);
-        }
-
-        $lastsaqid = -1;
+        }       
     } else {
         //todo: error handling
     }
@@ -173,19 +182,22 @@
                 </div>
 				
                 <div class="col-md-8" style="opacity:0.9;">
-				<?php for($i=0; $i<count($rows); $i++) {							
-							$currentsaqid = $rows[$i] -> SAQID;
+				<?php for($i=0; $i<count($saqresult); $i++) {							
+							$currentsaqid = $saqresult[$i] -> SAQID;
 							if($currentsaqid != $lastsaqid){ ?>
 								<div class="panel panel-default">
-									<div class="panel-heading"><b><i><?php echo ($i+1).". ".htmlspecialchars($rows[$i] -> Question); ?></i></b></div>
+									<div class="panel-heading"><b><i><?php echo ($i+1).". ".htmlspecialchars($saqresult[$i] -> Question); ?></i></b></div>
 										<div class="panel-body">
 						<?php
-							} $lastsaqid = $currentsaqid;?>
-                                <!--Short Answer Question Input TextBox-->
+							} $lastsaqid = $currentsaqid;?>                                
                                 <input type="hidden" name="saqid[]" value="<?php echo $currentsaqid ?>"/>
-                                <textarea rows="4" cols="50" name="answer[]" placeholder='Please input your answer here'></textarea>
+                                <!--Short Answer Question Input TextBox-->
+                                <textarea <?php if($status == "UNGRADED" || $status == "GRADED"){echo "disabled";} ?> rows="4" cols="50" name="answer[]" placeholder='Please input your answer here'><?php if($status == "UNGRADED" || $status == "GRADED"){echo $saq_question_record_result[$i]->Answer;} ?></textarea>
+                                <!--Feedback if graded-->
+                                <?php if($status == "GRADED"){echo "<br><p>".$saq_question_record_result[$i]->Feedback."</p>";
+                                echo "<p>Score: ".$saq_question_record_result[$i]->Grading."</p>";} ?>
 						<?php
-								if(($i+1)==sizeof($rows)){ ?>
+								if(($i+1)==sizeof($saqresult)){ ?>
 										</div>	
 								</div>
 								

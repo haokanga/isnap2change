@@ -23,6 +23,10 @@ function scoreboard(){
 	document.getElementById("scoreboard").submit();	
 }
 
+function checkprogress(){
+		window.location.href = "check-progress.php";
+}
+
 </script>
 </head>
 <body>
@@ -54,7 +58,7 @@ function scoreboard(){
 </form>
 </div>
 <div align="center">
-	<button type=button> Check Progress </button>
+	<button id="checkprogress" type=button onclick="checkprogress()"> Check Progress </button>
     <form id="scoreboard" action=scoreboard.php method=post>
 	<button type=button onclick="scoreboard()"> Check Scoreboard </button>
     </form>

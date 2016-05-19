@@ -215,7 +215,6 @@
                 <ul class="list-group lg opt" style="max-height: 89vh; overflow-y: auto;">
                     <li class="list-group-item" style="color:turquoise;">
                         <button type="button" class="btn btn-default" style="color:turquoise;font-weight: bold;" value="0">i</button>
-
                     </li>
 					
 			<?php 

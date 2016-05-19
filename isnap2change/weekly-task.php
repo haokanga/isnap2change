@@ -7,7 +7,8 @@
 		$studentid = $_SESSION["studentid"];
 	} else {
 		
-	}	
+	}
+    	
 	if ($_SERVER["REQUEST_METHOD"] == "POST") {		
 		if(isset($_POST["week"])){
 			$week = $_POST["week"];
@@ -36,17 +37,38 @@
     $quizQuery = $conn->prepare($quizSql);
     $quizQuery->execute(array($studentid, $week)); 
     $count = 0;
+	
     while($quizResult = $quizQuery->fetch(PDO::FETCH_ASSOC)){
         $count++;
         if($DEBUG_MODE){
             echo "<script language=\"javascript\">  console.log(\"[SUCCESS] studentid: $studentid week:$week QuizID:".$quizResult["QuizID"]." QuizType:".$quizResult["QuizType"]."\"); </script>";
         }
-        echo '<form id="quiz" action=learning-material.php method=post>
-        <button type=button onclick="startQuiz()"> Quiz '.$count.'</button>
-        <input  type=hidden name="quizid" value='.$quizResult["QuizID"].'></input>
-        <input  type=hidden name="quiztype" value='.$quizResult["QuizType"].'></input>
-        <input  type=hidden name="week" value='.$week.'></input>
-        </form>';
+		
+		if(isset($quizResult["Status"])){
+			
+			$status = $quizResult["Status"];
+			
+			if($quizResult["QuizType"]=="MCQ"){
+				echo '<form id="quiz'.$quizResult["QuizID"].'" action=multiple-choice-question.php method=post>';
+			}
+			
+			if($quizResult["QuizType"]=="SAQ"){
+				echo '<form id="quiz'.$quizResult["QuizID"].'" action=short-answer-question.php method=post>';
+			}
+			
+		} else {
+			
+			$status = "UNANSWERED";
+				
+			echo '<form id="quiz'.$quizResult["QuizID"].'" action=learning-material.php method=post>';
+		}
+		
+        echo '<button type=button onclick="startQuiz('.$quizResult["QuizID"].')"> Quiz '.$count.'</button>
+			  <input  type=hidden name="quizid" value='.$quizResult["QuizID"].'></input>
+			  <input  type=hidden name="quiztype" value='.$quizResult["QuizType"].'></input>
+			  <input  type=hidden name="week" value='.$week.'></input>
+			  <input type=hidden name="status" value='.$status.'></input>
+			  </form>';
     }
     //game
     $gameSql = "SELECT * FROM Game";    
@@ -66,8 +88,8 @@
 <html>
 <head>
 <script>
-function startQuiz(){	
-	document.getElementById("quiz").submit();	
+function startQuiz(quizid){	
+	document.getElementById("quiz"+quizid).submit();	
 }
 </script>
 </head>

@@ -451,13 +451,22 @@ INSERT IGNORE INTO Quiz_Record(QuizID,StudentID) VALUES(2,4);
 INSERT IGNORE INTO Quiz_Record(QuizID,StudentID) VALUES(2,5);
 INSERT IGNORE INTO Quiz_Record(QuizID,StudentID) VALUES(2,6);
 
-# Example to insert SAQ section with multiple questions
+# Example to insert SAQ section with questions
 INSERT IGNORE INTO Quiz(Week,QuizType,TopicID) VALUES(1,'SAQ',1);
 SET @QUIZ_LAST_INSERT_ID = LAST_INSERT_ID();
 INSERT IGNORE INTO SAQ_Section(QuizID) VALUES(@QUIZ_LAST_INSERT_ID);
 INSERT IGNORE INTO SAQ_Question(Question, Points, QuizID) VALUES('Based on the video, list 3 problems or challenges that these teenagers face as a result of their smoking?', 10, @QUIZ_LAST_INSERT_ID);
 INSERT IGNORE INTO SAQ_Question(Question, Points, QuizID) VALUES('List 1 strategy that you could use to help convince a peer to stop smoking?', 10, @QUIZ_LAST_INSERT_ID);
 INSERT IGNORE INTO SAQ_Question(Question, Points, QuizID) VALUES('List 3 the different ways that you have seen anti-smoking messages presented to the public. With each suggest if you think they have been ‘effective’ or ‘not effective’. Eg. Poster-Effective.', 20, @QUIZ_LAST_INSERT_ID);
+
+# Example of Answer and Grading Feedback of SAQ 
+INSERT IGNORE INTO Quiz_Record(QuizID, StudentID,`Status`,Score) VALUES(3, 1, 'GRADED', 34);
+INSERT IGNORE INTO SAQ_Question_Record(StudentID, SAQID, Answer, Feedback, Grading) VALUES(1, 1, "[ANSWER] 3 problems or challenges that these teenagers face", "+10: Good job!", 10);
+INSERT IGNORE INTO SAQ_Question_Record(StudentID, SAQID, Answer, Feedback, Grading) VALUES(1, 2, "[ANSWER] help convince a peer to stop smoking", "+10: Good job!", 10);
+INSERT IGNORE INTO SAQ_Question_Record(StudentID, SAQID, Answer, Feedback, Grading) VALUES(1, 3, "[ANSWER] 3 different ways that you have seen anti-smoking messages presented to the public", "+20: Nice try. \n-2: You should also mention Poster-Effective.", 18);
+
+
+
 
 INSERT IGNORE INTO Quiz(Week,QuizType,TopicID) VALUES(3,'SAQ',4);
 SET @QUIZ_LAST_INSERT_ID = LAST_INSERT_ID();
@@ -472,6 +481,8 @@ INSERT IGNORE INTO Learning_Material(Content,QuizID) VALUES('<p>Eating a balance
 <p><img style="display: block; margin-left: auto; margin-right: auto;" src="https://cmudream.files.wordpress.com/2016/05/0.jpg" alt="" width="632" height="884" /></p>
 <p>There are three main layers of the food pyramid. The bottom layer is the most important one for your daily intake of food. It contains vegetables, fruits, grains and legumes. You should be having most of your daily food from this layer. These foods are all derived or grow on plants and contain important nutrients such as vitamins, minerals and antioxidants. They are also responsible for being the main contributor of carbohydrates and fibre to our diet.<br />The middle layer is comprised of dairy based products such as milk, yoghurt, cheese. These are essential to providing our bodies with calcium and protein and important vitamins and minerals.<br />They layer also contains lean meat, poultry, fish, eggs, nuts, seeds, legumes. These foods are our main source of protein and are also responsible for providing other nutrients to us including iodine, iron, zinc, B12 vitamins and healthy fats.<br />The top layer, which is the smallest layer, is the layer you should me eating the least off. This layer is made up of food which has unsaturated fats such as sugar, butter, margarine and oils; small amounts of these unsaturated fats are needed for healthy brain and hear function.<br />(my own words)<br />Source: The Healthy Living Pyramid. Nutrition Australia. [Accessed 28/04/2016 http://www.nutritionaustralia.org/national/resource/healthy-living-pyramid]</p>',1);
 INSERT IGNORE INTO Learning_Material(Content,QuizID) VALUES('https://www.youtube.com/watch?v=1ey0EDVjyeY&index=89&list=PLIGEVr8ox1oGsi-XcwSjudMi_uCPxGzSs',2);
+INSERT IGNORE INTO Learning_Material(Content,QuizID) VALUES('
+<p>Learning materials for week 3.',3);
 INSERT IGNORE INTO Learning_Material(Content,QuizID) VALUES('
 <p>Learning materials for this quiz has not been added.',4);
 
