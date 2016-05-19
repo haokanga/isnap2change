@@ -17,7 +17,7 @@ and open the template in the editor.
     right: 0;
     z-index: -1;
     display: block;
-    background-image: url('bg5.jpg');
+    background-image: url('g8.jpg');
     height: 100vh;
 
     -webkit-filter: blur(5px);
@@ -42,6 +42,17 @@ body
     font-family: 'Raleway', sans-serif;
 }
 
+.panel-body img
+{
+    height: 600px;
+    width: inherit;
+    display: flex;
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
 .bs-docs-nav
 {
     background-color: white;
@@ -56,14 +67,17 @@ body
     font-family: 'Raleway', sans-serif;
 }
 
-.options>.btn-default:hover
+.options>.btn:hover
 {
-    background-color: white;
+   color: black !important;
+   background-color: black !important;
+	
 }
 
-.options>.btn-default:focus
+.options>.btn:focus
 {
-    background-color: white;
+    background-color: black !important;
+	color: black !important;
 }
 
 .highlight
@@ -71,12 +85,13 @@ body
     background-color: orange !important;
 }
 
-.options>.btn-default.active, .options>.btn-default:active
+.options>.btn.active, .options>.btn:active
 {
-    background-color: white;
+    background-color: black;
+	color: black;
 }
 
-.options>.btn-default
+.options>.btn
 {
     text-align: left;
     font-family: 'Raleway', sans-serif;
@@ -94,7 +109,7 @@ body
 
 label
 {
-    color: dimgray;
+    color: floralwhite;
 }
 
 .myques>.panel
@@ -103,10 +118,18 @@ label
     border: none !important;
     position: absolute;
     left: 20%;
-    transform: translateY(15%);
+    top: 10%;
     width: 60%;
-    color: white;
+    color: floralwhite;
+    height: 80%;
 
+}
+
+.panel-heading
+{
+    border: none !important;
+    background-color: rgba(0,0,0,0) !important;
+    color: floralwhite !important;
 }
 
 .info
@@ -168,7 +191,7 @@ input[type=radio] + label:before
 input[type=radio] + label:before 
 {
     content:"\f10c";
-    color: dimgray;
+    color: floralwhite;
     cursor: pointer;
 }
 
@@ -180,7 +203,7 @@ input[type=radio] + label:before
 input[type=radio]:checked + label:before 
 {
     content:"\f111";
-    color: dimgray; /* Remove this if you remove the 3 Last Rules of the CSS */
+    color: floralwhite; /* Remove this if you remove the 3 Last Rules of the CSS */
 }
 
 .correct
@@ -202,11 +225,23 @@ input[type=radio]:checked + label:before
     width: 6px;
 }
  
+::-moz-scrollbar
+{
+	width: 6px;
+} 
+
 /* Track */
 ::-webkit-scrollbar-track 
 {
     -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3); 
     -webkit-border-radius: 10px;
+    border-radius: 10px;
+}
+
+::-moz-scrollbar-track 
+{
+    -moz-box-shadow: inset 0 0 6px rgba(0,0,0,0.3); 
+    -moz-border-radius: 10px;
     border-radius: 10px;
 }
  
@@ -218,7 +253,21 @@ input[type=radio]:checked + label:before
     background: grey; 
     -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.5); 
 }
+
+::-moz-scrollbar-thumb 
+{
+    -moz-border-radius: 10px;
+    border-radius: 10px;
+    background: grey; 
+    -moz-box-shadow: inset 0 0 6px rgba(0,0,0,0.5); 
+}
+
 ::-webkit-scrollbar-thumb:window-inactive 
+{
+	background: white;
+}
+
+::-moz-scrollbar-thumb:window-inactive 
 {
 	background: white;
 }
