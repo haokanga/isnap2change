@@ -54,7 +54,7 @@
         <title>Quiz</title>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <link rel="stylesheet" type="text/css" href="css/quiz.css" />
+        <link rel="stylesheet" type="text/css" href="css/info.css" />
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
         <link href='https://fonts.googleapis.com/css?family=Raleway:400|Open+Sans' rel='stylesheet' type='text/css'>
         <link href='https://maxcdn.bootstrapcdn.com/font-awesome/4.6.2/css/font-awesome.min.css' rel='stylesheet' type='text/css'>
@@ -77,28 +77,24 @@
         </script>
         
         <div class="content"> 
-           <div class="info" style="padding-top:10px; padding-bottom:10px;">
-            <div class="panel panel-default">
-                    <div class="panel-body">
-                   <div class="myHeader" style="text-align:center;">
-                <div class="page-header" style="color: black;">
-                    <h1> 
-                        <i><?php echo $materialRes->TopicName; ?></i>
-                    </h1> 
-                </div>
-                <div class="col_third">	
-                </div>
-                <p style="font-size:smaller;">
-                    <i> Scroll down to read </i>
-                    <br>
-                    <span class="glyphicon glyphicon-chevron-down"></span>
-                </p>
-            </div>  
-            <div class="para" style="padding-left:15px; padding-right:15px;">
-				<div style="color:black; text-align:center;">
-                  <?php echo $materialRes->Content; ?>
-				</div>
-            </div>
+		<div class="contentHeader">
+			<img src="css/n1.jpg" alt="logo" style='width:100%; height:70vh;'/>
+		</div>
+           
+		<div class="info" style="top:58vh; padding-bottom:10px;">
+			<div class="panel panel-default">
+				<div class="panel-body">
+					<div class="heading" style="color: black; max-height:10vh; text-align:center; border-bottom: 1px solid #eee;">
+                                <h1 style='padding: 0px;'> 
+								<i>	<?php echo $materialRes->TopicName; ?> </i>                          
+                                </h1> 
+					</div>
+                   
+		<div class="para" style="padding-left:15px; padding-right:15px; padding-top:8px; text-align:center;">
+			<div style="color:black; display:flex; justify-content:center; align-items:center;">
+			  <?php echo $materialRes->Content; ?>
+			</div>
+		</div>
                         <br>
                         <br>
 						<form id="formQuizBegin" method=post>
