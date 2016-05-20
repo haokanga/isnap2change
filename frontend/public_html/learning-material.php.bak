@@ -78,8 +78,8 @@
         
         <div class="content"> 
 		<div class="contentHeader">
-                <img src="css/n2.jpg" alt="logo" style='width:100%; height:70vh;'/>
-				<h2><span>QUIZ 1 - NUTRITION</span></h2>
+                <img src="css/n1.jpg" alt="logo" style='width:100%; height:70vh;'/>
+				
 				</div>
            <div class="info" style="top:58vh; padding-bottom:10px;">
             <div class="panel panel-default">
