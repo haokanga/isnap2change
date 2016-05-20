@@ -310,32 +310,38 @@
 								if($status == "GRADED"){
 									if(!isset($rows[$i]->Choice)){ 
 										if($rows[$i]->Content == $rows[$i]->CorrectChoice){
-											echo "<button value=\"".$i."\" type=\"button\" class=\"btn btn-default btn-lg btn-block correct\"";
+											echo "<button type=\"button\" class=\"btn btn-default btn-lg btn-block correct\" name=\"".$rows[$i]->MCQID."\" id=\"".$i."\" disabled> 
+												  <input type=\"radio\" name=\"R_".$rows[$i]->MCQID."\" id=\"radio_".$i."\"/>";
 										} else { 
-											echo "<button value=\"".$i."\" type=\"button\" class=\"btn btn-default btn-lg btn-block\"";
+											echo "<button type=\"button\" class=\"btn btn-default btn-lg btn-block\" name=\"".$rows[$i]->MCQID."\" id=\"".$i."\" disabled> 
+												  <input type=\"radio\" name=\"R_".$rows[$i]->MCQID."\" id=\"radio_".$i."\"/>";
 										} 
 									} else { 
 										if($rows[$i]->CorrectChoice == $rows[$i]->Choice){
 											if($rows[$i]->Content == $rows[$i]->CorrectChoice){
 												echo "<script>$(\"#button\"+".($questionIndex-1).").addClass(\"correct\");</script>";
-												echo "<button value=\"".$i."\" type=\"button\" class=\"btn btn-default btn-lg btn-block correct\"";
+												echo "<button type=\"button\" class=\"btn btn-default btn-lg btn-block correct\" name=\"".$rows[$i]->MCQID."\" id=\"".$i."\" disabled> 
+													  <input type=\"radio\" name=\"R_".$rows[$i]->MCQID."\" id=\"radio_".$i."\" checked/>";
 											} else {
-												echo "<button value=\"".$i."\" type=\"button\" class=\"btn btn-default btn-lg btn-block\"";
+												echo "<button type=\"button\" class=\"btn btn-default btn-lg btn-block\" name=\"".$rows[$i]->MCQID."\" id=\"".$i."\" disabled> 
+												      <input type=\"radio\" name=\"R_".$rows[$i]->MCQID."\" id=\"radio_".$i."\"/>";
 											}
 										} else {
 											if($rows[$i]->Content == $rows[$i]->CorrectChoice){ 
-												echo "<button value=\"".$i."\" type=\"button\" class=\"btn btn-default btn-lg btn-block correct\"";
+												echo "<button type=\"button\" class=\"btn btn-default btn-lg btn-block correct\" name=\"".$rows[$i]->MCQID."\" id=\"".$i."\" disabled> 
+													  <input type=\"radio\" name=\"R_".$rows[$i]->MCQID."\" id=\"radio_".$i."\"/>";
 											} else if($rows[$i]->Content == $rows[$i]->Choice){
 												echo "<script>$(\"#button\"+".($questionIndex-1).").addClass(\"wrong\");</script>";
-												echo "<button value=\"".$i."\" type=\"button\" class=\"btn btn-default btn-lg btn-block wrong\"";
+												echo "<button type=\"button\" class=\"btn btn-default btn-lg btn-block wrong\" name=\"".$rows[$i]->MCQID."\" id=\"".$i."\" disabled> 
+												      <input type=\"radio\" name=\"R_".$rows[$i]->MCQID."\" id=\"radio_".$i."\" checked/>";
 											} else {
-												echo "<button value=\"".$i."\" type=\"button\" class=\"btn btn-default btn-lg btn-block\"";
+												echo "<button type=\"button\" class=\"btn btn-default btn-lg btn-block\" name=\"".$rows[$i]->MCQID."\" id=\"".$i."\" disabled> 
+												      <input type=\"radio\" name=\"R_".$rows[$i]->MCQID."\" id=\"radio_".$i."\"/>";
 											}
 										}
 									}  ?>
 									
-									name="<?php echo $rows[$i]->MCQID;?>" id="<?php echo $i?>" value="<?php echo $rows[$i]->Content;?>" disabled> 
-									<input type="radio" name="R_<?php echo $rows[$i]->MCQID;?>" id="radio_<?php echo $i?>" /><label><?php echo $rows[$i]->Content;?></label><br><?php echo $rows[$i]->Explanation; ?></button>
+									<label><?php echo $rows[$i]->Content;?></label><br><?php echo $rows[$i]->Explanation; ?></button>
 									
 						<?php	}
 						
