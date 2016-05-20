@@ -81,7 +81,7 @@
 			<img src="css/n1.jpg" alt="logo" style='width:100%; height:70vh;'/>
 		</div>
            
-		<div class="info" style="top:58vh; padding-bottom:10px;">
+		<div class="info" id="panel0" style="top:58vh; padding-bottom:10px;">
 			<div class="panel panel-default">
 				<div class="panel-body">
 					<div class="heading" style="color: black; max-height:10vh; text-align:center; border-bottom: 1px solid #eee;">
@@ -91,8 +91,9 @@
 					</div>
                    
 		<div class="para" style="padding-left:15px; padding-right:15px; padding-top:8px; text-align:center;">
-			<div style="color:black; display:flex; justify-content:center; align-items:center;">
-			  <?php echo $materialRes->Content; ?>
+			<div style="color:black; justify-content:center; align-items:center;">
+			<i>
+			  <?php echo $materialRes->Content; ?></i>
 			</div>
 		</div>
                         <br>
