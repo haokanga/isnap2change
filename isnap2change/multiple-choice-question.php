@@ -182,6 +182,7 @@
 			{
 				
 				$(".btn-block").attr("disabled","disabled");
+				$("input[type='radio']").remove();
 				
 				var MCQIDArr = document.getElementById("hiddenMCQIDArray").value.split(',');
 				var answerArr = new Array(MCQIDArr.length);	
@@ -311,32 +312,32 @@
 									if(!isset($rows[$i]->Choice)){ 
 										if($rows[$i]->Content == $rows[$i]->CorrectChoice){
 											echo "<button type=\"button\" class=\"btn btn-default btn-lg btn-block correct\" name=\"".$rows[$i]->MCQID."\" id=\"".$i."\" disabled> 
-												  <input type=\"radio\" name=\"R_".$rows[$i]->MCQID."\" id=\"radio_".$i."\"/>";
+												  <span class=\"glyphicon glyphicon-ok\"></span>";
 										} else { 
 											echo "<button type=\"button\" class=\"btn btn-default btn-lg btn-block\" name=\"".$rows[$i]->MCQID."\" id=\"".$i."\" disabled> 
-												  <input type=\"radio\" name=\"R_".$rows[$i]->MCQID."\" id=\"radio_".$i."\"/>";
+												  <span class=\"glyphicon glyphicon-remove\"></span>";
 										} 
 									} else { 
 										if($rows[$i]->CorrectChoice == $rows[$i]->Choice){
 											if($rows[$i]->Content == $rows[$i]->CorrectChoice){
 												echo "<script>$(\"#button\"+".($questionIndex-1).").addClass(\"correct\");</script>";
 												echo "<button type=\"button\" class=\"btn btn-default btn-lg btn-block correct\" name=\"".$rows[$i]->MCQID."\" id=\"".$i."\" disabled> 
-													  <input type=\"radio\" name=\"R_".$rows[$i]->MCQID."\" id=\"radio_".$i."\" checked/>";
+													  <span class=\"glyphicon glyphicon-ok\"></span>";
 											} else {
 												echo "<button type=\"button\" class=\"btn btn-default btn-lg btn-block\" name=\"".$rows[$i]->MCQID."\" id=\"".$i."\" disabled> 
-												      <input type=\"radio\" name=\"R_".$rows[$i]->MCQID."\" id=\"radio_".$i."\"/>";
+												      <span class=\"glyphicon glyphicon-remove\"></span>";
 											}
 										} else {
 											if($rows[$i]->Content == $rows[$i]->CorrectChoice){ 
 												echo "<button type=\"button\" class=\"btn btn-default btn-lg btn-block correct\" name=\"".$rows[$i]->MCQID."\" id=\"".$i."\" disabled> 
-													  <input type=\"radio\" name=\"R_".$rows[$i]->MCQID."\" id=\"radio_".$i."\"/>";
+													  <span class=\"glyphicon glyphicon-ok\"></span>";
 											} else if($rows[$i]->Content == $rows[$i]->Choice){
 												echo "<script>$(\"#button\"+".($questionIndex-1).").addClass(\"wrong\");</script>";
 												echo "<button type=\"button\" class=\"btn btn-default btn-lg btn-block wrong\" name=\"".$rows[$i]->MCQID."\" id=\"".$i."\" disabled> 
-												      <input type=\"radio\" name=\"R_".$rows[$i]->MCQID."\" id=\"radio_".$i."\" checked/>";
+												      <span class=\"glyphicon glyphicon-remove\"></span>";
 											} else {
 												echo "<button type=\"button\" class=\"btn btn-default btn-lg btn-block\" name=\"".$rows[$i]->MCQID."\" id=\"".$i."\" disabled> 
-												      <input type=\"radio\" name=\"R_".$rows[$i]->MCQID."\" id=\"radio_".$i."\"/>";
+												      <span class=\"glyphicon glyphicon-remove\"></span>";
 											}
 										}
 									}  ?>
@@ -347,7 +348,9 @@
 						
 								if($status == "UNANSWERED"){  ?>
 										<button type="button" id="<?php echo $i?>" class="btn btn-default btn-lg btn-block" name="<?php echo $rows[$i]->MCQID;?>" value="<?php echo $rows[$i]->Content;?>">
-										<input type="radio" name="R_<?php echo $rows[$i]->MCQID;?>" id="radio_<?php echo $i?>"/><label><?php echo $rows[$i]->Content;?></label></button>
+										<span class="glyphicon glyphicon-remove hidden"></span> 
+										<span class="glyphicon glyphicon-ok hidden"></span> 
+										<input type="radio" name="R_<?php echo $rows[$i]->MCQID;?>" class="" id="radio_<?php echo $i?>"/><label><?php echo $rows[$i]->Content;?></label></button>
 						<?php	} ?>
 								
 			
