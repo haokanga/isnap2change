@@ -431,11 +431,11 @@ INSERT IGNORE INTO `Option`(Content, Explanation, MCQID) VALUES('Drug that targe
 INSERT IGNORE INTO `Option`(Content, Explanation, MCQID) VALUES('Drug that you do not need to worry about.', "Wrong", @MCQ_QUESTION_LAST_INSERT_ID);
 INSERT IGNORE INTO `Option`(Content, Explanation, MCQID) VALUES('Drug that does not affect your behaviour.', "Wrong", @MCQ_QUESTION_LAST_INSERT_ID);
 
-INSERT IGNORE INTO MCQ_Question(Question, CorrectChoice, QuizID) VALUES('Alcohol is broken down by:', 'Heart', @QUIZ_LAST_INSERT_ID);
+INSERT IGNORE INTO MCQ_Question(Question, CorrectChoice, QuizID) VALUES('Alcohol is broken down by:', 'Liver', @QUIZ_LAST_INSERT_ID);
 SET @MCQ_QUESTION_LAST_INSERT_ID = LAST_INSERT_ID();
 INSERT IGNORE INTO `Option`(Content, Explanation, MCQID) VALUES('Blood', "Wrong", @MCQ_QUESTION_LAST_INSERT_ID);
-INSERT IGNORE INTO `Option`(Content, Explanation, MCQID) VALUES('Heart', "Correct", @MCQ_QUESTION_LAST_INSERT_ID);
-INSERT IGNORE INTO `Option`(Content, Explanation, MCQID) VALUES('Liver', "Wrong", @MCQ_QUESTION_LAST_INSERT_ID);
+INSERT IGNORE INTO `Option`(Content, Explanation, MCQID) VALUES('Heart', "Wrong", @MCQ_QUESTION_LAST_INSERT_ID);
+INSERT IGNORE INTO `Option`(Content, Explanation, MCQID) VALUES('Liver', "Correct", @MCQ_QUESTION_LAST_INSERT_ID);
 INSERT IGNORE INTO `Option`(Content, Explanation, MCQID) VALUES('Kidney', "Wrong", @MCQ_QUESTION_LAST_INSERT_ID);
 
 # StudentID = 1 has not finished QuizID neither 1, 2 nor 3
