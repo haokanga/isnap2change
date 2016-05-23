@@ -18,13 +18,12 @@
         <link href="css/notify-metro.css" rel="stylesheet" />
         <script src="js/notify-metro.js"></script>
     </head>
-    <body>
-    <img src='img/achievement/diploma-2-52.png'/>
-    <script>
-    $(document).ready(function(){
+    <body>    
+    <script>     
+    function notify(title, text) {
         $.notify({
-            title: "Head First SNAP!",
-            text: "Welcome to iSNAP2Change!",
+            title: title,
+            text: text,
             image: "<img src='img/achievement/diploma-2-52.png'/>"
         }, {
             style: 'metro',
@@ -34,8 +33,14 @@
             showDuration: 300,
             hideDuration: 1000
         });
-    });   
-    
+    }
+    $(document).ready(function(){
+        var loginTitle = "&nbsp;3-day Log In Streak!";
+        var loginText = "&nbsp;You have logged in over 3 days!loooooooooooooooooooooooooooooooooooooooooooong";
+        notify(loginTitle, loginText);
+    }); 
     </script>
+    <h2>Achievement</h2>
+    <button onclick="notify('&nbsp;Head First SNAP!', '&nbsp;Welcome to iSNAP2Change!loooooooooooooooooooooooooooooooooooooooooooong')"><img src='img/achievement/diploma-2-52.png'/></button>
     </body>
 </html>
