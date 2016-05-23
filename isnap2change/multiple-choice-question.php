@@ -101,9 +101,79 @@
     </head>
     <body>
         <script>
+		    
+			function CountDownTimer(duration, granularity) {
+                this.duration = duration;
+                this.granularity = granularity || 1000;
+                this.tickFtns = [];
+                this.running = false;
+            }
+
+            CountDownTimer.prototype.start = function () {
+                if (this.running) {
+                    return;
+                }
+                this.running = true;
+                var start = Date.now(),
+                        that = this,
+                        diff, obj;
+
+                (function timer() {
+                    diff = that.duration - (((Date.now() - start) / 1000) | 0);
+
+                    if (diff > 0) {
+                        setTimeout(timer, that.granularity);
+                    } else {
+                        diff = 0;
+                        that.running = false;
+                    }
+
+                    obj = CountDownTimer.parse(diff);
+                    that.tickFtns.forEach(function (ftn) {
+                        ftn.call(this, obj.minutes, obj.seconds);
+                    }, that);
+                }());
+            };
+
+            CountDownTimer.prototype.onTick = function (ftn) {
+                if (typeof ftn === 'function') {
+                    this.tickFtns.push(ftn);
+                }
+                return this;
+            };
+
+            CountDownTimer.prototype.expired = function () {
+                return !this.running;
+            };
+
+            CountDownTimer.parse = function (seconds) {
+                return {
+                    'minutes': (seconds / 60) | 0,
+                    'seconds': (seconds % 60) | 0
+                };
+            };
+
+            window.onload = function () {
+
+                var display1 = document.querySelector('#time1'),
+                        timer = new CountDownTimer(30);    // set time here
+
+                timer.onTick(format1).start();
+
+                function format1(minutes, seconds) {
+                    minutes = minutes < 10 ? "0" + minutes : minutes;
+                    seconds = seconds < 10 ? "0" + seconds : seconds;
+                    display1.textContent = minutes + ':' + seconds;
+                }
+            };
+
             $(document).ready(function ()
             {
 				$("#button1").addClass("highlight");
+
+				$('#panel1').css ({
+                   top: ($('.content').outerHeight()-$('#panel1').outerHeight())/2  
+                });
 
                 $(".options").find(".btn").click(function () {
 					var index = $("#hiddenIndex").val();
@@ -120,6 +190,9 @@
 					$("#button"+index).removeClass("highlight");
 					index++;
                     $("#panel"+index).removeClass("hidden");
+					$("#panel"+index).css ({
+                     top: ($('.content').outerHeight()-$("#panel"+index).outerHeight())/2  
+                    });
 					$("#hiddenIndex").val(index);
 					$("#button"+index).addClass("highlight");
                 });
@@ -130,6 +203,9 @@
 					$("#button"+index).removeClass("highlight");
 					index--;
                     $("#panel"+index).removeClass("hidden");
+					$("#panel"+index).css ({
+                     top: ($('.content').outerHeight()-$("#panel"+index).outerHeight())/2  
+                    });
 					$("#hiddenIndex").val(index);					
 					$("#button"+index).addClass("highlight");
                 });
@@ -141,6 +217,9 @@
 					$("#button"+currentIndex).removeClass("highlight");
 					$("#panel"+currentIndex).addClass("hidden");
                     $("#panel"+index).removeClass("hidden");
+					$("#panel"+index).css ({
+                     top: ($('.content').outerHeight()-$("#panel"+index).outerHeight())/2  
+                    });
 					$("#hiddenIndex").val(index);
 
                 });
@@ -181,7 +260,7 @@
 			function submitQuiz()
 			{
 				
-				$(".btn-block").attr("disabled","disabled");
+			//	$(".btn-block").attr("disabled","disabled");
 				
 				var MCQIDArr = document.getElementById("hiddenMCQIDArray").value.split(',');
 				var answerArr = new Array(MCQIDArr.length);	
@@ -226,6 +305,7 @@
                 <a class="navbar-brand" href="#">QUIZ</a>
 			</div>
 			<div class="nav navbar-nav navbar-btn navbar-right" style="margin-right:22px;">
+			
 				<?php
 						if($status == "GRADED"){ ?>
 						<form id="goBack" method=post action=weekly-task.php>
@@ -242,6 +322,9 @@
 				<?php	} ?>
 					
 			</div>
+			<div class="nav navbar-nav navbar-btn navbar-right" style="margin-right: 15px; font-size: x-large;">
+			<span id="time1"></span>
+			</div>
         </header>
 		
 		<div class="content"> 
@@ -249,7 +332,7 @@
 
                 <ul class="list-group lg opt" style="max-height: 89vh; overflow-y: auto;">
                     <li class="list-group-item" style="color:turquoise;">
-                        <button type="button" class="btn btn-default" style="color:turquoise;font-weight: bold;" value="0">i</button>
+                        <button type="button" class="btn btn-default" id="button0" style="color:turquoise;font-weight: bold;" value="0">i</button>
                     </li>
 					
 			<?php 
@@ -334,7 +417,7 @@
 										}
 									}  ?>
 									
-									name="<?php echo $rows[$i]->MCQID;?>" id="<?php echo $i?>" value="<?php echo $rows[$i]->Content;?>" disabled> 
+									name="<?php echo $rows[$i]->MCQID;?>" id="<?php echo $i?>" value="<?php echo $rows[$i]->Content;?>"> 
 									<input type="radio" name="R_<?php echo $rows[$i]->MCQID;?>" id="radio_<?php echo $i?>" /><label><?php echo $rows[$i]->Content;?></label><br><?php echo $rows[$i]->Explanation; ?></button>
 									
 						<?php	}
