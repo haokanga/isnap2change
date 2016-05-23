@@ -135,6 +135,9 @@
 					echo "
 						if($(this).val() == \"".$mcqGradeRes->CorrectChoice."\"){
 							$(this).addClass(\"correct\");
+							$(this).find(\".glyphicon-ok\").removeClass(\"hidden\");
+						} else {
+							$(this).find(\".glyphicon-remove\").removeClass(\"hidden\");
 						}
 						";
 						
@@ -145,6 +148,9 @@
 									if($(this).hasClass(\"active\")){
 										$(this).addClass(\"correct\");
 										$(\"#button\"+".($i+1).").addClass(\"correct\");
+										$(this).find(\".glyphicon-ok\").removeClass(\"hidden\");
+									} else {
+										$(this).find(\".glyphicon-remove\").removeClass(\"hidden\");
 									}
 								 ";
 								 
@@ -153,12 +159,14 @@
 							echo "
 									if($(this).hasClass(\"active\")){
 										$(this).addClass(\"wrong\");
-									}
-						
-									if($(this).val() == \"".$mcqGradeRes->CorrectChoice."\"){
-										$(this).addClass(\"correct\");
-										$(\"#button\"+".($i+1).").addClass(\"wrong\");
-									}
+										$(this).find(\".glyphicon-remove\").removeClass(\"hidden\");
+									} else if($(this).val() == \"".$mcqGradeRes->CorrectChoice."\"){
+												$(this).addClass(\"correct\");
+												$(\"#button\"+".($i+1).").addClass(\"wrong\");
+												$(this).find(\".glyphicon-ok\").removeClass(\"hidden\");
+											} else {
+												$(this).find(\".glyphicon-remove\").removeClass(\"hidden\");
+											}
 								";
 						}	
 					}
@@ -167,6 +175,15 @@
 		}
 		
 		echo "</script>";
+
+		echo "<script>
+				var index = $(\"#hiddenIndex\").val();
+                $(\"#panel\"+index).addClass(\"hidden\");
+                $(\"#button\"+index).removeClass(\"highlight\");
+                $(\"#panel1\").removeClass(\"hidden\");
+                $(\"#button1\").addClass(\"highlight\");
+                $(\"#hiddenIndex\").val(1);
+			 </script>";
 		
 		
 	}else{
