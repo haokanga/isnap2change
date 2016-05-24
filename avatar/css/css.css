@@ -1,0 +1,31 @@
+h1, h2 {
+	margin: 0;
+	font-family: sans-serif;
+	font-weight: normal;
+}
+
+#flag-horizontal, #flag-vertical {
+	position: absolute;
+	bottom: 200px;
+	left: 15%;
+	width: 274px;
+	height: 367px;
+	background-repeat: no-repeat;
+}
+
+#flag-horizontal-canvas, #flag-vertical-canvas {
+	position: relative;
+	top: 4px;
+	left: 22px;
+}
+
+/* http://stackoverflow.com/questions/14359522/canvas-waving-flag-htm5#14361951 */
+#flag-vertical {
+	margin-top: -48px;
+	margin-left: 45px;
+	transform:rotate(90deg);
+	-ms-transform:rotate(90deg); /* IE 9 */
+	-moz-transform:rotate(90deg); /* Firefox */
+	-webkit-transform:rotate(90deg); /* Safari and Chrome */
+	-o-transform:rotate(90deg); /* Opera */
+}
