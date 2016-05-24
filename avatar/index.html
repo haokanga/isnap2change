@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html >
+  <head>
+    <meta charset="UTF-8">
+    <title>Pausing Transitions</title>
+    	<link rel="stylesheet" href="css/css.css">
+        <link rel="stylesheet" href="css/style.css">
+        <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
+    	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.2/jquery.min.js"></script>
+    	<script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+  </head>
+
+  <body>
+
+		<div id="clouds">
+			<div class="cloud x1"></div>
+			<div class="cloud x2"></div>
+			<div class="cloud x3"></div>
+			<div class="cloud x4"></div>
+			<div class="cloud x5"></div>
+		</div>
+
+		<div id="flag-horizontal"><img src="flag.png" width="274" height="367" alt="AWOL Industries"/></div>
+		
+		<div class='runnerWay'></div>
+		<div class='runner'></div> 
+
+		<div class="navigation">
+			<a id="nav-left" class="btn btn-info btn-lg" role="button" disabled>
+				<span class="glyphicon glyphicon-arrow-left"></span>
+			</a>
+
+			<a id="nav-right" class="btn btn-info btn-lg" role="button">
+				<span class="glyphicon glyphicon-arrow-right"></span> 
+			</a>
+		</div>
+
+		<input type="hidden" id="hiddenIndex" value="0"/>
+
+		<script src="js/js.js"></script>
+		<script src='http://code.jquery.com/jquery-2.0.0.js'></script>
+		<script src="js/index.js"></script>
+    
+    </body>
+</html>
