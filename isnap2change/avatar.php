@@ -62,7 +62,6 @@ function checkprogress(){
     <form id="scoreboard" action=scoreboard.php method=post>
 	<button type=button onclick="scoreboard()"> Check Scoreboard </button>
     </form>
-</form>
 </div>
 </body>
 </html>
