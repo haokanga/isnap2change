@@ -17,18 +17,8 @@
         <link rel="stylesheet" href="css/style.css">
         <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
     	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.2/jquery.min.js"></script>
-    	<script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
-        <script>
-            function startWeeklyTask(){
-                document.getElementById("weeklytask").submit();	
-            }
-            function scoreboard(){
-                document.getElementById("scoreboard").submit();	
-            }
-            function checkprogress(){
-                    window.location.href = "../isnap2change/check-progress.php";
-            }
-        </script>
+    	<script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>        
+        
   </head>
   <body>
         <!-- Animation -->
@@ -70,6 +60,40 @@
 		<script src="js/js.js"></script>
 		<script src='http://code.jquery.com/jquery-2.0.0.js'></script>
 		<script src="js/index.js"></script>
+        <!-- Achievement -->
+        <script type="text/javascript" src="js/notify.min.js"></script>
+        <link href="css/notify-metro.css" rel="stylesheet" />
+        <script src="js/notify-metro.js"></script>
+        <script>
+            function startWeeklyTask(){
+                document.getElementById("weeklytask").submit();	
+            }
+            function scoreboard(){
+                document.getElementById("scoreboard").submit();	
+            }
+            function checkprogress(){
+                    window.location.href = "../isnap2change/check-progress.php";
+            }
+            function notify(title, text) {
+                $.notify({
+                    title: title,
+                    text: text,
+                    image: "<img src='../isnap2change/img/achievement/diploma-2-52.png'/>"
+                }, {
+                    style: 'metro',
+                    position: "bottom right",
+                    className: "white",
+                    clickToHide: true,            
+                    showDuration: 300,
+                    hideDuration: 1000
+                });
+            }
+            $(document).ready(function(){
+                var loginTitle = "&nbsp;Log In For First Time!";
+                var loginText = "&nbsp;Welcome to iSNAP2Change!";
+                notify(loginTitle, loginText);
+            });
+        </script>
     
     </body>
 </html>
