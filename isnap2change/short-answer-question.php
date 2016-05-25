@@ -19,9 +19,8 @@
     }
     //POST parameters
     if ($_SERVER["REQUEST_METHOD"] == "POST") {		
-		if(isset($_POST["quizid"]) && isset($_POST["quiztype"]) && isset($_POST["week"]) && isset($_POST["status"])){
+		if(isset($_POST["quizid"]) && isset($_POST["week"]) && isset($_POST["status"])){
 			$quizid = $_POST["quizid"];
-			$quiztype = $_POST["quiztype"];
 			$week = $_POST["week"];
 			$status = $_POST["status"];
 		} else {
@@ -117,12 +116,9 @@
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <link rel="stylesheet" type="text/css" href="css/quiz.css" />
-        <link rel="stylesheet" type="text/css" href="css/feedback.css" />
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
         <link href='https://fonts.googleapis.com/css?family=Raleway:400|Open+Sans' rel='stylesheet' type='text/css'>
         <link href='https://maxcdn.bootstrapcdn.com/font-awesome/4.6.2/css/font-awesome.min.css' rel='stylesheet' type='text/css'>
-        <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.2/jquery.min.js"></script>
-        <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
         <script type="text/javascript" src="js/jquery-1.12.3.js"></script>
     </head>
     <body>
@@ -200,15 +196,6 @@
                     top: ($('.content').outerHeight() - $('#panel0').outerHeight()) / 2
                 });
 
-                $(".options").find(".btn").click(function () {
-                    var index = $("#hiddenIndex").val();
-                    var num = $(this).attr('id');
-                    $("#radio_" + num).prop("checked", true);
-                    $("#panel" + index).find(".btn").removeClass("active");
-                    $(this).addClass("active");
-                    $("#button" + index).addClass("completed");
-                });
-
                 $(".next").click(function () {
                     var index = $("#hiddenIndex").val();
                     $("#panel" + index).addClass("hidden");
@@ -236,7 +223,6 @@
                 });
 
                 $(".opt").find(".btn").click(function () {
-                    debugger;
                     var index = $(this).val();
                     $(this).addClass("highlight");
                     var currentIndex = $("#hiddenIndex").val();
@@ -256,6 +242,20 @@
 			{
 				document.getElementById("goBack").submit();
 			}
+            
+            function submitQuiz()
+			{                
+                $.ajax({
+                   url: location.href,                           
+                   data: $('#submission').serialize(),                 
+                   success: function (data) {                        
+                      window.location.href = 'avatar.php';;
+                   },
+                   error: function (xhr, text, error) {              
+                      alert('Error: ' + error);
+                   }
+                });
+			}
         </script>
         <header class="navbar navbar-static-top bs-docs-nav">
 
@@ -273,11 +273,8 @@
 							 <input type=hidden name="week" value=<?php echo $week; ?>></input>
 						</form>
 				<?php	}					
-						if($status == "UNANSWERED"){ ?>
-						<form id="goBack" method=post action=weekly-task.php>
-							<button id="back-btn" type="button" onclick="return submitQuiz();" class="btn btn-success">SUBMIT</button> 
-							<input type=hidden name="week" value=<?php echo $week; ?>></input>
-						</form>
+						 else if($status == "UNANSWERED" || $status == "UNGRADED"){ ?>
+							<button id="back-btn" type="button" onclick="return submitQuiz();" class="btn btn-success">SUBMIT</button>
 				<?php	} ?>
             </div>
             <div class="nav navbar-nav navbar-btn navbar-right" style="margin-right: 15px; font-size: x-large;">
@@ -319,26 +316,30 @@
                     </div>
                 </div>
             </div>
-
-            
-            <div class="myques">
+        <!--form submission-->    
+        <form id="submission" method="post" action="<?php echo $_SERVER['PHP_SELF']; ?>">
+            <input type=hidden name="week" value=<?php echo $week; ?> ></input>        
+            <input type=hidden name="quizid" value=<?php echo $quizid; ?> ></input>
+            <input type=hidden name="status" value="UNGRADED" ></input>
             <?php for($i=0; $i<count($saqresult); $i++) {
                 $currentsaqid = $saqresult[$i] -> SAQID;
                 if($currentsaqid != $lastsaqid){  
                     if($questionIndex == 1){ ?>
-                        <div class="myques" id="panel1">
+            <div class="myques" id="panel1">
             <?php		} else { ?>
-                        <div class="myques hidden" id="<?php echo "panel".$questionIndex;?>">
+            <div class="myques hidden" id="panel<?php echo $questionIndex;?>"> 
             <?php		} ?>
+                    <!--heading-->
                     <div class="panel-heading" style="font-size: xx-large; font-weight: 600; color:black; height:35%; min-height: 35%; max-height: 35%; text-align:center;">
                         <div class="ques" >                        
                             <?php $questionIndex++; echo ($i+1).". ".htmlspecialchars($saqresult[$i] -> Question); ?>
                         </div> 
                     </div>
+                    <!--body-->
                     <div class="panel-body" style="width: 85%; margin-left:7.5%;">
-            <?php  $lastsaqid = $currentsaqid;?>
-                        <!--if UNGRADED/GRADED-->
-                        <?php if($status == "UNGRADED" || $status == "GRADED"){ ?>
+                    <?php  $lastsaqid = $currentsaqid;?>
+                        <!--if GRADED-->
+                        <?php if($status == "GRADED"){ ?>                        
                             <div class="well-large">
                                 <ul class="nav nav-tabs nav-justified">
                                     <li role="presentation" class="active"><a data-toggle="tab" href="#feedback<?php echo $i+1;?>">FEEDBACK</a></li>
@@ -363,22 +364,28 @@
                                     </div>
                                 </div>
                             </div>
+                        <!--if UNANSWERED/UNGRADED-->    
+                        <?php } else { ?>
+                        <input type="hidden" name="saqid[]" value="<?php echo $currentsaqid ?>"/>
+                        <textarea class="form-control" rows="10" name="answer[]" placeholder='Please input your answer here'><?php if($status == "UNGRADED"){echo $saq_question_record_result[$i]->Answer;} ?></textarea>                        
                         <?php } ?>
                         <br>
                         <br>
                         <!--Navigation Button-->
-                        <div class="back2"  style="text-align: center;">
-                            <a class="btn btn-default last"  role="button" style="padding-top:8px; padding-bottom: 10px;"><span class="glyphicon glyphicon-chevron-left"></span></a>
-                            <a class="btn btn-default next"  role="button" style="padding-top:8px; padding-bottom: 10px;"><span class="glyphicon glyphicon-chevron-right"></span></a>
+                        <div class="back2"  style="text-align: center;">                            
+                            <a class="btn btn-default last <?php if($i<=0){echo disabled;} ?>"  role="button" style="padding-top:8px; padding-bottom: 10px;"><span class="glyphicon glyphicon-chevron-left"></span></a>                           
+                            <a class="btn btn-default next <?php if($i>=count($saqresult)-1){echo disabled;} ?>"  role="button" style="padding-top:8px; padding-bottom: 10px;"><span class="glyphicon glyphicon-chevron-right"></span></a>
                         </div>
                     </div>
                 </div>                
             <?php }
-            
+            //end of saq for-loop
             } ?> 
+            
 			<input type="hidden" id="hiddenIndex" value="1">  
             </div>
         </div>
+        </form>
     </body>
 </html>
 
