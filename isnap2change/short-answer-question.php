@@ -336,16 +336,17 @@
                         </div> 
                     </div>
                     <div class="panel-body" style="width: 85%; margin-left:7.5%;">
-            <?php  $lastsaqid = $currentsaqid;?>			
+            <?php  $lastsaqid = $currentsaqid;?>
+                        <!--if UNGRADED/GRADED-->
                         <?php if($status == "UNGRADED" || $status == "GRADED"){ ?>
                             <div class="well-large">
                                 <ul class="nav nav-tabs nav-justified">
-                                    <li role="presentation" class="active"><a data-toggle="tab" href="#feedback1">FEEDBACK</a></li>
-                                    <li role="presentation"><a data-toggle="tab" href="#myanswer1">MY ANSWER</a></li>
+                                    <li role="presentation" class="active"><a data-toggle="tab" href="#feedback<?php echo $i+1;?>">FEEDBACK</a></li>
+                                    <li role="presentation"><a data-toggle="tab" href="#myanswer<?php echo $i+1;?>">MY ANSWER</a></li>
                                 </ul>
                             </div>
                             <div class="tab-content">
-                                <div id="feedback1" class="tab-pane fade in active">
+                                <div id="feedback<?php echo $i+1;?>" class="tab-pane fade in active">
                                     <div class="alert alert-success" role="alert"> 
                                         <strong> Score : <?php echo $saq_question_record_result[$i]->Grading ?> / <?php echo $scoreArray[$i] ?> </strong>
                                         <br>
@@ -356,7 +357,7 @@
                                     </div>
                                 </div>
                                 
-                                <div class="tab-pane fade" id="myanswer1">
+                                <div class="tab-pane fade" id="myanswer<?php echo $i+1;?>">
                                     <div class="alert alert-warning" role="alert">
                                         <?php if($status == "UNGRADED" || $status == "GRADED"){echo $saq_question_record_result[$i]->Answer;} ?>
                                     </div>
