@@ -100,7 +100,6 @@ body
     border: 0px solid #eee;
     border-bottom-color: black;
     border-bottom-width: 0.8px; 
-    white-space: normal;
 }
 
 .panel-body
@@ -119,6 +118,7 @@ label
     border: none !important;
     position: absolute;
     left: 20%;
+    top: 10%;
     width: 60%;
     color: floralwhite;
     height: 80%;

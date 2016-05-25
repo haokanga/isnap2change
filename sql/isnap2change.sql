@@ -462,7 +462,7 @@ INSERT IGNORE INTO SAQ_Question(Question, Points, QuizID) VALUES('List 3 the dif
 # Example of Answer and Grading Feedback of SAQ 
 INSERT IGNORE INTO Quiz_Record(QuizID, StudentID,`Status`,Score) VALUES(3, 1, 'GRADED', 34);
 INSERT IGNORE INTO SAQ_Question_Record(StudentID, SAQID, Answer, Feedback, Grading) VALUES(1, 1, "[ANSWER] 3 problems or challenges that these teenagers face", "+10: Good job!", 10);
-INSERT IGNORE INTO SAQ_Question_Record(StudentID, SAQID, Answer, Feedback, Grading) VALUES(1, 2, "[ANSWER] help convince a peer to stop smoking", "+10: Good job!", 10);
+INSERT IGNORE INTO SAQ_Question_Record(StudentID, SAQID, Answer, Feedback, Grading) VALUES(1, 2, "[ANSWER] help convince a peer to stop smoking", "+10: Well done!", 10);
 INSERT IGNORE INTO SAQ_Question_Record(StudentID, SAQID, Answer, Feedback, Grading) VALUES(1, 3, "[ANSWER] 3 different ways that you have seen anti-smoking messages presented to the public", "+20: Nice try. \n-2: You should also mention Poster-Effective.", 18);
 
 

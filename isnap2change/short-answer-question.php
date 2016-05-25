@@ -1,5 +1,7 @@
 <?php
-
+    //if true, echo debug output in dev mode, else production mode
+	$DEBUG_MODE = true;
+    
 	session_start();
     require_once("connection.php");	
            
@@ -10,8 +12,10 @@
         $studentid = $_SESSION['studentid'];
         echo "<script language=\"javascript\">  console.log(\"This is DEBUG_MODE with SESSION studentID = ".$studentid.".\"); </script>";
     }else{
-        echo "<script language=\"javascript\">  console.log(\"This is DEBUG_MODE with hard-code studentID = 1.\"); </script>";
-        $studentid = 1;
+        if(DEBUG_MODE){
+            echo "<script language=\"javascript\">  console.log(\"This is DEBUG_MODE with hard-code studentID = 1.\"); </script>";
+            $studentid = 1;
+        }
     }
     //POST parameters
     if ($_SERVER["REQUEST_METHOD"] == "POST") {		
@@ -25,34 +29,61 @@
 		}		
 	} else {		
 	}
+    
     //get learning-material
     $materialPreSql = "SELECT COUNT(*) 
 					   FROM   Learning_Material
-					   WHERE  QuizID = ?";
-							
+					   WHERE  QuizID = ?";							
 	$materialPreQuery = $conn->prepare($materialPreSql);
-	$materialPreQuery->execute(array($quizid));
-			
-	if($materialPreQuery->fetchColumn() != 1){
-				
-	}
-			
-	$materialSql = "SELECT Content, TopicName 
-					FROM   Learning_Material NATURAL JOIN Quiz
-									         NATURAL JOIN Topic
-					WHERE  QuizID = ?";
-							
-	$materialQuery = $conn->prepare($materialSql);
-	$materialQuery->execute(array($quizid));
-	$materialRes = $materialQuery->fetch(PDO::FETCH_OBJ);
+	$materialPreQuery->execute(array($quizid));			
+	if($materialPreQuery->fetchColumn() == 1){
+		$materialSql = "SELECT Content, TopicName 
+                        FROM   Learning_Material NATURAL JOIN Quiz
+                                                 NATURAL JOIN Topic
+                        WHERE  QuizID = ?";							
+        $materialQuery = $conn->prepare($materialSql);
+        $materialQuery->execute(array($quizid));
+        $materialRes = $materialQuery->fetch(PDO::FETCH_OBJ);		
+	} else {       
+    }    
     
+    // get $saqresult[$i] -> SAQID;
+    $saqsql = "SELECT SAQID, Question
+               FROM   SAQ_Section NATURAL JOIN SAQ_Question
+               WHERE  QuizID = ?
+               ORDER BY SAQID";
+    $saqquery = $conn->prepare($saqsql);
+    $saqquery->execute(array($quizid));
+    $saqresult = $saqquery->fetchAll(PDO::FETCH_OBJ);
+    
+    //if submitted
+    if($status == "UNGRADED" || $status == "GRADED"){
+        $saq_question_record_sql = "SELECT StudentID, SAQID, Answer, Feedback, Grading
+               FROM   SAQ_Question_Record NATURAL JOIN SAQ_Question
+               WHERE  QuizID = ?
+               ORDER BY SAQID";
+        $saq_question_record_query = $conn->prepare($saq_question_record_sql);
+        $saq_question_record_query->execute(array($quizid));
+        $saq_question_record_result = $saq_question_record_query->fetchAll(PDO::FETCH_OBJ);
+    }
+    
+    // get score for each question    
+    $score = 0;
+    for($i=0; $i<count($saqresult); $i++) {
+        $scoreSql = "SELECT Points FROM SAQ_Question WHERE SAQID = ?";
+        $scoreQuery = $conn->prepare($scoreSql);
+        $scoreQuery->execute(array($saqresult[$i] -> SAQID));
+        $scoreResult = $scoreQuery->fetch(PDO::FETCH_OBJ);
+        $score += $scoreResult->Points;
+        $scoreArray[] = $scoreResult->Points;
+        $score += $scoreResult->Points;
+    }
     
     //if submission
     if(isset($_POST['answer']) && isset($_POST['saqid']) && isset($_POST['quizid'])){
         $quizid = $_POST["quizid"];
         $saqid = $_POST["saqid"];    
         $answer = $_POST["answer"];
-        $score = 0;
         for($i=0; $i<count($saqid); $i++) {
             $update_stmt = "INSERT INTO SAQ_Question_Record(StudentID, SAQID, Answer)
                                      VALUES (?,?,?) ON DUPLICATE KEY UPDATE Answer = ?";			
@@ -60,11 +91,6 @@
             if(! $update_stmt -> execute(array($studentid, $saqid[$i], htmlspecialchars($answer[$i]), htmlspecialchars($answer[$i])))){
                 echo "<script language=\"javascript\">  alert(\"Error occurred to submit your answer. Report this bug to reseachers.\"); </script>";
             }
-            $scoreSql = "SELECT Points FROM SAQ_Question WHERE SAQID = ?";
-            $scoreQuery = $conn->prepare($scoreSql);
-            $scoreQuery->execute(array($saqid[$i]));
-            $scoreResult = $scoreQuery->fetch(PDO::FETCH_OBJ);
-            $score += $scoreResult->Points;
         }
         $update_stmt = "INSERT INTO Quiz_Record(QuizID, StudentID, `Status`, Score)
                                      VALUES (?,?,?,?) ON DUPLICATE KEY UPDATE Score = ?";			
@@ -72,43 +98,17 @@
         if(! $update_stmt -> execute(array($quizid, $studentid, "UNGRADED", $score, $score))){
             echo "<script language=\"javascript\">  alert(\"Error occurred to update your score. Report this bug to reseachers.\"); </script>";
         }
-        db_close($conn);
         echo "<script language=\"javascript\">  console.log(\"SUBMISSION.\"); </script>";
         $saqresult = null;
     }
     //if Jump from weekly tasks/learning materials
     else if(!isset($_POST['answer']) && !isset($_POST['saqid']) && isset($_POST["status"])){
         echo "<script language=\"javascript\">  console.log(\"Jump from weekly tasks/learning materials.\"); </script>";
-        $saqresult = "";
-        $currentsaqid = "";    
-        if ($_SERVER["REQUEST_METHOD"] == "POST") {
-            $quizid = $_POST["quizid"];                  
-            $status = $_POST["status"];
-            $saqsql = "SELECT SAQID, Question
-                       FROM   SAQ_Section NATURAL JOIN SAQ_Question
-                       WHERE  QuizID = ?
-                       ORDER BY SAQID";
-            $saqquery = $conn->prepare($saqsql);
-            $saqquery->execute(array($quizid));
-            $saqresult = $saqquery->fetchAll(PDO::FETCH_OBJ);
-            
-            $lastsaqid = -1;
-            //if submitted
-            if($status == "UNGRADED" || $status == "GRADED"){
-                $saq_question_record_sql = "SELECT StudentID, SAQID, Answer, Feedback, Grading
-                       FROM   SAQ_Question_Record NATURAL JOIN SAQ_Question
-                       WHERE  QuizID = ?
-                       ORDER BY SAQID";
-                $saq_question_record_query = $conn->prepare($saq_question_record_sql);
-                $saq_question_record_query->execute(array($quizid));
-                $saq_question_record_result = $saq_question_record_query->fetchAll(PDO::FETCH_OBJ);
-            }
-            db_close($conn);
-        }       
     } else {
         //todo: error handling
     }
-    
+    db_close($conn);       
+    $lastsaqid = -1;
     $questionIndex = 1;
 ?>
 <html>
@@ -117,6 +117,7 @@
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <link rel="stylesheet" type="text/css" href="css/quiz.css" />
+        <link rel="stylesheet" type="text/css" href="css/feedback.css" />
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
         <link href='https://fonts.googleapis.com/css?family=Raleway:400|Open+Sans' rel='stylesheet' type='text/css'>
         <link href='https://maxcdn.bootstrapcdn.com/font-awesome/4.6.2/css/font-awesome.min.css' rel='stylesheet' type='text/css'>
@@ -326,16 +327,16 @@
                 if($currentsaqid != $lastsaqid){  
                     if($questionIndex == 1){ ?>
                         <div class="myques" id="panel1">
-          <?php		} else { ?>
+            <?php		} else { ?>
                         <div class="myques hidden" id="<?php echo "panel".$questionIndex;?>">
-          <?php		} ?>
+            <?php		} ?>
                     <div class="panel-heading" style="font-size: xx-large; font-weight: 600; color:black; height:35%; min-height: 35%; max-height: 35%; text-align:center;">
                         <div class="ques" >                        
                             <?php $questionIndex++; echo ($i+1).". ".htmlspecialchars($saqresult[$i] -> Question); ?>
                         </div> 
                     </div>
                     <div class="panel-body" style="width: 85%; margin-left:7.5%;">
-                        <br/>
+            <?php  $lastsaqid = $currentsaqid;?>			
                         <?php if($status == "UNGRADED" || $status == "GRADED"){ ?>
                             <div class="well-large">
                                 <ul class="nav nav-tabs nav-justified">
@@ -346,7 +347,7 @@
                             <div class="tab-content">
                                 <div id="feedback1" class="tab-pane fade in active">
                                     <div class="alert alert-success" role="alert"> 
-                                        <strong> Score : <?php echo $saq_question_record_result[$i]->Grading ?> /10 </strong>
+                                        <strong> Score : <?php echo $saq_question_record_result[$i]->Grading ?> / <?php echo $scoreArray[$i] ?> </strong>
                                         <br>
                                         <br>
                                         <strong>Comments :</strong>
@@ -374,7 +375,7 @@
             <?php }
             
             } ?> 
-			  
+			<input type="hidden" id="hiddenIndex" value="1">  
             </div>
         </div>
     </body>
