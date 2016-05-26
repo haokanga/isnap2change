@@ -91,7 +91,7 @@ body
 
 .panel-body img
 {
-    height: inherit;
+    height: 600px;
     width: inherit;
     display: flex;
     margin-left: auto;

@@ -7,8 +7,6 @@
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
         <link href='https://fonts.googleapis.com/css?family=Raleway:400|Open+Sans' rel='stylesheet' type='text/css'>
         <link href='https://maxcdn.bootstrapcdn.com/font-awesome/4.6.2/css/font-awesome.min.css' rel='stylesheet' type='text/css'>
-        <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.2/jquery.min.js"></script>
-        <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
         <script type="text/javascript" src="js/jquery-1.12.3.js"></script>
     </head>
     <body>
@@ -83,8 +81,8 @@
             {
                 $("#button0").addClass("highlight");
 
-                $('#panel0').css({
-                    top: ($('.content').outerHeight() - $('#panel0').outerHeight()) / 2
+                $('#panel1').css({
+                    top: ($('.content').outerHeight() - $('#panel1').outerHeight()) / 2
                 });
 
                 $(".options").find(".btn").click(function () {
@@ -165,7 +163,7 @@
                     <li class="list-group-item" style="color:turquoise;">
                         <button type="button" class="btn btn-default" id="button0" style="color:turquoise;font-weight: bold;" value="0">i</button>
                     </li>
-                    <li class="list-group-item">
+                     <li class="list-group-item">
                         <button type="button" class="btn btn-default" id="button1" value="1">1</button>
                     </li>
                     <li class="list-group-item">
@@ -231,34 +229,12 @@
                 <div class="panel panel-default hidden" id="panel1">
                     <div class="panel-heading" style="font-size: xx-large; font-weight: 600; color:black; height:35%; min-height: 35%; max-height: 35%; text-align:center;">
                         <div class="ques" >
-                            1. Which of these breakfast foods will provide you with the most energy and is very healthy for you?
+                            Which of these breakfast foods will provide you with the most energy and is very healthy for you?
                         </div> 
                     </div>
                     <div class="panel-body" style="width: 85%; margin-left:7.5%;">
                         <br/>
-                        <div class="well-large">
-                            <ul class="nav nav-tabs nav-justified">
-                                <li role="presentation" class="active"><a data-toggle="tab" href="#feedback1">FEEDBACK</a></li>
-                                <li role="presentation"><a data-toggle="tab" href="#myanswer1">MY ANSWER</a></li>
-                            </ul>
-                        </div>
-                        <div class="tab-content">
-                        <div id="feedback1" class="tab-pane fade in active">
-                            <div class="alert alert-success" role="alert"> 
-                                <strong> Score : 9/10 </strong>
-                                <br>
-                                <br>
-                                <strong>Comments :</strong>
-                                <br>
-                                Your answer was spot on, Well Done!
-                            </div>
-                        </div>
-                        <div class="tab-pane fade" id="myanswer1">
-                            <div class="alert alert-warning" role="alert">
-                                I think breakfast is the most important meal of the day.
-                            </div>
-                        </div>
-                        </div>
+                        <textarea class="form-control" rows="10"></textarea>
                         <br>
                         <br>
                         <div class="back2"  style="text-align: center;">
@@ -267,38 +243,15 @@
                         </div>
                     </div>
                 </div>
-                <!--panel2-->
                 <div class="panel panel-default hidden" id="panel2">
-                    <div class="panel-heading" style="font-size: xx-large; font-weight: 600; color:black; height:35%; min-height: 35%; max-height: 35%; text-align:center;">
+                    <div class="panel-heading" style="font-size: xx-large; font-weight: 600; color:black; height:35%; min-height: 35%; max-height: 35%; justify-content:center; display:flex; align-items:center;">
                         <div class="ques" >
-                            2. List 1 strategy that you could use to help convince a peer to stop smoking?
-                        </div> 
+                            Which of these breakfast foods?
+                        </div>   
                     </div>
-                    <div class="panel-body" style="width: 85%; margin-left:7.5%;">
+                     <div class="panel-body" style="width: 85%; margin-left:7.5%;">
                         <br/>
-                        <div class="well-large">
-                            <ul class="nav nav-tabs nav-justified">
-                                <li role="presentation" class="active"><a data-toggle="tab" href="#feedback2">FEEDBACK</a></li>
-                                <li role="presentation"><a data-toggle="tab" href="#myanswer2">MY ANSWER</a></li>
-                            </ul>
-                        </div>
-                        <div class="tab-content">
-                        <div id="feedback2" class="tab-pane fade in active">
-                            <div class="alert alert-success" role="alert"> 
-                                <strong> Score : 9/10 </strong>
-                                <br>
-                                <br>
-                                <strong>Comments :</strong>
-                                <br>
-                                [FEEDBACK 2]Your answer was spot on, Well Done!
-                            </div>
-                        </div>
-                        <div class="tab-pane fade" id="myanswer2">
-                            <div class="alert alert-warning" role="alert">
-                                [ANSWER 2]I think breakfast is the most important meal of the day.
-                            </div>
-                        </div>
-                        </div>
+                        <textarea class="form-control" rows="10"></textarea>
                         <br>
                         <br>
                         <div class="back2"  style="text-align: center;">
@@ -306,6 +259,8 @@
                             <a class="btn btn-default back" href="#" role="button" style="padding-top:8px;"><span class="glyphicon glyphicon-chevron-right"></span></a>
                         </div>
                     </div>
+                    
+                    
                 </div>
 
                 <input type="hidden" id="hiddenIndex" value="0">

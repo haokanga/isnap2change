@@ -1,22 +1,88 @@
 <?php
-
+    //if true, echo debug output in dev mode, else production mode
+	$DEBUG_MODE = true;
+    
 	session_start();
     require_once("connection.php");	
+           
+    $conn = db_connect();
+    
     //set userid    
     if(isset($_SESSION['studentid'])){
         $studentid = $_SESSION['studentid'];
         echo "<script language=\"javascript\">  console.log(\"This is DEBUG_MODE with SESSION studentID = ".$studentid.".\"); </script>";
     }else{
-        echo "<script language=\"javascript\">  console.log(\"This is DEBUG_MODE with hard-code studentID = 1.\"); </script>";
-        $studentid = 1;
+        if(DEBUG_MODE){
+            echo "<script language=\"javascript\">  console.log(\"This is DEBUG_MODE with hard-code studentID = 1.\"); </script>";
+            $studentid = 1;
+        }
     }
+    //POST parameters
+    if ($_SERVER["REQUEST_METHOD"] == "POST") {		
+		if(isset($_POST["quizid"]) && isset($_POST["week"]) && isset($_POST["status"])){
+			$quizid = $_POST["quizid"];
+			$week = $_POST["week"];
+			$status = $_POST["status"];
+		} else {
+			
+		}		
+	} else {		
+	}
+    
+    //get learning-material
+    $materialPreSql = "SELECT COUNT(*) 
+					   FROM   Learning_Material
+					   WHERE  QuizID = ?";							
+	$materialPreQuery = $conn->prepare($materialPreSql);
+	$materialPreQuery->execute(array($quizid));			
+	if($materialPreQuery->fetchColumn() == 1){
+		$materialSql = "SELECT Content, TopicName 
+                        FROM   Learning_Material NATURAL JOIN Quiz
+                                                 NATURAL JOIN Topic
+                        WHERE  QuizID = ?";							
+        $materialQuery = $conn->prepare($materialSql);
+        $materialQuery->execute(array($quizid));
+        $materialRes = $materialQuery->fetch(PDO::FETCH_OBJ);		
+	} else {       
+    }    
+    
+    // get $saqresult[$i] -> SAQID;
+    $saqsql = "SELECT SAQID, Question
+               FROM   SAQ_Section NATURAL JOIN SAQ_Question
+               WHERE  QuizID = ?
+               ORDER BY SAQID";
+    $saqquery = $conn->prepare($saqsql);
+    $saqquery->execute(array($quizid));
+    $saqresult = $saqquery->fetchAll(PDO::FETCH_OBJ);
+    
+    //if submitted
+    if($status == "UNGRADED" || $status == "GRADED"){
+        $saq_question_record_sql = "SELECT StudentID, SAQID, Answer, Feedback, Grading
+               FROM   SAQ_Question_Record NATURAL JOIN SAQ_Question
+               WHERE  QuizID = ?
+               ORDER BY SAQID";
+        $saq_question_record_query = $conn->prepare($saq_question_record_sql);
+        $saq_question_record_query->execute(array($quizid));
+        $saq_question_record_result = $saq_question_record_query->fetchAll(PDO::FETCH_OBJ);
+    }
+    
+    // get score for each question    
+    $score = 0;
+    for($i=0; $i<count($saqresult); $i++) {
+        $scoreSql = "SELECT Points FROM SAQ_Question WHERE SAQID = ?";
+        $scoreQuery = $conn->prepare($scoreSql);
+        $scoreQuery->execute(array($saqresult[$i] -> SAQID));
+        $scoreResult = $scoreQuery->fetch(PDO::FETCH_OBJ);
+        $score += $scoreResult->Points;
+        $scoreArray[] = $scoreResult->Points;
+        $score += $scoreResult->Points;
+    }
+    
     //if submission
     if(isset($_POST['answer']) && isset($_POST['saqid']) && isset($_POST['quizid'])){
         $quizid = $_POST["quizid"];
         $saqid = $_POST["saqid"];    
-        $answer = $_POST["answer"];      
-        $conn = db_connect();
-        $score = 0;
+        $answer = $_POST["answer"];
         for($i=0; $i<count($saqid); $i++) {
             $update_stmt = "INSERT INTO SAQ_Question_Record(StudentID, SAQID, Answer)
                                      VALUES (?,?,?) ON DUPLICATE KEY UPDATE Answer = ?";			
@@ -24,11 +90,6 @@
             if(! $update_stmt -> execute(array($studentid, $saqid[$i], htmlspecialchars($answer[$i]), htmlspecialchars($answer[$i])))){
                 echo "<script language=\"javascript\">  alert(\"Error occurred to submit your answer. Report this bug to reseachers.\"); </script>";
             }
-            $scoreSql = "SELECT Points FROM SAQ_Question WHERE SAQID = ?";
-            $scoreQuery = $conn->prepare($scoreSql);
-            $scoreQuery->execute(array($saqid[$i]));
-            $scoreResult = $scoreQuery->fetch(PDO::FETCH_OBJ);
-            $score += $scoreResult->Points;
         }
         $update_stmt = "INSERT INTO Quiz_Record(QuizID, StudentID, `Status`, Score)
                                      VALUES (?,?,?,?) ON DUPLICATE KEY UPDATE Score = ?";			
@@ -36,184 +97,295 @@
         if(! $update_stmt -> execute(array($quizid, $studentid, "UNGRADED", $score, $score))){
             echo "<script language=\"javascript\">  alert(\"Error occurred to update your score. Report this bug to reseachers.\"); </script>";
         }
-        db_close($conn);
         echo "<script language=\"javascript\">  console.log(\"SUBMISSION.\"); </script>";
         $saqresult = null;
     }
     //if Jump from weekly tasks/learning materials
     else if(!isset($_POST['answer']) && !isset($_POST['saqid']) && isset($_POST["status"])){
         echo "<script language=\"javascript\">  console.log(\"Jump from weekly tasks/learning materials.\"); </script>";
-        $saqresult = "";
-        $currentsaqid = "";    
-        if ($_SERVER["REQUEST_METHOD"] == "POST") {            
-            $conn = db_connect();
-            $quizid = $_POST["quizid"];                  
-            $status = $_POST["status"];
-            $saqsql = "SELECT SAQID, Question
-                       FROM   SAQ_Section NATURAL JOIN SAQ_Question
-                       WHERE  QuizID = ?
-                       ORDER BY SAQID";
-            $saqquery = $conn->prepare($saqsql);
-            $saqquery->execute(array($quizid));
-            $saqresult = $saqquery->fetchAll(PDO::FETCH_OBJ);
-            
-            $lastsaqid = -1;
-            if($status == "UNGRADED" || $status == "GRADED"){
-                $saq_question_record_sql = "SELECT StudentID, SAQID, Answer, Feedback, Grading
-                       FROM   SAQ_Question_Record NATURAL JOIN SAQ_Question
-                       WHERE  QuizID = ?
-                       ORDER BY SAQID";
-                $saq_question_record_query = $conn->prepare($saq_question_record_sql);
-                $saq_question_record_query->execute(array($quizid));
-                $saq_question_record_result = $saq_question_record_query->fetchAll(PDO::FETCH_OBJ);
-            }
-            db_close($conn);
-        }       
     } else {
         //todo: error handling
     }
+    db_close($conn);       
+    $lastsaqid = -1;
+    $questionIndex = 1;
 ?>
-
 <html>
     <head>
-        <title>Home</title>
+        <title>Quiz</title>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <script type="text/javascript" src="js/jquery-1.12.3.js">
-        </script>
-        <link href='https://fonts.googleapis.com/css?family=Raleway:400italic|Open+Sans' rel='stylesheet' type='text/css'>
+        <link rel="stylesheet" type="text/css" href="css/quiz.css" />
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
-        <link href='https://fonts.googleapis.com/css?family=Droid+Sans' rel='stylesheet' type='text/css'>
-        <!-- Optional theme -->
-        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap-theme.min.css" integrity="sha384-fLW2N01lMqjakBkx3l/M9EahuwpSfeNvV63J5ezn3uZzapT0u7EYsXMjQV+0En5r" crossorigin="anonymous">
-        <link rel="stylesheet" href="css/index.css" type="text/css">
-
-
-
-        <!-- Latest compiled and minified JavaScript -->
-        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js" integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS" crossorigin="anonymous"></script>
-        <script>
-            //timer
-            $(document).ready(function () {
-                var seconds_left = 60;
-                var interval = setInterval(function () {
-                    document.getElementById('timer_div').innerHTML = --seconds_left;
-                    if (seconds_left <= 0)
-                    {
-                        document.getElementById('timer_div').innerHTML = "Time is up!";
-                        clearInterval(interval);
-                    }
-                }, 1000);
-
-                $("#panel6").hide();
-                $("#scrollB").hide();
-            });
-            function fo()
-            {
-                document.getElementById("demo").style.color = "red";
-            }
-            // Nxt 
-            function changePanel()
-            {
-                if (jQuery(".panel").is(':visible'))
-                {
-                    jQuery('li', this).addClass('dropHover');
-                }
-                $(".panel").not("#panel2").hide();
-                $("#panel2").show();
-            }
-            // Previous
-            function changePanel2()
-            {
-                $(".panel").not("#panel3").hide();
-                $("#scrollB").hide();
-                $("#panel3").show();
-            }
-        </script>
+        <link href='https://fonts.googleapis.com/css?family=Raleway:400|Open+Sans' rel='stylesheet' type='text/css'>
+        <link href='https://maxcdn.bootstrapcdn.com/font-awesome/4.6.2/css/font-awesome.min.css' rel='stylesheet' type='text/css'>
+        <script type="text/javascript" src="js/jquery-1.12.3.js"></script>
     </head>
-
     <body>
+        <script>
+            function CountDownTimer(duration, granularity) {
+                this.duration = duration;
+                this.granularity = granularity || 1000;
+                this.tickFtns = [];
+                this.running = false;
+            }
 
-        <nav class="navbar navbar-default navbar-fixed-top">
-        <form method="post" action="<?php echo $_SERVER['PHP_SELF']; ?>">
-        <input  type=hidden name="quizid" value=<?php echo $quizid; ?>></input>
-            <div class="container-fluid">
-                <!-- Brand and toggle get grouped for better mobile display -->
-                <div class="navbar-header">
-                    <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
-                        <span class="sr-only">Toggle navigation</span>
-                        <span class="icon-bar"></span>
-                        <span class="icon-bar"></span>
-                        <span class="icon-bar"></span>
-                    </button>
-                    <a class="navbar-brand" href="#"><span class="glyphicon glyphicon-flash"></span>Quiz</a>
-                </div>
-                <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1" style="padding-top:15px;">
-                    <div class="row">
-                        <div class="col-md-9">
-                            <div class="progress">
-                                <div class="progress-bar progress-bar-success progress-bar-striped active" role="progressbar" aria-valuenow="40" aria-valuemin="0" aria-valuemax="100" style="width: 40%">
-                                    <span class="sr-only">40% Complete (success)</span>
-                                    4/10
-                                </div>
+            CountDownTimer.prototype.start = function () {
+                if (this.running) {
+                    return;
+                }
+                this.running = true;
+                var start = Date.now(),
+                        that = this,
+                        diff, obj;
+
+                (function timer() {
+                    diff = that.duration - (((Date.now() - start) / 1000) | 0);
+
+                    if (diff > 0) {
+                        setTimeout(timer, that.granularity);
+                    } else {
+                        diff = 0;
+                        that.running = false;
+                    }
+
+                    obj = CountDownTimer.parse(diff);
+                    that.tickFtns.forEach(function (ftn) {
+                        ftn.call(this, obj.minutes, obj.seconds);
+                    }, that);
+                }());
+            };
+
+            CountDownTimer.prototype.onTick = function (ftn) {
+                if (typeof ftn === 'function') {
+                    this.tickFtns.push(ftn);
+                }
+                return this;
+            };
+
+            CountDownTimer.prototype.expired = function () {
+                return !this.running;
+            };
+
+            CountDownTimer.parse = function (seconds) {
+                return {
+                    'minutes': (seconds / 60) | 0,
+                    'seconds': (seconds % 60) | 0
+                };
+            };
+
+            window.onload = function () {
+
+                var display1 = document.querySelector('#time1'),
+                        timer = new CountDownTimer(30);    // set time here
+
+                timer.onTick(format1).start();
+
+                function format1(minutes, seconds) {
+                    minutes = minutes < 10 ? "0" + minutes : minutes;
+                    seconds = seconds < 10 ? "0" + seconds : seconds;
+                    display1.textContent = minutes + ':' + seconds;
+                }
+            };
+
+            $(document).ready(function ()
+            {
+                $("#button0").addClass("highlight");
+
+                $('#panel0').css({
+                    top: ($('.content').outerHeight() - $('#panel0').outerHeight()) / 2
+                });
+
+                $(".next").click(function () {
+                    var index = $("#hiddenIndex").val();
+                    $("#panel" + index).addClass("hidden");
+                    $("#button" + index).removeClass("highlight");
+                    index++;
+                    $("#panel" + index).removeClass("hidden");
+                    $("#panel" + index).css({
+                        top: ($('.content').outerHeight() - $("#panel" + index).outerHeight()) / 2
+                    });
+                    $("#hiddenIndex").val(index);
+                    $("#button" + index).addClass("highlight");
+                });
+
+                $(".last").click(function () {
+                    var index = $("#hiddenIndex").val();
+                    $("#panel" + index).addClass("hidden");
+                    $("#button" + index).removeClass("highlight");
+                    index--;
+                    $("#panel" + index).removeClass("hidden");
+                    $("#panel" + index).css({
+                        top: ($('.content').outerHeight() - $("#panel" + index).outerHeight()) / 2
+                    });
+                    $("#hiddenIndex").val(index);
+                    $("#button" + index).addClass("highlight");
+                });
+
+                $(".opt").find(".btn").click(function () {
+                    var index = $(this).val();
+                    $(this).addClass("highlight");
+                    var currentIndex = $("#hiddenIndex").val();
+                    $("#button" + currentIndex).removeClass("highlight");
+                    $("#panel" + currentIndex).addClass("hidden");
+                    $("#panel" + index).removeClass("hidden");
+                    $("#panel" + index).css({
+                        top: ($('.content').outerHeight() - $("#panel" + index).outerHeight()) / 2
+                    });
+                    $("#hiddenIndex").val(index);
+
+                });
+
+            });
+            
+            function goBack()
+			{
+				document.getElementById("goBack").submit();
+			}
+            
+            function submitQuiz()
+			{                
+                $.ajax({
+                   url: location.href,                           
+                   data: $('#submission').serialize(),                 
+                   success: function (data) {                        
+                      window.location.href = 'avatar.php';;
+                   },
+                   error: function (xhr, text, error) {              
+                      alert('Error: ' + error);
+                   }
+                });
+			}
+        </script>
+        <header class="navbar navbar-static-top bs-docs-nav">
+
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+                </button>
+                <a class="navbar-brand" href="#">QUIZ</a>
+            </div>
+            <!--Sumbit/Go Back Button-->
+            <div class="nav navbar-nav navbar-btn navbar-right" style="margin-right:22px;">
+                <?php
+						if($status == "GRADED"){ ?>
+						<form id="goBack" method=post action=weekly-task.php>
+							 <button type="button" onclick="return goBack()" class="btn btn-success">GO BACK</button> 
+							 <input type=hidden name="week" value=<?php echo $week; ?>></input>
+						</form>
+				<?php	}					
+						 else if($status == "UNANSWERED" || $status == "UNGRADED"){ ?>
+							<button id="back-btn" type="button" onclick="return submitQuiz();" class="btn btn-success">SUBMIT</button>
+				<?php	} ?>
+            </div>
+            <div class="nav navbar-nav navbar-btn navbar-right" style="margin-right: 15px; font-size: x-large;">
+                <span id="time1"></span>
+            </div>
+        </header>
+        <!--Sidebar-->
+        <div class="content"> 
+            <div class="col-md-1 sidebar" style="margin-top:8px; margin-bottom:8px;">
+
+                <ul class="list-group lg opt" style="max-height: 89vh; overflow-y: auto;">
+                    <li class="list-group-item" style="color:turquoise;">
+                        <button type="button" class="btn btn-default" id="button0" style="color:turquoise;font-weight: bold;" value="0">i</button>
+                    </li>
+                    <?php for($i=0; $i<count($saqresult); $i++) {?>
+						<li class="list-group-item">
+							<button type="button" class="btn btn-default" id="button<?php echo $i+1;?>" value="<?php echo $i+1;?>"><?php echo $i+1;?></button>
+						</li>						
+                    <?php   } ?>
+                </ul>
+            </div>
+
+            <!--Learning_Material-->
+            <div class="info hidden" style="padding-top:10px; padding-bottom:10px;" id="panel0">
+                <div class="panel panel-default">
+                    <div class="panel-body">
+                        <div class="myHeader" style="text-align:center;">
+                            <div class="page-header" style="color: black;">
+                                <h1> 
+                                    <i><?php echo $materialRes->TopicName; ?></i>
+                                </h1> 
                             </div>
-                        </div>
-                        <div class ="col-md-1">
-                            <span class="glyphicon glyphicon-time"></span>
-                            <div id="timer_div" ></div>
-                        </div>
-                        <div class="col-md-1">
-                            <!--
-                            <button type="button" onclick="return changePanel2();" class="btn btn-success">SUBMIT</button>
-                            -->
-                            <input type="submit" name="submit" value="SUBMIT" id="submit"/>                            
+                            <div class="para" style="padding-left:15px; padding-right:15px;">
+                                <div style="color:black; text-align:center;">
+                                    <?php echo $materialRes->Content; ?>
+                                </div> 
+                            </div>
                         </div>
                     </div>
                 </div>
-
             </div>
-        </nav>
-        <div class="container" style="padding-top:100px;">
-            <div class="row">
-                <div class="col-md-2" style="padding-top:160px;">
-                    <!--  <div class="btn-group-vertical" role="group" aria-label="...">
-                          <button class="btn btn-primary" type="button" onclick="return changePanel2();" ><span class="glyphicon glyphicon-check"></span> Track Progress</button>
-                      </div> -->
-                </div>
-				
-                <div class="col-md-8" style="opacity:0.9;">
-				<?php for($i=0; $i<count($saqresult); $i++) {							
-							$currentsaqid = $saqresult[$i] -> SAQID;
-							if($currentsaqid != $lastsaqid){ ?>
-								<div class="panel panel-default">
-									<div class="panel-heading"><b><i><?php echo ($i+1).". ".htmlspecialchars($saqresult[$i] -> Question); ?></i></b></div>
-										<div class="panel-body">
-						<?php
-							} $lastsaqid = $currentsaqid;?>                                
-                                <input type="hidden" name="saqid[]" value="<?php echo $currentsaqid ?>"/>
-                                <!--Short Answer Question Input TextBox-->
-                                <textarea <?php if($status == "UNGRADED" || $status == "GRADED"){echo "disabled";} ?> rows="4" cols="50" name="answer[]" placeholder='Please input your answer here'><?php if($status == "UNGRADED" || $status == "GRADED"){echo $saq_question_record_result[$i]->Answer;} ?></textarea>
-                                <!--Feedback if graded-->
-                                <?php if($status == "GRADED"){echo "<br><p>".$saq_question_record_result[$i]->Feedback."</p>";
-                                echo "<p>Score: ".$saq_question_record_result[$i]->Grading."</p>";} ?>
-						<?php
-								if(($i+1)==sizeof($saqresult)){ ?>
-										</div>	
-								</div>
-								
-						<?php  	} else {
-                                    { ?>
-                                </div>	
+        <!--form submission-->    
+        <form id="submission" method="post" action="<?php echo $_SERVER['PHP_SELF']; ?>">
+            <input type=hidden name="week" value=<?php echo $week; ?> ></input>        
+            <input type=hidden name="quizid" value=<?php echo $quizid; ?> ></input>
+            <input type=hidden name="status" value="UNGRADED" ></input>
+            <?php for($i=0; $i<count($saqresult); $i++) {
+                $currentsaqid = $saqresult[$i] -> SAQID;
+                if($currentsaqid != $lastsaqid){  
+                    if($questionIndex == 1){ ?>
+            <div class="myques" id="panel1">
+            <?php		} else { ?>
+            <div class="myques hidden" id="panel<?php echo $questionIndex;?>"> 
+            <?php		} ?>
+                    <!--heading-->
+                    <div class="panel-heading" style="font-size: xx-large; font-weight: 600; color:black; height:35%; min-height: 35%; max-height: 35%; text-align:center;">
+                        <div class="ques" >                        
+                            <?php $questionIndex++; echo ($i+1).". ".htmlspecialchars($saqresult[$i] -> Question); ?>
+                        </div> 
+                    </div>
+                    <!--body-->
+                    <div class="panel-body" style="width: 85%; margin-left:7.5%;">
+                    <?php  $lastsaqid = $currentsaqid;?>
+                        <!--if GRADED-->
+                        <?php if($status == "GRADED"){ ?>                        
+                            <div class="well-large">
+                                <ul class="nav nav-tabs nav-justified">
+                                    <li role="presentation" class="active"><a data-toggle="tab" href="#feedback<?php echo $i+1;?>">FEEDBACK</a></li>
+                                    <li role="presentation"><a data-toggle="tab" href="#myanswer<?php echo $i+1;?>">MY ANSWER</a></li>
+                                </ul>
                             </div>
-						<?php		}
-									
-								} 
-							
-						}?>
-                </div>
-				
+                            <div class="tab-content">
+                                <div id="feedback<?php echo $i+1;?>" class="tab-pane fade in active">
+                                    <div class="alert alert-success" role="alert"> 
+                                        <strong> Score : <?php echo $saq_question_record_result[$i]->Grading ?> / <?php echo $scoreArray[$i] ?> </strong>
+                                        <br>
+                                        <br>
+                                        <strong>Comments :</strong>
+                                        <br>
+                                        <?php echo $saq_question_record_result[$i]->Feedback ?>
+                                    </div>
+                                </div>
+                                
+                                <div class="tab-pane fade" id="myanswer<?php echo $i+1;?>">
+                                    <div class="alert alert-warning" role="alert">
+                                        <?php if($status == "UNGRADED" || $status == "GRADED"){echo $saq_question_record_result[$i]->Answer;} ?>
+                                    </div>
+                                </div>
+                            </div>
+                        <!--if UNANSWERED/UNGRADED-->    
+                        <?php } else { ?>
+                        <input type="hidden" name="saqid[]" value="<?php echo $currentsaqid ?>"/>
+                        <textarea class="form-control" rows="10" name="answer[]" placeholder='Please input your answer here'><?php if($status == "UNGRADED"){echo $saq_question_record_result[$i]->Answer;} ?></textarea>                        
+                        <?php } ?>
+                        <br>
+                        <br>
+                        <!--Navigation Button-->
+                        <div class="back2"  style="text-align: center;">                            
+                            <a class="btn btn-default last <?php if($i<=0){echo disabled;} ?>"  role="button" style="padding-top:8px; padding-bottom: 10px;"><span class="glyphicon glyphicon-chevron-left"></span></a>                           
+                            <a class="btn btn-default next <?php if($i>=count($saqresult)-1){echo disabled;} ?>"  role="button" style="padding-top:8px; padding-bottom: 10px;"><span class="glyphicon glyphicon-chevron-right"></span></a>
+                        </div>
+                    </div>
+                </div>                
+            <?php }
+            //end of saq for-loop
+            } ?> 
+            
+			<input type="hidden" id="hiddenIndex" value="1">  
             </div>
         </div>
         </form>
     </body>
 </html>
+

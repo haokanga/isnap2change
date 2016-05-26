@@ -39,24 +39,25 @@
             <a id="nav-left" class="btn btn-info btn-lg" role="button" disabled>
                 <span class="glyphicon glyphicon-arrow-left"></span>
             </a>
-
             <a id="nav-right" class="btn btn-info btn-lg" role="button">
                 <span class="glyphicon glyphicon-arrow-right"></span> 
             </a>
-        </div>
+        </div> 
+       
         <!--Plain Avatar Buttons-->
-        <div align="center">
+        <div align="left">
             <form id="weeklytask" action="../isnap2change/weekly-task.php" method=post>               
                 <button type=button onclick="startWeeklyTask()"> Weekly Task </button>
                 <input id="hiddenIndex" name="week" value="1"/>
             </form>
         </div>
-        <div align="center">
+        <div align="left">
             <button id="checkprogress" type=button onclick="checkprogress()"> Check Progress </button>
             <form id="scoreboard" action="../isnap2change/scoreboard.php" method=post>
             <button type=button onclick="scoreboard()"> Check Scoreboard </button>
             </form>
         </div>
+               
 		<script src="js/js.js"></script>
 		<script src='http://code.jquery.com/jquery-2.0.0.js'></script>
 		<script src="js/index.js"></script>
