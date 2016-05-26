@@ -96,8 +96,7 @@
         $update_stmt = $conn->prepare($update_stmt);                
         if(! $update_stmt -> execute(array($quizid, $studentid, "UNGRADED", $score, $score))){
             echo "<script language=\"javascript\">  alert(\"Error occurred to update your score. Report this bug to reseachers.\"); </script>";
-        }
-        echo "<script language=\"javascript\">  console.log(\"SUBMISSION.\"); </script>";
+        }        
         $saqresult = null;
     }
     //if Jump from weekly tasks/learning materials
@@ -245,16 +244,7 @@
             
             function submitQuiz()
 			{                
-                $.ajax({
-                   url: location.href,                           
-                   data: $('#submission').serialize(),                 
-                   success: function (data) {                        
-                      window.location.href = 'avatar.php';;
-                   },
-                   error: function (xhr, text, error) {              
-                      alert('Error: ' + error);
-                   }
-                });
+                document.getElementById("submission").submit();
 			}
         </script>
         <header class="navbar navbar-static-top bs-docs-nav">
@@ -266,16 +256,20 @@
             </div>
             <!--Sumbit/Go Back Button-->
             <div class="nav navbar-nav navbar-btn navbar-right" style="margin-right:22px;">
-                <?php
-						if($status == "GRADED"){ ?>
-						<form id="goBack" method=post action=weekly-task.php>
-							 <button type="button" onclick="return goBack()" class="btn btn-success">GO BACK</button> 
-							 <input type=hidden name="week" value=<?php echo $week; ?>></input>
-						</form>
-				<?php	}					
-						 else if($status == "UNANSWERED" || $status == "UNGRADED"){ ?>
-							<button id="back-btn" type="button" onclick="return submitQuiz();" class="btn btn-success">SUBMIT</button>
-				<?php	} ?>
+                <form id="goBack" method=post action=weekly-task.php>
+                    <?php if($status == "GRADED" || isset($_POST["goback"])){ ?>
+                    <button type="button" onclick="goBack()" class="btn btn-success">GO BACK</button>
+                    <?php }	 else if($status == "UNANSWERED" || $status == "UNGRADED"){ ?>
+                    <button id="back-btn" type="button" onclick="return submitQuiz();" class="btn btn-success">SUBMIT</button>
+                    <?php } ?>                                        
+                    <input type=hidden name="week" value=<?php echo $week; ?>></input>
+                </form>
+            
+                
+						
+				
+							
+				
             </div>
             <div class="nav navbar-nav navbar-btn navbar-right" style="margin-right: 15px; font-size: x-large;">
                 <span id="time1"></span>
@@ -318,17 +312,15 @@
             </div>
         <!--form submission-->    
         <form id="submission" method="post" action="<?php echo $_SERVER['PHP_SELF']; ?>">
+            <input type=hidden name="goback" value=0 ></input> 
             <input type=hidden name="week" value=<?php echo $week; ?> ></input>        
             <input type=hidden name="quizid" value=<?php echo $quizid; ?> ></input>
             <input type=hidden name="status" value="UNGRADED" ></input>
+            <!--start of saq for-loop-->
             <?php for($i=0; $i<count($saqresult); $i++) {
                 $currentsaqid = $saqresult[$i] -> SAQID;
-                if($currentsaqid != $lastsaqid){  
-                    if($questionIndex == 1){ ?>
-            <div class="myques" id="panel1">
-            <?php		} else { ?>
-            <div class="myques hidden" id="panel<?php echo $questionIndex;?>"> 
-            <?php		} ?>
+                if($currentsaqid != $lastsaqid){?>
+                <div class="myques <?php if($questionIndex != 1){echo "hidden";} ?> " id="panel<?php echo $questionIndex;?>">
                     <!--heading-->
                     <div class="panel-heading" style="font-size: xx-large; font-weight: 600; color:black; height:35%; min-height: 35%; max-height: 35%; text-align:center;">
                         <div class="ques" >                        
@@ -373,8 +365,8 @@
                         <br>
                         <!--Navigation Button-->
                         <div class="back2"  style="text-align: center;">                            
-                            <a class="btn btn-default last <?php if($i<=0){echo disabled;} ?>"  role="button" style="padding-top:8px; padding-bottom: 10px;"><span class="glyphicon glyphicon-chevron-left"></span></a>                           
-                            <a class="btn btn-default next <?php if($i>=count($saqresult)-1){echo disabled;} ?>"  role="button" style="padding-top:8px; padding-bottom: 10px;"><span class="glyphicon glyphicon-chevron-right"></span></a>
+                            <a class="btn btn-default last <?php if($i<=0){echo "disabled";} ?>"  role="button" style="padding-top:8px; padding-bottom: 10px;"><span class="glyphicon glyphicon-chevron-left"></span></a>                           
+                            <a class="btn btn-default next <?php if($i>=count($saqresult)-1){echo "disabled";} ?>"  role="button" style="padding-top:8px; padding-bottom: 10px;"><span class="glyphicon glyphicon-chevron-right"></span></a>
                         </div>
                     </div>
                 </div>                
