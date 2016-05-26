@@ -122,75 +122,44 @@
     </head>
     <body>
         <script>
-            function CountDownTimer(duration, granularity) {
-                this.duration = duration;
-                this.granularity = granularity || 1000;
-                this.tickFtns = [];
-                this.running = false;
-            }
-
-            CountDownTimer.prototype.start = function () {
-                if (this.running) {
-                    return;
-                }
-                this.running = true;
-                var start = Date.now(),
-                        that = this,
-                        diff, obj;
-
-                (function timer() {
-                    diff = that.duration - (((Date.now() - start) / 1000) | 0);
-
-                    if (diff > 0) {
-                        setTimeout(timer, that.granularity);
-                    } else {
-                        diff = 0;
-                        that.running = false;
-                    }
-
-                    obj = CountDownTimer.parse(diff);
-                    that.tickFtns.forEach(function (ftn) {
-                        ftn.call(this, obj.minutes, obj.seconds);
-                    }, that);
-                }());
-            };
-
-            CountDownTimer.prototype.onTick = function (ftn) {
-                if (typeof ftn === 'function') {
-                    this.tickFtns.push(ftn);
-                }
-                return this;
-            };
-
-            CountDownTimer.prototype.expired = function () {
-                return !this.running;
-            };
-
-            CountDownTimer.parse = function (seconds) {
-                return {
-                    'minutes': (seconds / 60) | 0,
-                    'seconds': (seconds % 60) | 0
-                };
-            };
-
-            window.onload = function () {
-
-                var display1 = document.querySelector('#time1'),
-                        timer = new CountDownTimer(30);    // set time here
-
-                timer.onTick(format1).start();
-
-                function format1(minutes, seconds) {
-                    minutes = minutes < 10 ? "0" + minutes : minutes;
-                    seconds = seconds < 10 ? "0" + seconds : seconds;
-                    display1.textContent = minutes + ':' + seconds;
-                }
-            };
-
-            $(document).ready(function ()
-            {
+            <!--Timer-->
+            var timeinterval;
+		
+			function getTimeRemaining(endtime){
+				var t = Date.parse(endtime) - Date.parse(new Date());
+				var seconds = Math.floor( (t/1000) % 60 );
+				var minutes = Math.floor( (t/1000/60) % 60 );				
+				return {
+					'total': t,
+					'minutes': minutes,
+					'seconds': seconds
+				 };
+			}
+			
+			function initializeClock(endtime){
+				var clock = document.getElementById("clock");				
+				var timerSpan = clock.querySelector('.timer');				
+				function updateClock() {
+					var t = getTimeRemaining(endtime);
+					timerSpan.innerHTML = ('0' + t.minutes).slice(-2) + ":" + ('0' + t.seconds).slice(-2);				
+					if (t.total <= 0) {
+						alert("Time is up!");
+						submitQuiz();
+					}
+				}				
+				updateClock();
+				timeinterval = setInterval(updateClock, 1000);				
+			}
+            
+            <?php if(($status == "UNANSWERED" || $status == "UNGRADED") && !isset($_POST["goback"])){ ?>
+						window.onload = function () {
+						var deadline = new Date(Date.parse(new Date()) + 90 * 1000);
+						initializeClock(deadline);
+					};
+			<?php } ?>
+            
+            $(document).ready(function (){
                 $("#button0").addClass("highlight");
-
                 $('#panel0').css({
                     top: ($('.content').outerHeight() - $('#panel0').outerHeight()) / 2
                 });
@@ -259,20 +228,17 @@
                 <form id="goBack" method=post action=weekly-task.php>
                     <?php if($status == "GRADED" || isset($_POST["goback"])){ ?>
                     <button type="button" onclick="goBack()" class="btn btn-success">GO BACK</button>
-                    <?php }	 else if($status == "UNANSWERED" || $status == "UNGRADED"){ ?>
+                    <?php } else if($status == "UNANSWERED" || $status == "UNGRADED"){ ?>
                     <button id="back-btn" type="button" onclick="return submitQuiz();" class="btn btn-success">SUBMIT</button>
                     <?php } ?>                                        
                     <input type=hidden name="week" value=<?php echo $week; ?>></input>
-                </form>
-            
-                
-						
-				
-							
+                </form>	
 				
             </div>
             <div class="nav navbar-nav navbar-btn navbar-right" style="margin-right: 15px; font-size: x-large;">
-                <span id="time1"></span>
+                <div id="clock">
+						<span class="timer"></span>
+				</div>
             </div>
         </header>
         <!--Sidebar-->
@@ -378,6 +344,8 @@
             </div>
         </div>
         </form>
+    <!--notification of submission-->
+    <?php if(isset($_POST["goback"])) echo "<script> alert(\"Congratulations! You have finished this quiz. \")  </script>"; ?>   
     </body>
 </html>
 
