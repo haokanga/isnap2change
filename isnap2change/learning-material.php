@@ -55,21 +55,24 @@
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <link rel="stylesheet" type="text/css" href="css/info.css" />
-        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
+        <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
         <link href='https://fonts.googleapis.com/css?family=Raleway:400|Open+Sans' rel='stylesheet' type='text/css'>
         <link href='https://maxcdn.bootstrapcdn.com/font-awesome/4.6.2/css/font-awesome.min.css' rel='stylesheet' type='text/css'>
         <script type="text/javascript" src="js/jquery-1.12.3.js"></script>
     </head>
     <body>
-         <script>
+         <script>         
+            // decide quiz type and begin quiz
             function beginQuiz()
 			{
 				<?php if($quiztype == "MCQ"){ ?>
 							document.getElementById("formQuizBegin").setAttribute("action", "multiple-choice-question.php");
-				<?php }
-					  
-					  if($quiztype == "SAQ"){ ?>
+				<?php }					  
+					  else if($quiztype == "SAQ"){ ?>
 						  document.getElementById("formQuizBegin").setAttribute("action", "short-answer-question.php");
+                <?php }					  
+					  else if($quiztype == "Matching"){ ?>
+						  document.getElementById("formQuizBegin").setAttribute("action", "matching-question-1-1.php");
 				<?php } ?>
 					
 				document.getElementById("formQuizBegin").submit();

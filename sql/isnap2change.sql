@@ -5,6 +5,8 @@ USE isnap2changedb;
 
 SET FOREIGN_KEY_CHECKS=0;
 
+
+# [Assert] Lines of Drop table declaration = Lines of Create table declaration
 DROP TABLE IF EXISTS `School`;
 DROP TABLE IF EXISTS `Class`;
 DROP TABLE IF EXISTS `Token`;
@@ -23,6 +25,9 @@ DROP TABLE IF EXISTS `MCQ_Question_Record`;
 DROP TABLE IF EXISTS `SAQ_Section`;
 DROP TABLE IF EXISTS `SAQ_Question`;
 DROP TABLE IF EXISTS `SAQ_Question_Record`;
+DROP TABLE IF EXISTS `Matching_Section`;
+DROP TABLE IF EXISTS `Matching_Question`;
+DROP TABLE IF EXISTS `Matching_Option`;
 DROP TABLE IF EXISTS `Game`;
 DROP TABLE IF EXISTS `Game_Record`;
 DROP TABLE IF EXISTS `Bonus`;
@@ -110,7 +115,7 @@ CREATE TABLE IF NOT EXISTS `Topic` (
 CREATE TABLE IF NOT EXISTS `Quiz` (
     QuizID MEDIUMINT AUTO_INCREMENT,
     Week TINYINT,
-    QuizType ENUM('MCQ', 'SAQ'),    
+    QuizType ENUM('MCQ', 'SAQ', 'Matching', 'Calculator'),    
     TopicID MEDIUMINT,
     CONSTRAINT Quiz_QuizID_PK PRIMARY KEY (QuizID),
     CONSTRAINT Quiz_TopicID_FK FOREIGN KEY (TopicID)
@@ -219,6 +224,39 @@ CREATE TABLE IF NOT EXISTS `SAQ_Question_Record` (
         ON DELETE CASCADE ON UPDATE CASCADE
 )  ENGINE=INNODB;
 
+
+CREATE TABLE IF NOT EXISTS `Matching_Section` (
+    QuizID MEDIUMINT,
+    Explanation TEXT,
+    Points MEDIUMINT,
+    CONSTRAINT Matching_Section_QuizID_PK PRIMARY KEY (QuizID),
+    CONSTRAINT Matching_Section_QuizID_FK FOREIGN KEY (QuizID)
+        REFERENCES Quiz (QuizID)
+        ON DELETE CASCADE ON UPDATE CASCADE
+)  ENGINE=INNODB;
+
+# Set A: terminology/category/bucket
+CREATE TABLE IF NOT EXISTS `Matching_Question` (
+    MatchingQuestionID MEDIUMINT AUTO_INCREMENT,
+    Question TEXT,
+    QuizID MEDIUMINT,
+    CONSTRAINT Matching_Question_MatchingQuestionID_PK PRIMARY KEY (MatchingQuestionID),
+    CONSTRAINT Matching_Question_QuizID_FK FOREIGN KEY (QuizID)
+        REFERENCES Matching_Section (QuizID)
+        ON DELETE CASCADE ON UPDATE CASCADE
+)  ENGINE=INNODB;
+
+# Set B: explanation/concept/item
+CREATE TABLE IF NOT EXISTS `Matching_Option` (
+    OptionID MEDIUMINT AUTO_INCREMENT,
+    Content TEXT,
+    MatchingQuestionID MEDIUMINT,
+    CONSTRAINT Matching_Option_OptionID_PK PRIMARY KEY (OptionID),
+    CONSTRAINT Matching_Option_MatchingQuestionID_FK FOREIGN KEY (MatchingQuestionID)
+        REFERENCES Matching_Question (MatchingQuestionID)
+        ON DELETE CASCADE ON UPDATE CASCADE
+)  ENGINE=INNODB;
+
 CREATE TABLE IF NOT EXISTS `Game` (
     GameID MEDIUMINT AUTO_INCREMENT,
     Description TEXT,
@@ -289,7 +327,7 @@ SET FOREIGN_KEY_CHECKS=1;
 
 # INSERT RAW DATA FOR TEST
 
-# User Info
+# [Example] User Info
 INSERT IGNORE INTO School(SchoolName) VALUES('Adelaide High School');
 INSERT IGNORE INTO School(SchoolName) VALUES('Woodville High School');
 INSERT IGNORE INTO Class(ClassName,SchoolID) VALUES('Adelaide High 1A',1);
@@ -331,7 +369,7 @@ INSERT IGNORE INTO Teacher(Username,`Password`,FName,LName,ClassID) VALUES('Rach
 INSERT IGNORE INTO Researcher(Username,`Password`,FName,LName) VALUES('Ann','d59324e4d5acb950c4022cd5df834cc3','Ann','Gordon');
 INSERT IGNORE INTO Researcher(Username,`Password`,FName,LName) VALUES('Patricia','d59324e4d5acb950c4022cd5df834cc3','Patricia','Hayes');
 
-# Topic
+# [Formal] Topic
 INSERT IGNORE INTO Topic(TopicName) VALUES('Smoking');
 INSERT IGNORE INTO Topic(TopicName) VALUES('Nutrition');
 INSERT IGNORE INTO Topic(TopicName) VALUES('Alcohol');
@@ -339,7 +377,7 @@ INSERT IGNORE INTO Topic(TopicName) VALUES('Physical Activity');
 INSERT IGNORE INTO Topic(TopicName) VALUES('Introduction');
 
 
-# Example to insert MCQ section with multiple questions
+# [Formal] insert MCQ section with multiple questions
 INSERT IGNORE INTO Quiz(Week,QuizType,TopicID) VALUES(1,'MCQ',2);
 SET @QUIZ_LAST_INSERT_ID = LAST_INSERT_ID();
 INSERT IGNORE INTO MCQ_Section(QuizID,Points,Questionnaires) VALUES(@QUIZ_LAST_INSERT_ID,30,1);
@@ -438,6 +476,8 @@ INSERT IGNORE INTO `Option`(Content, Explanation, MCQID) VALUES('Heart', "Wrong"
 INSERT IGNORE INTO `Option`(Content, Explanation, MCQID) VALUES('Liver', "Correct", @MCQ_QUESTION_LAST_INSERT_ID);
 INSERT IGNORE INTO `Option`(Content, Explanation, MCQID) VALUES('Kidney', "Wrong", @MCQ_QUESTION_LAST_INSERT_ID);
 
+
+# [Example] Student Progress
 # StudentID = 1 has not finished QuizID neither 1, 2 nor 3
 INSERT IGNORE INTO Quiz_Record(QuizID,StudentID) VALUES(1,2);
 INSERT IGNORE INTO Quiz_Record(QuizID,StudentID) VALUES(1,3);
@@ -451,7 +491,7 @@ INSERT IGNORE INTO Quiz_Record(QuizID,StudentID) VALUES(2,4);
 INSERT IGNORE INTO Quiz_Record(QuizID,StudentID) VALUES(2,5);
 INSERT IGNORE INTO Quiz_Record(QuizID,StudentID) VALUES(2,6);
 
-# Example to insert SAQ section with questions
+# [Formal] insert SAQ section with questions
 INSERT IGNORE INTO Quiz(Week,QuizType,TopicID) VALUES(1,'SAQ',1);
 SET @QUIZ_LAST_INSERT_ID = LAST_INSERT_ID();
 INSERT IGNORE INTO SAQ_Section(QuizID) VALUES(@QUIZ_LAST_INSERT_ID);
@@ -459,14 +499,11 @@ INSERT IGNORE INTO SAQ_Question(Question, Points, QuizID) VALUES('Based on the v
 INSERT IGNORE INTO SAQ_Question(Question, Points, QuizID) VALUES('List 1 strategy that you could use to help convince a peer to stop smoking?', 10, @QUIZ_LAST_INSERT_ID);
 INSERT IGNORE INTO SAQ_Question(Question, Points, QuizID) VALUES('List 3 the different ways that you have seen anti-smoking messages presented to the public. With each suggest if you think they have been ‘effective’ or ‘not effective’. Eg. Poster-Effective.', 20, @QUIZ_LAST_INSERT_ID);
 
-# Example of Answer and Grading Feedback of SAQ 
+# [Sample] Answer and Grading Feedback of SAQ 
 INSERT IGNORE INTO Quiz_Record(QuizID, StudentID,`Status`,Score) VALUES(3, 1, 'GRADED', 34);
 INSERT IGNORE INTO SAQ_Question_Record(StudentID, SAQID, Answer, Feedback, Grading) VALUES(1, 1, "[ANSWER] Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque non justo et tellus venenatis consequat. Suspendisse laoreet rhoncus nulla, quis vulputate arcu interdum vel. Aenean at nisl at enim imperdiet rhoncus in non risus. Nam augue nisi, blandit sed feugiat eu, dapibus tristique ipsum. Vestibulum molestie orci risus, accumsan convallis sem sagittis mattis. Nulla ac justo sit amet erat lacinia vulputate. Aliquam accumsan pellentesque magna ac ultricies. Cras consequat feugiat suscipit. Vivamus suscipit lobortis nunc at aliquet. Nullam orci diam, viverra sed interdum ac, vehicula vel nisi. Cras blandit erat eget purus maximus condimentum. Nullam mattis pellentesque velit ac euismod. Nam vehicula est vel iaculis hendrerit. Vivamus pellentesque leo nec eleifend sodales. Phasellus eget condimentum metus.", "+10: Good job!", 10);
 INSERT IGNORE INTO SAQ_Question_Record(StudentID, SAQID, Answer, Feedback, Grading) VALUES(1, 2, "[ANSWER] Nunc rhoncus turpis eu risus pharetra, et pharetra libero euismod. Donec ac tellus consequat, aliquam ligula in, semper erat. Praesent ut justo auctor, imperdiet nisi quis, bibendum dolor. Nunc iaculis aliquet est ac maximus. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Suspendisse vel elit felis. Duis accumsan arcu cursus dapibus vulputate. Maecenas sit amet euismod orci. Sed imperdiet justo quis eros porta tristique eu a mi. Donec at est lacus. Vivamus viverra, purus ut tempor auctor, tellus massa hendrerit elit, tristique ornare mauris dolor vitae ante.", "+10: Well done!", 10);
 INSERT IGNORE INTO SAQ_Question_Record(StudentID, SAQID, Answer, Feedback, Grading) VALUES(1, 3, "[ANSWER] Nam odio tortor, finibus sit amet metus vitae, egestas venenatis arcu. Maecenas sodales, mi vitae tincidunt interdum, urna ipsum sagittis orci, semper mollis nisl ex ut felis. Vivamus lectus justo, interdum sit amet enim id, euismod posuere erat. Pellentesque auctor elit eget finibus placerat. Vivamus sodales dolor non ligula molestie aliquam. Ut at metus ut mauris consequat sollicitudin. Suspendisse non ipsum at neque molestie feugiat.", "+20: Nice try. <br> -2: You should also mention Poster-Effective.", 18);
-
-
-
 
 INSERT IGNORE INTO Quiz(Week,QuizType,TopicID) VALUES(3,'SAQ',4);
 SET @QUIZ_LAST_INSERT_ID = LAST_INSERT_ID();
@@ -476,20 +513,53 @@ INSERT IGNORE INTO SAQ_Question(Question, Points, QuizID) VALUES('Do you think t
 INSERT IGNORE INTO SAQ_Question(Question, Points, QuizID) VALUES('What are the benefits of exercising? List 5 examples.', 20, @QUIZ_LAST_INSERT_ID);
 INSERT IGNORE INTO SAQ_Question(Question, Points, QuizID) VALUES('What changes can you make to your daily routine to incorporate more exercise into your life?', 20, @QUIZ_LAST_INSERT_ID);
 
-# Learning_Material
+
+
+# [Formal] Week 6
+INSERT IGNORE INTO Quiz(Week,QuizType,TopicID) VALUES(6,'Calculator',3);
+INSERT IGNORE INTO Quiz(Week,QuizType,TopicID) VALUES(6,'MCQ',3);
+# [Formal] Matching quesitons
+INSERT IGNORE INTO Quiz(Week,QuizType,TopicID) VALUES(6,'Matching',2);
+SET @QUIZ_LAST_INSERT_ID = LAST_INSERT_ID();
+INSERT IGNORE INTO Matching_Section(QuizID, Explanation, Points) VALUES(@QUIZ_LAST_INSERT_ID, 'Match the diseases to the causes. You may have to do some research on other websites to find out the answers.', 20);
+INSERT IGNORE INTO Matching_Question(Question, QuizID) VALUES('Kwashiorkor', @QUIZ_LAST_INSERT_ID);
+SET @MATCHING_QUESTION_LAST_INSERT_ID = LAST_INSERT_ID();
+INSERT IGNORE INTO `Matching_Option`(Content, MatchingQuestionID) VALUES('A disease that occurs if your body doesn’t get enough proteins', @MATCHING_QUESTION_LAST_INSERT_ID);
+INSERT IGNORE INTO Matching_Question(Question, QuizID) VALUES('Marasmus', @QUIZ_LAST_INSERT_ID);
+SET @MATCHING_QUESTION_LAST_INSERT_ID = LAST_INSERT_ID();
+INSERT IGNORE INTO `Matching_Option`(Content, MatchingQuestionID) VALUES('Occurs in young children who don’t get enough calories every day', @MATCHING_QUESTION_LAST_INSERT_ID);
+INSERT IGNORE INTO Matching_Question(Question, QuizID) VALUES('Scurvy', @QUIZ_LAST_INSERT_ID);
+SET @MATCHING_QUESTION_LAST_INSERT_ID = LAST_INSERT_ID();
+INSERT IGNORE INTO `Matching_Option`(Content, MatchingQuestionID) VALUES('Caused by a lack of vitamin C', @MATCHING_QUESTION_LAST_INSERT_ID);
+INSERT IGNORE INTO Matching_Question(Question, QuizID) VALUES('Rickets', @QUIZ_LAST_INSERT_ID);
+SET @MATCHING_QUESTION_LAST_INSERT_ID = LAST_INSERT_ID();
+INSERT IGNORE INTO `Matching_Option`(Content, MatchingQuestionID) VALUES('This condition is brought on by a lack of vitamin D', @MATCHING_QUESTION_LAST_INSERT_ID);
+INSERT IGNORE INTO Matching_Question(Question, QuizID) VALUES('Beriberi', @QUIZ_LAST_INSERT_ID);
+SET @MATCHING_QUESTION_LAST_INSERT_ID = LAST_INSERT_ID();
+INSERT IGNORE INTO `Matching_Option`(Content, MatchingQuestionID) VALUES('Caused by the deficiency of vitamin B1 (thiamine) ', @MATCHING_QUESTION_LAST_INSERT_ID);
+
+
+# [Formal] Learning_Material
 INSERT IGNORE INTO Learning_Material(Content,QuizID) VALUES('<p>Eating a balanced diet is vital for your health and wellbeing. The food we eat is responsible for providing us with the energy to do all the tasks of daily life. For optimum performance and growth a balance of protein, essential fats, vitamins and minerals are required. We need a wide variety of different foods to provide the right amounts of nutrients for good health. The different types of food and how much of it you should be aiming to eat is demonstrated on the pyramid below. (my own words)</p>
 <p><img style="display: block; margin-left: auto; margin-right: auto;" src="https://cmudream.files.wordpress.com/2016/05/0.jpg" alt="" width="632" height="884" /></p>
 <p>There are three main layers of the food pyramid. The bottom layer is the most important one for your daily intake of food. It contains vegetables, fruits, grains and legumes. You should be having most of your daily food from this layer. These foods are all derived or grow on plants and contain important nutrients such as vitamins, minerals and antioxidants. They are also responsible for being the main contributor of carbohydrates and fibre to our diet.<br />The middle layer is comprised of dairy based products such as milk, yoghurt, cheese. These are essential to providing our bodies with calcium and protein and important vitamins and minerals.<br />They layer also contains lean meat, poultry, fish, eggs, nuts, seeds, legumes. These foods are our main source of protein and are also responsible for providing other nutrients to us including iodine, iron, zinc, B12 vitamins and healthy fats.<br />The top layer, which is the smallest layer, is the layer you should me eating the least off. This layer is made up of food which has unsaturated fats such as sugar, butter, margarine and oils; small amounts of these unsaturated fats are needed for healthy brain and hear function.<br />(my own words)<br />Source: The Healthy Living Pyramid. Nutrition Australia. [Accessed 28/04/2016 http://www.nutritionaustralia.org/national/resource/healthy-living-pyramid]</p>',1);
 INSERT IGNORE INTO Learning_Material(Content,QuizID) VALUES('https://www.youtube.com/watch?v=1ey0EDVjyeY&index=89&list=PLIGEVr8ox1oGsi-XcwSjudMi_uCPxGzSs',2);
 INSERT IGNORE INTO Learning_Material(Content,QuizID) VALUES('
-<p>Learning materials for week 3.',3);
+<p>Learning materials for week 3.</p>',3);
 INSERT IGNORE INTO Learning_Material(Content,QuizID) VALUES('
-<p>Learning materials for this quiz has not been added.',4);
+<p>Learning materials for this quiz has not been added.</p>',4);
+INSERT IGNORE INTO Learning_Material(Content,QuizID) VALUES('
+<p>Learning materials for this quiz has not been added.</p>',5);
+INSERT IGNORE INTO Learning_Material(Content,QuizID) VALUES('
+<p>Learning materials for this quiz has not been added.</p>',6);
+INSERT IGNORE INTO Learning_Material(Content,QuizID) VALUES('
+<p>Nutrition: All over the world people suffer from illnesses that are caused by eating the wrong food or not having enough to eat. In developing countries deficiency diseases arise when people do not get the right nutrients. Conversely, overconsumption of foods rich in fat and cholesterols can lead to heart diseases, obesity, strokes and cancer. (Own words)</p>',7);
 
-
+# [Formal] Games
 INSERT IGNORE INTO Game(Description,Week,Points) VALUES('Fruit Ninja',1,10);
 INSERT IGNORE INTO Game(Description,Week,Points) VALUES('Candy Crush',1,10);
 
+# [Example] Game_Record
 INSERT IGNORE INTO Game_Record(GameID,StudentID,`Level`,Score) VALUES(1,2,1,30);
 INSERT IGNORE INTO Game_Record(GameID,StudentID,`Level`,Score) VALUES(1,3,1,30);
 INSERT IGNORE INTO Game_Record(GameID,StudentID,`Level`,Score) VALUES(1,4,1,30);
@@ -498,7 +568,7 @@ INSERT IGNORE INTO Game_Record(GameID,StudentID,`Level`,Score) VALUES(2,3,1,30);
 INSERT IGNORE INTO Game_Record(GameID,StudentID,`Level`,Score) VALUES(2,4,1,30);
 INSERT IGNORE INTO Game_Record(GameID,StudentID,`Level`,Score) VALUES(2,5,1,40);
 
-# Example to add Bonus and tasks
+# [Example] add Bonus and tasks
 INSERT IGNORE INTO Bonus(Week) VALUES(1);
 SET @BONUS_LAST_INSERT_ID = LAST_INSERT_ID();
 INSERT IGNORE INTO Bonus_Task(Question, Points, BonusID) VALUES('Prepare a meal for your mom.', 10, @BONUS_LAST_INSERT_ID);
