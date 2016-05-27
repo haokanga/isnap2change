@@ -109,7 +109,10 @@
     <!--dragula plugin css-->
     <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
     <link href='css/dragula.css' rel='stylesheet' type='text/css' />
-    <link href='css/example.css' rel='stylesheet' type='text/css' />
+    <!--    
+    To edit style, please modify this css file    
+    -->
+    <link href='css/matching.css' rel='stylesheet' type='text/css' />
     <script type="text/javascript" src="js/jquery-1.12.3.js"></script>
     <!--md5-->
     <script src="js/md5.min.js"></script>
@@ -223,7 +226,7 @@
               <!--Multiple Buckets-->
                 <?php for($i=0; $i<count($matchingQuestionResult); $i++) { ?>
                 <div id="bucket-defaults<?php echo $i ?>" class="container bucket">
-                    <label><?php echo $matchingQuestionResult[$i]->Question ?> </label>
+                    <?php echo $matchingQuestionResult[$i]->Question ?>
                 </div>
                 <?php } ?>                
             </div>            
@@ -237,7 +240,7 @@
                 foreach ($randomOptionArray as $value) { ?>
                 <div class="choice" id="<?php echo encryptMD5($value) ?>" ><?php echo $matchingOptionResult[$value]->Content ?></div>
                 <?php } ?>
-            </div>
+           </div>
         </div>       
         <?php } ?>
     </form>    

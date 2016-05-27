@@ -542,7 +542,7 @@ INSERT IGNORE INTO `Matching_Option`(Content, MatchingQuestionID) VALUES('Caused
 # [Example] Week 7 MultipleChoices Matching
 INSERT IGNORE INTO Quiz(Week,QuizType,TopicID) VALUES(7,'Matching',2);
 SET @QUIZ_LAST_INSERT_ID = LAST_INSERT_ID();
-INSERT IGNORE INTO Matching_Section(QuizID, Explanation, Points, MultipleChoices) VALUES(@QUIZ_LAST_INSERT_ID, 'Classify the lists of foods into the 6 main food groups', 20, 1);
+INSERT IGNORE INTO Matching_Section(QuizID, Explanation, Points, MultipleChoices) VALUES(@QUIZ_LAST_INSERT_ID, 'Classify the lists of foods into the 5 main food groups', 20, 1);
 INSERT IGNORE INTO Matching_Question(Question, QuizID) VALUES('Protein', @QUIZ_LAST_INSERT_ID);
 SET @MATCHING_QUESTION_LAST_INSERT_ID = LAST_INSERT_ID();
 INSERT IGNORE INTO `Matching_Option`(Content, MatchingQuestionID) VALUES('Beef', @MATCHING_QUESTION_LAST_INSERT_ID);
