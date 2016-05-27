@@ -51,16 +51,25 @@
             $score=$matchingSectionResult->Points;
             // if 1, multipleChoices
             $multipleChoices=$matchingSectionResult->MultipleChoices;
-                      
             
-            // get matching questions and options;
-            $matchingSql = "SELECT MatchingQuestionID, Explanation, Question, Content, Points
+            // get matching questions
+            $matchingQuestionSql = "SELECT MatchingQuestionID, Question
+                       FROM   Matching_Section NATURAL JOIN Matching_Question
+                       WHERE  QuizID = ?
+                       ORDER BY MatchingQuestionID";
+            $matchingQuestionQuery = $conn->prepare($matchingQuestionSql);
+            $matchingQuestionQuery->execute(array($quizid));
+            $matchingQuestionResult = $matchingQuestionQuery->fetchAll(PDO::FETCH_OBJ);
+            
+            
+            // get matching options
+            $matchingOptionSql = "SELECT MatchingQuestionID, Explanation, Question, Content, Points
                        FROM   Matching_Section NATURAL JOIN Matching_Question NATURAL JOIN Matching_Option
                        WHERE  QuizID = ?
                        ORDER BY MatchingQuestionID";
-            $matchingQuery = $conn->prepare($matchingSql);
-            $matchingQuery->execute(array($quizid));
-            $matchingResult = $matchingQuery->fetchAll(PDO::FETCH_OBJ);
+            $matchingOptionQuery = $conn->prepare($matchingOptionSql);
+            $matchingOptionQuery->execute(array($quizid));
+            $matchingOptionResult = $matchingOptionQuery->fetchAll(PDO::FETCH_OBJ);
             
             //if submission            
             if($status == "GRADED"){
@@ -146,9 +155,8 @@
             $("#back-btn").attr("onclick", "goBack()");
             document.getElementById("submission").submit();
             }
-        else {alert("Failed! Try again!")};
-        
-    }
+        else {alert("Failed! Try again!")};        
+    }    
     </script>        
     <header class="navbar navbar-static-top bs-docs-nav">
         <div class="navbar-header">
@@ -186,68 +194,55 @@
                 <div class="row parent">        
                     <div class='container choices'>
                         <div class="choices">
-                            <?php for($i=0; $i<count($matchingResult); $i++) { ?>
+                            <?php for($i=0; $i<count($matchingOptionResult); $i++) { ?>
                             <div class="parent">
                                 <!--Questions and Arrows-->
-                                <div><span><?php echo $matchingResult[$i]->Question ?> </span></div><div><img class="rotated" src="img/arrow-19-64x64.png" width="25%"/></div>
+                                <div><span><?php echo $matchingOptionResult[$i]->Question ?> </span></div><div><img class="rotated" src="img/arrow-19-64x64.png" width="25%"/></div>
                             </div>
                             <?php } ?>
                         </div>
                     </div> 
                     <div id='sortable' class='container choices'>
                         <?php                         
-                        $randomOptionArray = range(0, count($matchingResult)-1);
+                        $randomOptionArray = range(0, count($matchingOptionResult)-1);
                         //shuffle options
                         if($status != "GRADED")
                             shuffle($randomOptionArray);
                         foreach ($randomOptionArray as $value) { ?>
-                        <div class="choice" id="<?php echo encryptMD5($value) ?>" ><?php echo $matchingResult[$value]->Content ?></div>
+                        <div class="choice" id="<?php echo encryptMD5($value) ?>" ><?php echo $matchingOptionResult[$value]->Content ?></div>
                          <?php } ?>
                     </div>       
                 </div>
           </div>
         </div>
         <?php } else {?>
-        <div class="examples">
-          <div class="parent">
-            <label for="hy">Move stuff between these two containers. Note how the stuff gets inserted near the mouse pointer? Great stuff.</label>    
+        <div class="examples">        
+            <label><?php echo $matchingSectionResult->Explanation ?></label> 
+          <div class="parent">   
             <div class="wrapper">
-              <!--Multiple Buckets-->      
-              <div id="bucket-defaults0" class="container">
-                <div>There's also the possibility of moving elements around in the same container, changing their position</div>
-                <div>This is the default use case. You only need to specify the containers you want to use</div>
-                <div>More interactive use cases lie ahead</div>
-                <div>Moving <code>&lt;input/&gt;</code> elements works just fine. You can still focus them, too. <input placeholder="See?"></div>
-                <div>Make sure to check out the <a href="https://github.com/bevacqua/dragula#readme">documentation on GitHub!</a></div>
-              </div>
-              <div id="bucket-defaults1" class="container">
-                <div>There's also the possibility of moving elements around in the same container, changing their position</div>
-                <div>This is the default use case. You only need to specify the containers you want to use</div>
-                <div>More interactive use cases lie ahead</div>
-                <div>Moving <code>&lt;input/&gt;</code> elements works just fine. You can still focus them, too. <input placeholder="See?"></div>
-                <div>Make sure to check out the <a href="https://github.com/bevacqua/dragula#readme">documentation on GitHub!</a></div>
-              </div>
-              <div id="bucket-defaults2" class="container">
-                <div>There's also the possibility of moving elements around in the same container, changing their position</div>
-                <div>This is the default use case. You only need to specify the containers you want to use</div>
-                <div>More interactive use cases lie ahead</div>
-                <div>Moving <code>&lt;input/&gt;</code> elements works just fine. You can still focus them, too. <input placeholder="See?"></div>
-                <div>Make sure to check out the <a href="https://github.com/bevacqua/dragula#readme">documentation on GitHub!</a></div>
-              </div>      
-            </div>
-            <div id="option-defaults" class="container">
-                <div>You can move these elements between these two containers</div>
-                <div>Moving them anywhere else isn't quite possible</div>
-                <div>Anything can be moved around. That includes images, <a href="https://github.com/bevacqua/dragula">links</a>, or any other nested elements.
-                <div class="image-thing"></div><sub>(You can still click on links, as usual!)</sub>
+              <!--Multiple Buckets-->
+                <?php for($i=0; $i<count($matchingQuestionResult); $i++) { ?>
+                <div id="bucket-defaults<?php echo $i ?>" class="container bucket">
+                    <label><?php echo $matchingQuestionResult[$i]->Question ?> </label>
                 </div>
-            </div>
+                <?php } ?>                
+            </div>            
           </div>
+          <div id="option-defaults" class="container">
+                <?php                         
+                $randomOptionArray = range(0, count($matchingOptionResult)-1);
+                //shuffle options
+                if($status != "GRADED")
+                    shuffle($randomOptionArray);
+                foreach ($randomOptionArray as $value) { ?>
+                <div class="choice" id="<?php echo encryptMD5($value) ?>" ><?php echo $matchingOptionResult[$value]->Content ?></div>
+                <?php } ?>
+            </div>
         </div>       
         <?php } ?>
     </form>    
     <!--dragula plugin js-->
-    <script src='js/dragula.js'></script>
-    <script src='js/example.min.js'></script> 
+    <script src='js/dragula.js'></script>    
+    <script src='js/example.min.js'></script>
     </body>
 </html>
