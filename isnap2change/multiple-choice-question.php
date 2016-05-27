@@ -203,31 +203,85 @@
 
             });
 			
-			function parseScript(strcode) {
-				var scripts = new Array();         // Array which will store the script's code
-  
-				// Strip out tags
-				while(strcode.indexOf("<script") > -1 || strcode.indexOf("</script") > -1) {
-					var s = strcode.indexOf("<script");
-					var s_e = strcode.indexOf(">", s);
-					var e = strcode.indexOf("</script", s);
-					var e_e = strcode.indexOf(">", e);
-    
-					// Add to scripts array
-					scripts.push(strcode.substring(s_e+1, e));
-					// Strip from strcode
-					strcode = strcode.substring(0, s) + strcode.substring(e_e+1);
-			  }
-			  
-			  // Loop through every script collected and eval it
-			  for(var i=0; i<scripts.length; i++) {
-				try {
-				  eval(scripts[i]);
+			function parseFeedback(response) {
+				var feedback = JSON.parse(response);
+				
+				var result = feedback.result;
+				var score = feedback.score;
+				var quesNumber = feedback.quesNum;
+				
+				if(result == "pass") {
+					alert("Congratulations! You have passed this quiz. The result is: " + score + "/" + quesNumber +".");
+					$("#back-btn").text('GO BACK');
+					$("#back-btn").attr("onclick", "goBack()");
+					
+					var index = $("#hiddenIndex").val();
+					$("#panel"+index).addClass("hidden");
+					$("#button"+index).removeClass("highlight");
+					$("#panel1").removeClass("hidden");
+					$("#button1").addClass("highlight");
+					$("#hiddenIndex").val(1);
+					
+					var detail = feedback.detail;
+						
+					for(i = 0; i < quesNumber; i++){
+						
+						var correctAns = detail[i].correctAns;
+						var studentAns = detail[i].studentAns;
+						var option = detail[i].option;
+						var explanation = detail[i].explanation;
+						
+						$("button[name='" + detail[i].MCQID + "']").each(function(){
+							
+							for(j = 0; j < option.length; j++){
+								if($(this).val() == option[j]){
+									$(this).append("<br>");
+									$(this).append(explanation[j]);
+								}
+							}
+							
+							if(studentAns == null){
+								if($(this).val() == correctAns){
+									$(this).addClass("correct");
+									$(this).find(".glyphicon-ok").removeClass("hidden");
+								} else {
+									$(this).find(".glyphicon-remove").removeClass("hidden");
+								}
+							} else {
+								if(correctAns == studentAns){
+									if($(this).hasClass("active")){
+										$(this).addClass("correct");
+										$("#button"+(i+1)).addClass("correct");
+										$(this).find(".glyphicon-ok").removeClass("hidden");
+									} else {
+										$(this).find(".glyphicon-remove").removeClass("hidden");
+									}
+								} else {
+									if($(this).hasClass("active")){
+										$(this).addClass("wrong");
+										$(this).find(".glyphicon-remove").removeClass("hidden");
+									} else if($(this).val() == correctAns){
+												$(this).addClass("correct");
+												$("#button"+(i+1)).addClass("wrong");
+												$(this).find(".glyphicon-ok").removeClass("hidden");
+										   } else {
+												$(this).find(".glyphicon-remove").removeClass("hidden");
+										   }
+								}	
+							}
+						});
+						
+					}
+					
+				} else if(result == "fail") {
+					if (confirm("Sorry! You have failed this quiz. The result is: " + score + "/" + quesNumber +". Do you want to try again?") == true) {
+						document.getElementById("hiddenReturnQuiz").submit();
+					} else {
+						document.getElementById("hiddenReturnTask").submit();
+					}
 				}
-				catch(ex) {
-				  // do what you want here when a script fails
-				}
-			  }
+				
+				
 			}
 			
 			function submitQuiz()
@@ -242,7 +296,7 @@
 				$(".options").each(function(i) {
 					$(this).find(".btn").each(function() {
 						if($(this).hasClass("active")){
-							answerArr[i]=$(this).val();
+							answerArr[i] = $(this).val();
 						}
 					});
 				});
@@ -251,10 +305,8 @@
 				
 				xmlhttp.onreadystatechange = function() {
 					if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
-						parseScript(xmlhttp.responseText);
-					} else {
-						
-					}
+						parseFeedback(xmlhttp.responseText);
+					} 
 				};
 				
 				xmlhttp.open("POST", "multiple-choice-question-feedback.php", true);
@@ -267,7 +319,6 @@
 			{
 				document.getElementById("goBack").submit();
 			}
-			
 			
         </script>
 		

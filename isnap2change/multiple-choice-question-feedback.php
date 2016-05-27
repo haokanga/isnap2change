@@ -6,7 +6,7 @@
     require_once("connection.php");
 	
     if($DEBUG_MODE){
-        echo "<script language=\"javascript\">  console.log(\"SUBMISSION.\"); </script>";
+   //     echo "<script language=\"javascript\">  console.log(\"SUBMISSION.\"); </script>";
     }
 	
 	if(isset($_SESSION["studentid"])){
@@ -45,11 +45,18 @@
 		$score += $sql->fetchColumn();
 	}		
 	if($DEBUG_MODE){
-		echo "<script language=\"javascript\">  console.log(\"Score: $score\"); </script>";
+	//	echo "<script language=\"javascript\">  console.log(\"Score: $score\"); </script>";
 	}
+	
+	$feedback = array();
+	$feedback['score'] = $score; 
+	$feedback['quesNum'] = count($MCQIDArr);
+	$feedback['detail'] = array();
             
 	//SQL UPDATE STATEMENT
 	if ($score >= $threshold) {
+		
+		$feedback['result'] = "pass";
 		
 		$score_sql = "SELECT Points 
 					  FROM MCQ_Section
@@ -62,143 +69,59 @@
 		//UPDATE Quiz_Record
 		$status = "GRADED";
 		$update_stmt = "REPLACE INTO Quiz_Record(QuizID, StudentID, Status, Score)
-			 VALUES (?,?,?,?);";			
+						VALUES (?,?,?,?);";			
 		$update_stmt = $conn->prepare($update_stmt);                            
 		if(! $update_stmt -> execute(array($quizid, $studentid, $status, $score_res -> Points))){
-			echo "<script language=\"javascript\">  alert(\"Error occurred to submit your answer. Report this bug to reseachers.\"); </script>";
+		//	echo "<script language=\"javascript\">  alert(\"Error occurred to submit your answer. Report this bug to reseachers.\"); </script>";
 		} else{ 
-			echo "<script language=\"javascript\">  console.log(\"Quiz Passed\"); </script>";
-		}
-		//UPDATE MCQ_Question_Record
-		for($i=0; $i<count($MCQIDArr); $i++){
-			if(!isset($answerArr[$i])){
-				//SQL UPDATE STATEMENT with Choice (assigned)
-				$update_stmt = "REPLACE INTO MCQ_Question_Record(StudentID, MCQID, Choice)
-							 VALUES (?,?,?);";			
-				$update_stmt = $conn->prepare($update_stmt);                            
-				if(! $update_stmt -> execute(array($studentid, $MCQIDArr[$i], null))){
-					echo "<script language=\"javascript\">  alert(\"Error occurred to submit your answer. Report this bug to reseachers.\"); </script>";
-				}                    
-			} else{ 
-				//SQL UPDATE STATEMENT with Choice (null)
-				$update_stmt = "REPLACE INTO MCQ_Question_Record(StudentID, MCQID, Choice)
-							 VALUES (?,?,?);";			
-				$update_stmt = $conn->prepare($update_stmt);                            
-				if(! $update_stmt -> execute(array($studentid, $MCQIDArr[$i], $answerArr[$i]))){
-					echo "<script language=\"javascript\">  alert(\"Error occurred to submit your answer. Report this bug to reseachers.\"); </script>";
-				}
-			}                
+		//	echo "<script language=\"javascript\">  console.log(\"Quiz Passed\"); </script>";
 		}
 		
+		$update_stmt = "REPLACE INTO MCQ_Question_Record(StudentID, MCQID, Choice)
+							 VALUES (?,?,?);";			
+		$update_stmt = $conn->prepare($update_stmt);   
+			
 		$mcqGradeSql = "SELECT CorrectChoice
 						FROM   MCQ_Question
 						WHERE  MCQID = ?";			
-			
 		$mcqGradeQuery = $conn->prepare($mcqGradeSql);    
-		
+	
 		$mcqExplanationSql = "SELECT Explanation, Content
 							  FROM   `Option`
 							  WHERE   MCQID = ?";	
+		$mcqExplanationQuery = $conn->prepare($mcqExplanationSql);
 		
-		$mcqExplanationQuery = $conn->prepare($mcqExplanationSql);   
-		
-		echo "<script> alert(\"Congratulations! You have passed this quiz. The result is: ".$score."/".count($MCQIDArr).".\")  </script>";
-		
-		echo "<script>
-					$(\"#back-btn\").text('GO BACK');
-					$(\"#back-btn\").attr(\"onclick\",\"goBack()\"); </script>";
-		
-		echo "<script>";
-		
+		//UPDATE MCQ_Question_Record
 		for($i=0; $i<count($MCQIDArr); $i++){
-						
-			$mcqGradeQuery->execute(array($MCQIDArr[$i]));	
-			$mcqGradeRes = $mcqGradeQuery->fetch(PDO::FETCH_OBJ);
+	
+			if(! $update_stmt -> execute(array($studentid, $MCQIDArr[$i], $answerArr[$i]))){
+			//	echo "<script language=\"javascript\">  alert(\"Error occurred to submit your answer. Report this bug to reseachers.\"); </script>";
+			}
 			
-			$mcqExplanationQuery->execute(array($MCQIDArr[$i]));	
-			$mcqExplanationRes = $mcqExplanationQuery->fetchAll(PDO::FETCH_OBJ);
+			$mcqGradeQuery -> execute(array($MCQIDArr[$i]));	
+			$mcqGradeRes = $mcqGradeQuery -> fetch(PDO::FETCH_OBJ);
+		
+			$mcqExplanationQuery -> execute(array($MCQIDArr[$i]));	
+			$mcqExplanationRes = $mcqExplanationQuery -> fetchAll(PDO::FETCH_OBJ);
+
+			$feedback['detail'][$i]['MCQID'] = $MCQIDArr[$i];
+			$feedback['detail'][$i]['correctAns'] = $mcqGradeRes->CorrectChoice;
+			$feedback['detail'][$i]['studentAns'] = $answerArr[$i];
+			$feedback['detail'][$i]['option'] = array();
+			$feedback['detail'][$i]['explanation'] = array();
 			
-			echo "
-				
-				$(\"button[name='".$MCQIDArr[$i]."']\").each(function(){ ";
-				
-				foreach($mcqExplanationRes as $row){
-						echo "
-							if($(this).val() == \"".$row->Content."\"){
-								$(this).append(\"<br>\");
-								$(this).append(\"".$row->Explanation."\");
-							}
-						";
-				}
-					
-				if(!isset($answerArr[$i])){
-					echo "
-						if($(this).val() == \"".$mcqGradeRes->CorrectChoice."\"){
-							$(this).addClass(\"correct\");
-							$(this).find(\".glyphicon-ok\").removeClass(\"hidden\");
-						} else {
-							$(this).find(\".glyphicon-remove\").removeClass(\"hidden\");
-						}
-						";
-						
-				} else {							
-						if($mcqGradeRes->CorrectChoice == $answerArr[$i]){
-							
-							echo "
-									if($(this).hasClass(\"active\")){
-										$(this).addClass(\"correct\");
-										$(\"#button\"+".($i+1).").addClass(\"correct\");
-										$(this).find(\".glyphicon-ok\").removeClass(\"hidden\");
-									} else {
-										$(this).find(\".glyphicon-remove\").removeClass(\"hidden\");
-									}
-								 ";
-								 
-						} else {
-						
-							echo "
-									if($(this).hasClass(\"active\")){
-										$(this).addClass(\"wrong\");
-										$(this).find(\".glyphicon-remove\").removeClass(\"hidden\");
-									} else if($(this).val() == \"".$mcqGradeRes->CorrectChoice."\"){
-												$(this).addClass(\"correct\");
-												$(\"#button\"+".($i+1).").addClass(\"wrong\");
-												$(this).find(\".glyphicon-ok\").removeClass(\"hidden\");
-											} else {
-												$(this).find(\".glyphicon-remove\").removeClass(\"hidden\");
-											}
-								";
-						}	
-					}
-					
-				echo "});";	
+			foreach($mcqExplanationRes as $row){
+				array_push($feedback['detail'][$i]['option'], $row->Content);  
+				array_push($feedback['detail'][$i]['explanation'], $row->Explanation);
+			}   
+			
 		}
 		
-		echo "</script>";
-
-		echo "<script>
-				var index = $(\"#hiddenIndex\").val();
-                $(\"#panel\"+index).addClass(\"hidden\");
-                $(\"#button\"+index).removeClass(\"highlight\");
-                $(\"#panel1\").removeClass(\"hidden\");
-                $(\"#button1\").addClass(\"highlight\");
-                $(\"#hiddenIndex\").val(1);
-			 </script>";
-		
-		
-	}else{
-		//todo: if failed the quiz
-		
-		echo "<script> 
-			if (confirm(\"Sorry! You have failed this quiz. The result is: ".$score."/".count($MCQIDArr).". Do you want to try again?\") == true) {
-				document.getElementById(\"hiddenReturnQuiz\").submit();
-			} else {
-				document.getElementById(\"hiddenReturnTask\").submit();
-			}
-			</script>";
-
+	} else {
+		$feedback['result'] = "fail";
 	} 
+		
+	echo json_encode($feedback);
 	
 	db_close($conn);	
-
 ?>
