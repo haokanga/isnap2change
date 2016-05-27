@@ -144,13 +144,28 @@
     function submitQuiz()
     {   
         var passed = true;
-        var count = 0;
-        $(".choice").each(function(){
-            //match md5 values
-            if($(this).attr('id') !=  md5(count++)) {
-                passed = false;
+        //if 1-1 matching
+        if($("#multiplechoices").val()==0){
+            var count = 0;
+            $(".choice").each(function(){
+                //match md5 values
+                if($(this).attr('id') !=  md5(count++)) {
+                    passed = false;
+                }
+            });         
+        //if n-1 matching
+        } else {
+            if ($("#option-defaults div").length > 0) {
+                alert("Please finish all the matchings before your submission.");
+                return;
             }
-        });
+            $(".choice").each(function(){
+                //match md5 values
+                if($(this).find("input").val() !=  md5($(this).parent().find("input").val())) {
+                    passed = false;
+                }
+            });
+        }
         //passed/failed feedback
         if (passed) {            
             alert("Congratulations! You have finished this quiz.");
@@ -159,7 +174,7 @@
             document.getElementById("submission").submit();
             }
         else {alert("Failed! Try again!")};        
-    }    
+        }    
     </script>        
     <header class="navbar navbar-static-top bs-docs-nav">
         <div class="navbar-header">
@@ -186,10 +201,13 @@
             </div>
         </div>
     </header>
+    <input type=hidden id="multiplechoices" name="multiplechoices" value=<?php echo $multipleChoices; ?> ></input>
     <form id="submission" method="post" action="<?php echo $_SERVER['PHP_SELF']; ?>">
         <input type=hidden name="week" value=<?php echo $week; ?> ></input>        
         <input type=hidden name="quizid" value=<?php echo $quizid; ?> ></input>
         <input type=hidden name="status" value="GRADED" ></input>
+        
+        
         <?php if($multipleChoices == 0){ ?>
         <div class='examples'>      
             <div class='wrapper'>   
@@ -204,8 +222,9 @@
                             </div>
                             <?php } ?>
                         </div>
-                    </div> 
-                    <div id='sortable' class='container choices'>
+                    </div>
+                    <!--if GRADED, disable dragging-->                    
+                    <div id='<?php if($status != "GRADED") echo "sortable"; ?>' class='container choices'>
                         <?php                         
                         $randomOptionArray = range(0, count($matchingOptionResult)-1);
                         //shuffle options
@@ -225,21 +244,32 @@
             <div class="wrapper">
               <!--Multiple Buckets-->
                 <?php for($i=0; $i<count($matchingQuestionResult); $i++) { ?>
-                <div id="bucket-defaults<?php echo $i ?>" class="container bucket">
+                <!--if GRADED, disable dragging-->
+                <div id="bucket-defaults<?php if($status != "GRADED") echo $i; ?>" class="container bucket">
+                <input type=hidden value= <?php echo $matchingQuestionResult[$i]->MatchingQuestionID; ?> ></input>                
                     <?php echo $matchingQuestionResult[$i]->Question ?>
+                    <!--if GRADED, directly show answers-->
+                    <?php if($status == "GRADED") { 
+                        for($j=0; $j<count($matchingOptionResult); $j++) {
+                            if($matchingOptionResult[$j]->MatchingQuestionID == $matchingQuestionResult[$i]->MatchingQuestionID) {?>                    
+                            <div class="choice" ><?php echo $matchingOptionResult[$j]->Content ?></div>
+                        <?php } 
+                        }
+                    }?>                 
                 </div>
                 <?php } ?>                
             </div>            
           </div>
           <div id="option-defaults" class="container">
-                <?php                         
-                $randomOptionArray = range(0, count($matchingOptionResult)-1);
-                //shuffle options
-                if($status != "GRADED")
+                <?php
+                if($status != "GRADED"){               
+                    $randomOptionArray = range(0, count($matchingOptionResult)-1);
+                    //shuffle options
                     shuffle($randomOptionArray);
-                foreach ($randomOptionArray as $value) { ?>
-                <div class="choice" id="<?php echo encryptMD5($value) ?>" ><?php echo $matchingOptionResult[$value]->Content ?></div>
-                <?php } ?>
+                    foreach ($randomOptionArray as $value) { ?>
+                    <div class="choice" ><?php echo $matchingOptionResult[$value]->Content ?><input type=hidden value="<?php echo encryptMD5($matchingOptionResult[$value]->MatchingQuestionID) ?>"></div>
+                <?php } 
+                } ?>
            </div>
         </div>       
         <?php } ?>

@@ -57,7 +57,7 @@
 			}
             
             else if($quizResult["QuizType"]=="Matching"){
-				echo '<form id="quiz'.$quizResult["QuizID"].'" action=matching-question-1-1.php method=post>';
+				echo '<form id="quiz'.$quizResult["QuizID"].'" action=matching-question.php method=post>';
 			}
 			
 		} else {
