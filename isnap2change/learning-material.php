@@ -61,15 +61,18 @@
         <script type="text/javascript" src="js/jquery-1.12.3.js"></script>
     </head>
     <body>
-         <script>
+         <script>         
+            // decide quiz type and begin quiz
             function beginQuiz()
 			{
 				<?php if($quiztype == "MCQ"){ ?>
 							document.getElementById("formQuizBegin").setAttribute("action", "multiple-choice-question.php");
-				<?php }
-					  
-					  if($quiztype == "SAQ"){ ?>
+				<?php }					  
+					  else if($quiztype == "SAQ"){ ?>
 						  document.getElementById("formQuizBegin").setAttribute("action", "short-answer-question.php");
+                <?php }					  
+					  else if($quiztype == "Matching"){ ?>
+						  document.getElementById("formQuizBegin").setAttribute("action", "matching-question-1-1.php");
 				<?php } ?>
 					
 				document.getElementById("formQuizBegin").submit();
