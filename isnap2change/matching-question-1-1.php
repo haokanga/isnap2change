@@ -102,10 +102,12 @@
     <head>
     <meta charset='utf-8'>
     <!--dragula plugin css-->
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
+    <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
     <link href='css/dragula.css' rel='stylesheet' type='text/css' />
     <link href='css/example.css' rel='stylesheet' type='text/css' />
     <script type="text/javascript" src="js/jquery-1.12.3.js"></script>
+    <!--md5-->
+    <script src="js/md5.min.js"></script>
     <title>1:1 matching</title>
     <style>
     .parent { display: -ms-flex; display: -webkit-flex; display: flex; }
@@ -132,8 +134,26 @@
     }
     
     function submitQuiz()
-    {                
-        document.getElementById("submission").submit();
+    {   
+        var passed = true;
+        var count = 0;
+        $(".choice").each(function(){
+            //match md5 values
+            if($(this).attr('id') !=  md5(count++)) {
+                passed = false;
+            }
+        });
+        //passed/failed feedback
+        if (passed) {            
+            alert("Congratulations! You have finished this quiz.");
+            $("#back-btn").val("GO BACK");
+            
+            <button id="back-btn" type="button" onclick="goBack()" class="btn btn-success">GO BACK</button>
+                <?php } else { ?>
+                <button id="back-btn" type="button" onclick="return submitQuiz();" class="btn btn-success">SUBMIT</button>
+            }; 
+        else  alert("Failed! Try again!");
+        
     }
     </script>        
     <header class="navbar navbar-static-top bs-docs-nav">
@@ -146,10 +166,10 @@
         <!--Sumbit/Go Back Button-->
         <div class="nav navbar-nav navbar-btn navbar-right" style="margin-right:22px;">
             <form id="goBack" method=post action=weekly-task.php>
-                <?php if($status == "GRADED" || isset($_POST["goback"])){ ?>
-                <button type="button" onclick="goBack()" class="btn btn-success">GO BACK</button>
-                <?php } else if($status == "UNANSWERED" || $status == "UNGRADED"){ ?>
-                <button id="back-btn" type="button" onclick="return submitQuiz();" class="btn btn-success">SUBMIT</button>
+                <?php if($status == "GRADED"){ ?>
+                <button id="back-btn" type="button" onclick="goBack()" class="btn btn-success">GO BACK</button>
+                <?php } else { ?>
+                <button id="back-btn" type="button" onclick="submitQuiz();" class="btn btn-success">SUBMIT</button>
                 <?php } ?>                                        
                 <input type=hidden name="week" value=<?php echo $week; ?>></input>
             </form>	
@@ -180,12 +200,13 @@
                         </div>
                     </div> 
                     <div id='sortable' class='container choices'>
-                        <?php 
-                        //shuffle options
+                        <?php                         
                         $randomOptionArray = range(0, count($matchingResult)-1);
-                        shuffle($randomOptionArray);
+                        //shuffle options
+                        if($status != "GRADED")
+                            shuffle($randomOptionArray);
                         foreach ($randomOptionArray as $value) { ?>
-                        <div id="<?php echo encryptMD5($value) ?>" ><?php echo $matchingResult[$value]->Content ?></div>
+                        <div class="choice" id="<?php echo encryptMD5($value) ?>" ><?php echo $matchingResult[$value]->Content ?></div>
                          <?php } ?>
                     </div>       
                 </div>
@@ -194,8 +215,6 @@
     </form>    
     <!--dragula plugin js-->
     <script src='js/dragula.js'></script>
-    <script src='js/example.min.js'></script>
-    <!--notification of submission-->
-    <?php if(isset($_POST["goback"])) echo "<script> alert(\"Congratulations! You have finished this quiz. \")  </script>"; ?>   
+    <script src='js/example.min.js'></script> 
     </body>
 </html>

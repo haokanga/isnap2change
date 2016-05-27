@@ -115,7 +115,7 @@
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <link rel="stylesheet" type="text/css" href="css/quiz.css" />
-        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
+        <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
         <link href='https://fonts.googleapis.com/css?family=Raleway:400|Open+Sans' rel='stylesheet' type='text/css'>
         <link href='https://maxcdn.bootstrapcdn.com/font-awesome/4.6.2/css/font-awesome.min.css' rel='stylesheet' type='text/css'>
         <script type="text/javascript" src="js/jquery-1.12.3.js"></script>
@@ -227,7 +227,7 @@
             <div class="nav navbar-nav navbar-btn navbar-right" style="margin-right:22px;">
                 <form id="goBack" method=post action=weekly-task.php>
                     <?php if($status == "GRADED" || isset($_POST["goback"])){ ?>
-                    <button type="button" onclick="goBack()" class="btn btn-success">GO BACK</button>
+                    <button id="back-btn" type="button" onclick="goBack()" class="btn btn-success">GO BACK</button>
                     <?php } else if($status == "UNANSWERED" || $status == "UNGRADED"){ ?>
                     <button id="back-btn" type="button" onclick="return submitQuiz();" class="btn btn-success">SUBMIT</button>
                     <?php } ?>                                        
