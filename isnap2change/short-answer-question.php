@@ -96,8 +96,7 @@
         $update_stmt = $conn->prepare($update_stmt);                
         if(! $update_stmt -> execute(array($quizid, $studentid, "UNGRADED", $score, $score))){
             echo "<script language=\"javascript\">  alert(\"Error occurred to update your score. Report this bug to reseachers.\"); </script>";
-        }
-        echo "<script language=\"javascript\">  console.log(\"SUBMISSION.\"); </script>";
+        }        
         $saqresult = null;
     }
     //if Jump from weekly tasks/learning materials
@@ -123,75 +122,44 @@
     </head>
     <body>
         <script>
-            function CountDownTimer(duration, granularity) {
-                this.duration = duration;
-                this.granularity = granularity || 1000;
-                this.tickFtns = [];
-                this.running = false;
-            }
-
-            CountDownTimer.prototype.start = function () {
-                if (this.running) {
-                    return;
-                }
-                this.running = true;
-                var start = Date.now(),
-                        that = this,
-                        diff, obj;
-
-                (function timer() {
-                    diff = that.duration - (((Date.now() - start) / 1000) | 0);
-
-                    if (diff > 0) {
-                        setTimeout(timer, that.granularity);
-                    } else {
-                        diff = 0;
-                        that.running = false;
-                    }
-
-                    obj = CountDownTimer.parse(diff);
-                    that.tickFtns.forEach(function (ftn) {
-                        ftn.call(this, obj.minutes, obj.seconds);
-                    }, that);
-                }());
-            };
-
-            CountDownTimer.prototype.onTick = function (ftn) {
-                if (typeof ftn === 'function') {
-                    this.tickFtns.push(ftn);
-                }
-                return this;
-            };
-
-            CountDownTimer.prototype.expired = function () {
-                return !this.running;
-            };
-
-            CountDownTimer.parse = function (seconds) {
-                return {
-                    'minutes': (seconds / 60) | 0,
-                    'seconds': (seconds % 60) | 0
-                };
-            };
-
-            window.onload = function () {
-
-                var display1 = document.querySelector('#time1'),
-                        timer = new CountDownTimer(30);    // set time here
-
-                timer.onTick(format1).start();
-
-                function format1(minutes, seconds) {
-                    minutes = minutes < 10 ? "0" + minutes : minutes;
-                    seconds = seconds < 10 ? "0" + seconds : seconds;
-                    display1.textContent = minutes + ':' + seconds;
-                }
-            };
-
-            $(document).ready(function ()
-            {
+            <!--Timer-->
+            var timeinterval;
+		
+			function getTimeRemaining(endtime){
+				var t = Date.parse(endtime) - Date.parse(new Date());
+				var seconds = Math.floor( (t/1000) % 60 );
+				var minutes = Math.floor( (t/1000/60) % 60 );				
+				return {
+					'total': t,
+					'minutes': minutes,
+					'seconds': seconds
+				 };
+			}
+			
+			function initializeClock(endtime){
+				var clock = document.getElementById("clock");				
+				var timerSpan = clock.querySelector('.timer');				
+				function updateClock() {
+					var t = getTimeRemaining(endtime);
+					timerSpan.innerHTML = ('0' + t.minutes).slice(-2) + ":" + ('0' + t.seconds).slice(-2);				
+					if (t.total <= 0) {
+						alert("Time is up!");
+						submitQuiz();
+					}
+				}				
+				updateClock();
+				timeinterval = setInterval(updateClock, 1000);				
+			}
+            
+            <?php if(($status == "UNANSWERED" || $status == "UNGRADED") && !isset($_POST["goback"])){ ?>
+						window.onload = function () {
+						var deadline = new Date(Date.parse(new Date()) + 90 * 1000);
+						initializeClock(deadline);
+					};
+			<?php } ?>
+            
+            $(document).ready(function (){
                 $("#button0").addClass("highlight");
-
                 $('#panel0').css({
                     top: ($('.content').outerHeight() - $('#panel0').outerHeight()) / 2
                 });
@@ -245,16 +213,7 @@
             
             function submitQuiz()
 			{                
-                $.ajax({
-                   url: location.href,                           
-                   data: $('#submission').serialize(),                 
-                   success: function (data) {                        
-                      window.location.href = 'avatar.php';;
-                   },
-                   error: function (xhr, text, error) {              
-                      alert('Error: ' + error);
-                   }
-                });
+                document.getElementById("submission").submit();
 			}
         </script>
         <header class="navbar navbar-static-top bs-docs-nav">
@@ -266,19 +225,20 @@
             </div>
             <!--Sumbit/Go Back Button-->
             <div class="nav navbar-nav navbar-btn navbar-right" style="margin-right:22px;">
-                <?php
-						if($status == "GRADED"){ ?>
-						<form id="goBack" method=post action=weekly-task.php>
-							 <button type="button" onclick="return goBack()" class="btn btn-success">GO BACK</button> 
-							 <input type=hidden name="week" value=<?php echo $week; ?>></input>
-						</form>
-				<?php	}					
-						 else if($status == "UNANSWERED" || $status == "UNGRADED"){ ?>
-							<button id="back-btn" type="button" onclick="return submitQuiz();" class="btn btn-success">SUBMIT</button>
-				<?php	} ?>
+                <form id="goBack" method=post action=weekly-task.php>
+                    <?php if($status == "GRADED" || isset($_POST["goback"])){ ?>
+                    <button type="button" onclick="goBack()" class="btn btn-success">GO BACK</button>
+                    <?php } else if($status == "UNANSWERED" || $status == "UNGRADED"){ ?>
+                    <button id="back-btn" type="button" onclick="return submitQuiz();" class="btn btn-success">SUBMIT</button>
+                    <?php } ?>                                        
+                    <input type=hidden name="week" value=<?php echo $week; ?>></input>
+                </form>	
+				
             </div>
             <div class="nav navbar-nav navbar-btn navbar-right" style="margin-right: 15px; font-size: x-large;">
-                <span id="time1"></span>
+                <div id="clock">
+						<span class="timer"></span>
+				</div>
             </div>
         </header>
         <!--Sidebar-->
@@ -318,17 +278,15 @@
             </div>
         <!--form submission-->    
         <form id="submission" method="post" action="<?php echo $_SERVER['PHP_SELF']; ?>">
+            <input type=hidden name="goback" value=0 ></input> 
             <input type=hidden name="week" value=<?php echo $week; ?> ></input>        
             <input type=hidden name="quizid" value=<?php echo $quizid; ?> ></input>
             <input type=hidden name="status" value="UNGRADED" ></input>
+            <!--start of saq for-loop-->
             <?php for($i=0; $i<count($saqresult); $i++) {
                 $currentsaqid = $saqresult[$i] -> SAQID;
-                if($currentsaqid != $lastsaqid){  
-                    if($questionIndex == 1){ ?>
-            <div class="myques" id="panel1">
-            <?php		} else { ?>
-            <div class="myques hidden" id="panel<?php echo $questionIndex;?>"> 
-            <?php		} ?>
+                if($currentsaqid != $lastsaqid){?>
+                <div class="myques <?php if($questionIndex != 1){echo "hidden";} ?> " id="panel<?php echo $questionIndex;?>">
                     <!--heading-->
                     <div class="panel-heading" style="font-size: xx-large; font-weight: 600; color:black; height:35%; min-height: 35%; max-height: 35%; text-align:center;">
                         <div class="ques" >                        
@@ -373,8 +331,8 @@
                         <br>
                         <!--Navigation Button-->
                         <div class="back2"  style="text-align: center;">                            
-                            <a class="btn btn-default last <?php if($i<=0){echo disabled;} ?>"  role="button" style="padding-top:8px; padding-bottom: 10px;"><span class="glyphicon glyphicon-chevron-left"></span></a>                           
-                            <a class="btn btn-default next <?php if($i>=count($saqresult)-1){echo disabled;} ?>"  role="button" style="padding-top:8px; padding-bottom: 10px;"><span class="glyphicon glyphicon-chevron-right"></span></a>
+                            <a class="btn btn-default last <?php if($i<=0){echo "disabled";} ?>"  role="button" style="padding-top:8px; padding-bottom: 10px;"><span class="glyphicon glyphicon-chevron-left"></span></a>                           
+                            <a class="btn btn-default next <?php if($i>=count($saqresult)-1){echo "disabled";} ?>"  role="button" style="padding-top:8px; padding-bottom: 10px;"><span class="glyphicon glyphicon-chevron-right"></span></a>
                         </div>
                     </div>
                 </div>                
@@ -386,6 +344,8 @@
             </div>
         </div>
         </form>
+    <!--notification of submission-->
+    <?php if(isset($_POST["goback"])) echo "<script> alert(\"Congratulations! You have finished this quiz. \")  </script>"; ?>   
     </body>
 </html>
 
