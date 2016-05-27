@@ -9,9 +9,11 @@
     //set userid    
     if(isset($_SESSION['studentid'])){
         $studentid = $_SESSION['studentid'];
-        echo "<script language=\"javascript\">  console.log(\"This is DEBUG_MODE with SESSION studentID = ".$studentid.".\"); </script>";
+        if($DEBUG_MODE){
+            echo "<script language=\"javascript\">  console.log(\"This is DEBUG_MODE with SESSION studentID = ".$studentid.".\"); </script>";
+        }
     }else{
-        if(DEBUG_MODE){
+        if($DEBUG_MODE){
             echo "<script language=\"javascript\">  console.log(\"This is DEBUG_MODE with hard-code studentID = 1.\"); </script>";
             $studentid = 1;
         }
@@ -22,76 +24,70 @@
 			$quizid = $_POST["quizid"];
 			$week = $_POST["week"];
 			$status = $_POST["status"];
-		} else {
+            //[unused] get learning-material
+            $materialPreSql = "SELECT COUNT(*) 
+                               FROM   Learning_Material
+                               WHERE  QuizID = ?";							
+            $materialPreQuery = $conn->prepare($materialPreSql);
+            $materialPreQuery->execute(array($quizid));			
+            if($materialPreQuery->fetchColumn() == 1){
+                $materialSql = "SELECT Content, TopicName 
+                                FROM   Learning_Material NATURAL JOIN Quiz
+                                                         NATURAL JOIN Topic
+                                WHERE  QuizID = ?";							
+                $materialQuery = $conn->prepare($materialSql);
+                $materialQuery->execute(array($quizid));
+                $materialRes = $materialQuery->fetch(PDO::FETCH_OBJ);		
+            } else {       
+            }
+
+            // get matching section
+            $matchingSectionSql = "SELECT Explanation, Points, MultipleChoices
+                       FROM   Matching_Section
+                       WHERE  QuizID = ?";
+            $matchingSectionQuery = $conn->prepare($matchingSectionSql);
+            $matchingSectionQuery->execute(array($quizid));
+            $matchingSectionResult = $matchingSectionQuery->fetch(PDO::FETCH_OBJ);
+            $score=$matchingSectionResult->Points;
+            // if 1, multipleChoices
+            $multipleChoices=$matchingSectionResult->MultipleChoices;
+                      
+            
+            // get matching questions and options;
+            $matchingSql = "SELECT MatchingQuestionID, Explanation, Question, Content, Points
+                       FROM   Matching_Section NATURAL JOIN Matching_Question NATURAL JOIN Matching_Option
+                       WHERE  QuizID = ?
+                       ORDER BY MatchingQuestionID";
+            $matchingQuery = $conn->prepare($matchingSql);
+            $matchingQuery->execute(array($quizid));
+            $matchingResult = $matchingQuery->fetchAll(PDO::FETCH_OBJ);
+            
+            //if submission            
+            if($status == "GRADED"){
+                $quizid = $_POST["quizid"];
+                $update_stmt = "INSERT INTO Quiz_Record(QuizID, StudentID, `Status`, Score)
+                                             VALUES (?,?,?,?) ON DUPLICATE KEY UPDATE Score = ?";			
+                $update_stmt = $conn->prepare($update_stmt);                
+                if(! $update_stmt -> execute(array($quizid, $studentid, $status, $score, $score))){
+                    echo "<script language=\"javascript\">  alert(\"Error occurred to update your score. Report this bug to reseachers.\"); </script>";
+                }
+            }
+            //if Jump from weekly tasks/learning materials
+            else if($status == "UNANSWERED"){
+                if($DEBUG_MODE){
+                    echo "<script language=\"javascript\">  console.log(\"Jump from weekly tasks/learning materials.\"); </script>";
+                }        
+            } else {
+                //todo: error handling
+            }       
+        
+        } else {
 			
 		}		
 	} else {		
 	}
     
-    //[unused] get learning-material
-    $materialPreSql = "SELECT COUNT(*) 
-					   FROM   Learning_Material
-					   WHERE  QuizID = ?";							
-	$materialPreQuery = $conn->prepare($materialPreSql);
-	$materialPreQuery->execute(array($quizid));			
-	if($materialPreQuery->fetchColumn() == 1){
-		$materialSql = "SELECT Content, TopicName 
-                        FROM   Learning_Material NATURAL JOIN Quiz
-                                                 NATURAL JOIN Topic
-                        WHERE  QuizID = ?";							
-        $materialQuery = $conn->prepare($materialSql);
-        $materialQuery->execute(array($quizid));
-        $materialRes = $materialQuery->fetch(PDO::FETCH_OBJ);		
-	} else {       
-    }    
     
-    // get $matchingResult[$i] -> MatchingQuestionID;
-    $matchingSql = "SELECT MatchingQuestionID, Explanation, Question, Content 
-               FROM   Matching_Section NATURAL JOIN Matching_Question NATURAL JOIN Matching_Option
-               WHERE  QuizID = ?
-               ORDER BY MatchingQuestionID";
-    $matchingQuery = $conn->prepare($matchingSql);
-    $matchingQuery->execute(array($quizid));
-    $matchingResult = $matchingQuery->fetchAll(PDO::FETCH_OBJ);
-    
-    //if submitted
-    if($status == "UNGRADED" || $status == "GRADED"){
-        $matching_question_record_sql = "SELECT StudentID, MatchingQuestionID, Answer, Feedback, Grading
-               FROM   Matching_Question_Record NATURAL JOIN Matching_Question
-               WHERE  QuizID = ?
-               ORDER BY MatchingQuestionID";
-        $matching_question_record_query = $conn->prepare($matching_question_record_sql);
-        $matching_question_record_query->execute(array($quizid));
-        $matching_question_record_result = $matching_question_record_query->fetchAll(PDO::FETCH_OBJ);
-    }
-    
-    //if submission
-    if(isset($_POST['answer']) && isset($_POST['MatchingQuestionID']) && isset($_POST['quizid'])){
-        $quizid = $_POST["quizid"];
-        $matchingQuestionID = $_POST["MatchingQuestionID"];    
-        $answer = $_POST["answer"];
-        for($i=0; $i<count($matchingQuestionID); $i++) {
-            $update_stmt = "INSERT INTO Matching_Question_Record(StudentID, MatchingQuestionID, Answer)
-                                     VALUES (?,?,?) ON DUPLICATE KEY UPDATE Answer = ?";			
-            $update_stmt = $conn->prepare($update_stmt);                
-            if(! $update_stmt -> execute(array($studentid, $matchingQuestionID[$i], htmlspecialchars($answer[$i]), htmlspecialchars($answer[$i])))){
-                echo "<script language=\"javascript\">  alert(\"Error occurred to submit your answer. Report this bug to reseachers.\"); </script>";
-            }
-        }
-        $update_stmt = "INSERT INTO Quiz_Record(QuizID, StudentID, `Status`, Score)
-                                     VALUES (?,?,?,?) ON DUPLICATE KEY UPDATE Score = ?";			
-        $update_stmt = $conn->prepare($update_stmt);                
-        if(! $update_stmt -> execute(array($quizid, $studentid, "UNGRADED", $score, $score))){
-            echo "<script language=\"javascript\">  alert(\"Error occurred to update your score. Report this bug to reseachers.\"); </script>";
-        }        
-        $matchingResult = null;
-    }
-    //if Jump from weekly tasks/learning materials
-    else if(!isset($_POST['answer']) && !isset($_POST['MatchingQuestionID']) && isset($_POST["status"])){
-        echo "<script language=\"javascript\">  console.log(\"Jump from weekly tasks/learning materials.\"); </script>";
-    } else {
-        //todo: error handling
-    }
     db_close($conn); 
     
 ?>
@@ -146,13 +142,11 @@
         //passed/failed feedback
         if (passed) {            
             alert("Congratulations! You have finished this quiz.");
-            $("#back-btn").val("GO BACK");
-            
-            <button id="back-btn" type="button" onclick="goBack()" class="btn btn-success">GO BACK</button>
-                <?php } else { ?>
-                <button id="back-btn" type="button" onclick="return submitQuiz();" class="btn btn-success">SUBMIT</button>
-            }; 
-        else  alert("Failed! Try again!");
+            $("#back-btn").text("GO BACK");
+            $("#back-btn").attr("onclick", "goBack()");
+            document.getElementById("submission").submit();
+            }
+        else {alert("Failed! Try again!")};
         
     }
     </script>        
@@ -184,10 +178,11 @@
     <form id="submission" method="post" action="<?php echo $_SERVER['PHP_SELF']; ?>">
         <input type=hidden name="week" value=<?php echo $week; ?> ></input>        
         <input type=hidden name="quizid" value=<?php echo $quizid; ?> ></input>
-        <input type=hidden name="status" value="UNGRADED" ></input>
+        <input type=hidden name="status" value="GRADED" ></input>
+        <?php if($multipleChoices == 0){ ?>
         <div class='examples'>      
             <div class='wrapper'>   
-                <label><?php echo $matchingResult[0]->Explanation ?></label>   
+                <label><?php echo $matchingSectionResult->Explanation ?></label>   
                 <div class="row parent">        
                     <div class='container choices'>
                         <div class="choices">
@@ -212,6 +207,44 @@
                 </div>
           </div>
         </div>
+        <?php } else {?>
+        <div class="examples">
+          <div class="parent">
+            <label for="hy">Move stuff between these two containers. Note how the stuff gets inserted near the mouse pointer? Great stuff.</label>    
+            <div class="wrapper">
+              <!--Multiple Buckets-->      
+              <div id="bucket-defaults0" class="container">
+                <div>There's also the possibility of moving elements around in the same container, changing their position</div>
+                <div>This is the default use case. You only need to specify the containers you want to use</div>
+                <div>More interactive use cases lie ahead</div>
+                <div>Moving <code>&lt;input/&gt;</code> elements works just fine. You can still focus them, too. <input placeholder="See?"></div>
+                <div>Make sure to check out the <a href="https://github.com/bevacqua/dragula#readme">documentation on GitHub!</a></div>
+              </div>
+              <div id="bucket-defaults1" class="container">
+                <div>There's also the possibility of moving elements around in the same container, changing their position</div>
+                <div>This is the default use case. You only need to specify the containers you want to use</div>
+                <div>More interactive use cases lie ahead</div>
+                <div>Moving <code>&lt;input/&gt;</code> elements works just fine. You can still focus them, too. <input placeholder="See?"></div>
+                <div>Make sure to check out the <a href="https://github.com/bevacqua/dragula#readme">documentation on GitHub!</a></div>
+              </div>
+              <div id="bucket-defaults2" class="container">
+                <div>There's also the possibility of moving elements around in the same container, changing their position</div>
+                <div>This is the default use case. You only need to specify the containers you want to use</div>
+                <div>More interactive use cases lie ahead</div>
+                <div>Moving <code>&lt;input/&gt;</code> elements works just fine. You can still focus them, too. <input placeholder="See?"></div>
+                <div>Make sure to check out the <a href="https://github.com/bevacqua/dragula#readme">documentation on GitHub!</a></div>
+              </div>      
+            </div>
+            <div id="option-defaults" class="container">
+                <div>You can move these elements between these two containers</div>
+                <div>Moving them anywhere else isn't quite possible</div>
+                <div>Anything can be moved around. That includes images, <a href="https://github.com/bevacqua/dragula">links</a>, or any other nested elements.
+                <div class="image-thing"></div><sub>(You can still click on links, as usual!)</sub>
+                </div>
+            </div>
+          </div>
+        </div>       
+        <?php } ?>
     </form>    
     <!--dragula plugin js-->
     <script src='js/dragula.js'></script>

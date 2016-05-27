@@ -229,6 +229,7 @@ CREATE TABLE IF NOT EXISTS `Matching_Section` (
     QuizID MEDIUMINT,
     Explanation TEXT,
     Points MEDIUMINT,
+    MultipleChoices BOOLEAN DEFAULT 0,
     CONSTRAINT Matching_Section_QuizID_PK PRIMARY KEY (QuizID),
     CONSTRAINT Matching_Section_QuizID_FK FOREIGN KEY (QuizID)
         REFERENCES Quiz (QuizID)
@@ -538,6 +539,42 @@ INSERT IGNORE INTO Matching_Question(Question, QuizID) VALUES('Beriberi', @QUIZ_
 SET @MATCHING_QUESTION_LAST_INSERT_ID = LAST_INSERT_ID();
 INSERT IGNORE INTO `Matching_Option`(Content, MatchingQuestionID) VALUES('Caused by the deficiency of vitamin B1 (thiamine) ', @MATCHING_QUESTION_LAST_INSERT_ID);
 
+# [Example] Week 7 MultipleChoices Matching
+INSERT IGNORE INTO Quiz(Week,QuizType,TopicID) VALUES(7,'Matching',2);
+SET @QUIZ_LAST_INSERT_ID = LAST_INSERT_ID();
+INSERT IGNORE INTO Matching_Section(QuizID, Explanation, Points, MultipleChoices) VALUES(@QUIZ_LAST_INSERT_ID, 'Classify the lists of foods into the 6 main food groups', 20, 1);
+INSERT IGNORE INTO Matching_Question(Question, QuizID) VALUES('Protein', @QUIZ_LAST_INSERT_ID);
+SET @MATCHING_QUESTION_LAST_INSERT_ID = LAST_INSERT_ID();
+INSERT IGNORE INTO `Matching_Option`(Content, MatchingQuestionID) VALUES('Beef', @MATCHING_QUESTION_LAST_INSERT_ID);
+INSERT IGNORE INTO `Matching_Option`(Content, MatchingQuestionID) VALUES('Beef', @MATCHING_QUESTION_LAST_INSERT_ID);
+INSERT IGNORE INTO `Matching_Option`(Content, MatchingQuestionID) VALUES('Beef', @MATCHING_QUESTION_LAST_INSERT_ID);
+INSERT IGNORE INTO `Matching_Option`(Content, MatchingQuestionID) VALUES('Beef', @MATCHING_QUESTION_LAST_INSERT_ID);
+INSERT IGNORE INTO Matching_Question(Question, QuizID) VALUES('Fat', @QUIZ_LAST_INSERT_ID);
+SET @MATCHING_QUESTION_LAST_INSERT_ID = LAST_INSERT_ID();
+INSERT IGNORE INTO `Matching_Option`(Content, MatchingQuestionID) VALUES('Chips', @MATCHING_QUESTION_LAST_INSERT_ID);
+INSERT IGNORE INTO `Matching_Option`(Content, MatchingQuestionID) VALUES('Chips', @MATCHING_QUESTION_LAST_INSERT_ID);
+INSERT IGNORE INTO `Matching_Option`(Content, MatchingQuestionID) VALUES('Chips', @MATCHING_QUESTION_LAST_INSERT_ID);
+INSERT IGNORE INTO `Matching_Option`(Content, MatchingQuestionID) VALUES('Chips', @MATCHING_QUESTION_LAST_INSERT_ID);
+INSERT IGNORE INTO Matching_Question(Question, QuizID) VALUES('Vitamin', @QUIZ_LAST_INSERT_ID);
+SET @MATCHING_QUESTION_LAST_INSERT_ID = LAST_INSERT_ID();
+INSERT IGNORE INTO `Matching_Option`(Content, MatchingQuestionID) VALUES('Orange', @MATCHING_QUESTION_LAST_INSERT_ID);
+INSERT IGNORE INTO `Matching_Option`(Content, MatchingQuestionID) VALUES('Orange', @MATCHING_QUESTION_LAST_INSERT_ID);
+INSERT IGNORE INTO `Matching_Option`(Content, MatchingQuestionID) VALUES('Orange', @MATCHING_QUESTION_LAST_INSERT_ID);
+INSERT IGNORE INTO `Matching_Option`(Content, MatchingQuestionID) VALUES('Orange', @MATCHING_QUESTION_LAST_INSERT_ID);
+INSERT IGNORE INTO Matching_Question(Question, QuizID) VALUES('Minerals', @QUIZ_LAST_INSERT_ID);
+SET @MATCHING_QUESTION_LAST_INSERT_ID = LAST_INSERT_ID();
+INSERT IGNORE INTO `Matching_Option`(Content, MatchingQuestionID) VALUES('Fish', @MATCHING_QUESTION_LAST_INSERT_ID);
+INSERT IGNORE INTO `Matching_Option`(Content, MatchingQuestionID) VALUES('Fish', @MATCHING_QUESTION_LAST_INSERT_ID);
+INSERT IGNORE INTO `Matching_Option`(Content, MatchingQuestionID) VALUES('Fish', @MATCHING_QUESTION_LAST_INSERT_ID);
+INSERT IGNORE INTO `Matching_Option`(Content, MatchingQuestionID) VALUES('Fish', @MATCHING_QUESTION_LAST_INSERT_ID);
+INSERT IGNORE INTO Matching_Question(Question, QuizID) VALUES('Carbohydrate', @QUIZ_LAST_INSERT_ID);
+SET @MATCHING_QUESTION_LAST_INSERT_ID = LAST_INSERT_ID();
+INSERT IGNORE INTO `Matching_Option`(Content, MatchingQuestionID) VALUES('Rice', @MATCHING_QUESTION_LAST_INSERT_ID);
+INSERT IGNORE INTO `Matching_Option`(Content, MatchingQuestionID) VALUES('Rice', @MATCHING_QUESTION_LAST_INSERT_ID);
+INSERT IGNORE INTO `Matching_Option`(Content, MatchingQuestionID) VALUES('Rice', @MATCHING_QUESTION_LAST_INSERT_ID);
+INSERT IGNORE INTO `Matching_Option`(Content, MatchingQuestionID) VALUES('Rice', @MATCHING_QUESTION_LAST_INSERT_ID);
+
+
 
 # [Formal] Learning_Material
 INSERT IGNORE INTO Learning_Material(Content,QuizID) VALUES('<p>Eating a balanced diet is vital for your health and wellbeing. The food we eat is responsible for providing us with the energy to do all the tasks of daily life. For optimum performance and growth a balance of protein, essential fats, vitamins and minerals are required. We need a wide variety of different foods to provide the right amounts of nutrients for good health. The different types of food and how much of it you should be aiming to eat is demonstrated on the pyramid below. (my own words)</p>
@@ -554,6 +591,8 @@ INSERT IGNORE INTO Learning_Material(Content,QuizID) VALUES('
 <p>Learning materials for this quiz has not been added.</p>',6);
 INSERT IGNORE INTO Learning_Material(Content,QuizID) VALUES('
 <p>Nutrition: All over the world people suffer from illnesses that are caused by eating the wrong food or not having enough to eat. In developing countries deficiency diseases arise when people do not get the right nutrients. Conversely, overconsumption of foods rich in fat and cholesterols can lead to heart diseases, obesity, strokes and cancer. (Own words)</p>',7);
+INSERT IGNORE INTO Learning_Material(Content,QuizID) VALUES('
+<p>Learning materials for this quiz has not been added.</p>',8);
 
 # [Formal] Games
 INSERT IGNORE INTO Game(Description,Week,Points) VALUES('Fruit Ninja',1,10);

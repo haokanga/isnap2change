@@ -65,6 +65,7 @@
             // decide quiz type and begin quiz
             function beginQuiz()
 			{
+                //list of question type
 				<?php if($quiztype == "MCQ"){ ?>
 							document.getElementById("formQuizBegin").setAttribute("action", "multiple-choice-question.php");
 				<?php }					  
