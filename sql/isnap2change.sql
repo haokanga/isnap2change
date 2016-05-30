@@ -5,7 +5,6 @@ USE isnap2changedb;
 
 SET FOREIGN_KEY_CHECKS=0;
 
-
 # [Assert] Lines of Drop table declaration = Lines of Create table declaration
 DROP TABLE IF EXISTS `School`;
 DROP TABLE IF EXISTS `Class`;
@@ -37,7 +36,8 @@ DROP TABLE IF EXISTS `Bonus_Task_Record`;
 
 CREATE TABLE IF NOT EXISTS `School` (
     SchoolID MEDIUMINT AUTO_INCREMENT,
-    SchoolName TEXT,
+    # Specified key was too long; max key length is 767 bytes, a UTF8 char is 4 bytes
+    SchoolName VARCHAR(190) UNIQUE,
     CONSTRAINT School_SchoolID_PK PRIMARY KEY (SchoolID)
 )  ENGINE=INNODB;
 
@@ -52,11 +52,10 @@ CREATE TABLE IF NOT EXISTS `Class` (
 )  ENGINE=INNODB;
 
 CREATE TABLE IF NOT EXISTS `Token` (
-    TokenID MEDIUMINT AUTO_INCREMENT,
-    `Type` TEXT NOT NULL,
-    TokenString TEXT NOT NULL,
     ClassID MEDIUMINT NOT NULL,
-    CONSTRAINT Token_TokenID_PK PRIMARY KEY (TokenID),
+    `Type` ENUM('TEACHER', 'STUDENT'),
+    TokenString TEXT NOT NULL,
+    CONSTRAINT Token_PK PRIMARY KEY (ClassID, `Type`),
     CONSTRAINT Token_ClassID_FK FOREIGN KEY (ClassID)
         REFERENCES Class (ClassID)
         ON DELETE CASCADE ON UPDATE CASCADE
@@ -329,13 +328,13 @@ SET FOREIGN_KEY_CHECKS=1;
 # INSERT RAW DATA FOR TEST
 
 # [Example] User Info
-INSERT IGNORE INTO School(SchoolName) VALUES('Adelaide High School');
-INSERT IGNORE INTO School(SchoolName) VALUES('Woodville High School');
-INSERT IGNORE INTO Class(ClassName,SchoolID) VALUES('Adelaide High 1A',1);
-INSERT IGNORE INTO Class(ClassName,SchoolID) VALUES('Adelaide High 1B',1);
-INSERT IGNORE INTO Class(ClassName,SchoolID) VALUES('Adelaide High 1C',1);
-INSERT IGNORE INTO Class(ClassName,SchoolID) VALUES('Adelaide High 2C',1);
-INSERT IGNORE INTO Class(ClassName,SchoolID) VALUES('Woodville High 2C',2);
+INSERT IGNORE INTO School(SchoolName) VALUES('Dummy School');
+INSERT IGNORE INTO School(SchoolName) VALUES('Dummy Adelaide High School');
+INSERT IGNORE INTO School(SchoolName) VALUES('Dummy Woodville High School');
+INSERT IGNORE INTO Class(ClassName,SchoolID) VALUES('Dummy Class 1A',1);
+INSERT IGNORE INTO Class(ClassName,SchoolID) VALUES('Dummy Class 1B',1);
+INSERT IGNORE INTO Class(ClassName,SchoolID) VALUES('Dummy Class 1C',1);
+INSERT IGNORE INTO Class(ClassName,SchoolID) VALUES('Dummy Class 2C',2);
 INSERT IGNORE INTO Token(`Type`,TokenString,ClassID) VALUES('STUDENT','TOKENSTRING01',1);
 INSERT IGNORE INTO Token(`Type`,TokenString,ClassID) VALUES('TEACHER','TOKENSTRING02',1);
 INSERT IGNORE INTO Token(`Type`,TokenString,ClassID) VALUES('STUDENT','TOKENSTRING03',2);
@@ -344,8 +343,7 @@ INSERT IGNORE INTO Token(`Type`,TokenString,ClassID) VALUES('STUDENT','TOKENSTRI
 INSERT IGNORE INTO Token(`Type`,TokenString,ClassID) VALUES('TEACHER','TOKENSTRING04',3);
 INSERT IGNORE INTO Token(`Type`,TokenString,ClassID) VALUES('STUDENT','TOKENSTRING03',4);
 INSERT IGNORE INTO Token(`Type`,TokenString,ClassID) VALUES('TEACHER','TOKENSTRING04',4);
-INSERT IGNORE INTO Token(`Type`,TokenString,ClassID) VALUES('STUDENT','TOKENSTRING03',5);
-INSERT IGNORE INTO Token(`Type`,TokenString,ClassID) VALUES('TEACHER','TOKENSTRING04',5);
+
 INSERT IGNORE INTO Student(Username,`Password`,FName,LName,Gender,DOB,ClassID) VALUES('Fernando','d59324e4d5acb950c4022cd5df834cc3','Fernando','Fernando','Male',"2003-10-20",1);
 INSERT IGNORE INTO Student(Username,`Password`,FName,LName,Gender,DOB,ClassID,Score) VALUES('Todd','d59324e4d5acb950c4022cd5df834cc3','Todd','Webb','Male',"2003-11-20",1,55);
 INSERT IGNORE INTO Student(Username,`Password`,FName,LName,Gender,DOB,ClassID,Score) VALUES('Theresa','d59324e4d5acb950c4022cd5df834cc3','Theresa','Rios','Female',"2003-12-20",1,90);
