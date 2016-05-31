@@ -5,7 +5,6 @@ USE isnap2changedb;
 
 SET FOREIGN_KEY_CHECKS=0;
 
-
 # [Assert] Lines of Drop table declaration = Lines of Create table declaration
 DROP TABLE IF EXISTS `School`;
 DROP TABLE IF EXISTS `Class`;
@@ -37,7 +36,8 @@ DROP TABLE IF EXISTS `Bonus_Task_Record`;
 
 CREATE TABLE IF NOT EXISTS `School` (
     SchoolID MEDIUMINT AUTO_INCREMENT,
-    SchoolName TEXT,
+    # Specified key was too long; max key length is 767 bytes, a UTF8 char is 4 bytes
+    SchoolName VARCHAR(190) UNIQUE,
     CONSTRAINT School_SchoolID_PK PRIMARY KEY (SchoolID)
 )  ENGINE=INNODB;
 
@@ -52,11 +52,10 @@ CREATE TABLE IF NOT EXISTS `Class` (
 )  ENGINE=INNODB;
 
 CREATE TABLE IF NOT EXISTS `Token` (
-    TokenID MEDIUMINT AUTO_INCREMENT,
-    `Type` TEXT NOT NULL,
-    TokenString TEXT NOT NULL,
     ClassID MEDIUMINT NOT NULL,
-    CONSTRAINT Token_TokenID_PK PRIMARY KEY (TokenID),
+    `Type` ENUM('TEACHER', 'STUDENT'),
+    TokenString TEXT NOT NULL,
+    CONSTRAINT Token_PK PRIMARY KEY (ClassID, `Type`),
     CONSTRAINT Token_ClassID_FK FOREIGN KEY (ClassID)
         REFERENCES Class (ClassID)
         ON DELETE CASCADE ON UPDATE CASCADE
@@ -229,6 +228,7 @@ CREATE TABLE IF NOT EXISTS `Matching_Section` (
     QuizID MEDIUMINT,
     Explanation TEXT,
     Points MEDIUMINT,
+    MultipleChoices BOOLEAN DEFAULT 0,
     CONSTRAINT Matching_Section_QuizID_PK PRIMARY KEY (QuizID),
     CONSTRAINT Matching_Section_QuizID_FK FOREIGN KEY (QuizID)
         REFERENCES Quiz (QuizID)
@@ -328,19 +328,22 @@ SET FOREIGN_KEY_CHECKS=1;
 # INSERT RAW DATA FOR TEST
 
 # [Example] User Info
-INSERT IGNORE INTO School(SchoolName) VALUES('Adelaide High School');
-INSERT IGNORE INTO School(SchoolName) VALUES('Woodville High School');
-INSERT IGNORE INTO Class(ClassName,SchoolID) VALUES('Adelaide High 1A',1);
-INSERT IGNORE INTO Class(ClassName,SchoolID) VALUES('Adelaide High 1B',1);
-INSERT IGNORE INTO Class(ClassName,SchoolID) VALUES('Adelaide High 1C',1);
-INSERT IGNORE INTO Class(ClassName,SchoolID) VALUES('Adelaide High 2A',1);
-INSERT IGNORE INTO Class(ClassName,SchoolID) VALUES('Adelaide High 2B',1);
-INSERT IGNORE INTO Class(ClassName,SchoolID) VALUES('Adelaide High 2C',1);
-INSERT IGNORE INTO Class(ClassName,SchoolID) VALUES('Woodville High 2C',1);
+INSERT IGNORE INTO School(SchoolName) VALUES('Dummy School');
+INSERT IGNORE INTO School(SchoolName) VALUES('Dummy Adelaide High School');
+INSERT IGNORE INTO School(SchoolName) VALUES('Dummy Woodville High School');
+INSERT IGNORE INTO Class(ClassName,SchoolID) VALUES('Dummy Class 1A',1);
+INSERT IGNORE INTO Class(ClassName,SchoolID) VALUES('Dummy Class 1B',1);
+INSERT IGNORE INTO Class(ClassName,SchoolID) VALUES('Dummy Class 1C',1);
+INSERT IGNORE INTO Class(ClassName,SchoolID) VALUES('Dummy Class 2C',2);
 INSERT IGNORE INTO Token(`Type`,TokenString,ClassID) VALUES('STUDENT','TOKENSTRING01',1);
 INSERT IGNORE INTO Token(`Type`,TokenString,ClassID) VALUES('TEACHER','TOKENSTRING02',1);
 INSERT IGNORE INTO Token(`Type`,TokenString,ClassID) VALUES('STUDENT','TOKENSTRING03',2);
 INSERT IGNORE INTO Token(`Type`,TokenString,ClassID) VALUES('TEACHER','TOKENSTRING04',2);
+INSERT IGNORE INTO Token(`Type`,TokenString,ClassID) VALUES('STUDENT','TOKENSTRING03',3);
+INSERT IGNORE INTO Token(`Type`,TokenString,ClassID) VALUES('TEACHER','TOKENSTRING04',3);
+INSERT IGNORE INTO Token(`Type`,TokenString,ClassID) VALUES('STUDENT','TOKENSTRING03',4);
+INSERT IGNORE INTO Token(`Type`,TokenString,ClassID) VALUES('TEACHER','TOKENSTRING04',4);
+
 INSERT IGNORE INTO Student(Username,`Password`,FName,LName,Gender,DOB,ClassID) VALUES('Fernando','d59324e4d5acb950c4022cd5df834cc3','Fernando','Fernando','Male',"2003-10-20",1);
 INSERT IGNORE INTO Student(Username,`Password`,FName,LName,Gender,DOB,ClassID,Score) VALUES('Todd','d59324e4d5acb950c4022cd5df834cc3','Todd','Webb','Male',"2003-11-20",1,55);
 INSERT IGNORE INTO Student(Username,`Password`,FName,LName,Gender,DOB,ClassID,Score) VALUES('Theresa','d59324e4d5acb950c4022cd5df834cc3','Theresa','Rios','Female',"2003-12-20",1,90);
@@ -538,6 +541,42 @@ INSERT IGNORE INTO Matching_Question(Question, QuizID) VALUES('Beriberi', @QUIZ_
 SET @MATCHING_QUESTION_LAST_INSERT_ID = LAST_INSERT_ID();
 INSERT IGNORE INTO `Matching_Option`(Content, MatchingQuestionID) VALUES('Caused by the deficiency of vitamin B1 (thiamine) ', @MATCHING_QUESTION_LAST_INSERT_ID);
 
+# [Example] Week 7 MultipleChoices Matching
+INSERT IGNORE INTO Quiz(Week,QuizType,TopicID) VALUES(7,'Matching',2);
+SET @QUIZ_LAST_INSERT_ID = LAST_INSERT_ID();
+INSERT IGNORE INTO Matching_Section(QuizID, Explanation, Points, MultipleChoices) VALUES(@QUIZ_LAST_INSERT_ID, 'Classify the lists of foods into the 5 main food groups', 20, 1);
+INSERT IGNORE INTO Matching_Question(Question, QuizID) VALUES('Protein', @QUIZ_LAST_INSERT_ID);
+SET @MATCHING_QUESTION_LAST_INSERT_ID = LAST_INSERT_ID();
+INSERT IGNORE INTO `Matching_Option`(Content, MatchingQuestionID) VALUES('Beef', @MATCHING_QUESTION_LAST_INSERT_ID);
+INSERT IGNORE INTO `Matching_Option`(Content, MatchingQuestionID) VALUES('Beef', @MATCHING_QUESTION_LAST_INSERT_ID);
+INSERT IGNORE INTO `Matching_Option`(Content, MatchingQuestionID) VALUES('Beef', @MATCHING_QUESTION_LAST_INSERT_ID);
+INSERT IGNORE INTO `Matching_Option`(Content, MatchingQuestionID) VALUES('Beef', @MATCHING_QUESTION_LAST_INSERT_ID);
+INSERT IGNORE INTO Matching_Question(Question, QuizID) VALUES('Fat', @QUIZ_LAST_INSERT_ID);
+SET @MATCHING_QUESTION_LAST_INSERT_ID = LAST_INSERT_ID();
+INSERT IGNORE INTO `Matching_Option`(Content, MatchingQuestionID) VALUES('Chips', @MATCHING_QUESTION_LAST_INSERT_ID);
+INSERT IGNORE INTO `Matching_Option`(Content, MatchingQuestionID) VALUES('Chips', @MATCHING_QUESTION_LAST_INSERT_ID);
+INSERT IGNORE INTO `Matching_Option`(Content, MatchingQuestionID) VALUES('Chips', @MATCHING_QUESTION_LAST_INSERT_ID);
+#INSERT IGNORE INTO `Matching_Option`(Content, MatchingQuestionID) VALUES('Chips', @MATCHING_QUESTION_LAST_INSERT_ID);
+INSERT IGNORE INTO Matching_Question(Question, QuizID) VALUES('Vitamin', @QUIZ_LAST_INSERT_ID);
+SET @MATCHING_QUESTION_LAST_INSERT_ID = LAST_INSERT_ID();
+INSERT IGNORE INTO `Matching_Option`(Content, MatchingQuestionID) VALUES('Orange', @MATCHING_QUESTION_LAST_INSERT_ID);
+INSERT IGNORE INTO `Matching_Option`(Content, MatchingQuestionID) VALUES('Orange', @MATCHING_QUESTION_LAST_INSERT_ID);
+#INSERT IGNORE INTO `Matching_Option`(Content, MatchingQuestionID) VALUES('Orange', @MATCHING_QUESTION_LAST_INSERT_ID);
+#INSERT IGNORE INTO `Matching_Option`(Content, MatchingQuestionID) VALUES('Orange', @MATCHING_QUESTION_LAST_INSERT_ID);
+INSERT IGNORE INTO Matching_Question(Question, QuizID) VALUES('Minerals', @QUIZ_LAST_INSERT_ID);
+SET @MATCHING_QUESTION_LAST_INSERT_ID = LAST_INSERT_ID();
+INSERT IGNORE INTO `Matching_Option`(Content, MatchingQuestionID) VALUES('Fish', @MATCHING_QUESTION_LAST_INSERT_ID);
+INSERT IGNORE INTO `Matching_Option`(Content, MatchingQuestionID) VALUES('Fish', @MATCHING_QUESTION_LAST_INSERT_ID);
+#INSERT IGNORE INTO `Matching_Option`(Content, MatchingQuestionID) VALUES('Fish', @MATCHING_QUESTION_LAST_INSERT_ID);
+#INSERT IGNORE INTO `Matching_Option`(Content, MatchingQuestionID) VALUES('Fish', @MATCHING_QUESTION_LAST_INSERT_ID);
+INSERT IGNORE INTO Matching_Question(Question, QuizID) VALUES('Carbohydrate', @QUIZ_LAST_INSERT_ID);
+SET @MATCHING_QUESTION_LAST_INSERT_ID = LAST_INSERT_ID();
+INSERT IGNORE INTO `Matching_Option`(Content, MatchingQuestionID) VALUES('Rice', @MATCHING_QUESTION_LAST_INSERT_ID);
+#INSERT IGNORE INTO `Matching_Option`(Content, MatchingQuestionID) VALUES('Rice', @MATCHING_QUESTION_LAST_INSERT_ID);
+#INSERT IGNORE INTO `Matching_Option`(Content, MatchingQuestionID) VALUES('Rice', @MATCHING_QUESTION_LAST_INSERT_ID);
+#INSERT IGNORE INTO `Matching_Option`(Content, MatchingQuestionID) VALUES('Rice', @MATCHING_QUESTION_LAST_INSERT_ID);
+
+
 
 # [Formal] Learning_Material
 INSERT IGNORE INTO Learning_Material(Content,QuizID) VALUES('<p>Eating a balanced diet is vital for your health and wellbeing. The food we eat is responsible for providing us with the energy to do all the tasks of daily life. For optimum performance and growth a balance of protein, essential fats, vitamins and minerals are required. We need a wide variety of different foods to provide the right amounts of nutrients for good health. The different types of food and how much of it you should be aiming to eat is demonstrated on the pyramid below. (my own words)</p>
@@ -554,6 +593,8 @@ INSERT IGNORE INTO Learning_Material(Content,QuizID) VALUES('
 <p>Learning materials for this quiz has not been added.</p>',6);
 INSERT IGNORE INTO Learning_Material(Content,QuizID) VALUES('
 <p>Nutrition: All over the world people suffer from illnesses that are caused by eating the wrong food or not having enough to eat. In developing countries deficiency diseases arise when people do not get the right nutrients. Conversely, overconsumption of foods rich in fat and cholesterols can lead to heart diseases, obesity, strokes and cancer. (Own words)</p>',7);
+INSERT IGNORE INTO Learning_Material(Content,QuizID) VALUES('
+<p>Learning materials for this quiz has not been added.</p>',8);
 
 # [Formal] Games
 INSERT IGNORE INTO Game(Description,Week,Points) VALUES('Fruit Ninja',1,10);

@@ -65,6 +65,7 @@
             // decide quiz type and begin quiz
             function beginQuiz()
 			{
+                //list of question type
 				<?php if($quiztype == "MCQ"){ ?>
 							document.getElementById("formQuizBegin").setAttribute("action", "multiple-choice-question.php");
 				<?php }					  
@@ -72,7 +73,7 @@
 						  document.getElementById("formQuizBegin").setAttribute("action", "short-answer-question.php");
                 <?php }					  
 					  else if($quiztype == "Matching"){ ?>
-						  document.getElementById("formQuizBegin").setAttribute("action", "matching-question-1-1.php");
+						  document.getElementById("formQuizBegin").setAttribute("action", "matching-question.php");
 				<?php } ?>
 					
 				document.getElementById("formQuizBegin").submit();
