@@ -4,6 +4,7 @@
 	session_start();
     require_once("../connection.php");	  
     $conn = db_connect();
+    $overviewName = "school";
     
     //set userid    
     if(isset($_SESSION['researcherid'])){
@@ -24,35 +25,35 @@
             $update = $_POST['update'];
             //update
             if($update == 0){
-                $schoolID = $_POST['SchoolID'];;
-                $schoolName = $_POST['SchoolName'];
-                // update class 
+                $schoolID = $_POST['schoolid'];
+                $schoolName = $_POST['schoolname'];
                 $update_stmt = "UPDATE School 
                     SET SchoolName = ?
                     WHERE SchoolID = ?";			
                 $update_stmt = $conn->prepare($update_stmt);                            
                 if(! $update_stmt -> execute(array($schoolName, $schoolID))){
-                    echo "<script language=\"javascript\">  alert(\"Error occurred to update school. Contact with developers.\"); </script>";
+                    echo "<script language=\"javascript\">  alert(\"Error occurred to update ".$overviewName.". Contact with developers.\"); </script>";
                 } else{
                 }
             }
+            // insert
             else if($update == 1){ 
-                $schoolName = $_POST['SchoolName'];
-                // insert school 
+                $schoolName = $_POST['schoolname'];                 
                 $update_stmt = "INSERT INTO School(SchoolName)
                      VALUES (?);";			
                 $update_stmt = $conn->prepare($update_stmt);                
                 if(! $update_stmt -> execute(array($schoolName))){
-                    echo "<script language=\"javascript\">  alert(\"Error occurred to insert school. Contact with developers.\"); </script>";
+                    echo "<script language=\"javascript\">  alert(\"Error occurred to insert ".$overviewName.". Contact with developers.\"); </script>";
                 } else{
                 }             
-            }else if($update == -1){
-                $schoolID = $_POST['SchoolID'];;
-                // remove school (with help of DELETE CASCADE) 
+            }
+            // remove school (with help of DELETE CASCADE) 
+            else if($update == -1){
+                $schoolID = $_POST['schoolid'];
                 $update_stmt = "DELETE FROM School WHERE SchoolID = ?";			
                 $update_stmt = $conn->prepare($update_stmt);
                 if(! $update_stmt -> execute(array($schoolID))){
-                    echo "<script language=\"javascript\">  alert(\"Error occurred to delete school. Contact with developers.\"); </script>";
+                    echo "<script language=\"javascript\">  alert(\"Error occurred to delete ".$overviewName.". Contact with developers.\"); </script>";
                 } else{
                 } 
             }            
@@ -95,7 +96,7 @@
     <meta name="description" content="">
     <meta name="author" content="">
 
-    <title>Content Editor</title>
+    <title>iSNAP2Change Admin</title>
 
     <!-- Bootstrap Core CSS -->
     <link href="../bower_components/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -158,7 +159,7 @@
                                 <table class="table table-striped table-bordered table-hover" id="dataTables-example">
                                     <thead>
                                         <tr>
-                                            <th>SchoolID</th>
+                                            <th style="display:none">SchoolID</th>
                                             <th>SchoolName</th>
                                             <th>Classes</th>
                                         </tr>
@@ -166,8 +167,8 @@
                                     <tbody>
                                     <?php for($i=0; $i<count($schoolResult); $i++) {?>
                                         <tr class="<?php if($i % 2 == 0){echo "odd";} else {echo "even";} ?>">
-                                            <td><?php echo $schoolResult[$i]->SchoolID ?></td>
-                                            <td><?php echo $schoolResult[$i]->SchoolName ?></td>
+                                            <td style="display:none"><?php echo $schoolResult[$i]->SchoolID ?></td>
+                                            <td><a href="class.php?schoolname=<?php echo $schoolResult[$i]->SchoolName ?>"><?php echo $schoolResult[$i]->SchoolName ?></a></td>
                                             <td><?php $count=0; for($j=0; $j<count($classNumResult); $j++){ if ($classNumResult[$j]->SchoolID == $schoolResult[$i]->SchoolID) $count=$classNumResult[$j]->Count; } echo $count; ?><span class="glyphicon glyphicon-remove pull-right" aria-hidden="true"></span><span class="pull-right" aria-hidden="true">&nbsp;</span><span class="glyphicon glyphicon-edit pull-right" data-toggle="modal" data-target="#dialog" aria-hidden="true"></span></td>
                                         </tr>
                                     <?php } ?>    
@@ -181,7 +182,7 @@
                                     <p>Navigate schools by filtering or searching. You can create/update/delete any school.</p>
                                 </div>
                                 <div class="alert alert-danger">
-                                    <p><strong>Reminder</strong> : If you remove one school. All the student data in this school will also get deleted (not recoverable).</p>
+                                    <p><strong>Reminder</strong> : If you remove one school. All the student data in this school will also get deleted (not recoverable).</p> It includes <strong>student information, their submissions of every task and your grading/feedback</strong>, not only the school itself.
                                 </div>
                             </div>
                         </div>
@@ -205,18 +206,22 @@
           <div class="modal-content">
             <div class="modal-header">
               <button type="button" class="close" data-dismiss="modal">&times;</button>
-              <h4 class="modal-title" id="dialogTitle">Edit Class</h4>
+              <h4 class="modal-title" id="dialogTitle">Edit School</h4>
             </div>
             <div class="modal-body">
             <form id="submission" method="post" action="<?php echo $_SERVER['PHP_SELF']; ?>">
                 <!--if 1, insert; else if 0 update; else if -1 delete;-->
                 <input type=hidden name="update" id="update" value="1"></input>
-                <label for="SchoolID">SchoolID</label>
-                <input type="text" class="form-control dialoginput" id="SchoolID" name="SchoolID">
+                <label for="SchoolID" style="display:none">SchoolID</label>
+                <input type="text" class="form-control dialoginput" id="SchoolID" name="schoolid" style="display:none">
                 <br><label for="SchoolName">SchoolName</label>
-                <input type="text" class="form-control dialoginput" id="SchoolName" name="SchoolName" required>               
+                <input type="text" class="form-control dialoginput" id="SchoolName" name="schoolname" required>               
                 <br><label for="Classes">Classes</label>
                 <input type="text" class="form-control dialoginput" id="Classes" name="Classes">
+                <br>
+                <div class="alert alert-danger">
+                    <p><strong>Reminder</strong> : School Name should be unique and no duplicate name is allowed.</p>
+                </div>
             </form>
             </div>
             <div class="modal-footer">            
@@ -254,7 +259,7 @@
     }); 
     //DO NOT put them in $(document).ready() since the table has multi pages
     $('.glyphicon-edit').on('click', function (){
-        $('#dialogTitle').text("Edit Class");
+        $('#dialogTitle').text("Edit School");
         $('#update').val(0);
         for(i=0;i<$('.dialoginput').length;i++){                
             $('.dialoginput').eq(i).val($(this).parent().parent().children('td').eq(i).text());
@@ -264,7 +269,7 @@
         $('.dialoginput').eq(2).attr('disabled','disabled');            
     });
     $('.glyphicon-plus').on('click', function (){
-        $('#dialogTitle').text("Add Class");
+        $('#dialogTitle').text("Add School");
         $('#update').val(1);
         for(i=0;i<$('.dialoginput').length;i++){                
             $('.dialoginput').eq(i).val('');
@@ -274,9 +279,10 @@
         $('.dialoginput').eq(2).attr('disabled','disabled');            
     }); 
     $('.glyphicon-remove').on('click', function (){
-        if (confirm('[WARNING] Are you sure to remove this school? All the student data in this school will also get deleted (not recoverable).')) {
+        if (confirm('[WARNING] Are you sure to remove this school? All the student data in this school will also get deleted (not recoverable). It includes student information, their submissions of every task and your grading/feedback, not only the school itself.')) {
             $('#update').val(-1);
             //fill required input
+            $('.dialoginput').eq(0).prop('disabled',false);
             for(i=0;i<$('.dialoginput').length;i++){                
                 $('.dialoginput').eq(i).val($(this).parent().parent().children('td').eq(i).text());
             }

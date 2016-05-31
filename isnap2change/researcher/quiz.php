@@ -4,6 +4,7 @@
 	session_start();
     require_once("../connection.php");	  
     $conn = db_connect();
+    $overviewName = "quiz";
     
     //set userid    
     if(isset($_SESSION['researcherid'])){
@@ -24,23 +25,23 @@
             $update = $_POST['update'];
             //update
             if($update == 0){
-                $classID = $_POST['ClassID'];
-                $className = $_POST['ClassName'];
-                $schoolName = $_POST['SchoolName'];
-                $teacherToken = $_POST['TeacherToken'];
-                $studentToken = $_POST['StudentToken'];
+                $classID = $_POST['classid'];
+                $className = $_POST['classname'];
+                $quizName = $_POST['schoolname'];
+                $teacherToken = $_POST['teachertoken'];
+                $studentToken = $_POST['studenttoken'];
                 // get school
-                $schoolSql = "SELECT SchoolID
+                $quizSql = "SELECT SchoolID
                            FROM School WHERE SchoolName = ?";
-                $schoolQuery = $conn->prepare($schoolSql);
-                $schoolQuery->execute(array($schoolName));
-                $schoolResult = $schoolQuery->fetch(PDO::FETCH_OBJ);
+                $quizQuery = $conn->prepare($quizSql);
+                $quizQuery->execute(array($quizName));
+                $quizResult = $quizQuery->fetch(PDO::FETCH_OBJ);
                 // update class 
                 $update_stmt = "UPDATE Class 
                     SET ClassName = ?, SchoolID = ?
                     WHERE ClassID = ?";			
                 $update_stmt = $conn->prepare($update_stmt);                            
-                if(! $update_stmt -> execute(array($className, $schoolResult->SchoolID, $classID))){
+                if(! $update_stmt -> execute(array($className, $quizResult->SchoolID, $classID))){
                     echo "<script language=\"javascript\">  alert(\"Error occurred to update class. Contact with developers.\"); </script>";
                 } else{
                 }
@@ -63,21 +64,21 @@
                 }
             }
             else if($update == 1){  
-                $className = $_POST['ClassName'];
-                $schoolName = $_POST['SchoolName'];
-                $teacherToken = $_POST['TeacherToken'];
-                $studentToken = $_POST['StudentToken'];
+                $className = $_POST['classname'];
+                $quizName = $_POST['schoolname'];
+                $teacherToken = $_POST['teachertoken'];
+                $studentToken = $_POST['studenttoken'];
                 // get school
-                $schoolSql = "SELECT SchoolID
+                $quizSql = "SELECT SchoolID
                            FROM School WHERE SchoolName = ?";
-                $schoolQuery = $conn->prepare($schoolSql);
-                $schoolQuery->execute(array($schoolName));
-                $schoolResult = $schoolQuery->fetch(PDO::FETCH_OBJ);
+                $quizQuery = $conn->prepare($quizSql);
+                $quizQuery->execute(array($quizName));
+                $quizResult = $quizQuery->fetch(PDO::FETCH_OBJ);
                 // update class 
                 $update_stmt = "INSERT INTO Class(ClassName, SchoolID)
                      VALUES (?,?);";			
                 $update_stmt = $conn->prepare($update_stmt);         
-                $update_stmt -> execute(array($className, $schoolResult->SchoolID));
+                $update_stmt -> execute(array($className, $quizResult->SchoolID));
                 $classID = $conn -> lastInsertId();
                 if($classID <= 0){
                     echo "<script language=\"javascript\">  alert(\"Error occurred to insert class. Contact with developers.\"); </script>";
@@ -99,7 +100,7 @@
                 } else{
                 }                
             }else if($update == -1){
-                $classID = $_POST['ClassID'];
+                $classID = $_POST['classid'];
                 // remove class (with help of DELETE CASCADE) 
                 $update_stmt = "DELETE FROM Class WHERE ClassID = ?";			
                 $update_stmt = $conn->prepare($update_stmt);
@@ -110,35 +111,13 @@
             }            
         }
     }
-
-    // get school
-    $schoolSql = "SELECT SchoolName
-               FROM School";
-    $schoolQuery = $conn->prepare($schoolSql);
-    $schoolQuery->execute();
-    $schoolResult = $schoolQuery->fetchAll(PDO::FETCH_OBJ);
     
-    // get class
-    $classSql = "SELECT ClassID, ClassName, SchoolName
-               FROM Class NATURAL JOIN School";
-    $classQuery = $conn->prepare($classSql);
-    $classQuery->execute();
-    $classResult = $classQuery->fetchAll(PDO::FETCH_OBJ);
-    
-    // get token
-    $tokenSql = "SELECT ClassID, `Type`, TokenString
-               FROM Token NATURAL JOIN Class";
-    $tokenQuery = $conn->prepare($tokenSql);
-    $tokenQuery->execute();
-    $tokenResult = $tokenQuery->fetchAll(PDO::FETCH_OBJ);    
-    
-    // get students number
-    $studentNumSql = "SELECT count(*) as Count, ClassID
-               FROM   Student NATURAL JOIN Class
-               GROUP BY ClassID";
-    $studentNumQuery = $conn->prepare($studentNumSql);
-    $studentNumQuery->execute();
-    $studentNumResult = $studentNumQuery->fetchAll(PDO::FETCH_OBJ);    
+    // get quiz and topic
+    $quizSql = "SELECT QuizID, Week, QuizType, TopicName
+               FROM Quiz NATURAL JOIN Topic";
+    $quizQuery = $conn->prepare($quizSql);
+    $quizQuery->execute();
+    $quizResult = $quizQuery->fetchAll(PDO::FETCH_OBJ); 
     
     db_close($conn); 
     
@@ -200,7 +179,7 @@
         <div id="page-wrapper">
             <div class="row">
                 <div class="col-lg-12">
-                    <h1 class="page-header">Class Overview</h1>
+                    <h1 class="page-header">Quiz Overview</h1>
                 </div>
                 <!-- /.col-lg-12 -->
             </div>
@@ -209,31 +188,32 @@
                 <div class="col-lg-12">
                     <div class="panel panel-default">
                         <div class="panel-heading">
-                            Class Information Table <span class="glyphicon glyphicon-plus pull-right" data-toggle="modal" data-target="#dialog"></span>
+                            Quiz Information Table <span class="glyphicon glyphicon-plus pull-right" data-toggle="modal" data-target="#dialog"></span>
                         </div>
                         <!-- /.panel-heading -->
                         <div class="panel-body">
                             <div class="dataTable_wrapper">
-                                <table class="table table-striped table-bordered table-hover" id="dataTables-example">
+                                <table class="table table-striped table-bordered table-hover" id="datatables">
                                     <thead>
                                         <tr>
-                                            <th>ClassID</th>
-                                            <th>ClassName</th>
-                                            <th>SchoolName</th>
-                                            <th>TeacherToken</th>                                            
-                                            <th>StudentToken</th>
-                                            <th>EnrolledStudents</th>
+                                            <th style="display:none">QuizID</th>
+                                            <th>Week</th>
+                                            <th>QuizType</th>
+                                            <th>TopicName</th>                                            
+                                            <th>Points</th>
                                         </tr>
                                     </thead>
                                     <tbody>
-                                    <?php for($i=0; $i<count($classResult); $i++) {?>
+                                    <?php for($i=0; $i<count($quizResult); $i++) {?>
                                         <tr class="<?php if($i % 2 == 0){echo "odd";} else {echo "even";} ?>">
-                                            <td><?php echo $classResult[$i]->ClassID ?></td>
-                                            <td><?php echo $classResult[$i]->ClassName ?></td>
-                                            <td><?php echo $classResult[$i]->SchoolName ?></td>
-                                            <td><?php for($j=0; $j<count($tokenResult); $j++){ if ($tokenResult[$j]->ClassID == $classResult[$i]->ClassID && $tokenResult[$j]->Type == 'TEACHER') echo $tokenResult[$j]->TokenString;} ?></td>
-                                            <td><?php for($j=0; $j<count($tokenResult); $j++){ if ($tokenResult[$j]->ClassID == $classResult[$i]->ClassID && $tokenResult[$j]->Type == 'STUDENT') echo $tokenResult[$j]->TokenString;} ?></td>
-                                            <td><?php $count=0; for($j=0; $j<count($studentNumResult); $j++){ if ($studentNumResult[$j]->ClassID == $classResult[$i]->ClassID) $count=$studentNumResult[$j]->Count; } echo $count; ?><span class="glyphicon glyphicon-remove pull-right" aria-hidden="true"></span><span class="pull-right" aria-hidden="true">&nbsp;</span><span class="glyphicon glyphicon-edit pull-right" data-toggle="modal" data-target="#dialog" aria-hidden="true"></span></td>
+                                            <td style="display:none"><?php echo $quizResult[$i]->QuizID ?></td>
+                                            <td><?php echo $quizResult[$i]->Week ?></td>
+                                    <!-- 
+                                    <a href="<?php echo $quizResult[$i]->QuizID ?>">
+                                    -->
+                                    <td><?php if($quizResult[$i]->QuizType=='MCQ') {echo 'Multiple Choice';} else if($quizResult[$i]->QuizType=='SAQ') {echo 'Short Answer';} else {echo $quizResult[$i]->QuizType;} ?></a></td>
+                                            <td><?php echo $quizResult[$i]->TopicName ?></td>
+                                            <td><!--points--><span class="glyphicon glyphicon-remove pull-right" aria-hidden="true"></span><span class="pull-right" aria-hidden="true">&nbsp;</span><span class="glyphicon glyphicon-edit pull-right" data-toggle="modal" data-target="#dialog" aria-hidden="true"></span></td>
                                         </tr>
                                     <?php } ?>    
                                     </tbody>
@@ -246,7 +226,7 @@
                                     <p>Navigate classes by filtering or searching. You can create/update/delete any class.</p>
                                 </div>
                                 <div class="alert alert-danger">
-                                    <p><strong>Reminder</strong> : If you remove one class. All the student data in this class will also get deleted (not recoverable).</p>
+                                    <p><strong>Warning</strong> : If you remove one class. All the <strong>student data</strong> in this class will also get deleted (not recoverable).</p> It includes <strong>student information, their submissions of every task and your grading/feedback</strong>, not only the class itself.
                                 </div>
                             </div>
                         </div>
@@ -276,22 +256,24 @@
             <form id="submission" method="post" action="<?php echo $_SERVER['PHP_SELF']; ?>">
                 <!--if 1, insert; else if 0 update; else if -1 delete;-->
                 <input type=hidden name="update" id="update" value="1"></input>
-                <label for="ClassID">ClassID</label>
-                <input type="text" class="form-control dialoginput" id="ClassID" name="ClassID">
+                <label for="ClassID" style="display:none">ClassID</label>
+                <input type="text" class="form-control dialoginput" id="ClassID" name="classid" style="display:none">
                 <br><label for="ClassName">ClassName</label>
-                <input type="text" class="form-control dialoginput" id="ClassName" name="ClassName" required>
+                <input type="text" class="form-control dialoginput" id="ClassName" name="classname" required>
                 <br><label for="SchoolName">SchoolName</label>
-                <select class="form-control dialoginput" id="SchoolName" form="submission" name="SchoolName" required>
-                  <?php for($i=0; $i<count($schoolResult); $i++) {?>                  
-                  <option value="<?php echo $schoolResult[$i]->SchoolName ?>"><?php echo $schoolResult[$i]->SchoolName ?></option>
+                <select class="form-control dialoginput" id="SchoolName" form="submission" name="schoolname" required>
+                  <?php for($i=0; $i<count($quizResult); $i++) {?>                  
+                  <option value="<?php echo $quizResult[$i]->SchoolName ?>"><?php echo $quizResult[$i]->SchoolName ?></option>
                   <?php } ?>
                 </select>                
                 <br><label for="TeacherToken">TeacherToken</label><span class="glyphicon glyphicon-random pull-right"></span>
-                <input type="text" class="form-control dialoginput" id="TeacherToken" name="TeacherToken" required></input>
+                <input type="text" class="form-control dialoginput" id="TeacherToken" name="teachertoken" required></input>
                 <br><label for="StudentToken">StudentToken</label><span class="glyphicon glyphicon-random pull-right"></span>
-                <input type="text" class="form-control dialoginput" id="StudentToken" name="StudentToken" required></input>
+                <input type="text" class="form-control dialoginput" id="StudentToken" name="studenttoken" required></input>
                 <br><label for="EnrolledStudents">EnrolledStudents</label>
                 <input type="text" class="form-control dialoginput" id="EnrolledStudents" name="EnrolledStudents">
+                <br><label for="UnlockedProgress">UnlockedProgress</label>
+                <input type="text" class="form-control dialoginput" id="UnlockedProgress" name="UnlockedProgress">
             </form>
             </div>
             <div class="modal-footer">            
@@ -301,6 +283,7 @@
           </div>          
         </div>
       </div>
+      <input type=hidden name="keyword" id="keyword" value="<?php if(isset($_GET['week'])){ echo $_GET['week']; } ?>"></input>
     <!-- jQuery -->
     <script src="../bower_components/jquery/dist/jquery.min.js"></script>
 
@@ -325,13 +308,6 @@
     function randomString(length) {
         return Math.round((Math.pow(36, length + 1) - Math.random() * Math.pow(36, length))).toString(36).slice(1);
     }
-    
-    
-    $(document).ready(function() {
-        $('#dataTables-example').DataTable({
-                responsive: true
-        });            
-    }); 
     //DO NOT put them in $(document).ready() since the table has multi pages
     $('.glyphicon-edit').on('click', function (){
         $('#dialogTitle').text("Edit Class");
@@ -339,9 +315,10 @@
         for(i=0;i<$('.dialoginput').length;i++){                
             $('.dialoginput').eq(i).val($(this).parent().parent().children('td').eq(i).text());
         }
-        //disable ClassID and EnrolledStudents
+        //disable ClassID, EnrolledStudents, UnlockedProgress
         $('.dialoginput').eq(0).attr('disabled','disabled');
-        $('.dialoginput').eq(5).attr('disabled','disabled');            
+        $('.dialoginput').eq(5).attr('disabled','disabled');
+        $('.dialoginput').eq(6).attr('disabled','disabled');          
     });
     $('.glyphicon-plus').on('click', function (){
         $('#dialogTitle').text("Add Class");
@@ -349,14 +326,16 @@
         for(i=0;i<$('.dialoginput').length;i++){                
             $('.dialoginput').eq(i).val('');
         }
-        //disable ClassID and EnrolledStudents
+        //disable ClassID, EnrolledStudents, UnlockedProgress
         $('.dialoginput').eq(0).attr('disabled','disabled');
-        $('.dialoginput').eq(5).attr('disabled','disabled');            
+        $('.dialoginput').eq(5).attr('disabled','disabled');    
+        $('.dialoginput').eq(6).attr('disabled','disabled');         
     }); 
     $('.glyphicon-remove').on('click', function (){
-        if (confirm('[WARNING] Are you sure to remove this class? All the student data in this class will also get deleted (not recoverable).')) {
+        if (confirm('[WARNING] Are you sure to remove this class? All the student data in this class will also get deleted (not recoverable). It includes student information, their submissions of every task and your grading/feedback, not only the class itself.')) {
             $('#update').val(-1);
             //fill required input
+            $('.dialoginput').eq(0).prop('disabled',false);
             for(i=0;i<$('.dialoginput').length;i++){                
                 $('.dialoginput').eq(i).val($(this).parent().parent().children('td').eq(i).text());
             }
@@ -365,9 +344,9 @@
     });
      $('.glyphicon-random').on('click', function (){
         var index = $(this).index();
-        if (index == 11)
+        if (index == $("#TeacherToken").index() - 1)
             $('#TeacherToken').val(randomString(16)); 
-        else if (index == 15)
+        else if (index == $("#StudentToken").index() - 1)
             $('#StudentToken').val(randomString(16));
     });
     $('#btnSave').on('click', function (){
@@ -377,7 +356,20 @@
         $('#submission').submit();
     });
     //include html
-    w3IncludeHTML();
+    w3IncludeHTML();   
+    $(document).ready(function() {
+        var table = $('#datatables').DataTable({
+                responsive: true,
+                "initComplete": function(settings, json) {
+                    
+                    $('.input-sm').eq(1).val($("#keyword").val());                    
+                }
+        })
+        //search keyword (schoolname), exact match
+        table.search(
+            $("#keyword").val(), true, false, true
+        ).draw();     
+    });        
     </script>
 </body>
 
