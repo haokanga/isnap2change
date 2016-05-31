@@ -1,0 +1,124 @@
+/*
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+*/
+/* 
+    Created on : 26/05/2016, 8:22:48 PM
+    Author     : Shivangi
+*/
+
+.start
+{ 
+    background: url('image/Chain_Fence.png') no-repeat center center fixed; 
+    -webkit-background-size: cover;
+    -moz-background-size: cover;
+    -o-background-size: cover;
+    background-size: cover;
+    height: 100vh;
+    width: 100%;
+}
+
+body
+{
+    margin: 0px !important;
+}
+
+.pg2
+{
+     background: url('image/BG_1.png') no-repeat center center fixed; 
+    -webkit-background-size: cover;
+    -moz-background-size: cover;
+    -o-background-size: cover;
+    background-size: cover;
+    height: calc(100vh - 52px);
+    width: 100%;
+    
+}
+
+.pg3
+{
+     background: url('image/BG_2.png') no-repeat center center fixed; 
+    -webkit-background-size: cover;
+    -moz-background-size: cover;
+    -o-background-size: cover;
+    background-size: cover;
+    height: calc(100vh - 52px);
+    width: 100%;
+    
+}
+
+.pg4
+{
+    background: url('image/Crossing.png') no-repeat center center fixed; 
+    -webkit-background-size: cover;
+    -moz-background-size: cover;
+    -o-background-size: cover;
+    background-size: cover;
+    height: calc(100vh - 52px);
+    width: 100%;
+    
+}
+
+.pg5
+{
+    background: url('image/BG_1.png') no-repeat center center fixed; 
+    -webkit-background-size: cover;
+    -moz-background-size: cover;
+    -o-background-size: cover;
+    background-size: cover;
+    height: calc(100vh - 52px);
+    width: 100%;
+    
+}
+
+.pg6
+{
+     background: url('image/BG_2.png') no-repeat center center fixed; 
+    -webkit-background-size: cover;
+    -moz-background-size: cover;
+    -o-background-size: cover;
+    background-size: cover;
+    height: calc(100vh - 52px);
+    width: 100%;
+    
+}
+
+#nav.affix {
+    position: fixed;
+    top: 0;
+    width: 100%;
+    z-index:10;
+}
+
+.navbar
+{
+    margin-bottom: 0px !important;
+}
+
+.navbar-inverse
+{
+    border-radius: 0px !important;
+}
+
+.navbar-btn
+{
+    background-color: rgba(0,0,0,0) !important;
+    color: yellow !important;
+    border-color: yellow !important;
+    border-radius: 0 !important;
+    margin-right: 15px;
+}
+
+.footer {
+    margin-top: 3%;
+    position: relative;
+    height: 50px;
+    color: white;
+    bottom: 0;
+    width: 100%;
+    background-color: #222;
+    display: block;
+    border-color: #080808;
+    border: #080808 0.8px solid;
+}
