@@ -200,7 +200,7 @@ file:///home/smhanov/fun/blorb.html#fileid=mXOJAJ4ny3RqsjvXK3kx0ZLXsg4
 </head>
 <body>
     <script src="http://code.jquery.com/jquery-1.11.1.min.js"></script>
-    <script src="http://zwibbler.com/zwibbler-demo.js"></script>
+    <script src="http://zwibbler.com/demo/frontend.js"></script>
     <div id=side-menu class="blue noselect">
         <div class=logo>
             <div>
@@ -613,6 +613,7 @@ file:///home/smhanov/fun/blorb.html#fileid=mXOJAJ4ny3RqsjvXK3kx0ZLXsg4
                 success: function(response, status, xhr) {
                     $("#working").hide();
                     location.hash = "fileid=" + response.fileid;
+					alert("success");
                 },
 
                 error: function(response, status, xhr) {
