@@ -71,7 +71,7 @@ CREATE TABLE IF NOT EXISTS `Student` (
     Gender TEXT,
     DOB DATE,
     Score MEDIUMINT DEFAULT 0,
-    SubmissionTime TIMESTAMP DEFAULT '0',  
+    SubmissionTime TIMESTAMP DEFAULT CURRENT_TIMESTAMP,  
     ClassID MEDIUMINT NOT NULL,
     CONSTRAINT Student_StudentID_PK PRIMARY KEY (StudentID),
     CONSTRAINT Student_ClassID_FK FOREIGN KEY (ClassID)
