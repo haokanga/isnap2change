@@ -45,6 +45,8 @@ CREATE TABLE IF NOT EXISTS `Class` (
     ClassID MEDIUMINT AUTO_INCREMENT,
     ClassName TEXT,
     SchoolID MEDIUMINT NOT NULL,
+    # UnlockedProgress
+    UnlockedProgress MEDIUMINT NOT NULL DEFAULT 10,
     CONSTRAINT Class_ClassID_PK PRIMARY KEY (ClassID),
     CONSTRAINT Class_SchoolID_FK FOREIGN KEY (SchoolID)
         REFERENCES School (SchoolID)
@@ -64,12 +66,12 @@ CREATE TABLE IF NOT EXISTS `Token` (
 CREATE TABLE IF NOT EXISTS `Student` (
     StudentID MEDIUMINT AUTO_INCREMENT,
     Username TEXT NOT NULL,
+    Nickname TEXT,
     `Password` TEXT NOT NULL,
-    FName TEXT,
-    LName TEXT,
     Gender TEXT,
     DOB DATE,
     Score MEDIUMINT DEFAULT 0,
+    SubmissionTime TIMESTAMP DEFAULT '0',  
     ClassID MEDIUMINT NOT NULL,
     CONSTRAINT Student_StudentID_PK PRIMARY KEY (StudentID),
     CONSTRAINT Student_ClassID_FK FOREIGN KEY (ClassID)
@@ -81,8 +83,6 @@ CREATE TABLE IF NOT EXISTS `Teacher` (
     TeacherID MEDIUMINT AUTO_INCREMENT,
     Username TEXT NOT NULL,
     `Password` TEXT NOT NULL,
-    FName TEXT,
-    LName TEXT,
     ClassID MEDIUMINT NOT NULL,
     CONSTRAINT Teacher_TeacherID_PK PRIMARY KEY (TeacherID),
     CONSTRAINT Teacher_ClassID_FK FOREIGN KEY (ClassID)
@@ -94,8 +94,6 @@ CREATE TABLE IF NOT EXISTS `Researcher` (
     ResearcherID MEDIUMINT AUTO_INCREMENT,
     Username TEXT NOT NULL,
     `Password` TEXT NOT NULL,
-    FName TEXT,
-    LName TEXT,
     CONSTRAINT Researcher_ResearcherID_PK PRIMARY KEY (ResearcherID)
 )  ENGINE=INNODB;
 
@@ -107,14 +105,14 @@ CREATE TABLE IF NOT EXISTS `Fact` (
 
 CREATE TABLE IF NOT EXISTS `Topic` (
     TopicID MEDIUMINT AUTO_INCREMENT,
-    TopicName TEXT,
+    TopicName VARCHAR(190) UNIQUE,
     CONSTRAINT Topic_TopicID_PK PRIMARY KEY (TopicID)
 )  ENGINE=INNODB;
 
 CREATE TABLE IF NOT EXISTS `Quiz` (
     QuizID MEDIUMINT AUTO_INCREMENT,
     Week TINYINT,
-    QuizType ENUM('MCQ', 'SAQ', 'Matching', 'Calculator'),    
+    QuizType ENUM('MCQ', 'SAQ', 'Matching', 'Calculator', 'Poster'),    
     TopicID MEDIUMINT,
     CONSTRAINT Quiz_QuizID_PK PRIMARY KEY (QuizID),
     CONSTRAINT Quiz_TopicID_FK FOREIGN KEY (TopicID)
@@ -193,7 +191,6 @@ CREATE TABLE IF NOT EXISTS `MCQ_Question_Record` (
 
 CREATE TABLE IF NOT EXISTS `SAQ_Section` (
     QuizID MEDIUMINT AUTO_INCREMENT,
-    Week TINYINT,
     CONSTRAINT SAQ_Section_QuizID_PK PRIMARY KEY (QuizID)
 )  ENGINE=INNODB;
 
@@ -328,13 +325,13 @@ SET FOREIGN_KEY_CHECKS=1;
 # INSERT RAW DATA FOR TEST
 
 # [Example] User Info
-INSERT IGNORE INTO School(SchoolName) VALUES('Dummy School');
-INSERT IGNORE INTO School(SchoolName) VALUES('Dummy Adelaide High School');
-INSERT IGNORE INTO School(SchoolName) VALUES('Dummy Woodville High School');
-INSERT IGNORE INTO Class(ClassName,SchoolID) VALUES('Dummy Class 1A',1);
-INSERT IGNORE INTO Class(ClassName,SchoolID) VALUES('Dummy Class 1B',1);
-INSERT IGNORE INTO Class(ClassName,SchoolID) VALUES('Dummy Class 1C',1);
-INSERT IGNORE INTO Class(ClassName,SchoolID) VALUES('Dummy Class 2C',2);
+INSERT IGNORE INTO School(SchoolName) VALUES('Sample School');
+INSERT IGNORE INTO School(SchoolName) VALUES('Sample Adelaide High School');
+INSERT IGNORE INTO School(SchoolName) VALUES('Sample Woodville High School');
+INSERT IGNORE INTO Class(ClassName,SchoolID) VALUES('Sample Class 1A',1);
+INSERT IGNORE INTO Class(ClassName,SchoolID) VALUES('Sample Class 1B',1);
+INSERT IGNORE INTO Class(ClassName,SchoolID) VALUES('Sample Class 1C',1);
+INSERT IGNORE INTO Class(ClassName,SchoolID) VALUES('Sample Class 2C',2);
 INSERT IGNORE INTO Token(`Type`,TokenString,ClassID) VALUES('STUDENT','TOKENSTRING01',1);
 INSERT IGNORE INTO Token(`Type`,TokenString,ClassID) VALUES('TEACHER','TOKENSTRING02',1);
 INSERT IGNORE INTO Token(`Type`,TokenString,ClassID) VALUES('STUDENT','TOKENSTRING03',2);
@@ -344,33 +341,33 @@ INSERT IGNORE INTO Token(`Type`,TokenString,ClassID) VALUES('TEACHER','TOKENSTRI
 INSERT IGNORE INTO Token(`Type`,TokenString,ClassID) VALUES('STUDENT','TOKENSTRING03',4);
 INSERT IGNORE INTO Token(`Type`,TokenString,ClassID) VALUES('TEACHER','TOKENSTRING04',4);
 
-INSERT IGNORE INTO Student(Username,`Password`,FName,LName,Gender,DOB,ClassID) VALUES('Fernando','d59324e4d5acb950c4022cd5df834cc3','Fernando','Fernando','Male',"2003-10-20",1);
-INSERT IGNORE INTO Student(Username,`Password`,FName,LName,Gender,DOB,ClassID,Score) VALUES('Todd','d59324e4d5acb950c4022cd5df834cc3','Todd','Webb','Male',"2003-11-20",1,55);
-INSERT IGNORE INTO Student(Username,`Password`,FName,LName,Gender,DOB,ClassID,Score) VALUES('Theresa','d59324e4d5acb950c4022cd5df834cc3','Theresa','Rios','Female',"2003-12-20",1,90);
-INSERT IGNORE INTO Student(Username,`Password`,FName,LName,Gender,DOB,ClassID,Score) VALUES('Hai','d59324e4d5acb950c4022cd5df834cc3','Hai','Lam','Male',"2003-10-22",1,30);
-INSERT IGNORE INTO Student(Username,`Password`,FName,LName,Gender,DOB,ClassID,Score) VALUES('Lee','d59324e4d5acb950c4022cd5df834cc3','Lee','Malone','Male',"2003-10-24",1,45);
-INSERT IGNORE INTO Student(Username,`Password`,FName,LName,Gender,DOB,ClassID,Score) VALUES('Tim','d59324e4d5acb950c4022cd5df834cc3','Tim','Mason','Male',"2003-10-25",1,60);
-INSERT IGNORE INTO Student(Username,`Password`,FName,LName,Gender,DOB,ClassID) VALUES('Clinton','d59324e4d5acb950c4022cd5df834cc3','Clinton','Snyder','Male',"2003-10-28",1);
-INSERT IGNORE INTO Student(Username,`Password`,FName,LName,Gender,DOB,ClassID) VALUES('Elbert','d59324e4d5acb950c4022cd5df834cc3','Elbert','Chapman','Male',"2003-10-22",1);
-INSERT IGNORE INTO Student(Username,`Password`,FName,LName,Gender,DOB,ClassID) VALUES('Ervin','d59324e4d5acb950c4022cd5df834cc3','Ervin','Murray','Male',"2003-11-20",1);
-INSERT IGNORE INTO Student(Username,`Password`,FName,LName,Gender,DOB,ClassID) VALUES('Sheila','d59324e4d5acb950c4022cd5df834cc3','Sheila','Frank','Female',"2003-10-20",1);
-INSERT IGNORE INTO Student(Username,`Password`,FName,LName,Gender,DOB,ClassID) VALUES('Grace','d59324e4d5acb950c4022cd5df834cc3','Grace','Austin','Female',"2003-10-29",1);
-INSERT IGNORE INTO Student(Username,`Password`,FName,LName,Gender,DOB,ClassID) VALUES('Ruby','d59324e4d5acb950c4022cd5df834cc3','Ruby','Chavez','Female',"2003-10-20",1);
-INSERT IGNORE INTO Student(Username,`Password`,FName,LName,Gender,DOB,ClassID) VALUES('Sonya','d59324e4d5acb950c4022cd5df834cc3','Sonya','Kelly','Female',"2003-10-20",1);
-INSERT IGNORE INTO Student(Username,`Password`,FName,LName,Gender,DOB,ClassID) VALUES('Donna','d59324e4d5acb950c4022cd5df834cc3','Donna','Pratt','Female',"2003-10-20",1);
-INSERT IGNORE INTO Student(Username,`Password`,FName,LName,Gender,DOB,ClassID) VALUES('Stacy','d59324e4d5acb950c4022cd5df834cc3','Stacy','Figueroa','Female',"2003-10-20",1);
-INSERT IGNORE INTO Student(Username,`Password`,FName,LName,Gender,DOB,ClassID) VALUES('Fannie','d59324e4d5acb950c4022cd5df834cc3','Fannie','Waters','Female',"2003-10-28",1);
-INSERT IGNORE INTO Student(Username,`Password`,FName,LName,Gender,DOB,ClassID) VALUES('June','d59324e4d5acb950c4022cd5df834cc3','June','West','Female',"2003-10-20",1);
-INSERT IGNORE INTO Student(Username,`Password`,FName,LName,Gender,DOB,ClassID) VALUES('Melinda','d59324e4d5acb950c4022cd5df834cc3','Melinda','Kelley','Female',"2003-10-20",1);
-INSERT IGNORE INTO Student(Username,`Password`,FName,LName,Gender,DOB,ClassID) VALUES('Leo','d59324e4d5acb950c4022cd5df834cc3','Leo','Potter','Male',"2002-04-22",1);
-INSERT IGNORE INTO Student(Username,`Password`,FName,LName,Gender,DOB,ClassID) VALUES('Hector','d59324e4d5acb950c4022cd5df834cc3','Hector','Byrd','Male',"2002-04-20",1);
-INSERT IGNORE INTO Student(Username,`Password`,FName,LName,Gender,DOB,ClassID) VALUES('Otis','d59324e4d5acb950c4022cd5df834cc3','Otis','Lawrence','Male',"2002-04-20",2);
-INSERT IGNORE INTO Student(Username,`Password`,FName,LName,Gender,DOB,ClassID) VALUES('Cassandra','d59324e4d5acb950c4022cd5df834cc3','Cassandra','James','Female',"2002-04-20",2);
-INSERT IGNORE INTO Student(Username,`Password`,FName,LName,Gender,DOB,ClassID) VALUES('Marilyn','d59324e4d5acb950c4022cd5df834cc3','Marilyn','Ryan','Female',"2002-04-20",1);
-INSERT IGNORE INTO Teacher(Username,`Password`,FName,LName,ClassID) VALUES('Lynette','d59324e4d5acb950c4022cd5df834cc3','Lynette','Coleman',1);
-INSERT IGNORE INTO Teacher(Username,`Password`,FName,LName,ClassID) VALUES('Rachael','d59324e4d5acb950c4022cd5df834cc3','Rachael','Horton',2);
-INSERT IGNORE INTO Researcher(Username,`Password`,FName,LName) VALUES('Ann','d59324e4d5acb950c4022cd5df834cc3','Ann','Gordon');
-INSERT IGNORE INTO Researcher(Username,`Password`,FName,LName) VALUES('Patricia','d59324e4d5acb950c4022cd5df834cc3','Patricia','Hayes');
+INSERT IGNORE INTO Student(Username,`Password`,Gender,DOB,ClassID) VALUES('Fernando','d59324e4d5acb950c4022cd5df834cc3','Male',"2003-10-20",1);
+INSERT IGNORE INTO Student(Username,`Password`,Gender,DOB,ClassID,Score) VALUES('Todd','d59324e4d5acb950c4022cd5df834cc3','Male',"2003-11-20",1,55);
+INSERT IGNORE INTO Student(Username,`Password`,Gender,DOB,ClassID,Score) VALUES('Theresa','d59324e4d5acb950c4022cd5df834cc3','Female',"2003-12-20",1,90);
+INSERT IGNORE INTO Student(Username,`Password`,Gender,DOB,ClassID,Score) VALUES('Hai','d59324e4d5acb950c4022cd5df834cc3','Male',"2003-10-22",1,30);
+INSERT IGNORE INTO Student(Username,`Password`,Gender,DOB,ClassID,Score) VALUES('Lee','d59324e4d5acb950c4022cd5df834cc3','Male',"2003-10-24",1,45);
+INSERT IGNORE INTO Student(Username,`Password`,Gender,DOB,ClassID,Score) VALUES('Tim','d59324e4d5acb950c4022cd5df834cc3','Male',"2003-10-25",1,60);
+INSERT IGNORE INTO Student(Username,`Password`,Gender,DOB,ClassID) VALUES('Clinton','d59324e4d5acb950c4022cd5df834cc3','Male',"2003-10-28",1);
+INSERT IGNORE INTO Student(Username,`Password`,Gender,DOB,ClassID) VALUES('Elbert','d59324e4d5acb950c4022cd5df834cc3','Male',"2003-10-22",1);
+INSERT IGNORE INTO Student(Username,`Password`,Gender,DOB,ClassID) VALUES('Ervin','d59324e4d5acb950c4022cd5df834cc3','Male',"2003-11-20",1);
+INSERT IGNORE INTO Student(Username,`Password`,Gender,DOB,ClassID) VALUES('Sheila','d59324e4d5acb950c4022cd5df834cc3','Female',"2003-10-20",1);
+INSERT IGNORE INTO Student(Username,`Password`,Gender,DOB,ClassID) VALUES('Grace','d59324e4d5acb950c4022cd5df834cc3','Female',"2003-10-29",1);
+INSERT IGNORE INTO Student(Username,`Password`,Gender,DOB,ClassID) VALUES('Ruby','d59324e4d5acb950c4022cd5df834cc3','Female',"2003-10-20",1);
+INSERT IGNORE INTO Student(Username,`Password`,Gender,DOB,ClassID) VALUES('Sonya','d59324e4d5acb950c4022cd5df834cc3','Female',"2003-10-20",1);
+INSERT IGNORE INTO Student(Username,`Password`,Gender,DOB,ClassID) VALUES('Donna','d59324e4d5acb950c4022cd5df834cc3','Female',"2003-10-20",1);
+INSERT IGNORE INTO Student(Username,`Password`,Gender,DOB,ClassID) VALUES('Stacy','d59324e4d5acb950c4022cd5df834cc3','Female',"2003-10-20",1);
+INSERT IGNORE INTO Student(Username,`Password`,Gender,DOB,ClassID) VALUES('Fannie','d59324e4d5acb950c4022cd5df834cc3','Female',"2003-10-28",1);
+INSERT IGNORE INTO Student(Username,`Password`,Gender,DOB,ClassID) VALUES('June','d59324e4d5acb950c4022cd5df834cc3','Female',"2003-10-20",1);
+INSERT IGNORE INTO Student(Username,`Password`,Gender,DOB,ClassID) VALUES('Melinda','d59324e4d5acb950c4022cd5df834cc3','Female',"2003-10-20",1);
+INSERT IGNORE INTO Student(Username,`Password`,Gender,DOB,ClassID) VALUES('Leo','d59324e4d5acb950c4022cd5df834cc3','Male',"2002-04-22",1);
+INSERT IGNORE INTO Student(Username,`Password`,Gender,DOB,ClassID) VALUES('Hector','d59324e4d5acb950c4022cd5df834cc3','Male',"2002-04-20",1);
+INSERT IGNORE INTO Student(Username,`Password`,Gender,DOB,ClassID) VALUES('Otis','d59324e4d5acb950c4022cd5df834cc3','Male',"2002-04-20",2);
+INSERT IGNORE INTO Student(Username,`Password`,Gender,DOB,ClassID) VALUES('Cassandra','d59324e4d5acb950c4022cd5df834cc3','Female',"2002-04-20",2);
+INSERT IGNORE INTO Student(Username,`Password`,Gender,DOB,ClassID) VALUES('Marilyn','d59324e4d5acb950c4022cd5df834cc3','Female',"2002-04-20",1);
+INSERT IGNORE INTO Teacher(Username,`Password`,ClassID) VALUES('Lynette','d59324e4d5acb950c4022cd5df834cc3',1);
+INSERT IGNORE INTO Teacher(Username,`Password`,ClassID) VALUES('Rachael','d59324e4d5acb950c4022cd5df834cc3',2);
+INSERT IGNORE INTO Researcher(Username,`Password`) VALUES('Ann','d59324e4d5acb950c4022cd5df834cc3');
+INSERT IGNORE INTO Researcher(Username,`Password`) VALUES('Patricia','d59324e4d5acb950c4022cd5df834cc3');
 
 # [Formal] Topic
 INSERT IGNORE INTO Topic(TopicName) VALUES('Smoking');

@@ -78,7 +78,7 @@
                      VALUES (?,?);";			
                 $update_stmt = $conn->prepare($update_stmt);         
                 $update_stmt -> execute(array($className, $schoolResult->SchoolID));
-                $classID = $conn -> lastInsertId();;
+                $classID = $conn -> lastInsertId();
                 if($classID <= 0){
                     echo "<script language=\"javascript\">  alert(\"Error occurred to insert class. Contact with developers.\"); </script>";
                 } else{
@@ -154,7 +154,7 @@
     <meta name="description" content="">
     <meta name="author" content="">
 
-    <title>Content Editor</title>
+    <title>iSNAP2Change Admin</title>
 
     <!-- Bootstrap Core CSS -->
     <link href="../bower_components/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
