@@ -11,7 +11,6 @@ $studentid = 1;
     <input type="button" onclick="onSave()" value="Save"/>
     <input id="loadButton" type="button" onclick="onLoad()" disabled="disabled" value="Load"/>
     <input type="button" onclick="onImage()" value="Open as image"/>
-    <input type="button" onclick="zwibbler.onResize()" value="Open as image"/>
 	<form style="display:none" method=post enctype="multipart/form-data" action="upload-handler.php">
 		<input type=file name=file id=fileinput accept="image/*">
 		<input type=hidden name="studentid" value=<?php echo $studentid;?>>
@@ -46,12 +45,8 @@ $studentid = 1;
         }
 
         function onImage() {
-            
-			//var dataUrl = zwibbler.save('svg');
 			var dataUrl = zwibbler.save("png");
 		    $("#res").attr("src", dataUrl);
-			//$("img").attr("width","500");
-            //window.open(dataUrl, "other");
         }
 		
 		$("#fileinput").on("change", function(e) {
@@ -62,11 +57,7 @@ $studentid = 1;
 		
 		function uploadDone(status, result) {
             if (status === "ok") {	
-			
 				var url = "http://localhost/isnap2change/isnap2change/tmp_poster_image/" + result.fileid;
-				
-			//	var url = "http://localhost/isnap2change/isnap2change/tmp_poster_image/Picture3.png"
-				
 				var dataURL;
 					
 				var img = new Image();
@@ -75,7 +66,6 @@ $studentid = 1;
 				img.onload = function(){
 					var canvas = document.createElement('CANVAS');
 					var ctx = canvas.getContext('2d');
-					
 					
 					canvas.height = this.height;
 					canvas.width = this.width;
