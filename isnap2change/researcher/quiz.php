@@ -2,7 +2,8 @@
     session_start();
     require_once("../connection.php");
     require_once("../debug.php");
-    require_once("/researcher_validation.php");	  
+    require_once("/researcher_validation.php");
+    require_once("/get_quiz_points.php");	    
     $conn = db_connect();
     $overviewName = "quiz";
     
@@ -200,7 +201,7 @@
                                     -->
                                     <td><?php if($quizResult[$i]->QuizType=='MCQ') {echo 'Multiple Choice';} else if($quizResult[$i]->QuizType=='SAQ') {echo 'Short Answer';} else {echo $quizResult[$i]->QuizType;} ?></a></td>
                                             <td><?php echo $quizResult[$i]->TopicName ?></td>
-                                            <td><!--points--><span class="glyphicon glyphicon-remove pull-right" aria-hidden="true"></span><span class="pull-right" aria-hidden="true">&nbsp;</span><span class="glyphicon glyphicon-edit pull-right" data-toggle="modal" data-target="#dialog" aria-hidden="true"></span></td>
+                                            <td><?php echo getQuizPoints($quizResult[$i]->QuizID); ?><span class="glyphicon glyphicon-remove pull-right" aria-hidden="true"></span><span class="pull-right" aria-hidden="true">&nbsp;</span><span class="glyphicon glyphicon-edit pull-right" data-toggle="modal" data-target="#dialog" aria-hidden="true"></span></td>
                                         </tr>
                                     <?php } ?>    
                                     </tbody>
