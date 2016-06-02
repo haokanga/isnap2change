@@ -37,7 +37,7 @@ DROP TABLE IF EXISTS `Bonus_Task_Record`;
 CREATE TABLE IF NOT EXISTS `School` (
     SchoolID MEDIUMINT AUTO_INCREMENT,
     # Specified key was too long; max key length is 767 bytes, a UTF8 char is 4 bytes
-    SchooLastName VARCHAR(190) UNIQUE,
+    SchoolName VARCHAR(190) UNIQUE,
     CONSTRAINT School_SchoolID_PK PRIMARY KEY (SchoolID)
 )  ENGINE=INNODB;
 
@@ -332,9 +332,9 @@ SET FOREIGN_KEY_CHECKS=1;
 # INSERT RAW DATA FOR TEST
 
 # [Example] User Info
-INSERT IGNORE INTO School(SchooLastName) VALUES('Sample School');
-INSERT IGNORE INTO School(SchooLastName) VALUES('Sample Adelaide High School');
-INSERT IGNORE INTO School(SchooLastName) VALUES('Sample Woodville High School');
+INSERT IGNORE INTO School(SchoolName) VALUES('Sample School');
+INSERT IGNORE INTO School(SchoolName) VALUES('Sample Adelaide High School');
+INSERT IGNORE INTO School(SchoolName) VALUES('Sample Woodville High School');
 INSERT IGNORE INTO Class(ClassName,SchoolID) VALUES('Sample Class 1A',1);
 INSERT IGNORE INTO Class(ClassName,SchoolID) VALUES('Sample Class 1B',1);
 INSERT IGNORE INTO Class(ClassName,SchoolID) VALUES('Sample Class 1C',1);

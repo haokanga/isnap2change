@@ -1,23 +1,10 @@
-<?php
-    //if true, echo debug output in dev mode, else production mode
-	$DEBUG_MODE = true;    
+<?php        
 	session_start();
-    require_once("../connection.php");	  
+    require_once("../connection.php");
+    require_once("../debug.php");
+    require_once("/researcher_validation.php");
     $conn = db_connect();    
     $columnName = array('StudentID','ClassName','Username','FirstName','LastName','Email','Gender','DOB','Score','SubmissionDate');
-    
-    //set userid    
-    if(isset($_SESSION['researcherid'])){
-        $researcherid = $_SESSION['researcherid'];
-        if($DEBUG_MODE){
-            echo "<script language=\"javascript\">  console.log(\"This is DEBUG_MODE with SESSION ResearcherID = ".$researcherid.".\"); </script>";
-        }
-    }else{
-        if($DEBUG_MODE){
-            echo "<script language=\"javascript\">  console.log(\"This is DEBUG_MODE with hard-code ResearcherID = 1.\"); </script>";
-            $researcherid = 1;
-        }
-    }
     
     //if update/insert/remove class
     if($_SERVER["REQUEST_METHOD"] == "POST"){
@@ -217,7 +204,9 @@
                                     <?php for($i=0; $i<count($studentResult); $i++) {?>
                                         <tr class="<?php if($i % 2 == 0){echo "odd";} else {echo "even";} ?>">
                                         <?php for($j=0; $j<count($columnName); $j++) {?>
-                                        <td <?php if ($j==0) echo 'style="display:none"'; ?>><?php echo $studentResult[$i]->$columnName[$j]; ?></td>
+                                        <td <?php if ($j==0) echo 'style="display:none"'; ?>><?php echo $studentResult[$i]->$columnName[$j]; ?>
+                                        <?php if ($j==2) echo '<span class="glyphicon glyphicon-remove pull-right" aria-hidden="true"></span><span class="pull-right" aria-hidden="true">&nbsp;</span><span class="glyphicon glyphicon-edit pull-right" data-toggle="modal" data-target="#dialog" aria-hidden="true"></span>'; ?>
+                                        </td>
                                         <?php } ?>    
                                         </tr>
                                     <?php } ?> 
@@ -376,14 +365,16 @@
         ).draw();
 
         $('a.toggle-vis').on( 'click', function (e) {
-            e.preventDefault();
-     
+            e.preventDefault();     
             // Get the column API object
-            var column = table.column( $(this).attr('data-column') );
-     
+            var column = table.column( $(this).attr('data-column') );     
             // Toggle the visibility
             column.visible( ! column.visible() );
         } );
+        $('a.toggle-vis').eq(2).click();
+        $('a.toggle-vis').eq(3).click();
+        $('a.toggle-vis').eq(4).click();
+        
     });        
     </script>
 </body>
