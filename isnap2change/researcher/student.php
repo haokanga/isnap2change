@@ -6,93 +6,28 @@
     $conn = db_connect();    
     $columnName = array('StudentID','ClassName','Username','FirstName','LastName','Email','Gender','DOB','Score','SubmissionDate');
     
-    //if update/insert/remove class
     if($_SERVER["REQUEST_METHOD"] == "POST"){
         if(isset($_POST['update'])){                          
             $update = $_POST['update'];
-            //update
+            //reset student password
             if($update == 0){
-                $studentID = $_POST['classid'];
-                $studentName = $_POST['classname'];
-                $schoolName = $_POST['schoolname'];
-                $teacherToken = $_POST['teachertoken'];
-                $studentToken = $_POST['studenttoken'];
-                // get school
-                $schoolSql = "SELECT SchoolID
-                           FROM School WHERE SchoolName = ?";
-                $schoolQuery = $conn->prepare($schoolSql);
-                $schoolQuery->execute(array($schoolName));
-                $schoolResult = $schoolQuery->fetch(PDO::FETCH_OBJ);
-                // update class 
-                $update_stmt = "UPDATE Class 
-                    SET ClassName = ?, SchoolID = ?
-                    WHERE ClassID = ?";			
+                $studentID = $_POST['studentid'];
+                $update_stmt = "UPDATE Student 
+                    SET Password = ?
+                    WHERE StudentID = ?";			
                 $update_stmt = $conn->prepare($update_stmt);                            
-                if(! $update_stmt -> execute(array($studentName, $schoolResult->SchoolID, $studentID))){
-                    echo "<script language=\"javascript\">  alert(\"Error occurred to update class. Contact with developers.\"); </script>";
-                } else{
-                }
-                // update token                     
-                $update_stmt = "UPDATE Token 
-                    SET TokenString = ?
-                    WHERE ClassID = ? AND `Type` = ?";			
-                $update_stmt = $conn->prepare($update_stmt);                            
-                if(! $update_stmt -> execute(array($teacherToken, $studentID, "TEACHER"))){
-                    echo "<script language=\"javascript\">  alert(\"Error occurred to update teacherToken. Contact with developers.\"); </script>";
-                } else{
-                }
-                $update_stmt = "UPDATE Token 
-                    SET TokenString = ?
-                    WHERE ClassID = ? AND `Type` = ?";			
-                $update_stmt = $conn->prepare($update_stmt);                            
-                if(! $update_stmt -> execute(array($studentToken, $studentID, "STUDENT"))){
-                    echo "<script language=\"javascript\">  alert(\"Error occurred to update studentToken. Contact with developers.\"); </script>";
+                if(! $update_stmt -> execute(array(md5('WelcomeToiSNAP2'), $studentID))){
+                    echo "<script language=\"javascript\">  alert(\"Error occurred to reset password. Contact with developers.\"); </script>";
                 } else{
                 }
             }
-            else if($update == 1){  
-                $studentName = $_POST['classname'];
-                $schoolName = $_POST['schoolname'];
-                $teacherToken = $_POST['teachertoken'];
-                $studentToken = $_POST['studenttoken'];
-                // get school
-                $schoolSql = "SELECT SchoolID
-                           FROM School WHERE SchoolName = ?";
-                $schoolQuery = $conn->prepare($schoolSql);
-                $schoolQuery->execute(array($schoolName));
-                $schoolResult = $schoolQuery->fetch(PDO::FETCH_OBJ);
-                // update class 
-                $update_stmt = "INSERT INTO Class(ClassName, SchoolID)
-                     VALUES (?,?);";			
-                $update_stmt = $conn->prepare($update_stmt);         
-                $update_stmt -> execute(array($studentName, $schoolResult->SchoolID));
-                $studentID = $conn -> lastInsertId();
-                if($studentID <= 0){
-                    echo "<script language=\"javascript\">  alert(\"Error occurred to insert class. Contact with developers.\"); </script>";
-                } else{
-                }
-                // update token                     
-                $update_stmt = "REPLACE INTO Token(ClassID, `Type`, TokenString)
-                     VALUES (?,?,?);";			
-                $update_stmt = $conn->prepare($update_stmt);                            
-                if(! $update_stmt -> execute(array($studentID, "TEACHER", $teacherToken))){
-                    echo "<script language=\"javascript\">  alert(\"Error occurred to insert teacherToken. Contact with developers.\"); </script>";
-                } else{
-                }
-                $update_stmt = "REPLACE INTO Token(ClassID, `Type`, TokenString)
-                     VALUES (?,?,?);";			
-                $update_stmt = $conn->prepare($update_stmt);                            
-                if(! $update_stmt -> execute(array($studentID, "STUDENT", $studentToken))){
-                    echo "<script language=\"javascript\">  alert(\"Error occurred to insert studentToken. Contact with developers.\"); </script>";
-                } else{
-                }                
-            }else if($update == -1){
-                $studentID = $_POST['classid'];
-                // remove class (with help of DELETE CASCADE) 
-                $update_stmt = "DELETE FROM Class WHERE ClassID = ?";			
+            //delete student (with help of DELETE CASCADE)            
+            else if($update == -1){
+                $studentID = $_POST['studentid'];
+                $update_stmt = "DELETE FROM Student WHERE StudentID = ?";			
                 $update_stmt = $conn->prepare($update_stmt);
                 if(! $update_stmt -> execute(array($studentID))){
-                    echo "<script language=\"javascript\">  alert(\"Error occurred to delete class/token. Contact with developers.\"); </script>";
+                    echo "<script language=\"javascript\">  alert(\"Error occurred to delete student. Contact with developers.\"); </script>";
                 } else{
                 } 
             }            
@@ -183,7 +118,7 @@
                             Toggle column: 
                             <?php for($i=1; $i<count($columnName); $i++) {
                             if($columnName[$i] != 'Username'){ ?>
-                                <i class="fa fa-cog fa-fw"></i><a class="toggle-vis" data-column="<?php echo $i; ?>"><?php echo $columnName[$i]; ?></a>&nbsp;
+                                <i class="fa fa-check-square-o fa-fw"></i><a class="toggle-vis" data-column="<?php echo $i; ?>"><?php echo $columnName[$i]; ?></a>&nbsp;
                             <?php }
                             } ?>
                             <br>
@@ -256,9 +191,13 @@
                     if($columnName[$i] == 'StudentID' || $columnName[$i] == 'Username'){?>
                     <label for="<?php echo $columnName[$i]; ?>" <?php if ($i==0){ echo 'style="display:none"';} ?>><?php echo $columnName[$i]; ?></label>
                     <input type="text" class="form-control dialoginput" id="<?php echo $columnName[$i]; ?>" name="<?php echo strtolower($columnName[$i]); ?>"  
-                    <?php if ($i==0){ echo 'style="display:none"';} ?>>
+                    <?php if ($i==0){ echo 'style="display:none"';} ?> ></input>
                 <?php } 
                 }?>
+                <br>
+                <div class="alert alert-info">
+                    <p>You can <strong>reset student password</strong> to <code>WelcomeToiSNAP2</code>.</p>
+                </div>
             </form>
             </div>
             <div class="modal-footer">            
@@ -296,7 +235,12 @@
     //DO NOT put them in $(document).ready() since the table has multi pages
     $('.glyphicon-edit').on('click', function (){
         $('#update').val(0);
+        //studentid, username
+        $('.dialoginput').eq(0).val($(this).parent().parent().children('td').eq(0).text());        
         $('.dialoginput').eq(1).val($(this).parent().text());
+        $('.dialoginput').each(function() {
+            $( this ).attr('disabled','disabled');
+        });
     });
     $('.glyphicon-remove').on('click', function (){
         if (confirm('[WARNING] Are you sure to remove this class? All the student data in this class will also get deleted (not recoverable).')) {
@@ -311,15 +255,16 @@
         $('.dialoginput').each(function() {
             $( this ).prop('disabled',false);
         });
-        $('#submission').submit();
+        if (confirm('[WARNING] Are you sure to reset this student password to `WelcomeToiSNAP2`? (not recoverable).')) {
+            $('#submission').submit();
+        }
     });
     //include html
     w3IncludeHTML();   
     $(document).ready(function() {
         var table = $('#datatables').DataTable({
                 responsive: true,
-                "initComplete": function(settings, json) {
-                    
+                "initComplete": function(settings, json) {                    
                     $('.input-sm').eq(1).val($("#keyword").val());                    
                 }
         })
@@ -327,16 +272,26 @@
         table.search(
             $("#keyword").val(), true, false, true
         ).draw();
-
+        
+        //Toggle column visibility
         $('a.toggle-vis').on( 'click', function (e) {
             e.preventDefault();     
             // Get the column API object
-            var column = table.column( $(this).attr('data-column') );     
-            // Toggle the visibility
+            var column = table.column( $(this).attr('data-column') ); 
             column.visible( ! column.visible() );
+            var checkbox = $(this).parent().children().eq($(this).index()-1);
+            if(checkbox.hasClass('fa-check-square-o'))
+                checkbox.removeClass('fa-check-square-o').addClass('fa-square-o');
+            else if(checkbox.hasClass('fa-square-o'))
+                checkbox.removeClass('fa-square-o').addClass('fa-check-square-o');
         } );
-        //hide FirstName LastName Email
-        var hiddenColArray=['FirstName','LastName','Email'] 
+        
+        $('.fa-square-o, .fa-check-square-o').on( 'click', function (e) {
+            $(this).parent().children().eq($(this).index()+1).click();
+        } );        
+        
+        //hide 'FirstName','LastName','Gender', 'DOB' by default
+        var hiddenColArray=['FirstName','LastName','Gender', 'DOB'] 
         $('a.toggle-vis').each(function() {
             if(jQuery.inArray( $(this).text(), hiddenColArray )!= -1)
                 $( this ).click();

@@ -375,8 +375,7 @@
     $(document).ready(function() {
         var table = $('#datatables').DataTable({
                 responsive: true,
-                "initComplete": function(settings, json) {
-                    
+                "initComplete": function(settings, json) {                    
                     $('.input-sm').eq(1).val($("#keyword").val());                    
                 }
         })
