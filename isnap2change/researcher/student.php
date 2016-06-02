@@ -1,22 +1,9 @@
-<?php
-    //if true, echo debug output in dev mode, else production mode
-	$DEBUG_MODE = true;    
+<?php        
 	session_start();
-    require_once("../connection.php");	  
+    require_once("../connection.php");
+    require_once("../debug.php");
+    require_once("/researcher_validation.php");
     $conn = db_connect();
-    
-    //set userid    
-    if(isset($_SESSION['researcherid'])){
-        $researcherid = $_SESSION['researcherid'];
-        if($DEBUG_MODE){
-            echo "<script language=\"javascript\">  console.log(\"This is DEBUG_MODE with SESSION ResearcherID = ".$researcherid.".\"); </script>";
-        }
-    }else{
-        if($DEBUG_MODE){
-            echo "<script language=\"javascript\">  console.log(\"This is DEBUG_MODE with hard-code ResearcherID = 1.\"); </script>";
-            $researcherid = 1;
-        }
-    }
     
     //if update/insert/remove class
     if($_SERVER["REQUEST_METHOD"] == "POST"){
@@ -236,9 +223,9 @@
                                     <?php for($i=0; $i<count($classResult); $i++) {?>
                                         <tr class="<?php if($i % 2 == 0){echo "odd";} else {echo "even";} ?>">
                                             <td style="display:none"><?php echo $classResult[$i]->ClassID ?></td>
-                                            <td><?php echo $classResult[$i]->ClassName ?></td>
-                                            <td><?php echo $classResult[$i]->SchoolName ?></td>
-                                            <td><?php for($j=0; $j<count($tokenResult); $j++){ if ($tokenResult[$j]->ClassID == $classResult[$i]->ClassID && $tokenResult[$j]->Type == 'TEACHER') echo $tokenResult[$j]->TokenString;} ?></td>
+                                        <td <?php if ($j==0) echo 'style="display:none"'; ?>><?php echo $studentResult[$i]->$columnName[$j]; ?>
+                                        <?php if ($j==2) echo '<span class="glyphicon glyphicon-remove pull-right" aria-hidden="true"></span><span class="pull-right" aria-hidden="true">&nbsp;</span><span class="glyphicon glyphicon-edit pull-right" data-toggle="modal" data-target="#dialog" aria-hidden="true"></span>'; ?>
+                                        </td>
                                             <td><?php for($j=0; $j<count($tokenResult); $j++){ if ($tokenResult[$j]->ClassID == $classResult[$i]->ClassID && $tokenResult[$j]->Type == 'STUDENT') echo $tokenResult[$j]->TokenString;} ?></td>
                                             <td><?php $count=0; for($j=0; $j<count($studentNumResult); $j++){ if ($studentNumResult[$j]->ClassID == $classResult[$i]->ClassID) $count=$studentNumResult[$j]->Count; } echo $count; ?></td>
                                             <td><?php echo min($classResult[$i]->UnlockedProgress, $weekResult->WeekNum)."/".$weekResult->WeekNum ?><span class="glyphicon glyphicon-remove pull-right" aria-hidden="true"></span><span class="pull-right" aria-hidden="true">&nbsp;</span><span class="glyphicon glyphicon-edit pull-right" data-toggle="modal" data-target="#dialog" aria-hidden="true"></span></td>
@@ -397,6 +384,12 @@
         table.search(
             $("#keyword").val(), true, false, true
         ).draw();     
+            e.preventDefault();     
+            var column = table.column( $(this).attr('data-column') );     
+        $('a.toggle-vis').eq(2).click();
+        $('a.toggle-vis').eq(3).click();
+        $('a.toggle-vis').eq(4).click();
+        
     });        
     </script>
 </body>

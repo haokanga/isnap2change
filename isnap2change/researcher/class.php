@@ -1,22 +1,9 @@
 <?php
-    //if true, echo debug output in dev mode, else production mode
-	$DEBUG_MODE = true;    
 	session_start();
-    require_once("../connection.php");	  
+    require_once("../connection.php");
+    require_once("../debug.php");
+    require_once("/researcher_validation.php");
     $conn = db_connect();
-    
-    //set userid    
-    if(isset($_SESSION['researcherid'])){
-        $researcherid = $_SESSION['researcherid'];
-        if($DEBUG_MODE){
-            echo "<script language=\"javascript\">  console.log(\"This is DEBUG_MODE with SESSION ResearcherID = ".$researcherid.".\"); </script>";
-        }
-    }else{
-        if($DEBUG_MODE){
-            echo "<script language=\"javascript\">  console.log(\"This is DEBUG_MODE with hard-code ResearcherID = 1.\"); </script>";
-            $researcherid = 1;
-        }
-    }
     
     //if update/insert/remove class
     if($_SERVER["REQUEST_METHOD"] == "POST"){
