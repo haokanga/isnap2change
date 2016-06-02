@@ -24,8 +24,8 @@
             $update = $_POST['update'];
             //update
             if($update == 0){
-                $classID = $_POST['classid'];
-                $className = $_POST['classname'];
+                $studentID = $_POST['classid'];
+                $studentName = $_POST['classname'];
                 $schoolName = $_POST['schoolname'];
                 $teacherToken = $_POST['teachertoken'];
                 $studentToken = $_POST['studenttoken'];
@@ -40,7 +40,7 @@
                     SET ClassName = ?, SchoolID = ?
                     WHERE ClassID = ?";			
                 $update_stmt = $conn->prepare($update_stmt);                            
-                if(! $update_stmt -> execute(array($className, $schoolResult->SchoolID, $classID))){
+                if(! $update_stmt -> execute(array($studentName, $schoolResult->SchoolID, $studentID))){
                     echo "<script language=\"javascript\">  alert(\"Error occurred to update class. Contact with developers.\"); </script>";
                 } else{
                 }
@@ -49,7 +49,7 @@
                     SET TokenString = ?
                     WHERE ClassID = ? AND `Type` = ?";			
                 $update_stmt = $conn->prepare($update_stmt);                            
-                if(! $update_stmt -> execute(array($teacherToken, $classID, "TEACHER"))){
+                if(! $update_stmt -> execute(array($teacherToken, $studentID, "TEACHER"))){
                     echo "<script language=\"javascript\">  alert(\"Error occurred to update teacherToken. Contact with developers.\"); </script>";
                 } else{
                 }
@@ -57,13 +57,13 @@
                     SET TokenString = ?
                     WHERE ClassID = ? AND `Type` = ?";			
                 $update_stmt = $conn->prepare($update_stmt);                            
-                if(! $update_stmt -> execute(array($studentToken, $classID, "STUDENT"))){
+                if(! $update_stmt -> execute(array($studentToken, $studentID, "STUDENT"))){
                     echo "<script language=\"javascript\">  alert(\"Error occurred to update studentToken. Contact with developers.\"); </script>";
                 } else{
                 }
             }
             else if($update == 1){  
-                $className = $_POST['classname'];
+                $studentName = $_POST['classname'];
                 $schoolName = $_POST['schoolname'];
                 $teacherToken = $_POST['teachertoken'];
                 $studentToken = $_POST['studenttoken'];
@@ -77,9 +77,9 @@
                 $update_stmt = "INSERT INTO Class(ClassName, SchoolID)
                      VALUES (?,?);";			
                 $update_stmt = $conn->prepare($update_stmt);         
-                $update_stmt -> execute(array($className, $schoolResult->SchoolID));
-                $classID = $conn -> lastInsertId();
-                if($classID <= 0){
+                $update_stmt -> execute(array($studentName, $schoolResult->SchoolID));
+                $studentID = $conn -> lastInsertId();
+                if($studentID <= 0){
                     echo "<script language=\"javascript\">  alert(\"Error occurred to insert class. Contact with developers.\"); </script>";
                 } else{
                 }
@@ -87,64 +87,36 @@
                 $update_stmt = "REPLACE INTO Token(ClassID, `Type`, TokenString)
                      VALUES (?,?,?);";			
                 $update_stmt = $conn->prepare($update_stmt);                            
-                if(! $update_stmt -> execute(array($classID, "TEACHER", $teacherToken))){
+                if(! $update_stmt -> execute(array($studentID, "TEACHER", $teacherToken))){
                     echo "<script language=\"javascript\">  alert(\"Error occurred to insert teacherToken. Contact with developers.\"); </script>";
                 } else{
                 }
                 $update_stmt = "REPLACE INTO Token(ClassID, `Type`, TokenString)
                      VALUES (?,?,?);";			
                 $update_stmt = $conn->prepare($update_stmt);                            
-                if(! $update_stmt -> execute(array($classID, "STUDENT", $studentToken))){
+                if(! $update_stmt -> execute(array($studentID, "STUDENT", $studentToken))){
                     echo "<script language=\"javascript\">  alert(\"Error occurred to insert studentToken. Contact with developers.\"); </script>";
                 } else{
                 }                
             }else if($update == -1){
-                $classID = $_POST['classid'];
+                $studentID = $_POST['classid'];
                 // remove class (with help of DELETE CASCADE) 
                 $update_stmt = "DELETE FROM Class WHERE ClassID = ?";			
                 $update_stmt = $conn->prepare($update_stmt);
-                if(! $update_stmt -> execute(array($classID))){
+                if(! $update_stmt -> execute(array($studentID))){
                     echo "<script language=\"javascript\">  alert(\"Error occurred to delete class/token. Contact with developers.\"); </script>";
                 } else{
                 } 
             }            
         }
-    }
+    }   
     
-    // get max week
-    $weekSql = "SELECT MAX(Week) AS WeekNum FROM Quiz";
-    $weekQuery = $conn->prepare($weekSql);
-    $weekQuery->execute();
-    $weekResult = $weekQuery->fetch(PDO::FETCH_OBJ);
-
-    // get school
-    $schoolSql = "SELECT SchoolName
-               FROM School";
-    $schoolQuery = $conn->prepare($schoolSql);
-    $schoolQuery->execute();
-    $schoolResult = $schoolQuery->fetchAll(PDO::FETCH_OBJ);
-    
-    // get class
-    $classSql = "SELECT ClassID, ClassName, SchoolName, UnlockedProgress
-               FROM Class NATURAL JOIN School";
-    $classQuery = $conn->prepare($classSql);
-    $classQuery->execute();
-    $classResult = $classQuery->fetchAll(PDO::FETCH_OBJ);
-    
-    // get token
-    $tokenSql = "SELECT ClassID, `Type`, TokenString
-               FROM Token NATURAL JOIN Class";
-    $tokenQuery = $conn->prepare($tokenSql);
-    $tokenQuery->execute();
-    $tokenResult = $tokenQuery->fetchAll(PDO::FETCH_OBJ);    
-    
-    // get students number
-    $studentNumSql = "SELECT count(*) as Count, ClassID
-               FROM   Student NATURAL JOIN Class
-               GROUP BY ClassID";
-    $studentNumQuery = $conn->prepare($studentNumSql);
-    $studentNumQuery->execute();
-    $studentNumResult = $studentNumQuery->fetchAll(PDO::FETCH_OBJ);    
+    // get student
+    $studentSql = "SELECT ClassName, StudentID, Username, `Password`, Gender, DOB, Score, SubmissionTime FROM Student NATURAL JOIN Class
+               ORDER BY ClassID";
+    $studentQuery = $conn->prepare($studentSql);
+    $studentQuery->execute();
+    $studentResult = $studentQuery->fetchAll(PDO::FETCH_OBJ);    
     
     db_close($conn); 
     
@@ -224,24 +196,26 @@
                                     <thead>
                                         <tr>
                                             <th style="display:none">StudentID</th>
+                                            <th>ClassName</th>
                                             <th>UserName</th>
                                             <th>Password</th>
-                                            <th>Nickname</th>                                            
-                                            <th>StudentToken</th>
-                                            <th>EnrolledStudents</th>
-                                            <th>UnlockedProgress</th>
+                                            <th>Gender</th>                                            
+                                            <th>DOB</th>
+                                            <th>Score</th>
+                                            <th>SubmissionTime</th>                                            
                                         </tr>
                                     </thead>
                                     <tbody>
-                                    <?php for($i=0; $i<count($classResult); $i++) {?>
+                                    <?php for($i=0; $i<count($studentResult); $i++) {?>
                                         <tr class="<?php if($i % 2 == 0){echo "odd";} else {echo "even";} ?>">
-                                            <td style="display:none"><?php echo $classResult[$i]->ClassID ?></td>
-                                            <td><?php echo $classResult[$i]->ClassName ?></td>
-                                            <td><?php echo $classResult[$i]->SchoolName ?></td>
-                                            <td><?php for($j=0; $j<count($tokenResult); $j++){ if ($tokenResult[$j]->ClassID == $classResult[$i]->ClassID && $tokenResult[$j]->Type == 'TEACHER') echo $tokenResult[$j]->TokenString;} ?></td>
-                                            <td><?php for($j=0; $j<count($tokenResult); $j++){ if ($tokenResult[$j]->ClassID == $classResult[$i]->ClassID && $tokenResult[$j]->Type == 'STUDENT') echo $tokenResult[$j]->TokenString;} ?></td>
-                                            <td><?php $count=0; for($j=0; $j<count($studentNumResult); $j++){ if ($studentNumResult[$j]->ClassID == $classResult[$i]->ClassID) $count=$studentNumResult[$j]->Count; } echo $count; ?></td>
-                                            <td><?php echo min($classResult[$i]->UnlockedProgress, $weekResult->WeekNum)."/".$weekResult->WeekNum ?><span class="glyphicon glyphicon-remove pull-right" aria-hidden="true"></span><span class="pull-right" aria-hidden="true">&nbsp;</span><span class="glyphicon glyphicon-edit pull-right" data-toggle="modal" data-target="#dialog" aria-hidden="true"></span></td>
+                                            <td style="display:none"><?php echo $studentResult[$i]->StudentID ?></td>
+                                            <td><?php echo $studentResult[$i]->ClassName ?></td>
+                                            <td><?php echo $studentResult[$i]->Username ?></td>
+                                            <td><?php echo $studentResult[$i]->Password ?></td>
+                                            <td><?php echo $studentResult[$i]->Gender ?></td>
+                                            <td><?php echo $studentResult[$i]->DOB ?></td>
+                                            <td><?php echo $studentResult[$i]->Score ?></td>                              
+                                            <td><?php echo $studentResult[$i]->SubmissionTime ?><span class="glyphicon glyphicon-remove pull-right" aria-hidden="true"></span><span class="pull-right" aria-hidden="true">&nbsp;</span><span class="glyphicon glyphicon-edit pull-right" data-toggle="modal" data-target="#dialog" aria-hidden="true"></span></td>
                                         </tr>
                                     <?php } ?>    
                                     </tbody>
