@@ -36,8 +36,7 @@ DROP TABLE IF EXISTS `Bonus_Task_Record`;
 
 CREATE TABLE IF NOT EXISTS `School` (
     SchoolID MEDIUMINT AUTO_INCREMENT,
-    # Specified key was too long; max key length is 767 bytes, a UTF8 char is 4 bytes
-    SchoolName VARCHAR(190) UNIQUE,
+    SchoolName TEXT,
     CONSTRAINT School_SchoolID_PK PRIMARY KEY (SchoolID)
 )  ENGINE=INNODB;
 

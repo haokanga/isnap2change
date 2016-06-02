@@ -157,7 +157,7 @@
                                     <p>View students by filtering or searching. You can <strong>reset student password</strong> or delete students.</p>
                                 </div>
                                 <div class="alert alert-danger">
-                                    <p><strong>Reminder</strong> : If you remove one student. All the data of this student will also get deleted (not recoverable).</p>
+                                    <p><strong>Reminder</strong> : If you remove one student. All the data of this student will also get deleted (not recoverable). It includes <strong>student submissions of every task and your grading/feedback</strong>, not only the student itself.</p>
                                 </div>
                             </div>
                         </div>
@@ -207,7 +207,17 @@
           </div>          
         </div>
       </div>
-      <input type=hidden name="keyword" id="keyword" value="<?php if(isset($_GET['schoolname'])){ echo $_GET['schoolname']; } ?>"></input>
+      <input type=hidden name="keyword" id="keyword" value="
+      <?php if(isset($_GET['classid'])){ 
+        // get ClassName
+        $classSql = 'SELECT ClassName
+                   FROM Class WHERE ClassID = ?';
+        $classQuery = $conn->prepare($classSql);
+        $classQuery->execute(array($_GET['classid']));
+        $classResult = $classQuery->fetch(PDO::FETCH_OBJ);
+        echo $classResult->ClassName; 
+      } else echo '';
+      ?>"></input>
     <!-- jQuery -->
     <script src="../bower_components/jquery/dist/jquery.min.js"></script>
 
@@ -243,10 +253,16 @@
         });
     });
     $('.glyphicon-remove').on('click', function (){
-        if (confirm('[WARNING] Are you sure to remove this class? All the student data in this class will also get deleted (not recoverable).')) {
-            $('#update').val(-1);            
-            //$('.dialoginput').eq(1).val($(this).parent().text());
-            //$('#submission').submit();
+        if (confirm('[WARNING] Are you sure to remove this student? All the data of this student will also get deleted (not recoverable). It includes student submissions of every task and your grading/feedback, not only the student itself.')) {
+            $('#update').val(-1);
+            //studentid, username
+            $('.dialoginput').eq(0).val($(this).parent().parent().children('td').eq(0).text());        
+            $('.dialoginput').eq(1).val($(this).parent().text());            
+            //enable all the input
+            $('.dialoginput').each(function() {
+                $( this ).prop('disabled',false);
+            });
+            $('#submission').submit();
         }           
     });
     $('#btmResetPwd').on('click', function (){
@@ -265,12 +281,12 @@
         var table = $('#datatables').DataTable({
                 responsive: true,
                 "initComplete": function(settings, json) {                    
-                    $('.input-sm').eq(1).val($("#keyword").val());                    
+                    $('.input-sm').eq(1).val($("#keyword").val().trim());                    
                 }
         })
         //search keyword (schoolname), exact match
         table.search(
-            $("#keyword").val(), true, false, true
+            $("#keyword").val().trim(), true, false, true
         ).draw();
         
         //Toggle column visibility

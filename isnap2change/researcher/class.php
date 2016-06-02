@@ -223,7 +223,7 @@
                                     <?php for($i=0; $i<count($classResult); $i++) {?>
                                         <tr class="<?php if($i % 2 == 0){echo "odd";} else {echo "even";} ?>">
                                             <td style="display:none"><?php echo $classResult[$i]->ClassID ?></td>
-                                            <td><?php echo $classResult[$i]->ClassName ?></td>
+                                            <td><a href="student.php?classid=<?php echo $classResult[$i]->ClassID ?>"><?php echo $classResult[$i]->ClassName ?></a></td>
                                             <td><?php echo $classResult[$i]->SchoolName ?></td>
                                             <td><?php for($j=0; $j<count($tokenResult); $j++){ if ($tokenResult[$j]->ClassID == $classResult[$i]->ClassID && $tokenResult[$j]->Type == 'TEACHER') echo $tokenResult[$j]->TokenString;} ?></td>
                                             <td><?php for($j=0; $j<count($tokenResult); $j++){ if ($tokenResult[$j]->ClassID == $classResult[$i]->ClassID && $tokenResult[$j]->Type == 'STUDENT') echo $tokenResult[$j]->TokenString;} ?></td>
@@ -298,7 +298,17 @@
           </div>          
         </div>
       </div>
-      <input type=hidden name="keyword" id="keyword" value="<?php if(isset($_GET['schoolname'])){ echo $_GET['schoolname']; } ?>"></input>
+      <input type=hidden name="keyword" id="keyword" value="
+      <?php if(isset($_GET['schoolid'])){
+        // get SchoolName
+        $schoolSql = "SELECT SchoolName
+                   FROM School WHERE SchoolID = ?";
+        $schoolQuery = $conn->prepare($schoolSql);
+        $schoolQuery->execute(array($_GET['schoolid']));
+        $schoolResult = $schoolQuery->fetch(PDO::FETCH_OBJ);
+        echo $schoolResult->SchoolName; 
+      } else echo ''; ?>">
+      </input>
     <!-- jQuery -->
     <script src="../bower_components/jquery/dist/jquery.min.js"></script>
 
@@ -376,12 +386,12 @@
         var table = $('#datatables').DataTable({
                 responsive: true,
                 "initComplete": function(settings, json) {                    
-                    $('.input-sm').eq(1).val($("#keyword").val());                    
+                    $('.input-sm').eq(1).val($("#keyword").val().trim());                    
                 }
         })
         //search keyword (schoolname), exact match
         table.search(
-            $("#keyword").val(), true, false, true
+            $("#keyword").val().trim(), true, false, true
         ).draw();     
     });        
     </script>

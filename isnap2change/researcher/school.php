@@ -155,7 +155,7 @@
                                     <?php for($i=0; $i<count($schoolResult); $i++) {?>
                                         <tr class="<?php if($i % 2 == 0){echo "odd";} else {echo "even";} ?>">
                                             <td style="display:none"><?php echo $schoolResult[$i]->SchoolID ?></td>
-                                            <td><a href="class.php?schoolname=<?php echo $schoolResult[$i]->SchoolName ?>"><?php echo $schoolResult[$i]->SchoolName ?></a></td>
+                                            <td><a href="class.php?schoolid=<?php echo $schoolResult[$i]->SchoolID ?>"><?php echo $schoolResult[$i]->SchoolName ?></a></td>
                                             <td><?php $count=0; for($j=0; $j<count($classNumResult); $j++){ if ($classNumResult[$j]->SchoolID == $schoolResult[$i]->SchoolID) $count=$classNumResult[$j]->Count; } echo $count; ?><span class="glyphicon glyphicon-remove pull-right" aria-hidden="true"></span><span class="pull-right" aria-hidden="true">&nbsp;</span><span class="glyphicon glyphicon-edit pull-right" data-toggle="modal" data-target="#dialog" aria-hidden="true"></span></td>
                                         </tr>
                                     <?php } ?>    

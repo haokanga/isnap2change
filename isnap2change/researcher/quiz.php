@@ -349,12 +349,12 @@
                 responsive: true,
                 "initComplete": function(settings, json) {
                     
-                    $('.input-sm').eq(1).val($("#keyword").val());                    
+                    $('.input-sm').eq(1).val($("#keyword").val().trim());                    
                 }
         })
         //search keyword (schoolname), exact match
         table.search(
-            $("#keyword").val(), true, false, true
+            $("#keyword").val().trim(), true, false, true
         ).draw();     
     });        
     </script>
