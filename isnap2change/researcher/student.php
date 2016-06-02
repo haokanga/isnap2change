@@ -3,8 +3,7 @@
     require_once("../connection.php");
     require_once("../debug.php");
     require_once("/researcher_validation.php");
-    $conn = db_connect();    
-    $columnName = array('StudentID','ClassName','Username','FirstName','LastName','Email','Gender','DOB','Score','SubmissionDate');
+    $conn = db_connect();
     
     //if update/insert/remove class
     if($_SERVER["REQUEST_METHOD"] == "POST"){
@@ -12,8 +11,8 @@
             $update = $_POST['update'];
             //update
             if($update == 0){
-                $studentID = $_POST['classid'];
-                $studentName = $_POST['classname'];
+                $classID = $_POST['classid'];
+                $className = $_POST['classname'];
                 $schoolName = $_POST['schoolname'];
                 $teacherToken = $_POST['teachertoken'];
                 $studentToken = $_POST['studenttoken'];
@@ -28,7 +27,7 @@
                     SET ClassName = ?, SchoolID = ?
                     WHERE ClassID = ?";			
                 $update_stmt = $conn->prepare($update_stmt);                            
-                if(! $update_stmt -> execute(array($studentName, $schoolResult->SchoolID, $studentID))){
+                if(! $update_stmt -> execute(array($className, $schoolResult->SchoolID, $classID))){
                     echo "<script language=\"javascript\">  alert(\"Error occurred to update class. Contact with developers.\"); </script>";
                 } else{
                 }
@@ -37,7 +36,7 @@
                     SET TokenString = ?
                     WHERE ClassID = ? AND `Type` = ?";			
                 $update_stmt = $conn->prepare($update_stmt);                            
-                if(! $update_stmt -> execute(array($teacherToken, $studentID, "TEACHER"))){
+                if(! $update_stmt -> execute(array($teacherToken, $classID, "TEACHER"))){
                     echo "<script language=\"javascript\">  alert(\"Error occurred to update teacherToken. Contact with developers.\"); </script>";
                 } else{
                 }
@@ -45,13 +44,13 @@
                     SET TokenString = ?
                     WHERE ClassID = ? AND `Type` = ?";			
                 $update_stmt = $conn->prepare($update_stmt);                            
-                if(! $update_stmt -> execute(array($studentToken, $studentID, "STUDENT"))){
+                if(! $update_stmt -> execute(array($studentToken, $classID, "STUDENT"))){
                     echo "<script language=\"javascript\">  alert(\"Error occurred to update studentToken. Contact with developers.\"); </script>";
                 } else{
                 }
             }
             else if($update == 1){  
-                $studentName = $_POST['classname'];
+                $className = $_POST['classname'];
                 $schoolName = $_POST['schoolname'];
                 $teacherToken = $_POST['teachertoken'];
                 $studentToken = $_POST['studenttoken'];
@@ -65,9 +64,9 @@
                 $update_stmt = "INSERT INTO Class(ClassName, SchoolID)
                      VALUES (?,?);";			
                 $update_stmt = $conn->prepare($update_stmt);         
-                $update_stmt -> execute(array($studentName, $schoolResult->SchoolID));
-                $studentID = $conn -> lastInsertId();
-                if($studentID <= 0){
+                $update_stmt -> execute(array($className, $schoolResult->SchoolID));
+                $classID = $conn -> lastInsertId();
+                if($classID <= 0){
                     echo "<script language=\"javascript\">  alert(\"Error occurred to insert class. Contact with developers.\"); </script>";
                 } else{
                 }
@@ -75,36 +74,64 @@
                 $update_stmt = "REPLACE INTO Token(ClassID, `Type`, TokenString)
                      VALUES (?,?,?);";			
                 $update_stmt = $conn->prepare($update_stmt);                            
-                if(! $update_stmt -> execute(array($studentID, "TEACHER", $teacherToken))){
+                if(! $update_stmt -> execute(array($classID, "TEACHER", $teacherToken))){
                     echo "<script language=\"javascript\">  alert(\"Error occurred to insert teacherToken. Contact with developers.\"); </script>";
                 } else{
                 }
                 $update_stmt = "REPLACE INTO Token(ClassID, `Type`, TokenString)
                      VALUES (?,?,?);";			
                 $update_stmt = $conn->prepare($update_stmt);                            
-                if(! $update_stmt -> execute(array($studentID, "STUDENT", $studentToken))){
+                if(! $update_stmt -> execute(array($classID, "STUDENT", $studentToken))){
                     echo "<script language=\"javascript\">  alert(\"Error occurred to insert studentToken. Contact with developers.\"); </script>";
                 } else{
                 }                
             }else if($update == -1){
-                $studentID = $_POST['classid'];
+                $classID = $_POST['classid'];
                 // remove class (with help of DELETE CASCADE) 
                 $update_stmt = "DELETE FROM Class WHERE ClassID = ?";			
                 $update_stmt = $conn->prepare($update_stmt);
-                if(! $update_stmt -> execute(array($studentID))){
+                if(! $update_stmt -> execute(array($classID))){
                     echo "<script language=\"javascript\">  alert(\"Error occurred to delete class/token. Contact with developers.\"); </script>";
                 } else{
                 } 
             }            
         }
-    }   
+    }
     
-    // get student
-    $studentSql = "SELECT StudentID, ClassName, Username, FirstName, LastName, Email, Gender, DOB, Score, DATE(SubmissionTime) AS SubmissionDate FROM Student NATURAL JOIN Class
-               ORDER BY ClassID";
-    $studentQuery = $conn->prepare($studentSql);
-    $studentQuery->execute();
-    $studentResult = $studentQuery->fetchAll(PDO::FETCH_OBJ);    
+    // get max week
+    $weekSql = "SELECT MAX(Week) AS WeekNum FROM Quiz";
+    $weekQuery = $conn->prepare($weekSql);
+    $weekQuery->execute();
+    $weekResult = $weekQuery->fetch(PDO::FETCH_OBJ);
+
+    // get school
+    $schoolSql = "SELECT SchoolName
+               FROM School";
+    $schoolQuery = $conn->prepare($schoolSql);
+    $schoolQuery->execute();
+    $schoolResult = $schoolQuery->fetchAll(PDO::FETCH_OBJ);
+    
+    // get class
+    $classSql = "SELECT ClassID, ClassName, SchoolName, UnlockedProgress
+               FROM Class NATURAL JOIN School";
+    $classQuery = $conn->prepare($classSql);
+    $classQuery->execute();
+    $classResult = $classQuery->fetchAll(PDO::FETCH_OBJ);
+    
+    // get token
+    $tokenSql = "SELECT ClassID, `Type`, TokenString
+               FROM Token NATURAL JOIN Class";
+    $tokenQuery = $conn->prepare($tokenSql);
+    $tokenQuery->execute();
+    $tokenResult = $tokenQuery->fetchAll(PDO::FETCH_OBJ);    
+    
+    // get students number
+    $studentNumSql = "SELECT count(*) as Count, ClassID
+               FROM   Student NATURAL JOIN Class
+               GROUP BY ClassID";
+    $studentNumQuery = $conn->prepare($studentNumSql);
+    $studentNumQuery->execute();
+    $studentNumResult = $studentNumQuery->fetchAll(PDO::FETCH_OBJ);    
     
     db_close($conn); 
     
@@ -179,39 +206,36 @@
                         </div>
                         <!-- /.panel-heading -->
                         <div class="panel-body">
-                        <div>
-                            Toggle column: 
                             <?php for($i=1; $i<count($columnName); $i++) {
                             if($columnName[$i] != 'Username'){ ?>
                                 <i class="fa fa-cog fa-fw"></i><a class="toggle-vis" data-column="<?php echo $i; ?>"><?php echo $columnName[$i]; ?></a>&nbsp;
                             <?php }
                             } ?>
-                            <br>
-                            <br>
-                        </div>
                             <div class="dataTable_wrapper">
-                                <table class="table table-striped table-bordered table-hover" id="datatables" >
+                                <table class="table table-striped table-bordered table-hover" id="datatables">
                                     <thead>
                                         <tr>
-                                        <?php for($i=0; $i<count($columnName); $i++) {
-                                            if ($i==0){?>
-                                            <th style="display:none"><?php echo $columnName[$i]; ?></th>
-                                            <?php } else {?>                                            
-                                            <th><?php echo $columnName[$i]; ?></th>
-                                        <?php }
-                                        }?>                                            
+                                            <th style="display:none">StudentID</th>
+                                            <th>UserName</th>
+                                            <th>Password</th>
+                                            <th>Nickname</th>                                            
+                                            <th>StudentToken</th>
+                                            <th>EnrolledStudents</th>
+                                            <th>UnlockedProgress</th>
                                         </tr>
                                     </thead>
                                     <tbody>
-                                    <?php for($i=0; $i<count($studentResult); $i++) {?>
+                                    <?php for($i=0; $i<count($classResult); $i++) {?>
                                         <tr class="<?php if($i % 2 == 0){echo "odd";} else {echo "even";} ?>">
-                                        <?php for($j=0; $j<count($columnName); $j++) {?>
+                                            <td style="display:none"><?php echo $classResult[$i]->ClassID ?></td>
                                         <td <?php if ($j==0) echo 'style="display:none"'; ?>><?php echo $studentResult[$i]->$columnName[$j]; ?>
                                         <?php if ($j==2) echo '<span class="glyphicon glyphicon-remove pull-right" aria-hidden="true"></span><span class="pull-right" aria-hidden="true">&nbsp;</span><span class="glyphicon glyphicon-edit pull-right" data-toggle="modal" data-target="#dialog" aria-hidden="true"></span>'; ?>
                                         </td>
-                                        <?php } ?>    
+                                            <td><?php for($j=0; $j<count($tokenResult); $j++){ if ($tokenResult[$j]->ClassID == $classResult[$i]->ClassID && $tokenResult[$j]->Type == 'STUDENT') echo $tokenResult[$j]->TokenString;} ?></td>
+                                            <td><?php $count=0; for($j=0; $j<count($studentNumResult); $j++){ if ($studentNumResult[$j]->ClassID == $classResult[$i]->ClassID) $count=$studentNumResult[$j]->Count; } echo $count; ?></td>
+                                            <td><?php echo min($classResult[$i]->UnlockedProgress, $weekResult->WeekNum)."/".$weekResult->WeekNum ?><span class="glyphicon glyphicon-remove pull-right" aria-hidden="true"></span><span class="pull-right" aria-hidden="true">&nbsp;</span><span class="glyphicon glyphicon-edit pull-right" data-toggle="modal" data-target="#dialog" aria-hidden="true"></span></td>
                                         </tr>
-                                    <?php } ?> 
+                                    <?php } ?>    
                                     </tbody>
                                 </table>
                             </div>
@@ -219,10 +243,10 @@
                             <div class="well row">
                                 <h4>Class Overview Notification</h4>
                                 <div class="alert alert-info">
-                                    <p>View students by filtering or searching. You can <strong>reset student password</strong> or delete students.</p>
+                                    <p>Navigate classes by filtering or searching. You can create/update/delete any class.</p>
                                 </div>
                                 <div class="alert alert-danger">
-                                    <p><strong>Reminder</strong> : If you remove one student. All the data of this student will also get deleted (not recoverable).</p>
+                                    <p><strong>Reminder</strong> : If you remove one class. All the student data in this class will also get deleted (not recoverable).</p>
                                 </div>
                             </div>
                         </div>
@@ -326,15 +350,9 @@
         //search keyword (schoolname), exact match
         table.search(
             $("#keyword").val(), true, false, true
-        ).draw();
-
-        $('a.toggle-vis').on( 'click', function (e) {
+        ).draw();     
             e.preventDefault();     
-            // Get the column API object
             var column = table.column( $(this).attr('data-column') );     
-            // Toggle the visibility
-            column.visible( ! column.visible() );
-        } );
         //hide FirstName LastName Email
         var hiddenColArray=['FirstName','LastName','Email'] 
         $('a.toggle-vis').each(function() {
