@@ -431,21 +431,23 @@
                         <span style="font-size:13px;">Back to Top</span>
                     </div>
                 </div> 
-                <nav class="navbar navbar-inverse navbar-fixed-bottom">
-                    <div class="container">
+                <div class="footer">
+                    <div class="containter">
                         <div class="navbar-collapse collapse">
-                            <ul class="nav navbar-nav">
-                                <li class="active">
-                                    <a class="navbar-brand" href="#">
-                                        <img alt="Brand" src="css/image/Snap_Logo_Inverted.png" style="height: 100%;">
-                                    </a>
-                                </li>
-                                <li class="divider"></li>
-                                <li><span class="navbar-text navbar-right">Legal stuff - All rights reserved</span></li>
-                            </ul>
-                        </div>
+                        <ul class="nav navbar-nav">
+                            <li class="active">
+                                <a class="navbar-brand" href="#">
+                                    <img alt="Brand" src="css/image/Snap_Logo_Inverted.png" style="height: 100%;">
+                                </a>
+                            </li>
+                            <li class="divider"></li>
+                            <li><span class="navbar-text navbar-right">Legal stuff - All rights reserved</span></li>
+                        </ul>
+                       
                     </div>
-                </nav>
+                        
+                    </div>
+                </div>
             </div>
         </div>
     </body>
