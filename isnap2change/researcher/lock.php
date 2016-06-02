@@ -243,7 +243,7 @@
                             <div class="well row">
                                 <h4>Class Overview Notification</h4>
                                 <div class="alert alert-info">
-                                    <p>View classes by filtering or searching. You can create/update/delete any class.</p>
+                                    <p>Navigate classes by filtering or searching. You can create/update/delete any class.</p>
                                 </div>
                                 <div class="alert alert-danger">
                                     <p><strong>Reminder</strong> : If you remove one class. All the student data in this class will also get deleted (not recoverable).</p>
