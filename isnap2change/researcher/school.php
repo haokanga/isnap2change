@@ -2,7 +2,7 @@
     session_start();
     require_once("../connection.php");
     require_once("../debug.php");
-    require_once("/researcher_validation.php");
+    require_once("/researcher-validation.php");
     $conn = db_connect();
     $overviewName = "school";
     
@@ -166,7 +166,7 @@
                             <div class="well row">
                                 <h4>School Overview Notification</h4>
                                 <div class="alert alert-info">
-                                    <p>Navigate schools by filtering or searching. You can create/update/delete any school.</p>
+                                    <p>View schools by filtering or searching. You can create/update/delete any school.</p>
                                 </div>
                                 <div class="alert alert-danger">
                                     <p><strong>Reminder</strong> : If you remove one school. All the student data in this school will also get deleted (not recoverable).</p> It includes <strong>student information, their submissions of every task and your grading/feedback</strong>, not only the school itself.

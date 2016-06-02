@@ -2,7 +2,7 @@
 	session_start();
     require_once("../connection.php");
     require_once("../debug.php");
-    require_once("/researcher_validation.php");
+    require_once("/researcher-validation.php");
     $conn = db_connect();
     
     //if update/insert/remove class
@@ -238,7 +238,7 @@
                             <div class="well row">
                                 <h4>Class Overview Notification</h4>
                                 <div class="alert alert-info">
-                                    <p>Navigate classes by filtering or searching. You can create/update/delete any class.</p>
+                                    <p>View classes by filtering or searching. You can create/update/delete any class.</p>
                                 </div>
                                 <div class="alert alert-danger">
                                     <p><strong>Warning</strong> : If you remove one class. All the <strong>student data</strong> in this class will also get deleted (not recoverable).</p> It includes <strong>student information, their submissions of every task and your grading/feedback</strong>, not only the class itself.

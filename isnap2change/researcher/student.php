@@ -2,7 +2,7 @@
 	session_start();
     require_once("../connection.php");
     require_once("../debug.php");
-    require_once("/researcher_validation.php");
+    require_once("/researcher-validation.php");
     $conn = db_connect();    
     $columnName = array('StudentID','ClassName','Username','FirstName','LastName','Email','Gender','DOB','Score','SubmissionDate');
     
@@ -152,7 +152,7 @@
                             </div>
                             <!-- /.table-responsive -->
                             <div class="well row">
-                                <h4>Class Overview Notification</h4>
+                                <h4>Student Overview Notification</h4>
                                 <div class="alert alert-info">
                                     <p>View students by filtering or searching. You can <strong>reset student password</strong> or delete students.</p>
                                 </div>

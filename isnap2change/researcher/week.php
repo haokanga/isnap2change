@@ -2,7 +2,7 @@
 	session_start();
     require_once("../connection.php");
     require_once("../debug.php");
-    require_once("/researcher_validation.php");    
+    require_once("/researcher-validation.php");    
     $conn = db_connect();
     $overviewName = "week";
     
@@ -142,7 +142,7 @@
                             <div class="well row">
                                 <h4>School Overview Notification</h4>
                                 <div class="alert alert-info">
-                                    <p>Navigate weeks by filtering or searching. You can create/delete any week.</p>
+                                    <p>View weeks by filtering or searching. You can create/delete any week.</p>
                                 </div>
                                 <div class="alert alert-warning">
                                     <p>If you need to add another week, you don't need to explictly add it in this page. Go to <a href="quiz.php">Quiz Overview</a> to add a new quiz with that week number can simply work.</p>
