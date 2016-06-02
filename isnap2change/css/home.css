@@ -8,88 +8,118 @@ and open the template in the editor.
     Author     : Shivangi
 */
 
-.start
-{ 
-    background: url('image/Chain_Fence.png') no-repeat center center fixed; 
-    -webkit-background-size: cover;
-    -moz-background-size: cover;
-    -o-background-size: cover;
-    background-size: cover;
-    height: 100vh;
-    width: 100%;
-}
 
 body
 {
     margin: 0px !important;
 }
 
-.pg2
-{
-     background: url('image/BG_1.png') no-repeat center center fixed; 
-    -webkit-background-size: cover;
-    -moz-background-size: cover;
-    -o-background-size: cover;
-    background-size: cover;
-    height: calc(100vh - 52px);
+.start
+{ 
+    height: 100vh;
     width: 100%;
-    
+    overflow: hidden; 
+    position: relative;
+    overflow-y: hidden;
+    max-height: 100vh; /* approximate max height */
+
+    transition-property: all;
+    transition-duration: .5s;
+    transition-timing-function: cubic-bezier(0, 1, 0.5, 1);
+
+
+}
+
+.start-closed
+{
+    max-height: 0px;
+}
+
+.start::before
+{
+    content: ' ';
+    position: fixed;   
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    background: url('image/Chain_Fence.png') no-repeat center center;
+    background-size: cover;
+    will-change: transform; 
+    z-index: -1;
+
+
+}
+
+.pg2
+{ 
+    height: 100vh;
+    width: 100%;
+    overflow: hidden; 
+    position: relative;
+    background: url('image/Crossing.png') no-repeat center center;
+    background-size: cover;
+    will-change: transform; 
+    z-index: -1;
 }
 
 .pg3
-{
-     background: url('image/BG_2.png') no-repeat center center fixed; 
-    -webkit-background-size: cover;
-    -moz-background-size: cover;
-    -o-background-size: cover;
-    background-size: cover;
-    height: calc(100vh - 52px);
+{ 
+    height: calc(100vh - 48px);
     width: 100%;
-    
+    overflow: hidden; 
+    position: relative;
+    background: url('image/BG_2.png') no-repeat center center;
+    background-size: cover;
+    will-change: transform; 
+    z-index: -1;
 }
 
 .pg4
-{
-    background: url('image/Crossing.png') no-repeat center center fixed; 
-    -webkit-background-size: cover;
-    -moz-background-size: cover;
-    -o-background-size: cover;
-    background-size: cover;
-    height: calc(100vh - 52px);
+{ 
+    height: calc(100vh - 48px);
     width: 100%;
-    
+    overflow: hidden; 
+    position: relative;
+    background: url('image/Crossing.png') no-repeat center center;
+    background-size: cover;
+    will-change: transform; 
+    z-index: -1;
 }
 
 .pg5
-{
-    background: url('image/BG_1.png') no-repeat center center fixed; 
-    -webkit-background-size: cover;
-    -moz-background-size: cover;
-    -o-background-size: cover;
-    background-size: cover;
-    height: calc(100vh - 52px);
+{ 
+    height: calc(100vh - 48px);
     width: 100%;
-    
+    overflow: hidden; 
+    position: relative;
+    background: url('image/BG_1.png') no-repeat center center;
+    background-size: cover;
+    will-change: transform; 
+    z-index: -1;
 }
 
 .pg6
-{
-     background: url('image/BG_2.png') no-repeat center center fixed; 
-    -webkit-background-size: cover;
-    -moz-background-size: cover;
-    -o-background-size: cover;
-    background-size: cover;
-    height: calc(100vh - 52px);
+{ 
+    height: calc(100vh - 48px);
     width: 100%;
-    
+    overflow: hidden; 
+    position: relative;
+    background: url('image/BG_2.png') no-repeat center center;
+    background-size: cover;
+    will-change: transform; 
+    z-index: -1;
 }
 
+
+/*
 #nav.affix {
-    position: fixed;
+    position: relative;
     top: 0;
     width: 100%;
     z-index:10;
 }
+*/
 
 .navbar
 {
@@ -108,6 +138,42 @@ body
     border-color: yellow !important;
     border-radius: 0 !important;
     margin-right: 15px;
+}
+
+.scroll-top {
+    position:fixed;
+    bottom:0;
+    right:6%;
+    z-index:100;
+    background: #f2f3f2;
+    font-size:24px;
+    border-top-left-radius:3px;
+    border-top-right-radius:3px;
+}
+.scroll-top a:link,.scroll-top a:visited {
+    color:#222;
+} 
+
+#nav.affix-top {
+    position: absolute;
+    top:0;
+    left:0;
+    z-index:10;
+    height:54px;
+    background-color:transparent;
+    border:0;
+    visibility: hidden;
+}
+
+#nav {
+    width: 100%;
+}
+
+#nav.affix {
+    position: fixed;
+    top: 0;
+    z-index:10;
+    -webkit-transition: all .6s ease-in-out;
 }
 
 .footer {

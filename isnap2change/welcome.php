@@ -12,6 +12,28 @@
 	$leaderboardQuery->execute(array());
 	$leaderboardRes = $leaderboardQuery->fetchAll(PDO::FETCH_OBJ);
 	
+	$topicSql = "SELECT DISTINCT TopicID
+				 FROM FACT;";
+	
+	$topicQuery = $conn->prepare($topicSql);
+	$topicQuery->execute(array());
+	$topicRes = $topicQuery->fetchAll(PDO::FETCH_OBJ);
+	
+	$topicArr = array();
+	
+	foreach($topicRes as $singleTopic) {
+		array_push($topicArr, $singleTopic->TopicID);
+	}
+	
+	$randKeys = array_rand($topicArr, 3);
+	
+	$factSql = "SELECT *
+				FROM FACT NATURAL JOIN Topic
+				WHERE TopicID = ?;";
+				
+	$factQuery = $conn->prepare($factSql);
+	
+	
 ?>
 
 <html>
@@ -32,21 +54,22 @@
 
                 $('#nav').affix({
                     offset: {
-                        top: $('header').height()
+                        top: $('header').height() - $('#nav').height()
                     }
                 });
 
-                /* var topOfPg1 = ($("#1").offset().top) / 3;
-                 
-                 $(window).scroll(function () {
-                 if ($(window).scrollTop() > topOfPg1)
-                 {
-                 $('html, body').animate({
-                 scrollTop: $("#2").offset().top + 'px'
-                 }, 1000, 'swing');
-                 }
-                 });  */
-            });
+                $('body').scrollspy({target: '#nav'});
+
+                $('.scroll-top').click(function () {
+                    $('body,html').animate({scrollTop: 0}, 1000);
+                });
+
+                /* smooth scrolling for nav sections */
+                $('#nav .navbar-nav li>a').click(function () {
+                    var link = $(this).attr('href');
+                    var posi = $(link).offset().top;
+                    $('body,html').animate({scrollTop: posi}, 700);
+                });  });
 			
 			<!--Twitter widgets.js -->
 			window.twttr = (function(d, s, id) {
@@ -79,23 +102,18 @@
 		  fjs.parentNode.insertBefore(js, fjs);
 		}(document, 'script', 'facebook-jssdk'));</script>
 	
-        <header class="masthead" id="1">
-            <div class="start">
-                <div class="logo" style="display:flex;justify-content:center;align-items:center;width:100%;height:70%;">
-                    <img src="css/image/Snap_Logo_Inverted.png" alt="SNAP" style="width:50%;height:68%;">
-                </div>
-                <div class="tagline" style="color: white; font-size: 2em; display:flex;justify-content:center;align-items:center; margin-top:35px;">
-                    To Inspire A Healthier You.
-                </div>
+        <header class="start" id="1">
+            <div class="logo" style="display:flex;justify-content:center;align-items:center;width:100%;height:70%;">
+                <img src="css/image/Snap_Logo_Inverted.png" alt="SNAP" style="width:50%;height:68%;">
+            </div>
+            <div class="tagline" style="color: white; font-size: 2em; display:flex;justify-content:center;align-items:center; margin-top:35px;">
+                To Inspire A Healthier You.
+            <!--    <input type="image" src="css/image/Refresh.png" name="saveForm" class="btTxt" id="scrollDown" style="border: none;" />  -->
             </div>
         </header>
 
-        <!-- Page 2 -->
-
-        <!-- Begin Navbar -->
-        <div id="nav">
-            <div class="navbar navbar-inverse navbar-static">
-                <div class="container">
+        <nav class="navbar navbar-inverse navbar-static-top" id="nav">
+            <div class="container">
                     <!-- .btn-navbar is used as the toggle for collapsed navbar content -->
                     <a class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
                         <span class="glyphicon glyphicon-bar"></span>
@@ -125,12 +143,11 @@
                         </ul>
                     </div>		
                 </div>
-            </div><!-- /.navbar -->
-        </div>
+        </nav>
 
         <div class="pg2" id="2">
-            <div class="pg2_div">
-                <div class="col-xs-4 col-xs-offset-2" style="margin-top:3%;">
+            <div class="pg2_div" style="margin-top:5%;">
+                <div class="col-xs-4 col-xs-offset-2">
                     <div class="panel" style="background-color:black; border-radius:30px;">
                         <div class="panel-body" style="padding: 0px;">
                             <div class="col-xs-2">
@@ -211,7 +228,7 @@
                     </div>
 
                 </div>
-                <div class="col-xs-4" style="background-color: black; margin-top:3%; padding-right:0px; padding-left:0px; padding-bottom:0px;">
+                <div class="col-xs-4" style="background-color: black; padding-right:0px; padding-left:0px; padding-bottom:0px;">
                     <div class="scoreboard">
                         <h3 style="text-align:center; color:white;">SNAP Leaderboard </h3>
                         <table class="table table-hover" style="background-color:white;">					
@@ -257,47 +274,58 @@
             </div> 
             <div class="facts" style="width:100%; margin-top:3%;">
                 <div class="row" style="margin-left:0px; margin-right:0px;">
+		<?php	for($i = 0; $i < 3; $i++) {
+					echo '<script>console.log('.$topicArr[$randKeys[$i]].')</script>';
+					//echo '<script>'.$topicArr[$randKeys[$i]].'</script>';
+					$factQuery->execute(array($topicArr[$randKeys[$i]]));
+					$factRes = $factQuery->fetchAll(PDO::FETCH_OBJ);
+					//array_rand($factRes);
+					$randFactKey = array_rand($factRes, 1);	?>
+					
                     <div class="col-xs-4 fact1">
                         <div class="row" style="margin-left:0px; margin-right:0px;">
                             <div class="col-xs-2">
-                                <img src="css/image/Icon_Placeholder.png" style="">
+								<?php 
+									switch($factRes[$randFactKey]->TopicID) {
+										case 1: 
+											echo '<img src="css/image/Icon_Placeholder.png" style="">';
+											break;
+										case 2:
+											echo  '<img src="css/image/Star_Icon.png" style="">';
+											break;
+										case 3:
+											echo  '<img src="css/image/Star_Icon.png" style="">';
+											break;
+										case 4:
+										    echo  '<img src="css/image/Star_Icon.png" style="">';
+											break;
+										default:
+											echo  '<img src="css/image/Star_Icon.png" style="">';
+											break;
+								} ?>  
                             </div>
                             <div class="col-xs-9 col-xs-offset-1">
-                                <h4 style="color:rgb(252,238,045); border: 0px solid rgb(252,238,045); border-bottom-color: rgb(252,238,045); border-bottom-width: 4px;">
-                                    SMOKING FACT #23</h4>
-                                <p style="color:white;">Tobacco smoking is one of the largest causes of preventable illness and death in Australia. Research estimates that two in three lifetime smokers will die from a disease caused by their smoking. The most recent estimate of deaths caused by tobacco in Australia is for the financial year 2004–05. Tobacco use caused a total of 14,901 deaths in that year.  </p>
+								<?php 
+									if($i == 0) {
+										echo '<h4 style="color:rgb(252,238,045); border: 0px solid rgb(252,238,045); border-bottom-color: rgb(252,238,045); border-bottom-width: 4px;">';
+									}
+									
+									if($i == 1) {
+										echo '<h4 style="color:rgb(54,232,197); border: 0px solid rgb(54,232,197); border-bottom-color: rgb(54,232,197); border-bottom-width: 4px;">';
+									}
+									
+									if($i == 2) {
+										echo ' <h4 style="color:rgb(247,117,030); border: 0px solid rgb(247,117,030); border-bottom-color: rgb(247,117,030); border-bottom-width: 4px;">';
+									}									
+								        echo $factRes[$randFactKey]->TopicName." FACT #".$factRes[$randFactKey]->FactID;
+										echo '</h4>';
+								?>
+                            
+                                <p style="color:white;"><?php echo $factRes[$randFactKey]->Content; ?></p>
                             </div>
                         </div>   
-
                     </div>
-                    <div class="col-xs-4 fact2">
-                        <div class="row" style=" margin-left:0px; margin-right:0px;">
-                            <div class="col-xs-2">
-                                <img src="css/image/Star_Icon.png" style="">
-                            </div>
-                            <div class="col-xs-9 col-xs-offset-1">
-                                <h4 style="color:rgb(54,232,197); border: 0px solid rgb(54,232,197); border-bottom-color: rgb(54,232,197); border-bottom-width: 4px;">
-                                    DRUG FACT #15</h4>
-                                <p style="color:white;">Tobacco smoking is one of the largest causes of preventable illness and death in Australia. Research estimates that two in three lifetime smokers will die from a disease caused by their smoking. The most recent estimate of deaths caused by tobacco in Australia is for the financial year 2004–05. Tobacco use caused a total of 14,901 deaths in that year.  </p>
-
-                            </div>
-                        </div>   
-
-                    </div>
-                    <div class="col-xs-4 fact3">
-                        <div class="row" style="margin-left:0px; margin-right:0px;">
-                            <div class="col-xs-2">
-                                <img src="css/image/Star_Icon.png" style="">
-                            </div>
-                            <div class="col-xs-9 col-xs-offset-1">
-                                <h4 style="color:rgb(247,117,030); border: 0px solid rgb(247,117,030); border-bottom-color: rgb(247,117,030); border-bottom-width: 4px;">
-                                    NUTRITION FACT #9</h4>
-                                <p style="color:white;">Tobacco smoking is one of the largest causes of preventable illness and death in Australia. Research estimates that two in three lifetime smokers will die from a disease caused by their smoking. The most recent estimate of deaths caused by tobacco in Australia is for the financial year 2004–05. Tobacco use caused a total of 14,901 deaths in that year.  </p>
-
-                            </div>
-                        </div>   
-
-                    </div>
+		<?php 	}  ?>			
                 </div>
             </div>
             <div class="pg3_footer" style="display:flex;justify-content:center;align-items:center;width:100%;height:20%; margin-top:3%; font-family:'Museo Sans';">

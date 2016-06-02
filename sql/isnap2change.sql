@@ -636,6 +636,17 @@ UPDATE `isnap2changedb`.`student` SET `SubmissionTime`='2016-06-01 14:49:43' WHE
 UPDATE `isnap2changedb`.`student` SET `SubmissionTime`='2016-06-07 14:48:43' WHERE `StudentID`='5';
 UPDATE `isnap2changedb`.`student` SET `SubmissionTime`='2016-06-11 14:48:43' WHERE `StudentID`='6';
 
+# [Example] insert facts
+INSERT INTO `isnap2changedb`.`fact` (`Content`, `TopicID`) VALUES ('Each day, more than 3,200 people under 18 smoke their first cigarette, and approximately 2,100 youth and young adults become daily smokers.', '1');
+INSERT INTO `isnap2changedb`.`fact` (`Content`, `TopicID`) VALUES ('Nearly 9 out of 10 lung cancers are caused by smoking. Smokers today are much more likely to develop lung cancer than smokers were in 1964.', '1');
+INSERT INTO `isnap2changedb`.`fact` (`Content`, `TopicID`) VALUES ('A large part of the population is Omega-3 deficient. Avoiding a deficiency in these essential fatty acids can help prevent many diseases.', '2');
+INSERT INTO `isnap2changedb`.`fact` (`Content`, `TopicID`) VALUES ('Trans Fats are chemically processed fats that cause all sorts of damage in the body. You should avoid them like the plague.', '2');
+INSERT INTO `isnap2changedb`.`fact` (`Content`, `TopicID`) VALUES ('Excessive alcohol use is responsible for 2.5 million years of potential life lost annually, or an average of about 30 years of potential life lost for each death', '3');
+INSERT INTO `isnap2changedb`.`fact` (`Content`, `TopicID`) VALUES ('Up to 40% of all hospital beds in the United States (except for those being used by maternity and intensive care patients) are being used to treat health conditions that are related to alcohol consumption', '3');
+INSERT INTO `isnap2changedb`.`fact` (`Content`, `TopicID`) VALUES ('People aged 18-64 years old should exercice at least 150 min per week at least, each of the session lasting 10 min as a minimum,', '4');
+INSERT INTO `isnap2changedb`.`fact` (`Content`, `TopicID`) VALUES ('Supportive environments and communities may help people to be more physically active.', '4');
+
+
 /*
 #TEST
 
