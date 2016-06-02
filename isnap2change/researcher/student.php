@@ -175,15 +175,17 @@
                 <div class="col-lg-12">
                     <div class="panel panel-default">
                         <div class="panel-heading">
-                            Student Information Table <span class="glyphicon glyphicon-plus pull-right" data-toggle="modal" data-target="#dialog"></span>
+                            Student Information Table
                         </div>
                         <!-- /.panel-heading -->
                         <div class="panel-body">
                         <div>
                             Toggle column: 
-                            <?php for($i=1; $i<count($columnName); $i++) {?>
-                            <i class="fa fa-cog fa-fw"></i><a class="toggle-vis" data-column="<?php echo $i; ?>"><?php echo $columnName[$i]; ?></a>&nbsp;
-                            <?php } ?>
+                            <?php for($i=1; $i<count($columnName); $i++) {
+                            if($columnName[$i] != 'Username'){ ?>
+                                <i class="fa fa-cog fa-fw"></i><a class="toggle-vis" data-column="<?php echo $i; ?>"><?php echo $columnName[$i]; ?></a>&nbsp;
+                            <?php }
+                            } ?>
                             <br>
                             <br>
                         </div>
@@ -244,34 +246,23 @@
           <div class="modal-content">
             <div class="modal-header">
               <button type="button" class="close" data-dismiss="modal">&times;</button>
-              <h4 class="modal-title" id="dialogTitle">Edit Class</h4>
+              <h4 class="modal-title" id="dialogTitle">Reset Password</h4>
             </div>
             <div class="modal-body">
             <form id="submission" method="post" action="<?php echo $_SERVER['PHP_SELF']; ?>">
-                <!--if 1, insert; else if 0 update; else if -1 delete;-->
-                <input type=hidden name="update" id="update" value="1"></input>
-                <label for="ClassID" style="display:none">ClassID</label>
-                <input type="text" class="form-control dialoginput" id="ClassID" name="classid" style="display:none">
-                <br><label for="ClassName">ClassName</label>
-                <input type="text" class="form-control dialoginput" id="ClassName" name="classname" required>
-                <br><label for="SchoolName">SchoolName</label>
-                <select class="form-control dialoginput" id="SchoolName" form="submission" name="schoolname" required>
-                  <?php for($i=0; $i<count($schoolResult); $i++) {?>                  
-                  <option value="<?php echo $schoolResult[$i]->SchoolName ?>"><?php echo $schoolResult[$i]->SchoolName ?></option>
-                  <?php } ?>
-                </select>                
-                <br><label for="TeacherToken">TeacherToken</label><span class="glyphicon glyphicon-random pull-right"></span>
-                <input type="text" class="form-control dialoginput" id="TeacherToken" name="teachertoken" required></input>
-                <br><label for="StudentToken">StudentToken</label><span class="glyphicon glyphicon-random pull-right"></span>
-                <input type="text" class="form-control dialoginput" id="StudentToken" name="studenttoken" required></input>
-                <br><label for="EnrolledStudents">EnrolledStudents</label>
-                <input type="text" class="form-control dialoginput" id="EnrolledStudents" name="EnrolledStudents">
-                <br><label for="UnlockedProgress">UnlockedProgress</label>
-                <input type="text" class="form-control dialoginput" id="UnlockedProgress" name="UnlockedProgress">
+                <!--if 0 update; else if -1 delete;-->
+                <input type=hidden name="update" id="update" value="1"></input>                
+                <?php for($i=0; $i<count($columnName); $i++) {
+                    if($columnName[$i] == 'StudentID' || $columnName[$i] == 'Username'){?>
+                    <label for="<?php echo $columnName[$i]; ?>" <?php if ($i==0){ echo 'style="display:none"';} ?>><?php echo $columnName[$i]; ?></label>
+                    <input type="text" class="form-control dialoginput" id="<?php echo $columnName[$i]; ?>" name="<?php echo strtolower($columnName[$i]); ?>"  
+                    <?php if ($i==0){ echo 'style="display:none"';} ?>>
+                <?php } 
+                }?>
             </form>
             </div>
             <div class="modal-footer">            
-              <button type="button" id="btnSave" class="btn btn-default">Save</button>
+              <button type="button" id="btmResetPwd" class="btn btn-default">Reset Password</button>
               <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
             </div>
           </div>          
@@ -304,49 +295,22 @@
     }
     //DO NOT put them in $(document).ready() since the table has multi pages
     $('.glyphicon-edit').on('click', function (){
-        $('#dialogTitle').text("Edit Class");
         $('#update').val(0);
-        for(i=0;i<$('.dialoginput').length;i++){                
-            $('.dialoginput').eq(i).val($(this).parent().parent().children('td').eq(i).text());
-        }
-        //disable ClassID, EnrolledStudents, UnlockedProgress
-        $('.dialoginput').eq(0).attr('disabled','disabled');
-        $('.dialoginput').eq(5).attr('disabled','disabled');
-        $('.dialoginput').eq(6).attr('disabled','disabled');          
+        $('.dialoginput').eq(1).val($(this).parent().text());
     });
-    $('.glyphicon-plus').on('click', function (){
-        $('#dialogTitle').text("Add Class");
-        $('#update').val(1);
-        for(i=0;i<$('.dialoginput').length;i++){                
-            $('.dialoginput').eq(i).val('');
-        }
-        //disable ClassID, EnrolledStudents, UnlockedProgress
-        $('.dialoginput').eq(0).attr('disabled','disabled');
-        $('.dialoginput').eq(5).attr('disabled','disabled');    
-        $('.dialoginput').eq(6).attr('disabled','disabled');         
-    }); 
     $('.glyphicon-remove').on('click', function (){
         if (confirm('[WARNING] Are you sure to remove this class? All the student data in this class will also get deleted (not recoverable).')) {
-            $('#update').val(-1);
-            //fill required input
-            $('.dialoginput').eq(0).prop('disabled',false);
-            for(i=0;i<$('.dialoginput').length;i++){                
-                $('.dialoginput').eq(i).val($(this).parent().parent().children('td').eq(i).text());
-            }
-            $('#submission').submit();
+            $('#update').val(-1);            
+            //$('.dialoginput').eq(1).val($(this).parent().text());
+            //$('#submission').submit();
         }           
     });
-     $('.glyphicon-random').on('click', function (){
-        var index = $(this).index();
-        if (index == $("#TeacherToken").index() - 1)
-            $('#TeacherToken').val(randomString(16)); 
-        else if (index == $("#StudentToken").index() - 1)
-            $('#StudentToken').val(randomString(16));
-    });
-    $('#btnSave').on('click', function (){
+    $('#btmResetPwd').on('click', function (){
         $('#submission').validate();        
-        //enable ClassID and EnrolledStudents
-        $('.dialoginput').eq(0).prop('disabled',false);
+        //enable all the input
+        $('.dialoginput').each(function() {
+            $( this ).prop('disabled',false);
+        });
         $('#submission').submit();
     });
     //include html
@@ -371,10 +335,12 @@
             // Toggle the visibility
             column.visible( ! column.visible() );
         } );
-        $('a.toggle-vis').eq(2).click();
-        $('a.toggle-vis').eq(3).click();
-        $('a.toggle-vis').eq(4).click();
-        
+        //hide FirstName LastName Email
+        var hiddenColArray=['FirstName','LastName','Email'] 
+        $('a.toggle-vis').each(function() {
+            if(jQuery.inArray( $(this).text(), hiddenColArray )!= -1)
+                $( this ).click();
+        });        
     });        
     </script>
 </body>
