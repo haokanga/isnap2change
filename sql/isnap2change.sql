@@ -100,7 +100,11 @@ CREATE TABLE IF NOT EXISTS `Researcher` (
 CREATE TABLE IF NOT EXISTS `Fact` (
     FactID MEDIUMINT AUTO_INCREMENT,
     Content TEXT,
-    CONSTRAINT Fact_FactID_PK PRIMARY KEY (FactID)
+    TopicID MEDIUMINT,
+    CONSTRAINT Fact_FactID_PK PRIMARY KEY (FactID),
+    CONSTRAINT Fact_TopicID_FK FOREIGN KEY (TopicID)
+        REFERENCES Topic (TopicID)
+        ON DELETE CASCADE ON UPDATE CASCADE
 )  ENGINE=INNODB;
 
 CREATE TABLE IF NOT EXISTS `Topic` (
@@ -619,6 +623,18 @@ INSERT IGNORE INTO Bonus(Week) VALUES(3);
 SET @BONUS_LAST_INSERT_ID = LAST_INSERT_ID();
 INSERT IGNORE INTO Bonus_Task(Question, Points, BonusID) VALUES('Attend a football game', 10, @BONUS_LAST_INSERT_ID);
 
+# [Example] update Submission time
+UPDATE `isnap2changedb`.`student` SET `Score`='80' WHERE `StudentID`='10';
+UPDATE `isnap2changedb`.`student` SET `Score`='70', `SubmissionTime`='2016-06-05 14:48:43' WHERE `StudentID`='12';
+UPDATE `isnap2changedb`.`student` SET `Score`='70', `SubmissionTime`='2016-06-05 14:48:43' WHERE `StudentID`='8';
+UPDATE `isnap2changedb`.`student` SET `Score`='20' WHERE `StudentID`='14';
+UPDATE `isnap2changedb`.`student` SET `Score`='70', `SubmissionTime`='2016-06-01 14:48:42' WHERE `StudentID`='16';
+UPDATE `isnap2changedb`.`student` SET `Score`='10' WHERE `StudentID`='18';
+UPDATE `isnap2changedb`.`student` SET `SubmissionTime`='2016-06-02 14:48:43' WHERE `StudentID`='2';
+UPDATE `isnap2changedb`.`student` SET `SubmissionTime`='2016-06-03 14:48:43' WHERE `StudentID`='3';
+UPDATE `isnap2changedb`.`student` SET `SubmissionTime`='2016-06-01 14:49:43' WHERE `StudentID`='4';
+UPDATE `isnap2changedb`.`student` SET `SubmissionTime`='2016-06-07 14:48:43' WHERE `StudentID`='5';
+UPDATE `isnap2changedb`.`student` SET `SubmissionTime`='2016-06-11 14:48:43' WHERE `StudentID`='6';
 
 /*
 #TEST
