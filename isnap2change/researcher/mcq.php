@@ -127,7 +127,8 @@
                                             <td><?php echo $quizResult[$i]->Week ?></td>
                                             <td><?php echo $quizResult[$i]->TopicName ?></td>
                                             <td><?php echo getQuizPoints($quizResult[$i]->QuizID); ?></td>                                            
-                                            <td><?php echo $quizResult[$i]->Questions ?><span class="glyphicon glyphicon-remove pull-right" aria-hidden="true"></span><span class="pull-right" aria-hidden="true">&nbsp;</span><a href="mcq-viewer.php?quizid=<?php echo $quizResult[$i]->QuizID ?>"><span class="glyphicon glyphicon-edit pull-right" data-toggle="modal" data-target="#dialog" aria-hidden="true"></span></a></td>
+                                            <td><?php echo $quizResult[$i]->Questions ?><span class="glyphicon glyphicon-remove pull-right" aria-hidden="true"></span><span class="pull-right" aria-hidden="true">&nbsp;</span><a href="mcq-viewer.php?quizid=<?php echo $quizResult[$i]->QuizID ?>"><span class="glyphicon glyphicon-edit pull-right" aria-hidden="true"></span></a></td>
+                                            <!-- data-toggle="modal" data-target="#dialog" -->
                                         </tr>
                                     <?php } ?>    
                                     </tbody>
