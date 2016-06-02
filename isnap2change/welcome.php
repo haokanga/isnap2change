@@ -1,12 +1,16 @@
 <?php
 	require_once('connection.php');
 	
-	$materialPreSql = "SELECT COUNT(*) 
-					   FROM   Learning_Material
-					   WHERE  QuizID = ?";
+	$conn = db_connect();
+	
+	$leaderboardSql = "SELECT Username, Score
+					   FROM Student
+					   ORDER BY Score DESC, SubmissionTime 
+					   Limit 10;";
 							
-	$materialPreQuery = $conn->prepare($materialPreSql);
-	$materialPreQuery->execute(array($quizid));
+	$leaderboardQuery = $conn->prepare($leaderboardSql);
+	$leaderboardQuery->execute(array());
+	$leaderboardRes = $leaderboardQuery->fetchAll(PDO::FETCH_OBJ);
 	
 ?>
 
@@ -43,10 +47,38 @@
                  }
                  });  */
             });
+			
+			<!--Twitter widgets.js -->
+			window.twttr = (function(d, s, id) {
+			var js, fjs = d.getElementsByTagName(s)[0],
+					  t = window.twttr || {};
+			if (d.getElementById(id)) return t;
+			js = d.createElement(s);
+			js.id = id;
+			js.src = "https://platform.twitter.com/widgets.js";
+			fjs.parentNode.insertBefore(js, fjs);
+			 
+			t._e = [];
+			t.ready = function(f) {
+				t._e.push(f);
+		    };
+			 
+			  return t;
+			}(document, "script", "twitter-wjs"));
         </script>
 
     </head>
     <body>
+		 <!--Facebook Page Plugin JavaScript SDK -->
+		<div id="fb-root"></div>
+		<script>(function(d, s, id) {
+		  var js, fjs = d.getElementsByTagName(s)[0];
+		  if (d.getElementById(id)) return;
+		  js = d.createElement(s); js.id = id;
+		  js.src = "//connect.facebook.net/en_US/sdk.js#xfbml=1&version=v2.6&appId=909271749154924";
+		  fjs.parentNode.insertBefore(js, fjs);
+		}(document, 'script', 'facebook-jssdk'));</script>
+	
         <header class="masthead" id="1">
             <div class="start">
                 <div class="logo" style="display:flex;justify-content:center;align-items:center;width:100%;height:70%;">
@@ -182,55 +214,30 @@
                 <div class="col-xs-4" style="background-color: black; margin-top:3%; padding-right:0px; padding-left:0px; padding-bottom:0px;">
                     <div class="scoreboard">
                         <h3 style="text-align:center; color:white;">SNAP Leaderboard </h3>
-                        <table class="table table-hover" style="background-color:white;">
-                            <tr>
+                        <table class="table table-hover" style="background-color:white;">					
+		  <?php  for($i = 0; $i < count($leaderboardRes); $i++) { ?>
+							<tr>
+		  <?php			if($i == 0) { ?>
                                 <td style="font-size:27px;">
                                     <strong> 1st </strong>
-                                </td>
-                            </tr>
-                            <tr>
+                                </td>		
+		  <?php	   		} else if($i == 1) { ?>
                                 <td style="font-size:21px;">
-                                    <strong>    2nd </strong>
+                                    <strong> 2nd </strong>
                                 </td>
-                            </tr>
-                            <tr>
+		  <?php	   		} else if($i == 2) { ?>					
                                 <td style="font-size:19px;">
-                                    <strong>  3rd </strong>
+                                    <strong> 3rd </strong>
                                 </td>
-                            </tr>
-                            <tr>
-                                <td>
+		  <?php		  	} else { ?>
+								<td>
                                     4th
                                 </td>
+		 <?php		  	} ?>				
+								<td> <?php echo $leaderboardRes[$i]->Username ?> </td>
+								<td> <?php echo $leaderboardRes[$i]->Score ?> </td>
                             </tr>
-                            <tr>
-                                <td>
-                                    5th
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>
-                                    6th
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>
-                                    7th
-                                </td>
-                            </tr><tr>
-                                <td>
-                                    8th
-                                </td>
-                            </tr><tr>
-                                <td>
-                                    9th
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>
-                                    10th
-                                </td>
-                            </tr>
+		  <?php         } ?>
                         </table>
                     </div>
                 </div>
@@ -309,10 +316,14 @@
             <div class="social" style="width:100%; height:100%;">
                 <div class="row" style="margin-left:0px; margin-right:0px; align-content:center; height:100%;">
                     <div class="col-xs-4 col-xs-offset-2 social1" style="margin-top:4%; height:90%;">
-                        <img src="css/image/fbk.png" style="height: 90%; width:95%;">
+						    <div class="fb-page" data-width="400" data-height="500" data-href="https://www.facebook.com/cpuresearch" data-tabs="timeline, messages" data-small-header="true" data-adapt-container-width="true" data-hide-cover="false" data-show-facepile="true">
+								<div class="fb-xfbml-parse-ignore"><blockquote cite="https://www.facebook.com/cpuresearch"><a href="https://www.facebook.com/cpuresearch">CPU Research</a></blockquote></div>
+							</div>
+						
                     </div>
                     <div class="col-xs-4 social2" style="margin-top:4%; height:90%;">
-                        <img src="css/image/insta.png" style="height: 90%; width:95%;">
+                        <a class="twitter-timeline" data-width="400" data-height="500" href="https://twitter.com/CPUResearch" data-widget-id="732758309019607040">Tweets by @CPUResearch</a>
+						<script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+"://platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
                     </div>
                 </div>
             </div>
