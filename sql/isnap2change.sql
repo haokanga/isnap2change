@@ -131,7 +131,7 @@ CREATE TABLE IF NOT EXISTS `Quiz` (
 CREATE TABLE IF NOT EXISTS `Quiz_Record` (
     QuizID MEDIUMINT,
     StudentID MEDIUMINT,    
-    `Status` ENUM('UNGRADED', 'GRADED') DEFAULT 'GRADED',
+    `Status` ENUM('UNSUBMITTED', 'UNGRADED', 'GRADED') DEFAULT 'GRADED',
     Score MEDIUMINT DEFAULT 0,
     CONSTRAINT Quiz_Record_PK PRIMARY KEY (QuizID , StudentID),
     CONSTRAINT Quiz_Record_QuizID_FK FOREIGN KEY (QuizID)
@@ -208,7 +208,7 @@ CREATE TABLE IF NOT EXISTS `SAQ_Section` (
 CREATE TABLE IF NOT EXISTS `SAQ_Question` (
     SAQID MEDIUMINT AUTO_INCREMENT,
     Question TEXT,
-    Points INT,
+    Points SMALLINT,
     QuizID MEDIUMINT,
     CONSTRAINT SAQ_Question_SAQID_PK PRIMARY KEY (SAQID),
     CONSTRAINT SAQ_Question_QuizID_FK FOREIGN KEY (QuizID)
@@ -221,7 +221,7 @@ CREATE TABLE IF NOT EXISTS `SAQ_Question_Record` (
     SAQID MEDIUMINT,
     Answer TEXT,
     Feedback TEXT,
-    Grading INT,
+    Grading SMALLINT,
     CONSTRAINT SAQ_Question_Record_PK PRIMARY KEY (StudentID , SAQID),
     CONSTRAINT SAQ_Question_Record_StudentID_FK FOREIGN KEY (StudentID)
         REFERENCES Student (StudentID)
@@ -280,7 +280,7 @@ CREATE TABLE IF NOT EXISTS `Poster_Record` (
     QuizID MEDIUMINT,
     ZwibblerDoc LONGTEXT,
     DataURL LONGTEXT,
-    Grading INT,
+    Grading SMALLINT,
     CONSTRAINT Poster_Record_Record_PK PRIMARY KEY (StudentID , QuizID),
     CONSTRAINT Poster_Record_Record_StudentID_FK FOREIGN KEY (StudentID)
         REFERENCES Student (StudentID)
@@ -333,7 +333,7 @@ CREATE TABLE IF NOT EXISTS `Bonus_Record` (
 CREATE TABLE IF NOT EXISTS `Bonus_Task` (
     BonusQuestionID MEDIUMINT AUTO_INCREMENT,
     Question TEXT,
-    Points INT,
+    Points SMALLINT,
     BonusID MEDIUMINT,
     CONSTRAINT Bonus_Task_BonusQuestionID_PK PRIMARY KEY (BonusQuestionID),
     CONSTRAINT Bonus_Task_BonusID_FK FOREIGN KEY (BonusID)
@@ -346,7 +346,7 @@ CREATE TABLE IF NOT EXISTS `Bonus_Task_Record` (
     BonusQuestionID MEDIUMINT,
     Answer TEXT,
     Feedback TEXT,
-    Grading INT,
+    Grading SMALLINT,
     CONSTRAINT Bonus_Task_Record_PK PRIMARY KEY (StudentID , BonusQuestionID),
     CONSTRAINT Bonus_Task_Record_StudentID FOREIGN KEY (StudentID)
         REFERENCES Student (StudentID)
