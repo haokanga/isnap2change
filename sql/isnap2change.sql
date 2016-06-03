@@ -27,6 +27,8 @@ DROP TABLE IF EXISTS `SAQ_Question_Record`;
 DROP TABLE IF EXISTS `Matching_Section`;
 DROP TABLE IF EXISTS `Matching_Question`;
 DROP TABLE IF EXISTS `Matching_Option`;
+DROP TABLE IF EXISTS `Poster_Section`;
+DROP TABLE IF EXISTS `Poster_Record`;
 DROP TABLE IF EXISTS `Game`;
 DROP TABLE IF EXISTS `Game_Record`;
 DROP TABLE IF EXISTS `Bonus`;
@@ -196,8 +198,11 @@ CREATE TABLE IF NOT EXISTS `MCQ_Question_Record` (
 )  ENGINE=INNODB;
 
 CREATE TABLE IF NOT EXISTS `SAQ_Section` (
-    QuizID MEDIUMINT AUTO_INCREMENT,
-    CONSTRAINT SAQ_Section_QuizID_PK PRIMARY KEY (QuizID)
+    QuizID MEDIUMINT,
+    CONSTRAINT SAQ_Section_QuizID_PK PRIMARY KEY (QuizID),
+    CONSTRAINT SAQ_Section_QuizID_FK FOREIGN KEY (QuizID)
+        REFERENCES Quiz (QuizID)
+        ON DELETE CASCADE ON UPDATE CASCADE
 )  ENGINE=INNODB;
 
 CREATE TABLE IF NOT EXISTS `SAQ_Question` (
@@ -257,6 +262,32 @@ CREATE TABLE IF NOT EXISTS `Matching_Option` (
     CONSTRAINT Matching_Option_OptionID_PK PRIMARY KEY (OptionID),
     CONSTRAINT Matching_Option_MatchingQuestionID_FK FOREIGN KEY (MatchingQuestionID)
         REFERENCES Matching_Question (MatchingQuestionID)
+        ON DELETE CASCADE ON UPDATE CASCADE
+)  ENGINE=INNODB;
+
+CREATE TABLE IF NOT EXISTS `Poster_Section` (
+    QuizID MEDIUMINT,
+    Question TEXT,
+    Points MEDIUMINT,
+    CONSTRAINT Poster_Section_QuizID_PK PRIMARY KEY (QuizID),
+    CONSTRAINT Poster_Section_QuizID_FK FOREIGN KEY (QuizID)
+        REFERENCES Quiz (QuizID)
+        ON DELETE CASCADE ON UPDATE CASCADE
+)  ENGINE=INNODB;
+
+CREATE TABLE IF NOT EXISTS `Poster_Record` (
+    StudentID MEDIUMINT,
+    QuizID MEDIUMINT,
+    ZwibblerDoc LONGTEXT,
+    DataURL LONGTEXT,
+    Grading INT,
+    Feedback TEXT,
+    CONSTRAINT Poster_Record_Record_PK PRIMARY KEY (StudentID , QuizID),
+    CONSTRAINT Poster_Record_Record_StudentID_FK FOREIGN KEY (StudentID)
+        REFERENCES Student (StudentID)
+        ON DELETE CASCADE ON UPDATE CASCADE,
+    CONSTRAINT Poster_Record_Record_QuizID_FK FOREIGN KEY (QuizID)
+        REFERENCES Poster_Section (QuizID)
         ON DELETE CASCADE ON UPDATE CASCADE
 )  ENGINE=INNODB;
 
