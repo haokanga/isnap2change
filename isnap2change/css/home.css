@@ -57,7 +57,7 @@ body
     width: 100%;
     overflow: hidden; 
     position: relative;
-    background: url('image/Crossing.png') no-repeat center center;
+    background: url('image/BG_1.png') no-repeat center center;
     background-size: cover;
     will-change: transform;  
     /* z-index: -1;  */

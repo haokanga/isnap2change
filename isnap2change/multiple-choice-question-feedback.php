@@ -15,8 +15,6 @@
 		
 	}
 	
-	$DEBUG_MODE = true;
-	require_once("connection.php");
 	if($_SERVER["REQUEST_METHOD"] == "POST"){
 		
 		if(isset($_POST['MCQIDArr']) && isset($_POST['answerArr']) && isset($_POST['quizid'])){
