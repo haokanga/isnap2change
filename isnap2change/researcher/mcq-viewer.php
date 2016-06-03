@@ -82,7 +82,7 @@
         $materialRes = $materialQuery->fetch(PDO::FETCH_OBJ);
 
         //get questions and options
-        $mcqSql = "SELECT MCQID, Question, Content
+        $mcqSql = "SELECT MCQID, Question, CorrectChoice, Content
 				   FROM   MCQ_Section NATURAL JOIN MCQ_Question
 								  NATURAL JOIN `Option`
 			       WHERE  QuizID = ?
@@ -90,7 +90,15 @@
 								
 		$mcqQuery = $conn->prepare($mcqSql);
 		$mcqQuery->execute(array($quizID));
-        $mcqResult = $mcqQuery->fetchAll(PDO::FETCH_OBJ);       
+        $mcqResult = $mcqQuery->fetchAll(PDO::FETCH_OBJ); 
+
+
+        //get max option num
+        
+        $optionNumSql = "SELECT MAX(OptionNum) FROM (SELECT COUNT(*) AS OptionNum FROM MCQ_Question natural JOIN `Option` WHERE QuizID = ? GROUP BY MCQID) AS OptionNumbTable;";								
+		$optionNumQuery = $conn->prepare($optionNumSql);
+		$optionNumQuery->execute(array($quizID));
+        $optionNumResult = $optionNumQuery->fetch(PDO::FETCH_OBJ); 
 	}   
     db_close($conn); 
     
@@ -268,13 +276,15 @@
                                         </tr>
                                     </thead>
                                     <tbody>
-                                    <?php for($i=0; $i<count($mcqResult); $i++) {?>
+                                        <?php for($i=0; $i<count($mcqResult); $i++) {?>
                                         <tr class="<?php if($i % 2 == 0){echo "odd";} else {echo "even";} ?>">
-                                            <td style="display:none"><?php echo $mcqResult[$i]->QuizID ?></td>
+                                            <td style="display:none"><?php echo $mcqResult[$i]->QuizID; ?></td>
                                             <td><?php echo $mcqResult[$i]->Question ?></td>
-                                            <td><?php echo $mcqResult[$i]->Content ?></td>
+                                            <td class ="<?php if ($mcqResult[$i]->Content == $mcqResult[$i]->CorrectChoice) {echo 'bg-success';} else {echo 'bg-danger';} ?>">
+                                                <?php echo $mcqResult[$i]->Content; ?>             
+                                            </td>
                                         </tr>
-                                    <?php } ?>    
+                                    <?php } ?>
                                     </tbody>
                                 </table>
                             </div>
