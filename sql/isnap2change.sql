@@ -281,7 +281,6 @@ CREATE TABLE IF NOT EXISTS `Poster_Record` (
     ZwibblerDoc LONGTEXT,
     DataURL LONGTEXT,
     Grading INT,
-    Feedback TEXT,
     CONSTRAINT Poster_Record_Record_PK PRIMARY KEY (StudentID , QuizID),
     CONSTRAINT Poster_Record_Record_StudentID_FK FOREIGN KEY (StudentID)
         REFERENCES Student (StudentID)
