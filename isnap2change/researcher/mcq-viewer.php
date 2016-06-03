@@ -6,8 +6,7 @@
     require_once("/get-quiz-points.php");	    
     $conn = db_connect();
     $overviewName = "quiz";
-    $columnName = array('QuizID','Week','TopicName','Points', 'Questions');
-    $mcqQuesColName = array('QuizID','Question','Content');     
+    $columnName = array('QuizID','Week','TopicName','Points', 'Questions');     
     //edit/delete quiz
     if($_SERVER["REQUEST_METHOD"] == "POST"){
         if(isset($_POST['update'])){                          
@@ -93,12 +92,19 @@
         $mcqResult = $mcqQuery->fetchAll(PDO::FETCH_OBJ); 
 
 
-        //get max option num
-        
-        $optionNumSql = "SELECT MAX(OptionNum) FROM (SELECT COUNT(*) AS OptionNum FROM MCQ_Question natural JOIN `Option` WHERE QuizID = ? GROUP BY MCQID) AS OptionNumbTable;";								
+        //get max option num        
+        $optionNumSql = "SELECT MAX(OptionNum) AS MaxOptionNum FROM (SELECT COUNT(*) AS OptionNum FROM MCQ_Question natural JOIN `Option` WHERE QuizID = ? GROUP BY MCQID) AS OptionNumbTable;";								
 		$optionNumQuery = $conn->prepare($optionNumSql);
 		$optionNumQuery->execute(array($quizID));
-        $optionNumResult = $optionNumQuery->fetch(PDO::FETCH_OBJ); 
+        $optionNumResult = $optionNumQuery->fetch(PDO::FETCH_OBJ);
+        /**
+        $mcqQuesColName[] = 'QuizID';
+        $mcqQuesColName[] = 'Question';
+        for($i=0; $i<$optionNumResult->MaxOptionNum; $i++) {
+            $mcqQuesColName[] = 'Option'.($i+1);
+        }
+        */
+        $mcqQuesColName = array('QuizID','Question','Option');
 	}   
     db_close($conn); 
     
@@ -270,7 +276,7 @@
                                             if ($i==0){?>
                                             <th style="display:none"><?php echo $mcqQuesColName[$i]; ?></th>
                                             <?php } else {?>                                            
-                                            <th><?php if($mcqQuesColName[$i]=='Content') echo 'Option'; else echo $mcqQuesColName[$i]; ?></th>
+                                            <th><?php echo $mcqQuesColName[$i]; ?></th>
                                         <?php }
                                         }?>
                                         </tr>
