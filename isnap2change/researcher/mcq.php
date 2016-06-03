@@ -3,71 +3,36 @@
     require_once("../connection.php");
     require_once("../debug.php");
     require_once("/researcher-validation.php");
+    require_once("/get-quiz-points.php");	    
     $conn = db_connect();
-    $overviewName = "school";
-    
-    //if update/insert/remove school
+    $overviewName = "quiz";
+    $columnName = array('QuizID','Week','TopicName','Points', 'Questions');    
+    //edit/delete quiz
     if($_SERVER["REQUEST_METHOD"] == "POST"){
         if(isset($_POST['update'])){                          
             $update = $_POST['update'];
             //update
             if($update == 0){
-                $schoolID = $_POST['schoolid'];
-                $schoolName = $_POST['schoolname'];
-                $update_stmt = "UPDATE School 
-                    SET SchoolName = ?
-                    WHERE SchoolID = ?";			
-                $update_stmt = $conn->prepare($update_stmt);                            
-                if(! $update_stmt -> execute(array($schoolName, $schoolID))){
-                    echo "<script language=\"javascript\">  alert(\"Error occurred to update ".$overviewName.". Contact with developers.\"); </script>";
-                } else{
-                }
+                
             }
-            // insert
-            else if($update == 1){ 
-                $schoolName = $_POST['schoolname'];                 
-                $update_stmt = "INSERT INTO School(SchoolName)
-                     VALUES (?);";			
-                $update_stmt = $conn->prepare($update_stmt);                
-                if(! $update_stmt -> execute(array($schoolName))){
-                    echo "<script language=\"javascript\">  alert(\"Error occurred to insert ".$overviewName.". Contact with developers.\"); </script>";
-                } else{
-                }             
-            }
-            // remove school (with help of DELETE CASCADE) 
-            else if($update == -1){
-                $schoolID = $_POST['schoolid'];
-                $update_stmt = "DELETE FROM School WHERE SchoolID = ?";			
+            else if($update == 1){  
+                $quizID = $_POST['quizid'];
+                $update_stmt = "DELETE FROM Quiz WHERE QuizID = ?";			
                 $update_stmt = $conn->prepare($update_stmt);
-                if(! $update_stmt -> execute(array($schoolID))){
-                    echo "<script language=\"javascript\">  alert(\"Error occurred to delete ".$overviewName.". Contact with developers.\"); </script>";
+                if(! $update_stmt -> execute(array($quizID))){
+                    echo "<script language=\"javascript\">  alert(\"Error occurred to delete quiz. Contact with developers.\"); </script>";
                 } else{
                 } 
             }            
         }
     }
-
-    // get school
-    $schoolSql = "SELECT SchoolID, SchoolName
-               FROM School";
-    $schoolQuery = $conn->prepare($schoolSql);
-    $schoolQuery->execute();
-    $schoolResult = $schoolQuery->fetchAll(PDO::FETCH_OBJ);
     
-    // get class
-    $classSql = "SELECT ClassID, ClassName, SchoolName
-               FROM Class NATURAL JOIN School";
-    $classQuery = $conn->prepare($classSql);
-    $classQuery->execute();
-    $classResult = $classQuery->fetchAll(PDO::FETCH_OBJ);
-    
-    // get class number
-    $classNumSql = "SELECT count(*) as Count, SchoolID
-               FROM School NATURAL JOIN Class
-               GROUP BY SchoolID";
-    $classNumQuery = $conn->prepare($classNumSql);
-    $classNumQuery->execute();
-    $classNumResult = $classNumQuery->fetchAll(PDO::FETCH_OBJ); 
+    // get quiz and topic
+    $quizSql = "SELECT QuizID, Week, TopicName, COUNT(*) AS Questions
+               FROM Quiz NATURAL JOIN Topic NATURAL JOIN MCQ_Section NATURAL JOIN MCQ_Question WHERE QuizType = 'MCQ' GROUP BY QuizID";
+    $quizQuery = $conn->prepare($quizSql);
+    $quizQuery->execute();
+    $quizResult = $quizQuery->fetchAll(PDO::FETCH_OBJ); 
     
     db_close($conn); 
     
@@ -129,7 +94,7 @@
         <div id="page-wrapper">
             <div class="row">
                 <div class="col-lg-12">
-                    <h1 class="page-header">School Overview</h1>
+                    <h1 class="page-header">Multiple Choice Quiz Overview</h1>
                 </div>
                 <!-- /.col-lg-12 -->
             </div>
@@ -138,25 +103,32 @@
                 <div class="col-lg-12">
                     <div class="panel panel-default">
                         <div class="panel-heading">
-                            School Information Table <span class="glyphicon glyphicon-plus pull-right" data-toggle="modal" data-target="#dialog"></span>
+                            Multiple Choice Quiz Information Table <span class="glyphicon glyphicon-plus pull-right" data-toggle="modal" data-target="#dialog"></span>
                         </div>
                         <!-- /.panel-heading -->
                         <div class="panel-body">
                             <div class="dataTable_wrapper">
-                                <table class="table table-striped table-bordered table-hover" id="dataTables-example">
+                                <table class="table table-striped table-bordered table-hover" id="datatables">
                                     <thead>
                                         <tr>
-                                            <th style="display:none">SchoolID</th>
-                                            <th>SchoolName</th>
-                                            <th>Classes</th>
+                                        <?php for($i=0; $i<count($columnName); $i++) {
+                                            if ($i==0){?>
+                                            <th style="display:none"><?php echo $columnName[$i]; ?></th>
+                                            <?php } else {?>                                            
+                                            <th><?php echo $columnName[$i]; ?></th>
+                                        <?php }
+                                        }?>
                                         </tr>
                                     </thead>
                                     <tbody>
-                                    <?php for($i=0; $i<count($schoolResult); $i++) {?>
+                                    <?php for($i=0; $i<count($quizResult); $i++) {?>
                                         <tr class="<?php if($i % 2 == 0){echo "odd";} else {echo "even";} ?>">
-                                            <td style="display:none"><?php echo $schoolResult[$i]->SchoolID ?></td>
-                                            <td><a href="class.php?schoolid=<?php echo $schoolResult[$i]->SchoolID ?>"><?php echo $schoolResult[$i]->SchoolName ?></a></td>
-                                            <td><?php $count=0; for($j=0; $j<count($classNumResult); $j++){ if ($classNumResult[$j]->SchoolID == $schoolResult[$i]->SchoolID) $count=$classNumResult[$j]->Count; } echo $count; ?><span class="glyphicon glyphicon-remove pull-right" aria-hidden="true"></span><span class="pull-right" aria-hidden="true">&nbsp;</span><span class="glyphicon glyphicon-edit pull-right" data-toggle="modal" data-target="#dialog" aria-hidden="true"></span></td>
+                                            <td style="display:none"><?php echo $quizResult[$i]->QuizID ?></td>
+                                            <td><?php echo $quizResult[$i]->Week ?></td>
+                                            <td><?php echo $quizResult[$i]->TopicName ?></td>
+                                            <td><?php echo getQuizPoints($quizResult[$i]->QuizID); ?></td>                                            
+                                            <td><?php echo $quizResult[$i]->Questions ?><span class="glyphicon glyphicon-remove pull-right" aria-hidden="true"></span><span class="pull-right" aria-hidden="true">&nbsp;</span><a href="mcq-viewer.php?quizid=<?php echo $quizResult[$i]->QuizID ?>"><span class="glyphicon glyphicon-edit pull-right" aria-hidden="true"></span></a></td>
+                                            <!-- data-toggle="modal" data-target="#dialog" -->
                                         </tr>
                                     <?php } ?>    
                                     </tbody>
@@ -164,12 +136,12 @@
                             </div>
                             <!-- /.table-responsive -->
                             <div class="well row">
-                                <h4>School Overview Notification</h4>
+                                <h4>Multiple Choice Quiz Overview Notification</h4>
                                 <div class="alert alert-info">
-                                    <p>View schools by filtering or searching. You can create/update/delete any school.</p>
+                                    <p>View quizzes by filtering or searching. You can create/update/delete any quiz.</p>
                                 </div>
                                 <div class="alert alert-danger">
-                                    <p><strong>Reminder</strong> : If you remove one school. All the student data in this school will also get deleted (not recoverable).</p> It includes <strong>student information, their submissions of every task and your grading/feedback</strong>, not only the school itself.
+                                    <p><strong>Warning</strong> : If you remove one quiz. All the <strong>questions and submission</strong> of this quiz will also get deleted (not recoverable).</p> It includes <strong>learning material, questions and options, their submissions and your grading/feedback</strong>, not only the quiz itself.
                                 </div>
                             </div>
                         </div>
@@ -193,22 +165,30 @@
           <div class="modal-content">
             <div class="modal-header">
               <button type="button" class="close" data-dismiss="modal">&times;</button>
-              <h4 class="modal-title" id="dialogTitle">Edit School</h4>
+              <h4 class="modal-title" id="dialogTitle">Edit Class</h4>
             </div>
             <div class="modal-body">
             <form id="submission" method="post" action="<?php echo $_SERVER['PHP_SELF']; ?>">
                 <!--if 1, insert; else if 0 update; else if -1 delete;-->
                 <input type=hidden name="update" id="update" value="1"></input>
-                <label for="SchoolID" style="display:none">SchoolID</label>
-                <input type="text" class="form-control dialoginput" id="SchoolID" name="schoolid" style="display:none">
+                <label for="ClassID" style="display:none">ClassID</label>
+                <input type="text" class="form-control dialoginput" id="ClassID" name="classid" style="display:none">
+                <br><label for="ClassName">ClassName</label>
+                <input type="text" class="form-control dialoginput" id="ClassName" name="classname" required>
                 <br><label for="SchoolName">SchoolName</label>
-                <input type="text" class="form-control dialoginput" id="SchoolName" name="schoolname" required>               
-                <br><label for="Classes">Classes</label>
-                <input type="text" class="form-control dialoginput" id="Classes" name="Classes">
-                <br>
-                <div class="alert alert-danger">
-                    <p><strong>Reminder</strong> : School Name should be unique and no duplicate name is allowed.</p>
-                </div>
+                <select class="form-control dialoginput" id="SchoolName" form="submission" name="schoolname" required>
+                  <?php for($i=0; $i<count($quizResult); $i++) {?>                  
+                  <option value="<?php echo $quizResult[$i]->SchoolName ?>"><?php echo $quizResult[$i]->SchoolName ?></option>
+                  <?php } ?>
+                </select>                
+                <br><label for="TeacherToken">TeacherToken</label><span class="glyphicon glyphicon-random pull-right"></span>
+                <input type="text" class="form-control dialoginput" id="TeacherToken" name="teachertoken" required></input>
+                <br><label for="QuizToken">QuizToken</label><span class="glyphicon glyphicon-random pull-right"></span>
+                <input type="text" class="form-control dialoginput" id="QuizToken" name="quiztoken" required></input>
+                <br><label for="EnrolledQuizs">EnrolledQuizs</label>
+                <input type="text" class="form-control dialoginput" id="EnrolledQuizs" name="EnrolledQuizs">
+                <br><label for="UnlockedProgress">UnlockedProgress</label>
+                <input type="text" class="form-control dialoginput" id="UnlockedProgress" name="UnlockedProgress">
             </form>
             </div>
             <div class="modal-footer">            
@@ -218,6 +198,7 @@
           </div>          
         </div>
       </div>
+      <input type=hidden name="keyword" id="keyword" value="<?php if(isset($_GET['week'])){ echo $_GET['week']; } ?>"></input>
     <!-- jQuery -->
     <script src="../bower_components/jquery/dist/jquery.min.js"></script>
 
@@ -238,35 +219,35 @@
     <script src="http://ajax.aspnetcdn.com/ajax/jquery.validate/1.15.0/jquery.validate.min.js"></script>
 
     <!-- Page-Level Scripts -->
-    <script>    
-    $(document).ready(function() {
-        $('#dataTables-example').DataTable({
-                responsive: true
-        });            
-    }); 
+    <script>
+    function randomString(length) {
+        return Math.round((Math.pow(36, length + 1) - Math.random() * Math.pow(36, length))).toString(36).slice(1);
+    }
     //DO NOT put them in $(document).ready() since the table has multi pages
     $('.glyphicon-edit').on('click', function (){
-        $('#dialogTitle').text("Edit School");
+        $('#dialogTitle').text("Edit Class");
         $('#update').val(0);
         for(i=0;i<$('.dialoginput').length;i++){                
             $('.dialoginput').eq(i).val($(this).parent().parent().children('td').eq(i).text());
         }
-        //disable SchoolID and Classes
+        //disable ClassID, EnrolledQuizs, UnlockedProgress
         $('.dialoginput').eq(0).attr('disabled','disabled');
-        $('.dialoginput').eq(2).attr('disabled','disabled');            
+        $('.dialoginput').eq(5).attr('disabled','disabled');
+        $('.dialoginput').eq(6).attr('disabled','disabled');          
     });
     $('.glyphicon-plus').on('click', function (){
-        $('#dialogTitle').text("Add School");
+        $('#dialogTitle').text("Add Class");
         $('#update').val(1);
         for(i=0;i<$('.dialoginput').length;i++){                
             $('.dialoginput').eq(i).val('');
         }
-        //disable SchoolID and Classes
+        //disable ClassID, EnrolledQuizs, UnlockedProgress
         $('.dialoginput').eq(0).attr('disabled','disabled');
-        $('.dialoginput').eq(2).attr('disabled','disabled');            
+        $('.dialoginput').eq(5).attr('disabled','disabled');    
+        $('.dialoginput').eq(6).attr('disabled','disabled');         
     }); 
     $('.glyphicon-remove').on('click', function (){
-        if (confirm('[WARNING] Are you sure to remove this school? All the student data in this school will also get deleted (not recoverable). It includes student information, their submissions of every task and your grading/feedback, not only the school itself.')) {
+        if (confirm('[WARNING] Are you sure to remove this class? All the quiz data in this class will also get deleted (not recoverable). It includes quiz information, their submissions of every task and your grading/feedback, not only the class itself.')) {
             $('#update').val(-1);
             //fill required input
             $('.dialoginput').eq(0).prop('disabled',false);
@@ -276,14 +257,34 @@
             $('#submission').submit();
         }           
     });
+     $('.glyphicon-random').on('click', function (){
+        var index = $(this).index();
+        if (index == $("#TeacherToken").index() - 1)
+            $('#TeacherToken').val(randomString(16)); 
+        else if (index == $("#QuizToken").index() - 1)
+            $('#QuizToken').val(randomString(16));
+    });
     $('#btnSave').on('click', function (){
         $('#submission').validate();        
-        //enable SchoolID
+        //enable ClassID and EnrolledQuizs
         $('.dialoginput').eq(0).prop('disabled',false);
         $('#submission').submit();
     });
     //include html
-    w3IncludeHTML();
+    w3IncludeHTML();   
+    $(document).ready(function() {
+        var table = $('#datatables').DataTable({
+                responsive: true,
+                "initComplete": function(settings, json) {
+                    
+                    $('.input-sm').eq(1).val($("#keyword").val().trim());                    
+                }
+        })
+        //search keyword (schoolname), exact match
+        table.search(
+            $("#keyword").val().trim(), true, false, true
+        ).draw();     
+    });        
     </script>
 </body>
 

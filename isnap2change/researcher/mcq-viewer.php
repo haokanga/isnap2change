@@ -6,7 +6,8 @@
     require_once("/get-quiz-points.php");	    
     $conn = db_connect();
     $overviewName = "quiz";
-    $columnName = array('QuizID','Week','QuizType','TopicName','Points');    
+    $columnName = array('QuizID','Week','TopicName','Points', 'Questions');
+    $mcqQuesColName = array('QuizID','Question','Content');     
     //edit/delete quiz
     if($_SERVER["REQUEST_METHOD"] == "POST"){
         if(isset($_POST['update'])){                          
@@ -27,13 +28,78 @@
         }
     }
     
-    // get quiz and topic
-    $quizSql = "SELECT QuizID, Week, QuizType, TopicName
-               FROM Quiz NATURAL JOIN Topic";
-    $quizQuery = $conn->prepare($quizSql);
-    $quizQuery->execute();
-    $quizResult = $quizQuery->fetchAll(PDO::FETCH_OBJ); 
+    /**
+    //learning-material-editor
+    if(isset($_POST['richcontenttextarea'])){
+    $conn = db_connect();
+    $content = $_POST['richcontenttextarea'];
+    $materialid = 1;   
+    $quizid = 1;
+    echo "<h2>Preview</h2>";       
+    echo $content;
     
+    $update_stmt = "REPLACE INTO Learning_Material(MaterialID,Content,QuizID)
+                 VALUES (?,?,?);";			
+    $update_stmt = $conn->prepare($update_stmt);                            
+    if(! $update_stmt -> execute(array($materialid, $content, $quizid))){
+        echo "<script language=\"javascript\">  alert(\"Error occurred to submit learning material. Report this bug to reseachers.\"); </script>";
+    } else{            
+        echo "<script language=\"javascript\">  console.log(\"Learning Material Submitted. materialid: $materialid  quizid: $quizid\"); </script>";
+    }  
+    */
+    
+    if($_SERVER["REQUEST_METHOD"] == "GET"){
+        if(isset($_GET['quizid'])){
+        $quizID = $_GET['quizid'];    
+        // get quiz and topic
+        $quizSql = "SELECT QuizID, Week, TopicName, COUNT(*) AS Questions
+                   FROM Quiz NATURAL JOIN Topic NATURAL JOIN MCQ_Section NATURAL JOIN MCQ_Question WHERE QuizID = ?";
+        $quizQuery = $conn->prepare($quizSql);
+        $quizQuery->execute(array($quizID));
+        $quizResult = $quizQuery->fetch(PDO::FETCH_OBJ); 
+        }
+        //get topic
+        $topicSql = "SELECT TopicID, TopicName FROM Topic ORDER BY TopicID";
+        $topicQuery = $conn->prepare($topicSql);
+        $topicQuery->execute(array());
+        $topicResult = $topicQuery->fetchAll(PDO::FETCH_OBJ); 
+        
+        $materialPreSql = "SELECT COUNT(*) 
+					   FROM   Learning_Material
+					   WHERE  QuizID = ?";							
+        $materialPreQuery = $conn->prepare($materialPreSql);
+        $materialPreQuery->execute(array($quizID));                
+        if($materialPreQuery->fetchColumn() != 1){
+                    
+        }                
+        $materialSql = "SELECT Content, TopicName 
+                        FROM   Learning_Material NATURAL JOIN Quiz
+                                                 NATURAL JOIN Topic
+                        WHERE  QuizID = ?";
+                                
+        $materialQuery = $conn->prepare($materialSql);
+        $materialQuery->execute(array($quizID));
+        $materialRes = $materialQuery->fetch(PDO::FETCH_OBJ);
+
+        //get questions and options
+        $mcqSql = "SELECT MCQID, Question, CorrectChoice, Content
+				   FROM   MCQ_Section NATURAL JOIN MCQ_Question
+								  NATURAL JOIN `Option`
+			       WHERE  QuizID = ?
+			       ORDER BY MCQID";
+								
+		$mcqQuery = $conn->prepare($mcqSql);
+		$mcqQuery->execute(array($quizID));
+        $mcqResult = $mcqQuery->fetchAll(PDO::FETCH_OBJ); 
+
+
+        //get max option num
+        
+        $optionNumSql = "SELECT MAX(OptionNum) FROM (SELECT COUNT(*) AS OptionNum FROM MCQ_Question natural JOIN `Option` WHERE QuizID = ? GROUP BY MCQID) AS OptionNumbTable;";								
+		$optionNumQuery = $conn->prepare($optionNumSql);
+		$optionNumQuery->execute(array($quizID));
+        $optionNumResult = $optionNumQuery->fetch(PDO::FETCH_OBJ); 
+	}   
     db_close($conn); 
     
 ?>
@@ -77,12 +143,38 @@
 
     <!--w3data.js to include html-->
     <script src="../js/w3data.js"></script>
-    
+    <script src="//cdn.tinymce.com/4/tinymce.min.js"></script>
+    <script>
+      /**
+      tinymce.init({
+      selector: 'textarea',
+      height: 500,
+      theme: 'modern',
+      plugins: [
+        'advlist autolink lists link image charmap print preview hr anchor pagebreak',
+        'searchreplace wordcount visualblocks visualchars code fullscreen',
+        'insertdatetime media nonbreaking save table contextmenu directionality',
+        'emoticons template paste textcolor colorpicker textpattern imagetools'
+      ],
+      toolbar1: 'insertfile undo redo | styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image',
+      toolbar2: 'print preview media | forecolor backcolor emoticons',
+      image_advtab: true,
+      templates: [
+        { title: 'Test template 1', content: 'Test 1' },
+        { title: 'Test template 2', content: 'Test 2' }
+      ],
+      content_css: [
+        '//fast.fonts.net/cssapi/e6dc9b99-64fe-4292-ad98-6974f93cd2a2.css',
+        '//www.tinymce.com/css/codepen.min.css'
+      ]
+     });
+     */
+    </script>
     <style>
     .glyphicon:hover {
         background-color: rgb(153, 153, 102);
     }
-    </style>
+    </style> 
 </head>
 
 <body>
@@ -94,16 +186,79 @@
         <div id="page-wrapper">
             <div class="row">
                 <div class="col-lg-12">
-                    <h1 class="page-header">Quiz Overview</h1>
+                    <h1 class="page-header">Multiple Choice Quiz Editor</h1>
                 </div>
                 <!-- /.col-lg-12 -->
             </div>
             <!-- /.row -->
             <div class="row">
                 <div class="col-lg-12">
+                    
+                    <!--MetaData-->
                     <div class="panel panel-default">
                         <div class="panel-heading">
-                            Quiz Information Table <span class="glyphicon glyphicon-plus pull-right" data-toggle="modal" data-target="#dialog"></span>
+                            Quiz MetaData
+                        </div>
+                        <!-- /.panel-heading -->
+                        <div class="panel-body">
+                            <form id="submission" method="post" action="<?php echo $_SERVER['PHP_SELF']; ?>">
+                                <!--if 0 update; else if -1 delete;-->
+                                <input type=hidden name="update" id="update" value="1"></input>                
+                            <?php for($i=0; $i<count($columnName); $i++) {
+                                    if($columnName[$i]!='TopicName'){ ?>
+                                    <label for='<?php echo $columnName[$i]; ?>' <?php if ($i==0){ echo 'style="display:none"';} ?>><?php echo $columnName[$i]; ?></label>    
+                                    <input type="text" class="form-control dialoginput" id="<?php echo $columnName[$i]; ?>" name="<?php echo strtolower($columnName[$i]); ?>"  
+                                    <?php if ($i==0){ echo 'style="display:none"';} ?> value="<?php if($i!=3) {echo $quizResult->$columnName[$i];} else  {echo getQuizPoints($quizResult->QuizID);} ?>" required></input>
+                                <?php }
+                                else {?>
+                                    <label for='<?php echo $columnName[$i]; ?>' <?php if ($i==0){ echo 'style="display:none"';} ?>><?php echo $columnName[$i]; ?></label>
+                                    <select class="form-control dialoginput" id="<?php echo $columnName[$i]; ?>" form="submission" name="<?php echo strtolower($columnName[$i]);?>" required>
+                                      <?php for($j=0; $j<count($topicResult); $j++) {?>                  
+                                        <option value='<?php echo $topicResult[$j]->TopicName ?>' <?php if($topicResult[$j]->TopicName == $quizResult->$columnName[$i])echo 'selected' ?>><?php echo $topicResult[$j]->TopicName ?></option>
+                                      <?php } ?>
+                                    </select>                                     
+                                <?php } 
+                            }?>
+                                <br>
+                            </form>
+                            <span class="glyphicon glyphicon-remove pull-right" aria-hidden="true"></span><span class="pull-right" aria-hidden="true">&nbsp;</span><span class="glyphicon glyphicon-edit pull-right" data-toggle="modal" data-target="#dialog" aria-hidden="true"></span>    
+                        </div>                            
+                        <!-- /.panel-body -->
+                    </div>
+                    <!-- /.panel -->
+                    
+                    
+                    <!--Learning Material-->
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            Learning Material 
+                        </div>
+                        <!-- /.panel-heading -->
+                        <div class="panel-body">
+                            <div class="heading" style="color: black; max-height:10vh; text-align:center; border-bottom: 1px solid #eee;">
+                                <h1 style='padding: 0px;'> 
+								<i>	<?php echo $materialRes->TopicName; ?> </i>                          
+                                </h1> 
+                            </div>
+                   
+                            <div class="para" style="padding-left:15px; padding-right:15px; padding-top:8px; text-align:center;">
+                                <div style="color:black; justify-content:center; align-items:center;">
+                                <i>
+                                  <?php echo $materialRes->Content; ?></i>
+                                </div>
+                            </div>                        
+                        
+                            <span class="glyphicon glyphicon-remove pull-right" aria-hidden="true"></span><span class="pull-right" aria-hidden="true">&nbsp;</span><a href="learning-material-editor.php?quizid=<?php echo $quizResult->QuizID ?>"><span class="glyphicon glyphicon-edit pull-right" aria-hidden="true"></span></a>
+                            <!-- data-toggle="modal" data-target="#dialog" -->                            
+                        </div>                            
+                        <!-- /.panel-body -->
+                    </div>
+                    <!-- /.panel -->
+                    
+                    <!-- Options -->
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            Questions and Options 
                         </div>
                         <!-- /.panel-heading -->
                         <div class="panel-body">
@@ -111,33 +266,33 @@
                                 <table class="table table-striped table-bordered table-hover" id="datatables">
                                     <thead>
                                         <tr>
-                                        <?php for($i=0; $i<count($columnName); $i++) {
+                                        <?php for($i=0; $i<count($mcqQuesColName); $i++) {
                                             if ($i==0){?>
-                                            <th style="display:none"><?php echo $columnName[$i]; ?></th>
+                                            <th style="display:none"><?php echo $mcqQuesColName[$i]; ?></th>
                                             <?php } else {?>                                            
-                                            <th><?php echo $columnName[$i]; ?></th>
+                                            <th><?php if($mcqQuesColName[$i]=='Content') echo 'Option'; else echo $mcqQuesColName[$i]; ?></th>
                                         <?php }
                                         }?>
                                         </tr>
                                     </thead>
                                     <tbody>
-                                    <?php for($i=0; $i<count($quizResult); $i++) {?>
+                                        <?php for($i=0; $i<count($mcqResult); $i++) {?>
                                         <tr class="<?php if($i % 2 == 0){echo "odd";} else {echo "even";} ?>">
-                                            <td style="display:none"><?php echo $quizResult[$i]->QuizID ?></td>
-                                            <td><?php echo $quizResult[$i]->Week ?></td>
-                                            <td><?php if($quizResult[$i]->QuizType=='MCQ') {echo 'Multiple Choice';} else if($quizResult[$i]->QuizType=='SAQ') {echo 'Short Answer';} else {echo $quizResult[$i]->QuizType;} ?></a></td>
-                                            <td><?php echo $quizResult[$i]->TopicName ?></td>
-                                            <td><?php echo getQuizPoints($quizResult[$i]->QuizID); ?><span class="glyphicon glyphicon-remove pull-right" aria-hidden="true"></span><span class="pull-right" aria-hidden="true">&nbsp;</span><span class="glyphicon glyphicon-edit pull-right" data-toggle="modal" data-target="#dialog" aria-hidden="true"></span></td>
+                                            <td style="display:none"><?php echo $mcqResult[$i]->QuizID; ?></td>
+                                            <td><?php echo $mcqResult[$i]->Question ?></td>
+                                            <td class ="<?php if ($mcqResult[$i]->Content == $mcqResult[$i]->CorrectChoice) {echo 'bg-success';} else {echo 'bg-danger';} ?>">
+                                                <?php echo $mcqResult[$i]->Content; ?>             
+                                            </td>
                                         </tr>
-                                    <?php } ?>    
+                                    <?php } ?>
                                     </tbody>
                                 </table>
                             </div>
                             <!-- /.table-responsive -->
                             <div class="well row">
-                                <h4>Quiz Overview Notification</h4>
+                                <h4>Multiple Choice Quiz Overview Notification</h4>
                                 <div class="alert alert-info">
-                                    <p>View quizzes by filtering or searching. You can create/update/delete any quiz.</p>
+                                    <p>View quizzes by filtering or searching. You can create/update/delete any class.</p>
                                 </div>
                                 <div class="alert alert-danger">
                                     <p><strong>Warning</strong> : If you remove one quiz. All the <strong>questions and submission</strong> of this quiz will also get deleted (not recoverable).</p> It includes <strong>learning material, questions and options, their submissions and your grading/feedback</strong>, not only the quiz itself.
@@ -146,7 +301,9 @@
                         </div>
                         <!-- /.panel-body -->
                     </div>
-                    <!-- /.panel -->
+                    
+                    
+                    
                 </div>
                 <!-- /.col-lg-12 -->
             </div>
@@ -177,7 +334,7 @@
                 <br><label for="SchoolName">SchoolName</label>
                 <select class="form-control dialoginput" id="SchoolName" form="submission" name="schoolname" required>
                   <?php for($i=0; $i<count($quizResult); $i++) {?>                  
-                  <option value="<?php echo $quizResult[$i]->SchoolName ?>"><?php echo $quizResult[$i]->SchoolName ?></option>
+                  <option value="<?php echo $quizResult->SchoolName ?>"><?php echo $quizResult->SchoolName ?></option>
                   <?php } ?>
                 </select>                
                 <br><label for="TeacherToken">TeacherToken</label><span class="glyphicon glyphicon-random pull-right"></span>
@@ -282,7 +439,9 @@
         //search keyword (schoolname), exact match
         table.search(
             $("#keyword").val().trim(), true, false, true
-        ).draw();     
+        ).draw();
+        //TODO: layout of options
+        //$(".form-control.input-sm").eq(0).val(100);
     });        
     </script>
 </body>

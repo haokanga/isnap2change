@@ -2,136 +2,8 @@
 	session_start();
     require_once("../connection.php");
     require_once("../debug.php");
-    require_once("/researcher_validation.php");
+    require_once("/researcher-validation.php");
     $conn = db_connect();
-    
-    //if update/insert/remove class
-    if($_SERVER["REQUEST_METHOD"] == "POST"){
-        if(isset($_POST['update'])){                          
-            $update = $_POST['update'];
-            //update
-            if($update == 0){
-                $classID = $_POST['classid'];
-                $className = $_POST['classname'];
-                $schoolName = $_POST['schoolname'];
-                $teacherToken = $_POST['teachertoken'];
-                $studentToken = $_POST['studenttoken'];
-                // get school
-                $schoolSql = "SELECT SchoolID
-                           FROM School WHERE SchoolName = ?";
-                $schoolQuery = $conn->prepare($schoolSql);
-                $schoolQuery->execute(array($schoolName));
-                $schoolResult = $schoolQuery->fetch(PDO::FETCH_OBJ);
-                // update class 
-                $update_stmt = "UPDATE Class 
-                    SET ClassName = ?, SchoolID = ?
-                    WHERE ClassID = ?";			
-                $update_stmt = $conn->prepare($update_stmt);                            
-                if(! $update_stmt -> execute(array($className, $schoolResult->SchoolID, $classID))){
-                    echo "<script language=\"javascript\">  alert(\"Error occurred to update class. Contact with developers.\"); </script>";
-                } else{
-                }
-                // update token                     
-                $update_stmt = "UPDATE Token 
-                    SET TokenString = ?
-                    WHERE ClassID = ? AND `Type` = ?";			
-                $update_stmt = $conn->prepare($update_stmt);                            
-                if(! $update_stmt -> execute(array($teacherToken, $classID, "TEACHER"))){
-                    echo "<script language=\"javascript\">  alert(\"Error occurred to update teacherToken. Contact with developers.\"); </script>";
-                } else{
-                }
-                $update_stmt = "UPDATE Token 
-                    SET TokenString = ?
-                    WHERE ClassID = ? AND `Type` = ?";			
-                $update_stmt = $conn->prepare($update_stmt);                            
-                if(! $update_stmt -> execute(array($studentToken, $classID, "STUDENT"))){
-                    echo "<script language=\"javascript\">  alert(\"Error occurred to update studentToken. Contact with developers.\"); </script>";
-                } else{
-                }
-            }
-            else if($update == 1){  
-                $className = $_POST['classname'];
-                $schoolName = $_POST['schoolname'];
-                $teacherToken = $_POST['teachertoken'];
-                $studentToken = $_POST['studenttoken'];
-                // get school
-                $schoolSql = "SELECT SchoolID
-                           FROM School WHERE SchoolName = ?";
-                $schoolQuery = $conn->prepare($schoolSql);
-                $schoolQuery->execute(array($schoolName));
-                $schoolResult = $schoolQuery->fetch(PDO::FETCH_OBJ);
-                // update class 
-                $update_stmt = "INSERT INTO Class(ClassName, SchoolID)
-                     VALUES (?,?);";			
-                $update_stmt = $conn->prepare($update_stmt);         
-                $update_stmt -> execute(array($className, $schoolResult->SchoolID));
-                $classID = $conn -> lastInsertId();
-                if($classID <= 0){
-                    echo "<script language=\"javascript\">  alert(\"Error occurred to insert class. Contact with developers.\"); </script>";
-                } else{
-                }
-                // update token                     
-                $update_stmt = "REPLACE INTO Token(ClassID, `Type`, TokenString)
-                     VALUES (?,?,?);";			
-                $update_stmt = $conn->prepare($update_stmt);                            
-                if(! $update_stmt -> execute(array($classID, "TEACHER", $teacherToken))){
-                    echo "<script language=\"javascript\">  alert(\"Error occurred to insert teacherToken. Contact with developers.\"); </script>";
-                } else{
-                }
-                $update_stmt = "REPLACE INTO Token(ClassID, `Type`, TokenString)
-                     VALUES (?,?,?);";			
-                $update_stmt = $conn->prepare($update_stmt);                            
-                if(! $update_stmt -> execute(array($classID, "STUDENT", $studentToken))){
-                    echo "<script language=\"javascript\">  alert(\"Error occurred to insert studentToken. Contact with developers.\"); </script>";
-                } else{
-                }                
-            }else if($update == -1){
-                $classID = $_POST['classid'];
-                // remove class (with help of DELETE CASCADE) 
-                $update_stmt = "DELETE FROM Class WHERE ClassID = ?";			
-                $update_stmt = $conn->prepare($update_stmt);
-                if(! $update_stmt -> execute(array($classID))){
-                    echo "<script language=\"javascript\">  alert(\"Error occurred to delete class/token. Contact with developers.\"); </script>";
-                } else{
-                } 
-            }            
-        }
-    }
-    
-    // get max week
-    $weekSql = "select MAX(Week) as WeekNum from Quiz";
-    $weekQuery = $conn->prepare($weekSql);
-    $weekQuery->execute();
-    $weekResult = $weekQuery->fetch(PDO::FETCH_OBJ);
-
-    // get school
-    $schoolSql = "SELECT SchoolName
-               FROM School";
-    $schoolQuery = $conn->prepare($schoolSql);
-    $schoolQuery->execute();
-    $schoolResult = $schoolQuery->fetchAll(PDO::FETCH_OBJ);
-    
-    // get class
-    $classSql = "SELECT ClassID, ClassName, SchoolName, UnlockedProgress
-               FROM Class NATURAL JOIN School";
-    $classQuery = $conn->prepare($classSql);
-    $classQuery->execute();
-    $classResult = $classQuery->fetchAll(PDO::FETCH_OBJ);
-    
-    // get token
-    $tokenSql = "SELECT ClassID, `Type`, TokenString
-               FROM Token NATURAL JOIN Class";
-    $tokenQuery = $conn->prepare($tokenSql);
-    $tokenQuery->execute();
-    $tokenResult = $tokenQuery->fetchAll(PDO::FETCH_OBJ);    
-    
-    // get students number
-    $studentNumSql = "SELECT count(*) as Count, ClassID
-               FROM   Student NATURAL JOIN Class
-               GROUP BY ClassID";
-    $studentNumQuery = $conn->prepare($studentNumSql);
-    $studentNumQuery->execute();
-    $studentNumResult = $studentNumQuery->fetchAll(PDO::FETCH_OBJ);    
     
     db_close($conn); 
     
@@ -193,7 +65,7 @@
         <div id="page-wrapper">
             <div class="row">
                 <div class="col-lg-12">
-                    <h1 class="page-header">Class Overview</h1>
+                    <h1 class="page-header">iSNAP2Change Dashboard</h1>
                 </div>
                 <!-- /.col-lg-12 -->
             </div>
@@ -202,46 +74,106 @@
                 <div class="col-lg-12">
                     <div class="panel panel-default">
                         <div class="panel-heading">
-                            Class Information Table <span class="glyphicon glyphicon-plus pull-right" data-toggle="modal" data-target="#dialog"></span>
+                            Dashboard <span class="glyphicon glyphicon-plus pull-right" data-toggle="modal" data-target="#dialog"></span>
                         </div>
                         <!-- /.panel-heading -->
                         <div class="panel-body">
-                            <div class="dataTable_wrapper">
-                                <table class="table table-striped table-bordered table-hover" id="datatables">
-                                    <thead>
-                                        <tr>
-                                            <th style="display:none">ClassID</th>
-                                            <th>ClassName</th>
-                                            <th>SchoolName</th>
-                                            <th>TeacherToken</th>                                            
-                                            <th>StudentToken</th>
-                                            <th>EnrolledStudents</th>
-                                            <th>UnlockedProgress</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                    <?php for($i=0; $i<count($classResult); $i++) {?>
-                                        <tr class="<?php if($i % 2 == 0){echo "odd";} else {echo "even";} ?>">
-                                            <td style="display:none"><?php echo $classResult[$i]->ClassID ?></td>
-                                            <td><?php echo $classResult[$i]->ClassName ?></td>
-                                            <td><?php echo $classResult[$i]->SchoolName ?></td>
-                                            <td><?php for($j=0; $j<count($tokenResult); $j++){ if ($tokenResult[$j]->ClassID == $classResult[$i]->ClassID && $tokenResult[$j]->Type == 'TEACHER') echo $tokenResult[$j]->TokenString;} ?></td>
-                                            <td><?php for($j=0; $j<count($tokenResult); $j++){ if ($tokenResult[$j]->ClassID == $classResult[$i]->ClassID && $tokenResult[$j]->Type == 'STUDENT') echo $tokenResult[$j]->TokenString;} ?></td>
-                                            <td><?php $count=0; for($j=0; $j<count($studentNumResult); $j++){ if ($studentNumResult[$j]->ClassID == $classResult[$i]->ClassID) $count=$studentNumResult[$j]->Count; } echo $count; ?></td>
-                                            <td><?php echo min($classResult[$i]->UnlockedProgress, $weekResult->WeekNum)."/".$weekResult->WeekNum ?><span class="glyphicon glyphicon-remove pull-right" aria-hidden="true"></span><span class="pull-right" aria-hidden="true">&nbsp;</span><span class="glyphicon glyphicon-edit pull-right" data-toggle="modal" data-target="#dialog" aria-hidden="true"></span></td>
-                                        </tr>
-                                    <?php } ?>    
-                                    </tbody>
-                                </table>
-                            </div>
-                            <!-- /.table-responsive -->
-                            <div class="well row">
-                                <h4>Class Overview Notification</h4>
-                                <div class="alert alert-info">
-                                    <p>Navigate classes by filtering or searching. You can create/update/delete any class.</p>
+                             <div class="row">
+                                <div class="col-lg-3 col-md-6">
+                                    <div class="panel panel-primary">
+                                        <div class="panel-heading">
+                                            <div class="row">
+                                                <div class="col-xs-3">
+                                                    <i class="fa fa-comments fa-5x"></i>
+                                                </div>
+                                                <div class="col-xs-9 text-right">
+                                                    <div class="huge">26</div>
+                                                    <div>New Submissions!</div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <a href="#">
+                                            <div class="panel-footer">
+                                                <span class="pull-left">View Details</span>
+                                                <span class="pull-right"><i class="fa fa-arrow-circle-right"></i></span>
+                                                <div class="clearfix"></div>
+                                            </div>
+                                        </a>
+                                    </div>
                                 </div>
-                                <div class="alert alert-danger">
-                                    <p><strong>Warning</strong> : If you remove one class. All the <strong>student data</strong> in this class will also get deleted (not recoverable).</p> It includes <strong>student information, their submissions of every task and your grading/feedback</strong>, not only the class itself.
+                                <div class="col-lg-3 col-md-6">
+                                    <div class="panel panel-green">
+                                        <div class="panel-heading">
+                                            <div class="row">
+                                                <div class="col-xs-3">
+                                                    <i class="fa fa-tasks fa-5x"></i>
+                                                </div>
+                                                <div class="col-xs-9 text-right">
+                                                    <div class="huge">12</div>
+                                                    <div>New Public Questions!</div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <a href="#">
+                                            <div class="panel-footer">
+                                                <span class="pull-left">View Details</span>
+                                                <span class="pull-right"><i class="fa fa-arrow-circle-right"></i></span>
+                                                <div class="clearfix"></div>
+                                            </div>
+                                        </a>
+                                    </div>
+                                </div>                    
+                            </div>
+                            <div class="row">                   
+                                <div class="col-lg-3 col-md-6">
+                                    <div class="panel panel-yellow">
+                                        <div class="panel-heading">
+                                            <div class="row">
+                                                <div class="col-xs-3">
+                                                    <i class="fa fa-shopping-cart fa-5x"></i>
+                                                </div>
+                                                <div class="col-xs-9 text-right">
+                                                    <div class="huge">124</div>
+                                                    <div>New Student Questions!</div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <a href="#">
+                                            <div class="panel-footer">
+                                                <span class="pull-left">View Details</span>
+                                                <span class="pull-right"><i class="fa fa-arrow-circle-right"></i></span>
+                                                <div class="clearfix"></div>
+                                            </div>
+                                        </a>
+                                    </div>
+                                </div>
+                                <div class="col-lg-3 col-md-6">
+                                    <div class="panel panel-red">
+                                        <div class="panel-heading">
+                                            <div class="row">
+                                                <div class="col-xs-3">
+                                                    <i class="fa fa-support fa-5x"></i>
+                                                </div>
+                                                <div class="col-xs-9 text-right">
+                                                    <div class="huge">13</div>
+                                                    <div>New Tech Report!</div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <a href="#">
+                                            <div class="panel-footer">
+                                                <span class="pull-left">View Details</span>
+                                                <span class="pull-right"><i class="fa fa-arrow-circle-right"></i></span>
+                                                <div class="clearfix"></div>
+                                            </div>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="well row">
+                                <h4>Dashboard Notification</h4>
+                                <div class="alert alert-info">
+                                    <p>Grade student submission, answer public or student questions/comments, view tech bug report to contact with developers.</p>
                                 </div>
                             </div>
                         </div>
@@ -252,7 +184,6 @@
                 <!-- /.col-lg-12 -->
             </div>
             <!-- /.row -->
-            
         </div>
         <!-- /#page-wrapper -->
 
@@ -377,12 +308,12 @@
                 responsive: true,
                 "initComplete": function(settings, json) {
                     
-                    $('.input-sm').eq(1).val($("#keyword").val());                    
+                    $('.input-sm').eq(1).val($("#keyword").val().trim());                    
                 }
         })
         //search keyword (schoolname), exact match
         table.search(
-            $("#keyword").val(), true, false, true
+            $("#keyword").val().trim(), true, false, true
         ).draw();     
     });        
     </script>

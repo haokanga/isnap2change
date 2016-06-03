@@ -2,7 +2,7 @@
 	session_start();
     require_once("../connection.php");
     require_once("../debug.php");
-    require_once("/researcher_validation.php");
+    require_once("/researcher-validation.php");
     $conn = db_connect();
     
     //if update/insert/remove class
@@ -223,7 +223,7 @@
                                     <?php for($i=0; $i<count($classResult); $i++) {?>
                                         <tr class="<?php if($i % 2 == 0){echo "odd";} else {echo "even";} ?>">
                                             <td style="display:none"><?php echo $classResult[$i]->ClassID ?></td>
-                                            <td><?php echo $classResult[$i]->ClassName ?></td>
+                                            <td><a href="student.php?classid=<?php echo $classResult[$i]->ClassID ?>"><?php echo $classResult[$i]->ClassName ?></a></td>
                                             <td><?php echo $classResult[$i]->SchoolName ?></td>
                                             <td><?php for($j=0; $j<count($tokenResult); $j++){ if ($tokenResult[$j]->ClassID == $classResult[$i]->ClassID && $tokenResult[$j]->Type == 'TEACHER') echo $tokenResult[$j]->TokenString;} ?></td>
                                             <td><?php for($j=0; $j<count($tokenResult); $j++){ if ($tokenResult[$j]->ClassID == $classResult[$i]->ClassID && $tokenResult[$j]->Type == 'STUDENT') echo $tokenResult[$j]->TokenString;} ?></td>
@@ -238,7 +238,7 @@
                             <div class="well row">
                                 <h4>Class Overview Notification</h4>
                                 <div class="alert alert-info">
-                                    <p>Navigate classes by filtering or searching. You can create/update/delete any class.</p>
+                                    <p>View classes by filtering or searching. You can create/update/delete any class.</p>
                                 </div>
                                 <div class="alert alert-danger">
                                     <p><strong>Warning</strong> : If you remove one class. All the <strong>student data</strong> in this class will also get deleted (not recoverable).</p> It includes <strong>student information, their submissions of every task and your grading/feedback</strong>, not only the class itself.
@@ -298,7 +298,17 @@
           </div>          
         </div>
       </div>
-      <input type=hidden name="keyword" id="keyword" value="<?php if(isset($_GET['schoolname'])){ echo $_GET['schoolname']; } ?>"></input>
+      <input type=hidden name="keyword" id="keyword" value="
+      <?php if(isset($_GET['schoolid'])){
+        // get SchoolName
+        $schoolSql = "SELECT SchoolName
+                   FROM School WHERE SchoolID = ?";
+        $schoolQuery = $conn->prepare($schoolSql);
+        $schoolQuery->execute(array($_GET['schoolid']));
+        $schoolResult = $schoolQuery->fetch(PDO::FETCH_OBJ);
+        echo $schoolResult->SchoolName; 
+      } else echo ''; ?>">
+      </input>
     <!-- jQuery -->
     <script src="../bower_components/jquery/dist/jquery.min.js"></script>
 
@@ -375,14 +385,13 @@
     $(document).ready(function() {
         var table = $('#datatables').DataTable({
                 responsive: true,
-                "initComplete": function(settings, json) {
-                    
-                    $('.input-sm').eq(1).val($("#keyword").val());                    
+                "initComplete": function(settings, json) {                    
+                    $('.input-sm').eq(1).val($("#keyword").val().trim());                    
                 }
         })
         //search keyword (schoolname), exact match
         table.search(
-            $("#keyword").val(), true, false, true
+            $("#keyword").val().trim(), true, false, true
         ).draw();     
     });        
     </script>
