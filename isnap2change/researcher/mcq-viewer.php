@@ -104,7 +104,7 @@
             $mcqQuesColName[] = 'Option'.($i+1);
         }
         */
-        $mcqQuesColName = array('QuizID','Question','Option', 'Explanation');
+        $mcqQuesColName = array('QuizID','Question','Option', 'Explanation','Edit');
 	}   
     db_close($conn); 
     
@@ -213,12 +213,12 @@
                             <?php for($i=0; $i<count($columnName); $i++) {
                                     if($columnName[$i]!='TopicName'){ ?>
                                     <label for='<?php echo $columnName[$i]; ?>' <?php if ($i==0){ echo 'style="display:none"';} ?>><?php echo $columnName[$i]; ?></label>    
-                                    <input type="text" class="form-control dialoginput" id="<?php echo $columnName[$i]; ?>" name="<?php echo strtolower($columnName[$i]); ?>"  
+                                    <input type="text" class="form-control metadatainput" id="<?php echo $columnName[$i]; ?>" name="<?php echo strtolower($columnName[$i]); ?>"  
                                     <?php if ($i==0){ echo 'style="display:none"';} ?> value="<?php if($i!=3) {echo $quizResult->$columnName[$i];} else  {echo getQuizPoints($quizResult->QuizID);} ?>" required></input>
                                 <?php }
                                 else {?>
                                     <label for='<?php echo $columnName[$i]; ?>' <?php if ($i==0){ echo 'style="display:none"';} ?>><?php echo $columnName[$i]; ?></label>
-                                    <select class="form-control dialoginput" id="<?php echo $columnName[$i]; ?>" form="submission" name="<?php echo strtolower($columnName[$i]);?>" required>
+                                    <select class="form-control metadatainput" id="<?php echo $columnName[$i]; ?>" form="submission" name="<?php echo strtolower($columnName[$i]);?>" required>
                                       <?php for($j=0; $j<count($topicResult); $j++) {?>                  
                                         <option value='<?php echo $topicResult[$j]->TopicName ?>' <?php if($topicResult[$j]->TopicName == $quizResult->$columnName[$i])echo 'selected' ?>><?php echo $topicResult[$j]->TopicName ?></option>
                                       <?php } ?>
@@ -227,6 +227,7 @@
                             }?>
                                 <br>
                             </form>
+                            <!--edit metadata-->
                             <span class="glyphicon glyphicon-remove pull-right" aria-hidden="true"></span><span class="pull-right" aria-hidden="true">&nbsp;</span><span class="glyphicon glyphicon-edit pull-right" data-toggle="modal" data-target="#dialog" aria-hidden="true"></span>    
                         </div>                            
                         <!-- /.panel-body -->
@@ -288,8 +289,8 @@
                                             <td><?php echo $mcqResult[$i]->Question ?></td>
                                             <td class ="<?php if ($mcqResult[$i]->Content == $mcqResult[$i]->CorrectChoice) {echo 'bg-success';} else {echo 'bg-danger';} ?>">
                                                 <?php echo $mcqResult[$i]->Content; ?>
-                                            <td><?php echo $mcqResult[$i]->Explanation ?></td>                                                
-                                            </td>
+                                            <td><?php echo $mcqResult[$i]->Explanation ?></td>
+                                            <td><span class="glyphicon glyphicon-remove pull-right " aria-hidden="true"></span><span class="pull-right" aria-hidden="true">&nbsp;</span><span class="glyphicon glyphicon-edit pull-right" data-toggle="modal" data-target="#dialog" aria-hidden="true"></span></td>            
                                         </tr>
                                     <?php } ?>
                                     </tbody>
@@ -445,13 +446,15 @@
                 
                 $('.input-sm').eq(1).val($("#keyword").val().trim());                    
             },
-            rowsGroup: [1,3],
+            rowsGroup: [1,3,4],
             "pageLength":100
         })
         //search keyword (schoolname), exact match
         table.search(
             $("#keyword").val().trim(), true, false, true
         ).draw();
+         $('.metadatainput').eq(4).attr('disabled','disabled'); 
+        
     });        
     </script>
 </body>
