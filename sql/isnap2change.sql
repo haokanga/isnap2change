@@ -416,7 +416,7 @@ INSERT IGNORE INTO Topic(TopicName) VALUES('Introduction');
 # [Formal] insert MCQ section with multiple questions
 INSERT IGNORE INTO Quiz(Week,QuizType,TopicID) VALUES(1,'MCQ',2);
 SET @QUIZ_LAST_INSERT_ID = LAST_INSERT_ID();
-INSERT IGNORE INTO MCQ_Section(QuizID,Points,Questionnaires) VALUES(@QUIZ_LAST_INSERT_ID,30,1);
+INSERT IGNORE INTO MCQ_Section(QuizID,Points,Questionnaires) VALUES(@QUIZ_LAST_INSERT_ID,30,0);
 INSERT IGNORE INTO MCQ_Question(Question, CorrectChoice, QuizID) VALUES('Which of these breakfast foods will provide you with the most energy?', 'Whole grain cereal or oatmeal', @QUIZ_LAST_INSERT_ID);
 SET @MCQ_QUESTION_LAST_INSERT_ID = LAST_INSERT_ID();
 INSERT IGNORE INTO `Option`(Content, Explanation, MCQID) VALUES('Candy bar', 'Whole grains take your body longer to digest, giving you energy all morning!', @MCQ_QUESTION_LAST_INSERT_ID);

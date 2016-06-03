@@ -81,7 +81,7 @@
         $materialRes = $materialQuery->fetch(PDO::FETCH_OBJ);
 
         //get questions and options
-        $mcqSql = "SELECT MCQID, Question, CorrectChoice, Content
+        $mcqSql = "SELECT MCQID, Question, CorrectChoice, Content, Explanation
 				   FROM   MCQ_Section NATURAL JOIN MCQ_Question
 								  NATURAL JOIN `Option`
 			       WHERE  QuizID = ?
@@ -104,7 +104,7 @@
             $mcqQuesColName[] = 'Option'.($i+1);
         }
         */
-        $mcqQuesColName = array('QuizID','Question','Option');
+        $mcqQuesColName = array('QuizID','Question','Option', 'Explanation');
 	}   
     db_close($conn); 
     
@@ -284,10 +284,11 @@
                                     <tbody>
                                         <?php for($i=0; $i<count($mcqResult); $i++) {?>
                                         <tr class="<?php if($i % 2 == 0){echo "odd";} else {echo "even";} ?>">
-                                            <td style="display:none"><?php echo $mcqResult[$i]->QuizID; ?></td>
+                                            <td style="display:none"><?php echo $mcqResult[$i]->MCQID; ?></td>
                                             <td><?php echo $mcqResult[$i]->Question ?></td>
                                             <td class ="<?php if ($mcqResult[$i]->Content == $mcqResult[$i]->CorrectChoice) {echo 'bg-success';} else {echo 'bg-danger';} ?>">
-                                                <?php echo $mcqResult[$i]->Content; ?>             
+                                                <?php echo $mcqResult[$i]->Content; ?>
+                                            <td><?php echo $mcqResult[$i]->Explanation ?></td>                                                
                                             </td>
                                         </tr>
                                     <?php } ?>
@@ -380,6 +381,9 @@
     <!--jQuery Validate plugin-->
     <script src="http://ajax.aspnetcdn.com/ajax/jquery.validate/1.15.0/jquery.validate.min.js"></script>
 
+    <!-- DataTables rowsGroup Plugin -->
+    <script src="../bower_components/datatables-plugins/rowsgroup/dataTables.rowsGroup.js "></script>
+    
     <!-- Page-Level Scripts -->
     <script>
     function randomString(length) {
@@ -435,19 +439,19 @@
     //include html
     w3IncludeHTML();   
     $(document).ready(function() {
-        var table = $('#datatables').DataTable({
-                responsive: true,
-                "initComplete": function(settings, json) {
-                    
-                    $('.input-sm').eq(1).val($("#keyword").val().trim());                    
-                }
+    var table = $('#datatables').DataTable({
+            responsive: true,
+            "initComplete": function(settings, json) {
+                
+                $('.input-sm').eq(1).val($("#keyword").val().trim());                    
+            },
+            rowsGroup: [1,3],
+            "pageLength":100
         })
         //search keyword (schoolname), exact match
         table.search(
             $("#keyword").val().trim(), true, false, true
         ).draw();
-        //TODO: layout of options
-        //$(".form-control.input-sm").eq(0).val(100);
     });        
     </script>
 </body>
