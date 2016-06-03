@@ -19,7 +19,11 @@ $studentid = 1;
     <script src="http://code.jquery.com/jquery-1.8.2.min.js"></script>
     <script src="http://zwibbler.com/zwibbler2.js"></script>
     <script type="text/javascript">
-        
+		
+	  if(localStorage.getItem("zwibbler-document") != null) {
+			localStorage.removeItem("zwibbler-document");  
+	  }	
+	
 	  Zwibbler.addButton({
 			name: "imageInsertion",
             image: "http://zwibbler.com/wd-image.png",
@@ -37,7 +41,18 @@ $studentid = 1;
 		
         function onSave() {
             saved = zwibbler.save("zwibbler3");
-            $("#loadButton").removeAttr("disabled");
+         //   $("#loadButton").removeAttr("disabled");
+			
+			var xmlhttp = new XMLHttpRequest();
+			xmlhttp.onreadystatechange = function() {
+				if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
+					//parseFeedback(xmlhttp.responseText);
+				} 
+			};
+			
+			xmlhttp.open("POST", "poster-feedback.php", true);
+			xmlhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+			xmlhttp.send("studentid="+<?php echo $studentid; ?>+"&zwibblerdoc="+saved);
         }
 
         function onLoad() {
@@ -55,7 +70,8 @@ $studentid = 1;
 			form.reset();
         });
 		
-		function uploadDone(status, result) {
+		function uploadDone(status, result) 
+		{
             if (status === "ok") {	
 				var url = "http://localhost/isnap2change/isnap2change/tmp_poster_image/" + result.fileid;
 				var dataURL;
@@ -87,8 +103,6 @@ $studentid = 1;
         {
             var progress = new ProgressNotification("Reading file");
             var xhr = new XMLHttpRequest();
-			
-			
 			
             var fd = new FormData(form);
 

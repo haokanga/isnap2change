@@ -317,7 +317,7 @@
 									if($i == 2) {
 										echo ' <h4 style="color:rgb(247,117,030); border: 0px solid rgb(247,117,030); border-bottom-color: rgb(247,117,030); border-bottom-width: 4px;">';
 									}									
-								        echo $factRes[$randFactKey]->TopicName." FACT #".$factRes[$randFactKey]->FactID;
+								        echo strtoupper($factRes[$randFactKey]->TopicName)." FACT #".$factRes[$randFactKey]->FactID;
 										echo '</h4>';
 								?>
                             
