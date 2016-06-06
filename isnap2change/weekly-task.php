@@ -47,17 +47,23 @@
 		if(isset($quizResult["Status"])){
 			//if UNGRADED/GRADED
 			$status = $quizResult["Status"];
-			//list of question type
-			if($quizResult["QuizType"]=="MCQ"){
-				echo '<form id="quiz'.$quizResult["QuizID"].'" action=multiple-choice-question.php method=post>';
-			}
 			
-			else if($quizResult["QuizType"]=="SAQ"){
-				echo '<form id="quiz'.$quizResult["QuizID"].'" action=short-answer-question.php method=post>';
-			}
-            
-            else if($quizResult["QuizType"]=="Matching"){
-				echo '<form id="quiz'.$quizResult["QuizID"].'" action=matching-question.php method=post>';
+			//list of question type
+			switch($quizResult["QuizType"]) {
+				case "MCQ":
+					echo '<form id="quiz'.$quizResult["QuizID"].'" action=multiple-choice-question.php method=post>';
+					break;
+				case "SAQ":
+					echo '<form id="quiz'.$quizResult["QuizID"].'" action=short-answer-question.php method=post>';
+					break;
+				case "Matching":
+					echo '<form id="quiz'.$quizResult["QuizID"].'" action=matching-question.php method=post>';
+					break;
+				case "Poster":
+					echo '<form id="quiz'.$quizResult["QuizID"].'" action=poster-editor.php method=post>';
+					break;
+				default:
+					break;
 			}
 			
 		} else {
