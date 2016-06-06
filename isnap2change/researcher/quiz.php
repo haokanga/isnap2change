@@ -1,9 +1,7 @@
 <?php
     /**
     TODO: 
-    add quiz
     edit quiz (jump to different editor)
-    modal
     */
     session_start();
     require_once("../connection.php");
@@ -18,7 +16,25 @@
         if(isset($_POST['update'])){                          
             $update = $_POST['update'];
             if($update == 1){
+                $week = $_POST['week'];
+                $quizType = $_POST['quiztype'];
+                $topicName = $_POST['topicname'];
+                //get topicID
+                $topicSql = "SELECT TopicID
+                           FROM Topic WHERE TopicName = ?";
+                $topicQuery = $conn->prepare($topicSql);
+                $topicQuery->execute(array($topicName));
+                $topicResult = $topicQuery->fetch(PDO::FETCH_OBJ);
                 
+                $update_stmt = "INSERT INTO Quiz(Week, QuizType, TopicID)
+                     VALUES (?,?,?);";			
+                $update_stmt = $conn->prepare($update_stmt);         
+                $update_stmt -> execute(array($week, $quizType, $topicResult->TopicID));
+                $classID = $conn -> lastInsertId();
+                if($classID <= 0){
+                    echo "<script language=\"javascript\">  alert(\"Error occurred to insert class. Contact with developers.\"); </script>";
+                } else{
+                }
             }                       
             else if($update == 0){
                 
@@ -181,8 +197,10 @@
             <form id="submission" method="post" action="<?php echo $_SERVER['PHP_SELF']; ?>">
                 <!--if 1, insert; else if -1 delete;-->
                 <input type=hidden name="update" id="update" value="1" required></input>
+                <label for="QuizID" style="display:none">QuizID</label>
+                <input type="text" class="form-control dialoginput" id="QuizID" name="quizid" style="display:none"></input>
                 <label for="Week">Week</label>
-                <input type="text" class="form-control dialoginput" id="Week" name="week"  placeholder="First name" required></input> 
+                <input type="text" class="form-control dialoginput" id="Week" name="week"  placeholder="Input Week Number" required></input> 
                 <br>    
                 <label for='QuizType'>QuizType</label>
                 <select class="form-control dialoginput" id="QuizType" form="submission" name="quiztype" required>
@@ -239,7 +257,6 @@
         /*...*/        
     });
     $('.glyphicon-plus').on('click', function (){
-        /*...*/
         $('#dialogTitle').text("Add Quiz");
         $('#update').val(1);
         for(i=0;i<$('.dialoginput').length;i++){                
@@ -249,8 +266,6 @@
     $('.glyphicon-remove').on('click', function (){
         if (confirm('[WARNING] Are you sure to remove this quiz? If you remove one quiz. All the questions and submission of this quiz will also get deleted (not recoverable). It includes learning material, questions and options, their submissions and your grading/feedback, not only the quiz itself.')) {
             $('#update').val(-1);
-            //fill required input
-            $('.dialoginput').eq(0).prop('disabled',false);
             for(i=0;i<$('.dialoginput').length;i++){                
                 $('.dialoginput').eq(i).val($(this).parent().parent().children('td').eq(i).text());
             }
@@ -265,9 +280,14 @@
             $('#QuizToken').val(randomString(16));
     });
     $('#btnSave').on('click', function (){
-        $('#submission').validate();        
-        //enable ClassID and EnrolledQuizs
-        $('.dialoginput').eq(0).prop('disabled',false);
+        $('#submission').validate({
+          rules: {
+            week: {
+              required: true,
+              digits: true
+            }
+          }
+        });   
         $('#submission').submit();
     });
     //include html
@@ -275,10 +295,11 @@
     $(document).ready(function() {
         var table = $('#datatables').DataTable({
                 responsive: true,
-                "initComplete": function(settings, json) {
-                    
+                "initComplete": function(settings, json) {                    
                     $('.input-sm').eq(1).val($("#keyword").val().trim());                    
-                }
+                },
+                "order": [[ 1, "asc" ]],
+                "pageLength":50
         })
         //search keyword (schoolname), exact match
         table.search(

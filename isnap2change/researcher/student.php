@@ -282,7 +282,8 @@
                 responsive: true,
                 "initComplete": function(settings, json) {                    
                     $('.input-sm').eq(1).val($("#keyword").val().trim());                    
-                }
+                },
+                "pageLength":50
         })
         //search keyword (schoolname), exact match
         table.search(
