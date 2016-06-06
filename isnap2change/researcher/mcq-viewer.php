@@ -6,8 +6,7 @@
     require_once("/get-quiz-points.php");	    
     $conn = db_connect();
     $overviewName = "quiz";
-    $columnName = array('QuizID','Week','TopicName','Points', 'Questions');
-    $mcqQuesColName = array('QuizID','Question','Content');     
+    $columnName = array('QuizID','Week','TopicName','Points', 'Questions');     
     //edit/delete quiz
     if($_SERVER["REQUEST_METHOD"] == "POST"){
         if(isset($_POST['update'])){                          
@@ -82,7 +81,7 @@
         $materialRes = $materialQuery->fetch(PDO::FETCH_OBJ);
 
         //get questions and options
-        $mcqSql = "SELECT MCQID, Question, CorrectChoice, Content
+        $mcqSql = "SELECT MCQID, Question, CorrectChoice, Content, Explanation
 				   FROM   MCQ_Section NATURAL JOIN MCQ_Question
 								  NATURAL JOIN `Option`
 			       WHERE  QuizID = ?
@@ -93,12 +92,19 @@
         $mcqResult = $mcqQuery->fetchAll(PDO::FETCH_OBJ); 
 
 
-        //get max option num
-        
-        $optionNumSql = "SELECT MAX(OptionNum) FROM (SELECT COUNT(*) AS OptionNum FROM MCQ_Question natural JOIN `Option` WHERE QuizID = ? GROUP BY MCQID) AS OptionNumbTable;";								
+        //get max option num        
+        $optionNumSql = "SELECT MAX(OptionNum) AS MaxOptionNum FROM (SELECT COUNT(*) AS OptionNum FROM MCQ_Question natural JOIN `Option` WHERE QuizID = ? GROUP BY MCQID) AS OptionNumbTable;";								
 		$optionNumQuery = $conn->prepare($optionNumSql);
 		$optionNumQuery->execute(array($quizID));
-        $optionNumResult = $optionNumQuery->fetch(PDO::FETCH_OBJ); 
+        $optionNumResult = $optionNumQuery->fetch(PDO::FETCH_OBJ);
+        /**
+        $mcqQuesColName[] = 'QuizID';
+        $mcqQuesColName[] = 'Question';
+        for($i=0; $i<$optionNumResult->MaxOptionNum; $i++) {
+            $mcqQuesColName[] = 'Option'.($i+1);
+        }
+        */
+        $mcqQuesColName = array('MCQID','Question','Option', 'Explanation','Edit');
 	}   
     db_close($conn); 
     
@@ -174,6 +180,10 @@
     .glyphicon:hover {
         background-color: rgb(153, 153, 102);
     }
+    .modal-xl {
+        width: 90%;
+       max-width:1200px;
+    }
     </style> 
 </head>
 
@@ -207,12 +217,12 @@
                             <?php for($i=0; $i<count($columnName); $i++) {
                                     if($columnName[$i]!='TopicName'){ ?>
                                     <label for='<?php echo $columnName[$i]; ?>' <?php if ($i==0){ echo 'style="display:none"';} ?>><?php echo $columnName[$i]; ?></label>    
-                                    <input type="text" class="form-control dialoginput" id="<?php echo $columnName[$i]; ?>" name="<?php echo strtolower($columnName[$i]); ?>"  
+                                    <input type="text" class="form-control metadatainput" id="<?php echo $columnName[$i]; ?>" name="<?php echo strtolower($columnName[$i]); ?>"  
                                     <?php if ($i==0){ echo 'style="display:none"';} ?> value="<?php if($i!=3) {echo $quizResult->$columnName[$i];} else  {echo getQuizPoints($quizResult->QuizID);} ?>" required></input>
                                 <?php }
                                 else {?>
                                     <label for='<?php echo $columnName[$i]; ?>' <?php if ($i==0){ echo 'style="display:none"';} ?>><?php echo $columnName[$i]; ?></label>
-                                    <select class="form-control dialoginput" id="<?php echo $columnName[$i]; ?>" form="submission" name="<?php echo strtolower($columnName[$i]);?>" required>
+                                    <select class="form-control metadatainput" id="<?php echo $columnName[$i]; ?>" form="submission" name="<?php echo strtolower($columnName[$i]);?>" required>
                                       <?php for($j=0; $j<count($topicResult); $j++) {?>                  
                                         <option value='<?php echo $topicResult[$j]->TopicName ?>' <?php if($topicResult[$j]->TopicName == $quizResult->$columnName[$i])echo 'selected' ?>><?php echo $topicResult[$j]->TopicName ?></option>
                                       <?php } ?>
@@ -221,6 +231,7 @@
                             }?>
                                 <br>
                             </form>
+                            <!--edit metadata-->
                             <span class="glyphicon glyphicon-remove pull-right" aria-hidden="true"></span><span class="pull-right" aria-hidden="true">&nbsp;</span><span class="glyphicon glyphicon-edit pull-right" data-toggle="modal" data-target="#dialog" aria-hidden="true"></span>    
                         </div>                            
                         <!-- /.panel-body -->
@@ -270,7 +281,7 @@
                                             if ($i==0){?>
                                             <th style="display:none"><?php echo $mcqQuesColName[$i]; ?></th>
                                             <?php } else {?>                                            
-                                            <th><?php if($mcqQuesColName[$i]=='Content') echo 'Option'; else echo $mcqQuesColName[$i]; ?></th>
+                                            <th><?php echo $mcqQuesColName[$i]; ?></th>
                                         <?php }
                                         }?>
                                         </tr>
@@ -278,11 +289,12 @@
                                     <tbody>
                                         <?php for($i=0; $i<count($mcqResult); $i++) {?>
                                         <tr class="<?php if($i % 2 == 0){echo "odd";} else {echo "even";} ?>">
-                                            <td style="display:none"><?php echo $mcqResult[$i]->QuizID; ?></td>
-                                            <td><?php echo $mcqResult[$i]->Question ?></td>
+                                            <td style="display:none"><?php echo $mcqResult[$i]->$mcqQuesColName[0]; ?></td>
+                                            <td><?php echo $mcqResult[$i]->$mcqQuesColName[1] ?></td>
                                             <td class ="<?php if ($mcqResult[$i]->Content == $mcqResult[$i]->CorrectChoice) {echo 'bg-success';} else {echo 'bg-danger';} ?>">
-                                                <?php echo $mcqResult[$i]->Content; ?>             
-                                            </td>
+                                                <?php echo $mcqResult[$i]->Content; ?>
+                                            <td><?php echo $mcqResult[$i]->$mcqQuesColName[3] ?></td>
+                                            <td><span class="glyphicon glyphicon-remove pull-right " aria-hidden="true"></span><span class="pull-right" aria-hidden="true">&nbsp;</span><span class="glyphicon glyphicon-edit pull-right" data-toggle="modal" data-target="#dialog" aria-hidden="true"></span></td>            
                                         </tr>
                                     <?php } ?>
                                     </tbody>
@@ -315,37 +327,23 @@
     </div>
     <!-- /#wrapper -->
     <!-- Modal -->
-      <div class="modal fade" id="dialog" role="dialog">
+      <div class="modal fade modal-xl" id="dialog" role="dialog">
         <div class="modal-dialog">        
           <!-- Modal content-->
           <div class="modal-content">
             <div class="modal-header">
               <button type="button" class="close" data-dismiss="modal">&times;</button>
-              <h4 class="modal-title" id="dialogTitle">Edit Class</h4>
+              <h4 class="modal-title" id="dialogTitle">Edit Question</h4>
             </div>
             <div class="modal-body">
             <form id="submission" method="post" action="<?php echo $_SERVER['PHP_SELF']; ?>">
                 <!--if 1, insert; else if 0 update; else if -1 delete;-->
                 <input type=hidden name="update" id="update" value="1"></input>
-                <label for="ClassID" style="display:none">ClassID</label>
-                <input type="text" class="form-control dialoginput" id="ClassID" name="classid" style="display:none">
-                <br><label for="ClassName">ClassName</label>
-                <input type="text" class="form-control dialoginput" id="ClassName" name="classname" required>
-                <br><label for="SchoolName">SchoolName</label>
-                <select class="form-control dialoginput" id="SchoolName" form="submission" name="schoolname" required>
-                  <?php for($i=0; $i<count($quizResult); $i++) {?>                  
-                  <option value="<?php echo $quizResult->SchoolName ?>"><?php echo $quizResult->SchoolName ?></option>
-                  <?php } ?>
-                </select>                
-                <br><label for="TeacherToken">TeacherToken</label><span class="glyphicon glyphicon-random pull-right"></span>
-                <input type="text" class="form-control dialoginput" id="TeacherToken" name="teachertoken" required></input>
-                <br><label for="QuizToken">QuizToken</label><span class="glyphicon glyphicon-random pull-right"></span>
-                <input type="text" class="form-control dialoginput" id="QuizToken" name="quiztoken" required></input>
-                <br><label for="EnrolledQuizs">EnrolledQuizs</label>
-                <input type="text" class="form-control dialoginput" id="EnrolledQuizs" name="EnrolledQuizs">
-                <br><label for="UnlockedProgress">UnlockedProgress</label>
-                <input type="text" class="form-control dialoginput" id="UnlockedProgress" name="UnlockedProgress">
-            </form>
+                <label for="<?php echo $mcqQuesColName[0]; ?>" style="display:none"><?php echo $mcqQuesColName[0]; ?></label>
+                <input type="text" class="form-control dialoginput" id="<?php echo $mcqQuesColName[0]; ?>" name="<?php echo strtolower($mcqQuesColName[0]); ?>" style="display:none">
+                <br><label for="<?php echo $mcqQuesColName[1]; ?>"><?php echo $mcqQuesColName[1]; ?></label>
+                <input type="text" class="form-control dialoginput" id="<?php echo $mcqQuesColName[1]; ?>" name="<?php echo strtolower($mcqQuesColName[1]); ?>" required><br>
+            </form>            
             </div>
             <div class="modal-footer">            
               <button type="button" id="btnSave" class="btn btn-default">Save</button>
@@ -374,33 +372,32 @@
     <!--jQuery Validate plugin-->
     <script src="http://ajax.aspnetcdn.com/ajax/jquery.validate/1.15.0/jquery.validate.min.js"></script>
 
+    <!-- DataTables rowsGroup Plugin -->
+    <script src="../bower_components/datatables-plugins/rowsgroup/dataTables.rowsGroup.js "></script>
+    
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.11.4/themes/ui-lightness/jquery-ui.css" />
+    <link rel="stylesheet" href="https://code.jquery.com/qunit/qunit-1.18.0.css" />  
+    
     <!-- Page-Level Scripts -->
     <script>
-    function randomString(length) {
-        return Math.round((Math.pow(36, length + 1) - Math.random() * Math.pow(36, length))).toString(36).slice(1);
-    }
     //DO NOT put them in $(document).ready() since the table has multi pages
     $('.glyphicon-edit').on('click', function (){
-        $('#dialogTitle').text("Edit Class");
+        $('#dialogTitle').text("Edit Question");
         $('#update').val(0);
         for(i=0;i<$('.dialoginput').length;i++){                
             $('.dialoginput').eq(i).val($(this).parent().parent().children('td').eq(i).text());
         }
-        //disable ClassID, EnrolledQuizs, UnlockedProgress
-        $('.dialoginput').eq(0).attr('disabled','disabled');
-        $('.dialoginput').eq(5).attr('disabled','disabled');
-        $('.dialoginput').eq(6).attr('disabled','disabled');          
+        //disable MCQID    
+        $('.dialoginput').eq(0).attr('disabled','disabled');        
     });
     $('.glyphicon-plus').on('click', function (){
-        $('#dialogTitle').text("Add Class");
+        $('#dialogTitle').text("Add Question");
         $('#update').val(1);
         for(i=0;i<$('.dialoginput').length;i++){                
             $('.dialoginput').eq(i).val('');
         }
-        //disable ClassID, EnrolledQuizs, UnlockedProgress
-        $('.dialoginput').eq(0).attr('disabled','disabled');
-        $('.dialoginput').eq(5).attr('disabled','disabled');    
-        $('.dialoginput').eq(6).attr('disabled','disabled');         
+        //disable MCQID
+        $('.dialoginput').eq(0).attr('disabled','disabled');         
     }); 
     $('.glyphicon-remove').on('click', function (){
         if (confirm('[WARNING] Are you sure to remove this class? All the quiz data in this class will also get deleted (not recoverable). It includes quiz information, their submissions of every task and your grading/feedback, not only the class itself.')) {
@@ -413,13 +410,6 @@
             $('#submission').submit();
         }           
     });
-     $('.glyphicon-random').on('click', function (){
-        var index = $(this).index();
-        if (index == $("#TeacherToken").index() - 1)
-            $('#TeacherToken').val(randomString(16)); 
-        else if (index == $("#QuizToken").index() - 1)
-            $('#QuizToken').val(randomString(16));
-    });
     $('#btnSave').on('click', function (){
         $('#submission').validate();        
         //enable ClassID and EnrolledQuizs
@@ -429,21 +419,23 @@
     //include html
     w3IncludeHTML();   
     $(document).ready(function() {
-        var table = $('#datatables').DataTable({
-                responsive: true,
-                "initComplete": function(settings, json) {
-                    
-                    $('.input-sm').eq(1).val($("#keyword").val().trim());                    
-                }
+    var table = $('#datatables').DataTable({
+            responsive: true,
+            "initComplete": function(settings, json) {                
+                $('.input-sm').eq(1).val($("#keyword").val().trim());                    
+            },
+            //rows group for MCQID, Question and edit box
+            rowsGroup: [1,4],
+            "pageLength":100
         })
         //search keyword (schoolname), exact match
         table.search(
             $("#keyword").val().trim(), true, false, true
         ).draw();
-        //TODO: layout of options
-        //$(".form-control.input-sm").eq(0).val(100);
+         $('.metadatainput').eq(4).attr('disabled','disabled'); 
+        
     });        
-    </script>
+    </script>    
 </body>
 
 </html>

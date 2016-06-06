@@ -119,7 +119,7 @@ CREATE TABLE IF NOT EXISTS `Topic` (
 
 CREATE TABLE IF NOT EXISTS `Quiz` (
     QuizID MEDIUMINT AUTO_INCREMENT,
-    Week TINYINT,
+    Week MEDIUMINT,
     QuizType ENUM('MCQ', 'SAQ', 'Matching', 'Calculator', 'Poster'),    
     TopicID MEDIUMINT,
     CONSTRAINT Quiz_QuizID_PK PRIMARY KEY (QuizID),
@@ -131,7 +131,7 @@ CREATE TABLE IF NOT EXISTS `Quiz` (
 CREATE TABLE IF NOT EXISTS `Quiz_Record` (
     QuizID MEDIUMINT,
     StudentID MEDIUMINT,    
-    `Status` ENUM('UNGRADED', 'GRADED') DEFAULT 'GRADED',
+    `Status` ENUM('UNSUBMITTED', 'UNGRADED', 'GRADED') DEFAULT 'GRADED',
     Score MEDIUMINT DEFAULT 0,
     CONSTRAINT Quiz_Record_PK PRIMARY KEY (QuizID , StudentID),
     CONSTRAINT Quiz_Record_QuizID_FK FOREIGN KEY (QuizID)
@@ -208,7 +208,7 @@ CREATE TABLE IF NOT EXISTS `SAQ_Section` (
 CREATE TABLE IF NOT EXISTS `SAQ_Question` (
     SAQID MEDIUMINT AUTO_INCREMENT,
     Question TEXT,
-    Points INT,
+    Points MEDIUMINT,
     QuizID MEDIUMINT,
     CONSTRAINT SAQ_Question_SAQID_PK PRIMARY KEY (SAQID),
     CONSTRAINT SAQ_Question_QuizID_FK FOREIGN KEY (QuizID)
@@ -221,7 +221,7 @@ CREATE TABLE IF NOT EXISTS `SAQ_Question_Record` (
     SAQID MEDIUMINT,
     Answer TEXT,
     Feedback TEXT,
-    Grading INT,
+    Grading MEDIUMINT,
     CONSTRAINT SAQ_Question_Record_PK PRIMARY KEY (StudentID , SAQID),
     CONSTRAINT SAQ_Question_Record_StudentID_FK FOREIGN KEY (StudentID)
         REFERENCES Student (StudentID)
@@ -280,7 +280,7 @@ CREATE TABLE IF NOT EXISTS `Poster_Record` (
     QuizID MEDIUMINT,
     ZwibblerDoc LONGTEXT,
     ImageURL LONGTEXT,
-    Grading INT,
+    Grading MEDIUMINT,
     CONSTRAINT Poster_Record_Record_PK PRIMARY KEY (StudentID , QuizID),
     CONSTRAINT Poster_Record_Record_StudentID_FK FOREIGN KEY (StudentID)
         REFERENCES Student (StudentID)
@@ -293,7 +293,7 @@ CREATE TABLE IF NOT EXISTS `Poster_Record` (
 CREATE TABLE IF NOT EXISTS `Game` (
     GameID MEDIUMINT AUTO_INCREMENT,
     Description TEXT,
-    Week TINYINT,
+    Week MEDIUMINT,
     Points MEDIUMINT,
     CONSTRAINT Game_GameID_PK PRIMARY KEY (GameID)
 )  ENGINE=INNODB;
@@ -301,7 +301,7 @@ CREATE TABLE IF NOT EXISTS `Game` (
 CREATE TABLE IF NOT EXISTS `Game_Record` (
     GameID MEDIUMINT,
     StudentID MEDIUMINT,
-    `Level` TINYINT DEFAULT 0,
+    `Level` MEDIUMINT DEFAULT 0,
     Score INT,
     CONSTRAINT Game_Record_PK PRIMARY KEY (GameID , StudentID, `Level`),
     CONSTRAINT Game_Record_GameID_FK FOREIGN KEY (GameID)
@@ -314,7 +314,7 @@ CREATE TABLE IF NOT EXISTS `Game_Record` (
 
 CREATE TABLE IF NOT EXISTS `Bonus` (
     BonusID MEDIUMINT AUTO_INCREMENT,
-    Week TINYINT,
+    Week MEDIUMINT,
     CONSTRAINT Bonus_BonusID_PK PRIMARY KEY (BonusID)
 )  ENGINE=INNODB;
 
@@ -333,7 +333,7 @@ CREATE TABLE IF NOT EXISTS `Bonus_Record` (
 CREATE TABLE IF NOT EXISTS `Bonus_Task` (
     BonusQuestionID MEDIUMINT AUTO_INCREMENT,
     Question TEXT,
-    Points INT,
+    Points MEDIUMINT,
     BonusID MEDIUMINT,
     CONSTRAINT Bonus_Task_BonusQuestionID_PK PRIMARY KEY (BonusQuestionID),
     CONSTRAINT Bonus_Task_BonusID_FK FOREIGN KEY (BonusID)
@@ -346,7 +346,7 @@ CREATE TABLE IF NOT EXISTS `Bonus_Task_Record` (
     BonusQuestionID MEDIUMINT,
     Answer TEXT,
     Feedback TEXT,
-    Grading INT,
+    Grading MEDIUMINT,
     CONSTRAINT Bonus_Task_Record_PK PRIMARY KEY (StudentID , BonusQuestionID),
     CONSTRAINT Bonus_Task_Record_StudentID FOREIGN KEY (StudentID)
         REFERENCES Student (StudentID)
@@ -416,10 +416,10 @@ INSERT IGNORE INTO Topic(TopicName) VALUES('Introduction');
 # [Formal] insert MCQ section with multiple questions
 INSERT IGNORE INTO Quiz(Week,QuizType,TopicID) VALUES(1,'MCQ',2);
 SET @QUIZ_LAST_INSERT_ID = LAST_INSERT_ID();
-INSERT IGNORE INTO MCQ_Section(QuizID,Points,Questionnaires) VALUES(@QUIZ_LAST_INSERT_ID,30,1);
+INSERT IGNORE INTO MCQ_Section(QuizID,Points,Questionnaires) VALUES(@QUIZ_LAST_INSERT_ID,30,0);
 INSERT IGNORE INTO MCQ_Question(Question, CorrectChoice, QuizID) VALUES('Which of these breakfast foods will provide you with the most energy?', 'Whole grain cereal or oatmeal', @QUIZ_LAST_INSERT_ID);
 SET @MCQ_QUESTION_LAST_INSERT_ID = LAST_INSERT_ID();
-INSERT IGNORE INTO `Option`(Content, Explanation, MCQID) VALUES('Candy bar', 'Whole grains take your body longer to digest, giving you energy all morning!', @MCQ_QUESTION_LAST_INSERT_ID);
+INSERT IGNORE INTO `Option`(Content, Explanation, MCQID) VALUES('Candy bar', 'Candy bars will give you an instant burst of energy but will not last!', @MCQ_QUESTION_LAST_INSERT_ID);
 INSERT IGNORE INTO `Option`(Content, Explanation, MCQID) VALUES('Whole grain cereal or oatmeal', 'Whole grains take your body longer to digest, giving you energy all morning!', @MCQ_QUESTION_LAST_INSERT_ID);
 INSERT IGNORE INTO `Option`(Content, Explanation, MCQID) VALUES('Potato chips', 'Whole grains take your body longer to digest, giving you energy all morning!', @MCQ_QUESTION_LAST_INSERT_ID);
 
@@ -680,6 +680,45 @@ INSERT INTO `isnap2changedb`.`fact` (`Content`, `TopicID`) VALUES ('Supportive e
 
 # [Example] insert a poster task into Quiz
 INSERT INTO `isnap2changedb`.`quiz` (`Week`, `QuizType`, `TopicID`) VALUES ('2', 'Poster', '3');
+
+INSERT IGNORE INTO Quiz(Week,QuizType,TopicID) VALUES(1,'MCQ',5);
+SET @QUIZ_LAST_INSERT_ID = LAST_INSERT_ID();
+INSERT IGNORE INTO MCQ_Section(QuizID,Points,Questionnaires) VALUES(@QUIZ_LAST_INSERT_ID,20,0);
+INSERT IGNORE INTO MCQ_Question(Question, CorrectChoice, QuizID) VALUES('0 option:', '0', @QUIZ_LAST_INSERT_ID);
+SET @MCQ_QUESTION_LAST_INSERT_ID = LAST_INSERT_ID();
+
+INSERT IGNORE INTO MCQ_Question(Question, CorrectChoice, QuizID) VALUES('1 option:', '1', @QUIZ_LAST_INSERT_ID);
+SET @MCQ_QUESTION_LAST_INSERT_ID = LAST_INSERT_ID();
+INSERT IGNORE INTO `Option`(Content, Explanation, MCQID) VALUES('1', "Correct", @MCQ_QUESTION_LAST_INSERT_ID);
+
+INSERT IGNORE INTO MCQ_Question(Question, CorrectChoice, QuizID) VALUES('2 option', '2', @QUIZ_LAST_INSERT_ID);
+SET @MCQ_QUESTION_LAST_INSERT_ID = LAST_INSERT_ID();
+INSERT IGNORE INTO `Option`(Content, Explanation, MCQID) VALUES('1', "Wrong", @MCQ_QUESTION_LAST_INSERT_ID);
+INSERT IGNORE INTO `Option`(Content, Explanation, MCQID) VALUES('2', "Correct", @MCQ_QUESTION_LAST_INSERT_ID);
+
+INSERT IGNORE INTO MCQ_Question(Question, CorrectChoice, QuizID) VALUES('3 option', '3',@QUIZ_LAST_INSERT_ID);
+SET @MCQ_QUESTION_LAST_INSERT_ID = LAST_INSERT_ID();
+INSERT IGNORE INTO `Option`(Content, Explanation, MCQID) VALUES('1', "Wrong", @MCQ_QUESTION_LAST_INSERT_ID);
+INSERT IGNORE INTO `Option`(Content, Explanation, MCQID) VALUES('3', "Correct", @MCQ_QUESTION_LAST_INSERT_ID);
+INSERT IGNORE INTO `Option`(Content, Explanation, MCQID) VALUES('2', "Wrong", @MCQ_QUESTION_LAST_INSERT_ID);
+
+INSERT IGNORE INTO MCQ_Question(Question, CorrectChoice, QuizID) VALUES('4 option', '4', @QUIZ_LAST_INSERT_ID);
+SET @MCQ_QUESTION_LAST_INSERT_ID = LAST_INSERT_ID();
+INSERT IGNORE INTO `Option`(Content, Explanation, MCQID) VALUES('1', "Wrong", @MCQ_QUESTION_LAST_INSERT_ID);
+INSERT IGNORE INTO `Option`(Content, Explanation, MCQID) VALUES('2', "Wrong", @MCQ_QUESTION_LAST_INSERT_ID);
+INSERT IGNORE INTO `Option`(Content, Explanation, MCQID) VALUES('3', "Wrong", @MCQ_QUESTION_LAST_INSERT_ID);
+INSERT IGNORE INTO `Option`(Content, Explanation, MCQID) VALUES('4', "Correct", @MCQ_QUESTION_LAST_INSERT_ID);
+
+INSERT IGNORE INTO MCQ_Question(Question, CorrectChoice, QuizID) VALUES('5 option', '5', @QUIZ_LAST_INSERT_ID);
+SET @MCQ_QUESTION_LAST_INSERT_ID = LAST_INSERT_ID();
+INSERT IGNORE INTO `Option`(Content, Explanation, MCQID) VALUES('1', "Wrong", @MCQ_QUESTION_LAST_INSERT_ID);
+INSERT IGNORE INTO `Option`(Content, Explanation, MCQID) VALUES('2', "Wrong", @MCQ_QUESTION_LAST_INSERT_ID);
+INSERT IGNORE INTO `Option`(Content, Explanation, MCQID) VALUES('3', "Wrong", @MCQ_QUESTION_LAST_INSERT_ID);
+INSERT IGNORE INTO `Option`(Content, Explanation, MCQID) VALUES('4', "Wrong", @MCQ_QUESTION_LAST_INSERT_ID);
+INSERT IGNORE INTO `Option`(Content, Explanation, MCQID) VALUES('5', "Correct", @MCQ_QUESTION_LAST_INSERT_ID);
+
+INSERT IGNORE INTO Learning_Material(Content,QuizID) VALUES('
+<p>Learning materials for this quiz has not been added.</p>',9);
 
 # [Example] insert a poster task into Poster_Section
 INSERT INTO `isnap2changedb`.`poster_section` (`QuizID`, `Points`) VALUES ('9', '20');
