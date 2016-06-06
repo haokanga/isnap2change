@@ -389,7 +389,7 @@
                     $('.input-sm').eq(1).val($("#keyword").val().trim());                    
                 }
         })
-        //search keyword (schoolname), exact match
+        //search keyword, exact match
         table.search(
             $("#keyword").val().trim(), true, false, true
         ).draw();     

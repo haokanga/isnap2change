@@ -420,7 +420,7 @@
             rowsGroup: [1,4],
             "pageLength":100
         })
-        //search keyword (schoolname), exact match
+        //search keyword, exact match
         table.search(
             $("#keyword").val().trim(), true, false, true
         ).draw();

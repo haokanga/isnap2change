@@ -38,7 +38,7 @@ DROP TABLE IF EXISTS `Bonus_Task_Record`;
 
 CREATE TABLE IF NOT EXISTS `School` (
     SchoolID MEDIUMINT AUTO_INCREMENT,
-    SchoolName TEXT,
+    SchoolName VARCHAR(190) UNIQUE,
     CONSTRAINT School_SchoolID_PK PRIMARY KEY (SchoolID)
 )  ENGINE=INNODB;
 

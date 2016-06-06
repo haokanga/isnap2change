@@ -57,7 +57,7 @@
         $quizQuery->execute(array($quizID));
         $quizResult = $quizQuery->fetch(PDO::FETCH_OBJ); 
         }
-        //get topic
+        //get topic list
         $topicSql = "SELECT TopicID, TopicName FROM Topic ORDER BY TopicID";
         $topicQuery = $conn->prepare($topicSql);
         $topicQuery->execute(array());
@@ -91,19 +91,11 @@
 		$mcqQuery->execute(array($quizID));
         $mcqResult = $mcqQuery->fetchAll(PDO::FETCH_OBJ); 
 
-
         //get max option num        
         $optionNumSql = "SELECT MAX(OptionNum) AS MaxOptionNum FROM (SELECT COUNT(*) AS OptionNum FROM MCQ_Question natural JOIN `Option` WHERE QuizID = ? GROUP BY MCQID) AS OptionNumbTable;";								
 		$optionNumQuery = $conn->prepare($optionNumSql);
 		$optionNumQuery->execute(array($quizID));
         $optionNumResult = $optionNumQuery->fetch(PDO::FETCH_OBJ);
-        /**
-        $mcqQuesColName[] = 'QuizID';
-        $mcqQuesColName[] = 'Question';
-        for($i=0; $i<$optionNumResult->MaxOptionNum; $i++) {
-            $mcqQuesColName[] = 'Option'.($i+1);
-        }
-        */
         $mcqQuesColName = array('MCQID','Question','Option', 'Explanation','Edit');
 	}   
     db_close($conn); 
@@ -428,7 +420,7 @@
             rowsGroup: [1,4],
             "pageLength":100
         })
-        //search keyword (schoolname), exact match
+        //search keyword, exact match
         table.search(
             $("#keyword").val().trim(), true, false, true
         ).draw();

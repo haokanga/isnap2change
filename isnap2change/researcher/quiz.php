@@ -211,7 +211,7 @@
                 </select>
                 <br>   
                 <label for='TopicName'>TopicName</label>
-                <select class="form-control metadatainput" id="TopicName" form="submission" name="topicname" required>
+                <select class="form-control dialoginput" id="TopicName" form="submission" name="topicname" required>
                 <option value="" disabled selected>Select Topic</option>
                   <?php for($j=0; $j<count($topicResult); $j++) {?>                  
                     <option value='<?php echo $topicResult[$j]->TopicName ?>'><?php echo $topicResult[$j]->TopicName ?></option>
@@ -249,9 +249,6 @@
 
     <!-- Page-Level Scripts -->
     <script>
-    function randomString(length) {
-        return Math.round((Math.pow(36, length + 1) - Math.random() * Math.pow(36, length))).toString(36).slice(1);
-    }
     //DO NOT put them in $(document).ready() since the table has multi pages
     $('.glyphicon-edit').on('click', function (){
         /*...*/        
@@ -271,13 +268,6 @@
             }
             $('#submission').submit();
         }           
-    });
-     $('.glyphicon-random').on('click', function (){
-        var index = $(this).index();
-        if (index == $("#TeacherToken").index() - 1)
-            $('#TeacherToken').val(randomString(16)); 
-        else if (index == $("#QuizToken").index() - 1)
-            $('#QuizToken').val(randomString(16));
     });
     $('#btnSave').on('click', function (){
         $('#submission').validate({
@@ -301,7 +291,7 @@
                 "order": [[ 1, "asc" ]],
                 "pageLength":50
         })
-        //search keyword (schoolname), exact match
+        //search keyword, exact match
         table.search(
             $("#keyword").val().trim(), true, false, true
         ).draw();     
