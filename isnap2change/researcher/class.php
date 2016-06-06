@@ -270,7 +270,7 @@
             <div class="modal-body">
             <form id="submission" method="post" action="<?php echo $_SERVER['PHP_SELF']; ?>">
                 <!--if 1, insert; else if 0 update; else if -1 delete;-->
-                <input type=hidden name="update" id="update" value="1"></input>
+                <input type=hidden name="update" id="update" value="1" required></input>
                 <label for="ClassID" style="display:none">ClassID</label>
                 <input type="text" class="form-control dialoginput" id="ClassID" name="classid" style="display:none">
                 <br><label for="ClassName">ClassName</label>
