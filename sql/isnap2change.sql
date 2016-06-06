@@ -279,7 +279,7 @@ CREATE TABLE IF NOT EXISTS `Poster_Record` (
     StudentID MEDIUMINT,
     QuizID MEDIUMINT,
     ZwibblerDoc LONGTEXT,
-    DataURL LONGTEXT,
+    ImageURL LONGTEXT,
     Grading MEDIUMINT,
     CONSTRAINT Poster_Record_Record_PK PRIMARY KEY (StudentID , QuizID),
     CONSTRAINT Poster_Record_Record_StudentID_FK FOREIGN KEY (StudentID)
@@ -678,8 +678,8 @@ INSERT INTO `isnap2changedb`.`fact` (`Content`, `TopicID`) VALUES ('Up to 40% of
 INSERT INTO `isnap2changedb`.`fact` (`Content`, `TopicID`) VALUES ('People aged 18-64 years old should exercice at least 150 min per week at least, each of the session lasting 10 min as a minimum,', '4');
 INSERT INTO `isnap2changedb`.`fact` (`Content`, `TopicID`) VALUES ('Supportive environments and communities may help people to be more physically active.', '4');
 
-
-# [Example] Corner case MCQ Example
+# [Example] insert a poster task into Quiz
+INSERT INTO `isnap2changedb`.`quiz` (`Week`, `QuizType`, `TopicID`) VALUES ('2', 'Poster', '3');
 
 INSERT IGNORE INTO Quiz(Week,QuizType,TopicID) VALUES(1,'MCQ',5);
 SET @QUIZ_LAST_INSERT_ID = LAST_INSERT_ID();
@@ -720,6 +720,11 @@ INSERT IGNORE INTO `Option`(Content, Explanation, MCQID) VALUES('5', "Correct", 
 INSERT IGNORE INTO Learning_Material(Content,QuizID) VALUES('
 <p>Learning materials for this quiz has not been added.</p>',9);
 
+# [Example] insert a poster task into Poster_Section
+INSERT INTO `isnap2changedb`.`poster_section` (`QuizID`, `Points`) VALUES ('9', '20');
+
+# [Example] insert a learning material for a Poster task with QuizID = 9
+INSERT INTO `isnap2changedb`.`learning_material` (`Content`, `QuizID`) VALUES ('<p>Learning materials for this quiz has not been added.</p>', '9');
 /*
 #TEST
 
