@@ -440,17 +440,12 @@
         // Prepare common variables
         var gColumns = [
             { name: 'OptionID', type: 'hidden' },
-            { name: 'Album', display: 'Album', type: 'text', ctrlAttr: { maxlength: 100 }, ctrlCss: { width: '160px' } },
-            { name: 'Artist', display: 'Artist', type: 'text', ctrlAttr: { maxlength: 100 }, ctrlCss: { width: '120px' } },
-            { name: 'Year', display: 'Year', type: 'text', ctrlAttr: { maxlength: 4 }, ctrlCss: { width: '50px' } },
-            { name: 'Origin', display: 'Origin', type: 'select', ctrlOptions: { 0: '{Choose}', 1: 'Hong Kong', 2: 'Taiwan', 3: 'Japan', 4: 'Korea', 5: 'US', 6: 'Others' } },
-            { name: 'CorrentChoice', display: 'CorrentChoice', type: 'checkbox' },
+            { name: 'Option', display: 'Option', type: 'text', ctrlAttr: { maxlength: 200 }, ctrlCss: { width: '160px' } },
+            { name: 'Explanation', display: 'Explanation', type: 'text', ctrlAttr: { maxlength: 200 }, ctrlCss: { width: '120px' } },
+            { name: 'CorrectChoice', display: 'CorrectChoice', type: 'checkbox' }
         ], gData = [
-            { 'ID': 1, 'Album': 'Dearest', 'Artist': 'Theresa Fu', 'Year': '2009', 'Origin': 1, 'Poster': true, 'Price': 168.9 },
-            { 'ID': 2, 'Album': 'To be Free', 'Artist': 'Arashi', 'Year': '2010', 'Origin': 3, 'Poster': true, 'Price': 152.6 },
-            { 'ID': 3, 'Album': 'Count On Me', 'Artist': 'Show Luo', 'Year': '2012', 'Origin': 2, 'Poster': false, 'Price': 306.8 },
-            { 'ID': 4, 'Album': 'Wonder Party', 'Artist': 'Wonder Girls', 'Year': '2012', 'Origin': 4, 'Poster': true, 'Price': 108.6 },
-            { 'ID': 5, 'Album': 'Reflection', 'Artist': 'Kelly Chen', 'Year': '2013', 'Origin': 1, 'Poster': false, 'Price': 138.2 }
+            { 'OptionID': 1, 'Option': 'Candy bar', 'Explanation': 'Candy bars will give you an instant burst of energy but will not last!', 'CorrectChoice': true },
+            { 'OptionID': 2, 'Option': 'Whole grain cereal or oatmeal', 'Explanation': 'Whole grains take your body longer to digest, giving you energy all morning!', 'CorrectChoice': false },
         ], gI18n = {
             append: '!append!',
             removeLast: '!removeLast!',
