@@ -78,7 +78,7 @@
                     echo "<script language=\"javascript\">  alert(\"Error occurred to insert teacherToken. Contact with developers.\"); </script>";
                 } else{
                 }
-                $update_stmt = "REPLACE INTO Token(ClassID, `Type`, TokenString)
+                $update_stmt = "INSERT INTO Token(ClassID, `Type`, TokenString)
                      VALUES (?,?,?) ON DUPLICATE KEY UPDATE TokenString = ?;";			
                 $update_stmt = $conn->prepare($update_stmt);                            
                 if(! $update_stmt -> execute(array($classID, "STUDENT", $studentToken, $studentToken))){
