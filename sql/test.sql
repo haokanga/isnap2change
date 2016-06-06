@@ -19,7 +19,7 @@ SELECT * FROM MCQ_Question;
 SELECT MAX(OptionNum) FROM (SELECT COUNT(*) AS OptionNum FROM MCQ_Question natural JOIN `Option` GROUP BY MCQID) AS OptionNumbTable;
 
                
-SELECT MCQID, Question, CorrectChoice, Content
+SELECT *
 				   FROM   MCQ_Section NATURAL JOIN MCQ_Question
 								  NATURAL JOIN `Option`
 			       WHERE  QuizID = 1
@@ -28,8 +28,8 @@ SELECT MCQID, Question, CorrectChoice, Content
                    
 SELECT MAX(OptionNum) AS MaxOptionNum FROM (SELECT COUNT(*) AS OptionNum FROM MCQ_Question natural JOIN `Option` WHERE QuizID = 1 GROUP BY MCQID) AS OptionNumbTable;                   
 
-
-
+SELECT * FROM `Option`;
+SELECT * FROM MCQ_Question;
 
 
                    

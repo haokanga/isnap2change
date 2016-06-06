@@ -104,7 +104,7 @@
             $mcqQuesColName[] = 'Option'.($i+1);
         }
         */
-        $mcqQuesColName = array('QuizID','Question','Option', 'Explanation','Edit');
+        $mcqQuesColName = array('MCQID','Question','Option', 'Explanation','Edit');
 	}   
     db_close($conn); 
     
@@ -285,11 +285,11 @@
                                     <tbody>
                                         <?php for($i=0; $i<count($mcqResult); $i++) {?>
                                         <tr class="<?php if($i % 2 == 0){echo "odd";} else {echo "even";} ?>">
-                                            <td style="display:none"><?php echo $mcqResult[$i]->MCQID; ?></td>
-                                            <td><?php echo $mcqResult[$i]->Question ?></td>
+                                            <td style="display:none"><?php echo $mcqResult[$i]->$mcqQuesColName[0]; ?></td>
+                                            <td><?php echo $mcqResult[$i]->$mcqQuesColName[1] ?></td>
                                             <td class ="<?php if ($mcqResult[$i]->Content == $mcqResult[$i]->CorrectChoice) {echo 'bg-success';} else {echo 'bg-danger';} ?>">
                                                 <?php echo $mcqResult[$i]->Content; ?>
-                                            <td><?php echo $mcqResult[$i]->Explanation ?></td>
+                                            <td><?php echo $mcqResult[$i]->$mcqQuesColName[3] ?></td>
                                             <td><span class="glyphicon glyphicon-remove pull-right " aria-hidden="true"></span><span class="pull-right" aria-hidden="true">&nbsp;</span><span class="glyphicon glyphicon-edit pull-right" data-toggle="modal" data-target="#dialog" aria-hidden="true"></span></td>            
                                         </tr>
                                     <?php } ?>
@@ -329,31 +329,18 @@
           <div class="modal-content">
             <div class="modal-header">
               <button type="button" class="close" data-dismiss="modal">&times;</button>
-              <h4 class="modal-title" id="dialogTitle">Edit Class</h4>
+              <h4 class="modal-title" id="dialogTitle">Edit Question</h4>
             </div>
             <div class="modal-body">
             <form id="submission" method="post" action="<?php echo $_SERVER['PHP_SELF']; ?>">
                 <!--if 1, insert; else if 0 update; else if -1 delete;-->
                 <input type=hidden name="update" id="update" value="1"></input>
-                <label for="ClassID" style="display:none">ClassID</label>
-                <input type="text" class="form-control dialoginput" id="ClassID" name="classid" style="display:none">
-                <br><label for="ClassName">ClassName</label>
-                <input type="text" class="form-control dialoginput" id="ClassName" name="classname" required>
-                <br><label for="SchoolName">SchoolName</label>
-                <select class="form-control dialoginput" id="SchoolName" form="submission" name="schoolname" required>
-                  <?php for($i=0; $i<count($quizResult); $i++) {?>                  
-                  <option value="<?php echo $quizResult->SchoolName ?>"><?php echo $quizResult->SchoolName ?></option>
-                  <?php } ?>
-                </select>                
-                <br><label for="TeacherToken">TeacherToken</label><span class="glyphicon glyphicon-random pull-right"></span>
-                <input type="text" class="form-control dialoginput" id="TeacherToken" name="teachertoken" required></input>
-                <br><label for="QuizToken">QuizToken</label><span class="glyphicon glyphicon-random pull-right"></span>
-                <input type="text" class="form-control dialoginput" id="QuizToken" name="quiztoken" required></input>
-                <br><label for="EnrolledQuizs">EnrolledQuizs</label>
-                <input type="text" class="form-control dialoginput" id="EnrolledQuizs" name="EnrolledQuizs">
-                <br><label for="UnlockedProgress">UnlockedProgress</label>
-                <input type="text" class="form-control dialoginput" id="UnlockedProgress" name="UnlockedProgress">
-            </form>
+                <label for="<?php echo $mcqQuesColName[0]; ?>" style="display:none"><?php echo $mcqQuesColName[0]; ?></label>
+                <input type="text" class="form-control dialoginput" id="<?php echo $mcqQuesColName[0]; ?>" name="<?php echo strtolower($mcqQuesColName[0]); ?>" style="display:none">
+                <br><label for="<?php echo $mcqQuesColName[1]; ?>"><?php echo $mcqQuesColName[1]; ?></label>
+                <input type="text" class="form-control dialoginput" id="<?php echo $mcqQuesColName[1]; ?>" name="<?php echo strtolower($mcqQuesColName[1]); ?>" required><br>
+                <table id="tblAppendGrid"></table>
+            </form>            
             </div>
             <div class="modal-footer">            
               <button type="button" id="btnSave" class="btn btn-default">Save</button>
@@ -385,33 +372,32 @@
     <!-- DataTables rowsGroup Plugin -->
     <script src="../bower_components/datatables-plugins/rowsgroup/dataTables.rowsGroup.js "></script>
     
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.11.4/themes/ui-lightness/jquery-ui.css" />
+    <link rel="stylesheet" href="https://code.jquery.com/qunit/qunit-1.18.0.css" />
+    <link href="../bower_components/appendgrid/jquery.appendGrid-1.6.2.css" rel="stylesheet" />
+    <script type="text/javascript" src="https://code.jquery.com/ui/1.11.4/jquery-ui.min.js"></script>
+    <script type="text/javascript" src="../bower_components/appendgrid/jquery.appendGrid-1.6.2.js"></script>   
+    
     <!-- Page-Level Scripts -->
     <script>
-    function randomString(length) {
-        return Math.round((Math.pow(36, length + 1) - Math.random() * Math.pow(36, length))).toString(36).slice(1);
-    }
     //DO NOT put them in $(document).ready() since the table has multi pages
     $('.glyphicon-edit').on('click', function (){
-        $('#dialogTitle').text("Edit Class");
+        $('#dialogTitle').text("Edit Question");
         $('#update').val(0);
         for(i=0;i<$('.dialoginput').length;i++){                
             $('.dialoginput').eq(i).val($(this).parent().parent().children('td').eq(i).text());
         }
-        //disable ClassID, EnrolledQuizs, UnlockedProgress
-        $('.dialoginput').eq(0).attr('disabled','disabled');
-        $('.dialoginput').eq(5).attr('disabled','disabled');
-        $('.dialoginput').eq(6).attr('disabled','disabled');          
+        //disable MCQID    
+        $('.dialoginput').eq(0).attr('disabled','disabled');        
     });
     $('.glyphicon-plus').on('click', function (){
-        $('#dialogTitle').text("Add Class");
+        $('#dialogTitle').text("Add Question");
         $('#update').val(1);
         for(i=0;i<$('.dialoginput').length;i++){                
             $('.dialoginput').eq(i).val('');
         }
-        //disable ClassID, EnrolledQuizs, UnlockedProgress
-        $('.dialoginput').eq(0).attr('disabled','disabled');
-        $('.dialoginput').eq(5).attr('disabled','disabled');    
-        $('.dialoginput').eq(6).attr('disabled','disabled');         
+        //disable MCQID
+        $('.dialoginput').eq(0).attr('disabled','disabled');         
     }); 
     $('.glyphicon-remove').on('click', function (){
         if (confirm('[WARNING] Are you sure to remove this class? All the quiz data in this class will also get deleted (not recoverable). It includes quiz information, their submissions of every task and your grading/feedback, not only the class itself.')) {
@@ -424,13 +410,6 @@
             $('#submission').submit();
         }           
     });
-     $('.glyphicon-random').on('click', function (){
-        var index = $(this).index();
-        if (index == $("#TeacherToken").index() - 1)
-            $('#TeacherToken').val(randomString(16)); 
-        else if (index == $("#QuizToken").index() - 1)
-            $('#QuizToken').val(randomString(16));
-    });
     $('#btnSave').on('click', function (){
         $('#submission').validate();        
         //enable ClassID and EnrolledQuizs
@@ -442,11 +421,11 @@
     $(document).ready(function() {
     var table = $('#datatables').DataTable({
             responsive: true,
-            "initComplete": function(settings, json) {
-                
+            "initComplete": function(settings, json) {                
                 $('.input-sm').eq(1).val($("#keyword").val().trim());                    
             },
-            rowsGroup: [1,3,4],
+            //rows group for MCQID, Question and edit box
+            rowsGroup: [1,4],
             "pageLength":100
         })
         //search keyword (schoolname), exact match
@@ -457,6 +436,62 @@
         
     });        
     </script>
+    <script type="text/javascript">
+        // Prepare common variables
+        var gColumns = [
+            { name: 'OptionID', type: 'hidden' },
+            { name: 'Album', display: 'Album', type: 'text', ctrlAttr: { maxlength: 100 }, ctrlCss: { width: '160px' } },
+            { name: 'Artist', display: 'Artist', type: 'text', ctrlAttr: { maxlength: 100 }, ctrlCss: { width: '120px' } },
+            { name: 'Year', display: 'Year', type: 'text', ctrlAttr: { maxlength: 4 }, ctrlCss: { width: '50px' } },
+            { name: 'Origin', display: 'Origin', type: 'select', ctrlOptions: { 0: '{Choose}', 1: 'Hong Kong', 2: 'Taiwan', 3: 'Japan', 4: 'Korea', 5: 'US', 6: 'Others' } },
+            { name: 'CorrentChoice', display: 'CorrentChoice', type: 'checkbox' },
+        ], gData = [
+            { 'ID': 1, 'Album': 'Dearest', 'Artist': 'Theresa Fu', 'Year': '2009', 'Origin': 1, 'Poster': true, 'Price': 168.9 },
+            { 'ID': 2, 'Album': 'To be Free', 'Artist': 'Arashi', 'Year': '2010', 'Origin': 3, 'Poster': true, 'Price': 152.6 },
+            { 'ID': 3, 'Album': 'Count On Me', 'Artist': 'Show Luo', 'Year': '2012', 'Origin': 2, 'Poster': false, 'Price': 306.8 },
+            { 'ID': 4, 'Album': 'Wonder Party', 'Artist': 'Wonder Girls', 'Year': '2012', 'Origin': 4, 'Poster': true, 'Price': 108.6 },
+            { 'ID': 5, 'Album': 'Reflection', 'Artist': 'Kelly Chen', 'Year': '2013', 'Origin': 1, 'Poster': false, 'Price': 138.2 }
+        ], gI18n = {
+            append: '!append!',
+            removeLast: '!removeLast!',
+            insert: '!insert!',
+            remove: '!remove!',
+            moveUp: '!moveUp!',
+            moveDown: '!moveDown!',
+            rowDrag: '!rowDrag!',
+            rowEmpty: '!rowEmpty!'
+        }, gButtonClasses = {
+            append: 'ap-pend',
+            removeLast: 'remove-Last',
+            insert: 'in-sert',
+            remove: 're-move',
+            moveUp: 'move-Up',
+            moveDown: 'move-Down',
+            rowDrag: 'row-Drag'
+        }, gSectionClasses = {
+			caption: 'cap-tion',
+			header: 'head-er',
+			body: 'bo-dy',
+			footer: 'foot-er'
+		};
+        var eValid = false, eValues, eInitRows = 2, eDataLoaded = false, eCaption = 'Options', eIdPrefix = 'option';
+        var $grid = $('#tblAppendGrid');
+        $grid.appendGrid({
+                caption: eCaption,
+                captionTooltip: eCaption,
+                columns: gColumns,
+                initRows: eInitRows,
+                idPrefix: eIdPrefix,
+                i18n: gI18n,
+                buttonClasses: gButtonClasses,
+				sectionClasses: gSectionClasses,
+                dataLoaded: function () {
+                    eDataLoaded = true;
+                }
+        });
+    </script>
+    
+    
 </body>
 
 </html>
