@@ -180,6 +180,10 @@
     .glyphicon:hover {
         background-color: rgb(153, 153, 102);
     }
+    .modal-xl {
+        width: 90%;
+       max-width:1200px;
+    }
     </style> 
 </head>
 
@@ -323,7 +327,7 @@
     </div>
     <!-- /#wrapper -->
     <!-- Modal -->
-      <div class="modal fade" id="dialog" role="dialog">
+      <div class="modal fade modal-xl" id="dialog" role="dialog">
         <div class="modal-dialog">        
           <!-- Modal content-->
           <div class="modal-content">
@@ -339,7 +343,6 @@
                 <input type="text" class="form-control dialoginput" id="<?php echo $mcqQuesColName[0]; ?>" name="<?php echo strtolower($mcqQuesColName[0]); ?>" style="display:none">
                 <br><label for="<?php echo $mcqQuesColName[1]; ?>"><?php echo $mcqQuesColName[1]; ?></label>
                 <input type="text" class="form-control dialoginput" id="<?php echo $mcqQuesColName[1]; ?>" name="<?php echo strtolower($mcqQuesColName[1]); ?>" required><br>
-                <table id="tblAppendGrid"></table>
             </form>            
             </div>
             <div class="modal-footer">            
@@ -373,10 +376,7 @@
     <script src="../bower_components/datatables-plugins/rowsgroup/dataTables.rowsGroup.js "></script>
     
     <link rel="stylesheet" href="https://code.jquery.com/ui/1.11.4/themes/ui-lightness/jquery-ui.css" />
-    <link rel="stylesheet" href="https://code.jquery.com/qunit/qunit-1.18.0.css" />
-    <link href="../bower_components/appendgrid/jquery.appendGrid-1.6.2.css" rel="stylesheet" />
-    <script type="text/javascript" src="https://code.jquery.com/ui/1.11.4/jquery-ui.min.js"></script>
-    <script type="text/javascript" src="../bower_components/appendgrid/jquery.appendGrid-1.6.2.js"></script>   
+    <link rel="stylesheet" href="https://code.jquery.com/qunit/qunit-1.18.0.css" />  
     
     <!-- Page-Level Scripts -->
     <script>
@@ -435,58 +435,7 @@
          $('.metadatainput').eq(4).attr('disabled','disabled'); 
         
     });        
-    </script>
-    <script type="text/javascript">
-        // Prepare common variables
-        var gColumns = [
-            { name: 'OptionID', type: 'hidden' },
-            { name: 'Option', display: 'Option', type: 'text', ctrlAttr: { maxlength: 200 }, ctrlCss: { width: '160px' } },
-            { name: 'Explanation', display: 'Explanation', type: 'text', ctrlAttr: { maxlength: 200 }, ctrlCss: { width: '120px' } },
-            { name: 'CorrectChoice', display: 'CorrectChoice', type: 'checkbox' }
-        ], gData = [
-            { 'OptionID': 1, 'Option': 'Candy bar', 'Explanation': 'Candy bars will give you an instant burst of energy but will not last!', 'CorrectChoice': true },
-            { 'OptionID': 2, 'Option': 'Whole grain cereal or oatmeal', 'Explanation': 'Whole grains take your body longer to digest, giving you energy all morning!', 'CorrectChoice': false },
-        ], gI18n = {
-            append: '!append!',
-            removeLast: '!removeLast!',
-            insert: '!insert!',
-            remove: '!remove!',
-            moveUp: '!moveUp!',
-            moveDown: '!moveDown!',
-            rowDrag: '!rowDrag!',
-            rowEmpty: '!rowEmpty!'
-        }, gButtonClasses = {
-            append: 'ap-pend',
-            removeLast: 'remove-Last',
-            insert: 'in-sert',
-            remove: 're-move',
-            moveUp: 'move-Up',
-            moveDown: 'move-Down',
-            rowDrag: 'row-Drag'
-        }, gSectionClasses = {
-			caption: 'cap-tion',
-			header: 'head-er',
-			body: 'bo-dy',
-			footer: 'foot-er'
-		};
-        var eValid = false, eValues, eInitRows = 2, eDataLoaded = false, eCaption = 'Options', eIdPrefix = 'option';
-        var $grid = $('#tblAppendGrid');
-        $grid.appendGrid({
-                caption: eCaption,
-                captionTooltip: eCaption,
-                columns: gColumns,
-                initRows: eInitRows,
-                idPrefix: eIdPrefix,
-                i18n: gI18n,
-                buttonClasses: gButtonClasses,
-				sectionClasses: gSectionClasses,
-                dataLoaded: function () {
-                    eDataLoaded = true;
-                }
-        });
-    </script>
-    
-    
+    </script>    
 </body>
 
 </html>
