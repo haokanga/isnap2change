@@ -7,47 +7,42 @@
     $overviewName = "school";
     
     //if update/insert/remove school
-    if($_SERVER["REQUEST_METHOD"] == "POST"){
-        if(isset($_POST['update'])){                          
-            $update = $_POST['update'];
-            //update
-            if($update == 0){
-                $schoolID = $_POST['schoolid'];
-                $schoolName = $_POST['schoolname'];
-                $update_stmt = "UPDATE School 
-                    SET SchoolName = ?
-                    WHERE SchoolID = ?";			
-                $update_stmt = $conn->prepare($update_stmt);                            
-                if(! $update_stmt->execute(array($schoolName, $schoolID))){
-                    echo "<script language=\"javascript\">  alert(\"Error occurred to update ".$overviewName.". Contact with developers.\"); </script>";
-                } else{
+    try{
+        if($_SERVER["REQUEST_METHOD"] == "POST"){
+            if(isset($_POST['update'])){                          
+                $update = $_POST['update'];
+                //update
+                if($update == 0){
+                    $schoolID = $_POST['schoolid'];
+                    $schoolName = $_POST['schoolname'];
+                    $update_stmt = "UPDATE School 
+                        SET SchoolName = ?
+                        WHERE SchoolID = ?";			
+                    $update_stmt = $conn->prepare($update_stmt);                            
+                    $update_stmt->execute(array($schoolName, $schoolID));
                 }
+                // insert
+                else if($update == 1){ 
+                    
+                        $schoolName = $_POST['schoolname'];                 
+                        $update_stmt = "INSERT INTO School(SchoolName)
+                         VALUES (?);";			
+                        $update_stmt = $conn->prepare($update_stmt);                
+                        $update_stmt->execute(array($schoolName));
+                                    
+                }
+                // remove school (with help of DELETE CASCADE) 
+                else if($update == -1){
+                    $schoolID = $_POST['schoolid'];
+                    $update_stmt = "DELETE FROM School WHERE SchoolID = ?";			
+                    $update_stmt = $conn->prepare($update_stmt);
+                    $update_stmt->execute(array($schoolID));
+                }            
             }
-            // insert
-            else if($update == 1){ 
-                try{
-                    $schoolName = $_POST['schoolname'];                 
-                    $update_stmt = "INSERT INTO School(SchoolName)
-                     VALUES (?);";			
-                    $update_stmt = $conn->prepare($update_stmt);                
-                    $update_stmt->execute(array($schoolName));
-                } catch(Exception $e) {
-                    debug_pdo_err($overviewName, $e);
-                }                 
-            }
-            // remove school (with help of DELETE CASCADE) 
-            else if($update == -1){
-                $schoolID = $_POST['schoolid'];
-                $update_stmt = "DELETE FROM School WHERE SchoolID = ?";			
-                $update_stmt = $conn->prepare($update_stmt);
-                if(! $update_stmt->execute(array($schoolID))){
-                    echo "<script language=\"javascript\">  alert(\"Error occurred to delete ".$overviewName.". Contact with developers.\"); </script>";
-                } else{
-                } 
-            }            
         }
-    }
-
+    } catch(Exception $e) {
+        debug_pdo_err($overviewName, $e);
+    } 
     // get school
     $schoolSql = "SELECT SchoolID, SchoolName
                FROM School";

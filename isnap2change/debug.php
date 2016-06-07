@@ -3,16 +3,22 @@
 	$DEBUG_MODE = true;
     
     function debug_log($message){
+        if($GLOBALS['DEBUG_MODE']){
+            echo "<script language=\"javascript\">  console.log(\"".$message."\"); </script>";
+        }
+    }
+    
+    function debug_err($message){
         echo "<script language=\"javascript\">  alert(\"".$message."\"); </script>";
     }
     function debug_pdo_err($pageName, $e){
         // duplicate entry
         if ($e->errorInfo[1] == 1062) {          
-            debug_log("Duplicate names are not allowed!");
+            debug_err("Duplicate names are not allowed!");
         } 
         // unclassfied error occurred
         else {          
-            debug_log("Unexpected MySQL Error occurred in ".$pageName.". Contact with developers.");        
+            debug_err("Unexpected MySQL Error occurred in ".$pageName.". Contact with developers.");        
             echo $e->getMessage();
         }
     }
