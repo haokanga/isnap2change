@@ -19,7 +19,8 @@
                     $topicName = $_POST['topicname'];
                     $points = $_POST['points'];
                     $questionnaires = $_POST['questionnaires'];
-                    $conn->beginTransaction();                
+                    $conn->beginTransaction();              
+                    
                     //get topicID
                     $topicSql = "SELECT TopicID
                                FROM Topic WHERE TopicName = ?";
@@ -36,7 +37,14 @@
                     $update_stmt = "INSERT INTO MCQ_Section(QuizID, Points, Questionnaires)
                                     VALUES (?,?,?) ON DUPLICATE KEY UPDATE Points = ?, Questionnaires = ?;";			
                     $update_stmt = $conn->prepare($update_stmt);                            
-                    $update_stmt->execute(array($quizID, $points, $questionnaires, $points, $questionnaires));                    
+                    $update_stmt->execute(array($quizID, $points, $questionnaires, $points, $questionnaires)); 
+                    //init empty Learning Material
+                    $update_stmt = "INSERT INTO Learning_Material(Content,QuizID)
+                     VALUES (?,?);";
+                    $update_stmt = $conn->prepare($update_stmt);                            
+                    $update_stmt->execute(array('<p>Learning materials for this quiz has not been added.</p>', $quizID)); 
+                    
+                    $conn->commit();                    
                 } catch(Exception $e) {
                     debug_pdo_err($overviewName, $e);
                     $conn->rollback();
@@ -58,8 +66,8 @@
     }
     
     // get quiz and topic
-    $quizSql = "SELECT QuizID, Week, TopicName, Points, Questionnaires, COUNT(*) AS Questions
-               FROM Quiz NATURAL JOIN Topic NATURAL JOIN MCQ_Section NATURAL JOIN MCQ_Question WHERE QuizType = 'MCQ' GROUP BY QuizID";
+    $quizSql = "SELECT QuizID, Week, TopicName, Points, Questionnaires, COUNT(MCQID) AS Questions
+               FROM Quiz NATURAL JOIN Topic NATURAL JOIN MCQ_Section LEFT JOIN MCQ_Question USING (QuizID) WHERE QuizType = 'MCQ' GROUP BY QuizID";
     $quizQuery = $conn->prepare($quizSql);
     $quizQuery->execute();
     $quizResult = $quizQuery->fetchAll(PDO::FETCH_OBJ); 
@@ -230,7 +238,7 @@
                 <input type="text" class="form-control dialoginput" id="Points" name="points"  placeholder="Input Points" required></input>
                 <br>
                 <label for="Questionnaires">Questionnaires</label>
-                <input type="checkbox" class="form-control dialoginput" id="Questionnaires" name="questionnaires" value="1"></input>
+                <input type="checkbox" class="form-control" id="Questionnaires" name="questionnaires" value="1"></input>
             </form>
             </div>
             <div class="modal-footer">            
@@ -283,6 +291,10 @@
         $('#submission').validate({
           rules: {
             week: {
+              required: true,
+              digits: true
+            },
+            points: {
               required: true,
               digits: true
             }

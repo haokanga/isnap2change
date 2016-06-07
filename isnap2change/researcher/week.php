@@ -121,7 +121,7 @@
                                         for($j=0; $j<count($weekResult); $j++){ 
                                             if ($weekResult[$j]->Week == $i){ ?>
                                         <tr class="<?php if(($i - 1) % 2 == 0){echo "odd";} else {echo "even";} ?>">
-                                            <td><a id="<?php echo $i; ?>" href="quiz.php?week=<?php echo $i; ?>"><?php echo "Week ".$i; ?></a>
+                                            <td><a id="<?php echo $i; ?>" href="quiz.php?week=<?php echo $i; ?>"><?php echo $i; ?></a>
                                             </td>
                                             <td><?php echo $weekResult[$j]->QuizNum; ?><span class="glyphicon glyphicon-remove pull-right" aria-hidden="true" data-toggle="modal" data-target="#dialog"></span></td>
                                         </tr>
@@ -129,7 +129,7 @@
                                         }                                        
                                         if(!$notEmpty){ ?>
                                         <tr class="<?php if(($i - 1) % 2 == 0){echo "odd";} else {echo "even";} ?>">
-                                            <td><a id="<?php echo $i; ?>" href="quiz.php?week=<?php echo $i; ?>"><?php echo "Week ".$i; ?></a>
+                                            <td><a id="<?php echo $i; ?>" href="quiz.php?week=<?php echo $i; ?>"><?php echo $i; ?></a>
                                             </td>
                                             <td><?php echo 0; ?><span class="glyphicon glyphicon-remove pull-right" aria-hidden="true" data-toggle="modal" data-target="#dialog"></span></td>
                                         </tr>    
@@ -216,7 +216,8 @@
     <script>    
     $(document).ready(function() {
         $('#dataTables-example').DataTable({
-                responsive: true
+                responsive: true,                
+                "pageLength":25
         });            
     });    
     $('.glyphicon-remove').on('click', function (){

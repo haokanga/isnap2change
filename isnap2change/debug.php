@@ -3,7 +3,7 @@
 	$DEBUG_MODE = true;
     
     function debug_log($message){
-        echo "<script language=\"javascript\">  console.log(\"".$message."\"); </script>";
+        echo "<script language=\"javascript\">  alert(\"".$message."\"); </script>";
     }
     function debug_pdo_err($pageName, $e){
         debug_log("MySQL Error occurred in ".$pageName.". Contact with developers.");        
