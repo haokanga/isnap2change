@@ -18,7 +18,7 @@
                     SET SchoolName = ?
                     WHERE SchoolID = ?";			
                 $update_stmt = $conn->prepare($update_stmt);                            
-                if(! $update_stmt -> execute(array($schoolName, $schoolID))){
+                if(! $update_stmt->execute(array($schoolName, $schoolID))){
                     echo "<script language=\"javascript\">  alert(\"Error occurred to update ".$overviewName.". Contact with developers.\"); </script>";
                 } else{
                 }
@@ -29,7 +29,7 @@
                 $update_stmt = "INSERT INTO School(SchoolName)
                      VALUES (?);";			
                 $update_stmt = $conn->prepare($update_stmt);                
-                if(! $update_stmt -> execute(array($schoolName))){
+                if(! $update_stmt->execute(array($schoolName))){
                     echo "<script language=\"javascript\">  alert(\"Error occurred to insert ".$overviewName.". Contact with developers.\"); </script>";
                 } else{
                 }             
@@ -39,7 +39,7 @@
                 $schoolID = $_POST['schoolid'];
                 $update_stmt = "DELETE FROM School WHERE SchoolID = ?";			
                 $update_stmt = $conn->prepare($update_stmt);
-                if(! $update_stmt -> execute(array($schoolID))){
+                if(! $update_stmt->execute(array($schoolID))){
                     echo "<script language=\"javascript\">  alert(\"Error occurred to delete ".$overviewName.". Contact with developers.\"); </script>";
                 } else{
                 } 

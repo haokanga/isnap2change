@@ -29,8 +29,8 @@
                 $update_stmt = "INSERT INTO Quiz(Week, QuizType, TopicID)
                      VALUES (?,?,?);";			
                 $update_stmt = $conn->prepare($update_stmt);         
-                $update_stmt -> execute(array($week, $quizType, $topicResult->TopicID));
-                $classID = $conn -> lastInsertId();
+                $update_stmt->execute(array($week, $quizType, $topicResult->TopicID));
+                $classID = $conn->lastInsertId();
                 if($classID <= 0){
                     echo "<script language=\"javascript\">  alert(\"Error occurred to insert class. Contact with developers.\"); </script>";
                 } else{
@@ -43,7 +43,7 @@
                 $quizID = $_POST['quizid'];
                 $update_stmt = "DELETE FROM Quiz WHERE QuizID = ?";			
                 $update_stmt = $conn->prepare($update_stmt);
-                if(! $update_stmt -> execute(array($quizID))){
+                if(! $update_stmt->execute(array($quizID))){
                     echo "<script language=\"javascript\">  alert(\"Error occurred to delete quiz. Contact with developers.\"); </script>";
                 } else{
                 } 

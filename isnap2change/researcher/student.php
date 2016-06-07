@@ -16,7 +16,7 @@
                     SET Password = ?
                     WHERE StudentID = ?";			
                 $update_stmt = $conn->prepare($update_stmt);                            
-                if(! $update_stmt -> execute(array(md5('WelcomeToiSNAP2'), $studentID))){
+                if(! $update_stmt->execute(array(md5('WelcomeToiSNAP2'), $studentID))){
                     echo "<script language=\"javascript\">  alert(\"Error occurred to reset password. Contact with developers.\"); </script>";
                 } else{
                 }
@@ -26,7 +26,7 @@
                 $studentID = $_POST['studentid'];
                 $update_stmt = "DELETE FROM Student WHERE StudentID = ?";			
                 $update_stmt = $conn->prepare($update_stmt);
-                if(! $update_stmt -> execute(array($studentID))){
+                if(! $update_stmt->execute(array($studentID))){
                     echo "<script language=\"javascript\">  alert(\"Error occurred to delete student. Contact with developers.\"); </script>";
                 } else{
                 } 

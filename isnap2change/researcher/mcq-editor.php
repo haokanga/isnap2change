@@ -19,7 +19,7 @@
                 $quizID = $_POST['quizid'];
                 $update_stmt = "DELETE FROM Quiz WHERE QuizID = ?";			
                 $update_stmt = $conn->prepare($update_stmt);
-                if(! $update_stmt -> execute(array($quizID))){
+                if(! $update_stmt->execute(array($quizID))){
                     echo "<script language=\"javascript\">  alert(\"Error occurred to delete quiz. Contact with developers.\"); </script>";
                 } else{
                 } 
@@ -40,7 +40,7 @@
     $update_stmt = "REPLACE INTO Learning_Material(MaterialID,Content,QuizID)
                  VALUES (?,?,?);";			
     $update_stmt = $conn->prepare($update_stmt);                            
-    if(! $update_stmt -> execute(array($materialid, $content, $quizid))){
+    if(! $update_stmt->execute(array($materialid, $content, $quizid))){
         echo "<script language=\"javascript\">  alert(\"Error occurred to submit learning material. Report this bug to reseachers.\"); </script>";
     } else{            
         echo "<script language=\"javascript\">  console.log(\"Learning Material Submitted. materialid: $materialid  quizid: $quizid\"); </script>";

@@ -13,7 +13,7 @@
             UPDATE Quiz SET Week = NULL WHERE Week = ?;
             SET SQL_SAFE_UPDATES=1;";			
         $update_stmt = $conn->prepare($update_stmt);                            
-        if(! $update_stmt -> execute(array($week))){
+        if(! $update_stmt->execute(array($week))){
             echo "<script language=\"javascript\">  alert(\"Error occurred to delete ".$overviewName.". Contact with developers.\"); </script>";
         } else{
         }         

@@ -5,31 +5,42 @@
     require_once("/researcher-validation.php");
     require_once("/get-quiz-points.php");	    
     $conn = db_connect();
-    $overviewName = "quiz";
-    $columnName = array('QuizID','Week','TopicName','Points', 'Questions');    
+    $overviewName = "mcq";
+    $columnName = array('QuizID','Week','TopicName','Points','Questionnaires','Questions');
+    
     //edit/delete quiz
     if($_SERVER["REQUEST_METHOD"] == "POST"){
         if(isset($_POST['update'])){                          
             $update = $_POST['update'];
             if($update == 1){
-                $week = $_POST['week'];
-                $quizType = 'MCQ';
-                $topicName = $_POST['topicname'];             
-                //get topicID
-                $topicSql = "SELECT TopicID
-                           FROM Topic WHERE TopicName = ?";
-                $topicQuery = $conn->prepare($topicSql);
-                $topicQuery->execute(array($topicName));
-                $topicResult = $topicQuery->fetch(PDO::FETCH_OBJ);                
-                $update_stmt = "INSERT INTO Quiz(Week, QuizType, TopicID)
-                     VALUES (?,?,?);";			
-                $update_stmt = $conn->prepare($update_stmt);         
-                $update_stmt -> execute(array($week, $quizType, $topicResult->TopicID));
-                $mcqID = $conn -> lastInsertId();  
-                if($mcqID <= 0){
-                    echo "<script language=\"javascript\">  alert(\"Error occurred to insert class. Contact with developers.\"); </script>";
-                } else{
-                }
+                try{
+                    $week = $_POST['week'];
+                    $quizType = 'MCQ';
+                    $topicName = $_POST['topicname'];
+                    $points = $_POST['points'];
+                    $questionnaires = $_POST['questionnaires'];
+                    $conn->beginTransaction();                
+                    //get topicID
+                    $topicSql = "SELECT TopicID
+                               FROM Topic WHERE TopicName = ?";
+                    $topicQuery = $conn->prepare($topicSql);
+                    $topicQuery->execute(array($topicName));
+                    $topicResult = $topicQuery->fetch(PDO::FETCH_OBJ);
+                    //insert quiz
+                    $update_stmt = "INSERT INTO Quiz(Week, QuizType, TopicID)
+                         VALUES (?,?,?);";			
+                    $update_stmt = $conn->prepare($update_stmt);         
+                    $update_stmt->execute(array($week, $quizType, $topicResult->TopicID)); 
+                    //insert MCQ_Section
+                    $quizID = $conn->lastInsertId(); 
+                    $update_stmt = "INSERT INTO MCQ_Section(QuizID, Points, Questionnaires)
+                                    VALUES (?,?,?) ON DUPLICATE KEY UPDATE Points = ?, Questionnaires = ?;";			
+                    $update_stmt = $conn->prepare($update_stmt);                            
+                    $update_stmt->execute(array($quizID, $points, $questionnaires, $points, $questionnaires));                    
+                } catch(Exception $e) {
+                    debug_pdo_err($overviewName, $e);
+                    $conn->rollback();
+                } 
             }                       
             else if($update == 0){
                 
@@ -38,7 +49,7 @@
                 $quizID = $_POST['quizid'];
                 $update_stmt = "DELETE FROM Quiz WHERE QuizID = ?";			
                 $update_stmt = $conn->prepare($update_stmt);
-                if(! $update_stmt -> execute(array($quizID))){
+                if(! $update_stmt->execute(array($quizID))){
                     echo "<script language=\"javascript\">  alert(\"Error occurred to delete quiz. Contact with developers.\"); </script>";
                 } else{
                 } 
@@ -47,7 +58,7 @@
     }
     
     // get quiz and topic
-    $quizSql = "SELECT QuizID, Week, TopicName, COUNT(*) AS Questions
+    $quizSql = "SELECT QuizID, Week, TopicName, Points, Questionnaires, COUNT(*) AS Questions
                FROM Quiz NATURAL JOIN Topic NATURAL JOIN MCQ_Section NATURAL JOIN MCQ_Question WHERE QuizType = 'MCQ' GROUP BY QuizID";
     $quizQuery = $conn->prepare($quizSql);
     $quizQuery->execute();
@@ -136,24 +147,30 @@
                                 <table class="table table-striped table-bordered table-hover" id="datatables">
                                     <thead>
                                         <tr>
-                                        <?php for($i=0; $i<count($columnName); $i++) {
-                                            if ($i==0){?>
-                                            <th style="display:none"><?php echo $columnName[$i]; ?></th>
-                                            <?php } else {?>                                            
-                                            <th><?php echo $columnName[$i]; ?></th>
-                                        <?php }
-                                        }?>
+                                        <?php for($i=0; $i<count($columnName); $i++){ ?>
+                                            <th <?php if ($i==0){ echo 'style="display:none"';} ?>><?php echo $columnName[$i]; ?></th>
+                                        <?php }?>
                                         </tr>
                                     </thead>
                                     <tbody>
                                     <?php for($i=0; $i<count($quizResult); $i++) {?>
                                         <tr class="<?php if($i % 2 == 0){echo "odd";} else {echo "even";} ?>">
-                                            <td style="display:none"><?php echo $quizResult[$i]->QuizID ?></td>
-                                            <td><?php echo $quizResult[$i]->Week ?></td>
-                                            <td><?php echo $quizResult[$i]->TopicName ?></td>
-                                            <td><?php echo getQuizPoints($quizResult[$i]->QuizID); ?></td>                                            
-                                            <td><?php echo $quizResult[$i]->Questions ?><span class="glyphicon glyphicon-remove pull-right" aria-hidden="true"></span><span class="pull-right" aria-hidden="true">&nbsp;</span><a href="mcq-editor.php?quizid=<?php echo $quizResult[$i]->QuizID ?>"><span class="glyphicon glyphicon-edit pull-right" aria-hidden="true"></span></a></td>
-                                            <!-- data-toggle="modal" data-target="#dialog" -->
+                                            <?php for($j=0; $j<count($columnName); $j++){ ?>
+                                                <td <?php if ($j==0){ echo 'style="display:none"';} ?>>                                                
+                                                    <?php 
+                                                        // Questionnaires: if 1, true; else if 0, false
+                                                        if($j==count($columnName)-2){
+                                                            echo $quizResult[$i]->$columnName[$j] ? 'True' : 'False';
+                                                        } 
+                                                        else {
+                                                            echo $quizResult[$i]->$columnName[$j];  
+                                                        }                                                        
+                                                    ?> 
+                                                    <?php if($j==count($columnName)-1){?>
+                                                        <span class="glyphicon glyphicon-remove pull-right" aria-hidden="true"></span><span class="pull-right" aria-hidden="true">&nbsp;</span><a href="mcq-editor.php?quizid=<?php echo $quizResult[$i]->QuizID ?>"><span class="glyphicon glyphicon-edit pull-right" aria-hidden="true"></span></a>
+                                                    <?php } ?>
+                                                </td>
+                                            <?php }?>
                                         </tr>
                                     <?php } ?>    
                                     </tbody>
@@ -209,6 +226,11 @@
                   <?php } ?>
                 </select>
                 <br>
+                <label for="Points">Points</label>
+                <input type="text" class="form-control dialoginput" id="Points" name="points"  placeholder="Input Points" required></input>
+                <br>
+                <label for="Questionnaires">Questionnaires</label>
+                <input type="checkbox" class="form-control dialoginput" id="Questionnaires" name="questionnaires" value="1"></input>
             </form>
             </div>
             <div class="modal-footer">            

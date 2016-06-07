@@ -27,7 +27,7 @@
                     SET ClassName = ?, SchoolID = ?
                     WHERE ClassID = ?";			
                 $update_stmt = $conn->prepare($update_stmt);                            
-                if(! $update_stmt -> execute(array($className, $schoolResult->SchoolID, $classID))){
+                if(! $update_stmt->execute(array($className, $schoolResult->SchoolID, $classID))){
                     echo "<script language=\"javascript\">  alert(\"Error occurred to update class. Contact with developers.\"); </script>";
                 } else{
                 }
@@ -36,7 +36,7 @@
                     SET TokenString = ?
                     WHERE ClassID = ? AND `Type` = ?";			
                 $update_stmt = $conn->prepare($update_stmt);                            
-                if(! $update_stmt -> execute(array($teacherToken, $classID, "TEACHER"))){
+                if(! $update_stmt->execute(array($teacherToken, $classID, "TEACHER"))){
                     echo "<script language=\"javascript\">  alert(\"Error occurred to update teacherToken. Contact with developers.\"); </script>";
                 } else{
                 }
@@ -44,7 +44,7 @@
                     SET TokenString = ?
                     WHERE ClassID = ? AND `Type` = ?";			
                 $update_stmt = $conn->prepare($update_stmt);                            
-                if(! $update_stmt -> execute(array($studentToken, $classID, "STUDENT"))){
+                if(! $update_stmt->execute(array($studentToken, $classID, "STUDENT"))){
                     echo "<script language=\"javascript\">  alert(\"Error occurred to update studentToken. Contact with developers.\"); </script>";
                 } else{
                 }
@@ -64,8 +64,8 @@
                 $update_stmt = "INSERT INTO Class(ClassName, SchoolID)
                      VALUES (?,?);";			
                 $update_stmt = $conn->prepare($update_stmt);         
-                $update_stmt -> execute(array($className, $schoolResult->SchoolID));
-                $classID = $conn -> lastInsertId();
+                $update_stmt->execute(array($className, $schoolResult->SchoolID));
+                $classID = $conn->lastInsertId();
                 if($classID <= 0){
                     echo "<script language=\"javascript\">  alert(\"Error occurred to insert class. Contact with developers.\"); </script>";
                 } else{
@@ -74,14 +74,14 @@
                 $update_stmt = "INSERT INTO Token(ClassID, `Type`, TokenString)
 								VALUES (?,?,?) ON DUPLICATE KEY UPDATE TokenString = ?;";			
                 $update_stmt = $conn->prepare($update_stmt);                            
-                if(! $update_stmt -> execute(array($classID, "TEACHER", $teacherToken, $teacherToken))){
+                if(! $update_stmt->execute(array($classID, "TEACHER", $teacherToken, $teacherToken))){
                     echo "<script language=\"javascript\">  alert(\"Error occurred to insert teacherToken. Contact with developers.\"); </script>";
                 } else{
                 }
                 $update_stmt = "INSERT INTO Token(ClassID, `Type`, TokenString)
                      VALUES (?,?,?) ON DUPLICATE KEY UPDATE TokenString = ?;";			
                 $update_stmt = $conn->prepare($update_stmt);                            
-                if(! $update_stmt -> execute(array($classID, "STUDENT", $studentToken, $studentToken))){
+                if(! $update_stmt->execute(array($classID, "STUDENT", $studentToken, $studentToken))){
                     echo "<script language=\"javascript\">  alert(\"Error occurred to insert studentToken. Contact with developers.\"); </script>";
                 } else{
                 }                
@@ -90,7 +90,7 @@
                 // remove class (with help of DELETE CASCADE) 
                 $update_stmt = "DELETE FROM Class WHERE ClassID = ?";			
                 $update_stmt = $conn->prepare($update_stmt);
-                if(! $update_stmt -> execute(array($classID))){
+                if(! $update_stmt->execute(array($classID))){
                     echo "<script language=\"javascript\">  alert(\"Error occurred to delete class/token. Contact with developers.\"); </script>";
                 } else{
                 } 
