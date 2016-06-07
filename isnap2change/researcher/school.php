@@ -25,14 +25,15 @@
             }
             // insert
             else if($update == 1){ 
-                $schoolName = $_POST['schoolname'];                 
-                $update_stmt = "INSERT INTO School(SchoolName)
+                try{
+                    $schoolName = $_POST['schoolname'];                 
+                    $update_stmt = "INSERT INTO School(SchoolName)
                      VALUES (?);";			
-                $update_stmt = $conn->prepare($update_stmt);                
-                if(! $update_stmt->execute(array($schoolName))){
-                    echo "<script language=\"javascript\">  alert(\"Error occurred to insert ".$overviewName.". Contact with developers.\"); </script>";
-                } else{
-                }             
+                    $update_stmt = $conn->prepare($update_stmt);                
+                    $update_stmt->execute(array($schoolName));
+                } catch(Exception $e) {
+                    debug_pdo_err($overviewName, $e);
+                }                 
             }
             // remove school (with help of DELETE CASCADE) 
             else if($update == -1){

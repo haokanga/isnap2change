@@ -44,7 +44,7 @@ CREATE TABLE IF NOT EXISTS `School` (
 
 CREATE TABLE IF NOT EXISTS `Class` (
     ClassID MEDIUMINT AUTO_INCREMENT,
-    ClassName TEXT,
+    ClassName VARCHAR(190) UNIQUE,
     SchoolID MEDIUMINT NOT NULL,
     # UnlockedProgress
     UnlockedProgress MEDIUMINT NOT NULL DEFAULT 10,

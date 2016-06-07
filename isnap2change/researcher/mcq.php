@@ -175,7 +175,10 @@
                                                         }                                                        
                                                     ?> 
                                                     <?php if($j==count($columnName)-1){?>
-                                                        <span class="glyphicon glyphicon-remove pull-right" aria-hidden="true"></span><span class="pull-right" aria-hidden="true">&nbsp;</span><a href="mcq-editor.php?quizid=<?php echo $quizResult[$i]->QuizID ?>"><span class="glyphicon glyphicon-edit pull-right" aria-hidden="true"></span></a>
+                                                        <span class="glyphicon glyphicon-remove pull-right" aria-hidden="true"></span>
+                                                        <span class="pull-right" aria-hidden="true">&nbsp;</span>
+                                                        <a href="mcq-editor.php?quizid=<?php echo $quizResult[$i]->QuizID ?>">
+                                                        <span class="glyphicon glyphicon-edit pull-right" aria-hidden="true"></span></a>
                                                     <?php } ?>
                                                 </td>
                                             <?php }?>
