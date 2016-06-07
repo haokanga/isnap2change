@@ -248,7 +248,6 @@
           </div>          
         </div>
       </div>
-      <input type=hidden name="keyword" id="keyword" value="<?php if(isset($_GET['week'])){ echo $_GET['week']; } ?>"></input>
     <!-- jQuery -->
     <script src="../bower_components/jquery/dist/jquery.min.js"></script>
 
@@ -307,16 +306,9 @@
     $(document).ready(function() {
         var table = $('#datatables').DataTable({
                 responsive: true,
-                "initComplete": function(settings, json) {                    
-                    $('.input-sm').eq(1).val($("#keyword").val().trim());                    
-                },
                 "order": [[ 1, "asc" ]],
                 "pageLength":50
-        })
-        //search keyword, exact match
-        table.search(
-            $("#keyword").val().trim(), true, false, true
-        ).draw();     
+        })   
     });        
     </script>
 </body>

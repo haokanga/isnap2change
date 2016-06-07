@@ -211,7 +211,7 @@
               <h4 class="modal-title" id="dialogTitle">Edit Class</h4>
             </div>
             <div class="modal-body">
-            <form id="submission" method="post" action="<?php echo $_SERVER['PHP_SELF']; ?>">
+            <form id="submission" method="post" action="<?php if(isset($_GET['week'])) echo $_SERVER['PHP_SELF'].'?week='.$_GET['week']; else echo $_SERVER['PHP_SELF']; ?>">
                 <!--if 1, insert; else if -1 delete;-->
                 <input type=hidden name="update" id="update" value="1" required></input>
                 <label for="QuizID" style="display:none">QuizID</label>

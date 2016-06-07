@@ -184,7 +184,7 @@
               <h4 class="modal-title" id="dialogTitle">Reset Password</h4>
             </div>
             <div class="modal-body">
-            <form id="submission" method="post" action="<?php echo $_SERVER['PHP_SELF']; ?>">
+            <form id="submission" method="post" action="<?php if(isset($_GET['classid'])) echo $_SERVER['PHP_SELF'].'?classid='.$_GET['classid']; else echo $_SERVER['PHP_SELF']; ?>">
                 <!--if 0 update; else if -1 delete;-->
                 <input type=hidden name="update" id="update" value="1"></input>                
                 <?php for($i=0; $i<count($columnName); $i++) {
