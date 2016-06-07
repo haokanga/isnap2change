@@ -12,76 +12,91 @@
     $overviewName = "quiz";
     $columnName = array('QuizID','Week','QuizType','TopicName','Points');    
     //add/edit/delete quiz
-    if($_SERVER["REQUEST_METHOD"] == "POST"){
-        if(isset($_POST['update'])){                          
-            $update = $_POST['update'];
-            if($update == 1){
-                try{
-                    $week = $_POST['week'];
-                    $quizType = $_POST['quiztype'];
-                    $topicName = $_POST['topicname'];
-                    $conn->beginTransaction();              
-                    
-                    //get topicID
-                    $topicSql = "SELECT TopicID
-                               FROM Topic WHERE TopicName = ?";
-                    $topicQuery = $conn->prepare($topicSql);
-                    $topicQuery->execute(array($topicName));
-                    $topicResult = $topicQuery->fetch(PDO::FETCH_OBJ);
-                    //insert quiz
-                    $update_stmt = "INSERT INTO Quiz(Week, QuizType, TopicID)
-                         VALUES (?,?,?);";			
-                    $update_stmt = $conn->prepare($update_stmt);         
-                    $update_stmt->execute(array($week, $quizType, $topicResult->TopicID));                     
-                    $quizID = $conn->lastInsertId(); 
-                    //if MCQ, insert MCQ_Section
-                    if($quizType=='MCQ'){                        
-                        $points = 0;
-                        $questionnaires = 0;
-                        $update_stmt = "INSERT INTO MCQ_Section(QuizID, Points, Questionnaires)
-                                    VALUES (?,?,?);";			
-                        $update_stmt = $conn->prepare($update_stmt);                            
-                        $update_stmt->execute(array($quizID, $points, $questionnaires)); 
-                    }                    
-                    //init empty Learning Material
-                    $content='<p>Learning materials for this quiz has not been added.</p>';
-                    $update_stmt = "INSERT INTO Learning_Material(Content,QuizID) VALUES (?,?);";
-                    $update_stmt = $conn->prepare($update_stmt);                            
-                    $update_stmt->execute(array($content, $quizID)); 
-                    
-                    $conn->commit();                    
-                } catch(Exception $e) {
-                    debug_pdo_err($overviewName, $e);
-                    $conn->rollback();
-                }                
-            }
-            else if($update == -1){  
-                $quizID = $_POST['quizid'];
-                $update_stmt = "DELETE FROM Quiz WHERE QuizID = ?";			
-                $update_stmt = $conn->prepare($update_stmt);
-                if(! $update_stmt->execute(array($quizID))){
-                    echo "<script language=\"javascript\">  alert(\"Error occurred to delete quiz. Contact with developers.\"); </script>";
-                } else{
-                } 
-            }            
-        }
-    }
     
-    // get quiz and topic
-    $quizSql = "SELECT QuizID, Week, QuizType, TopicName
-               FROM Quiz NATURAL JOIN Topic";
-    $quizQuery = $conn->prepare($quizSql);
-    $quizQuery->execute();
-    $quizResult = $quizQuery->fetchAll(PDO::FETCH_OBJ);
-    // list all editable quiz types    
-    $quizTypeArray = array('MCQ','SAQ','Matching','Poster');
-    db_close($conn);
-
-    //get topic list
-    $topicSql = "SELECT TopicID, TopicName FROM Topic ORDER BY TopicID";
-    $topicQuery = $conn->prepare($topicSql);
-    $topicQuery->execute(array());
-    $topicResult = $topicQuery->fetchAll(PDO::FETCH_OBJ);     
+    try{
+        if($_SERVER["REQUEST_METHOD"] == "POST"){
+            if(isset($_POST['update'])){                          
+                $update = $_POST['update'];
+                if($update == 1){
+                    try{
+                        $week = $_POST['week'];
+                        $quizType = $_POST['quiztype'];
+                        $topicName = $_POST['topicname'];
+                        $conn->beginTransaction();              
+                        
+                        //get topicID
+                        $topicSql = "SELECT TopicID
+                                   FROM Topic WHERE TopicName = ?";
+                        $topicQuery = $conn->prepare($topicSql);
+                        $topicQuery->execute(array($topicName));
+                        $topicResult = $topicQuery->fetch(PDO::FETCH_OBJ);
+                        //insert quiz
+                        $update_stmt = "INSERT INTO Quiz(Week, QuizType, TopicID)
+                             VALUES (?,?,?);";			
+                        $update_stmt = $conn->prepare($update_stmt);         
+                        $update_stmt->execute(array($week, $quizType, $topicResult->TopicID));                     
+                        $quizID = $conn->lastInsertId(); 
+                        //if MCQ, insert MCQ_Section
+                        if($quizType=='MCQ'){                        
+                            $points = 0;
+                            $questionnaires = 0;
+                            $update_stmt = "INSERT INTO MCQ_Section(QuizID, Points, Questionnaires)
+                                        VALUES (?,?,?);";			
+                            $update_stmt = $conn->prepare($update_stmt);                            
+                            $update_stmt->execute(array($quizID, $points, $questionnaires)); 
+                        }                    
+                        //init empty Learning Material
+                        $content='<p>Learning materials for this quiz has not been added.</p>';
+                        $update_stmt = "INSERT INTO Learning_Material(Content,QuizID) VALUES (?,?);";
+                        $update_stmt = $conn->prepare($update_stmt);                            
+                        $update_stmt->execute(array($content, $quizID)); 
+                        
+                        $conn->commit();                    
+                    } catch(Exception $e) {
+                        debug_pdo_err($overviewName, $e);
+                        $conn->rollback();
+                    }                
+                }
+                else if($update == -1){  
+                    $quizID = $_POST['quizid'];
+                    $update_stmt = "DELETE FROM Quiz WHERE QuizID = ?";			
+                    $update_stmt = $conn->prepare($update_stmt);
+                    if(! $update_stmt->execute(array($quizID))){
+                        echo "<script language=\"javascript\">  alert(\"Error occurred to delete quiz. Contact with developers.\"); </script>";
+                    } else{
+                    } 
+                }            
+            }
+        }
+        
+        // get quiz and topic
+        if(isset($_GET['week'])){
+            $quizSql = "SELECT QuizID, Week, QuizType, TopicName
+                   FROM Quiz NATURAL JOIN Topic WHERE Week = ?";
+            $quizQuery = $conn->prepare($quizSql);
+            $quizQuery->execute(array($_GET['week']));
+            $quizResult = $quizQuery->fetchAll(PDO::FETCH_OBJ);
+        }else{
+            $quizSql = "SELECT QuizID, Week, QuizType, TopicName
+                   FROM Quiz NATURAL JOIN Topic";
+            $quizQuery = $conn->prepare($quizSql);
+            $quizQuery->execute();
+            $quizResult = $quizQuery->fetchAll(PDO::FETCH_OBJ);
+        }
+        
+        // list all editable quiz types    
+        $quizTypeArray = array('MCQ','SAQ','Matching','Poster');
+        
+        //get topic list
+        $topicSql = "SELECT TopicID, TopicName FROM Topic ORDER BY TopicID";
+        $topicQuery = $conn->prepare($topicSql);
+        $topicQuery->execute(array());
+        $topicResult = $topicQuery->fetchAll(PDO::FETCH_OBJ);  
+    } catch(Exception $e) {
+        debug_pdo_err($overviewName, $e);
+    }     
+    
+    db_close($conn);      
     
 ?>
 <!DOCTYPE html>
@@ -139,7 +154,7 @@
         <div id="page-wrapper">
             <div class="row">
                 <div class="col-lg-12">
-                    <h1 class="page-header">Quiz Overview</h1>
+                    <h1 class="page-header">Quiz Overview <?php if(isset($_GET['week'])) echo '- Week '.$_GET['week'] ?></h1>
                 </div>
                 <!-- /.col-lg-12 -->
             </div>
@@ -217,7 +232,7 @@
                 <label for="QuizID" style="display:none">QuizID</label>
                 <input type="text" class="form-control dialoginput" id="QuizID" name="quizid" style="display:none"></input>
                 <label for="Week">Week</label>
-                <input type="text" class="form-control dialoginput" id="Week" name="week"  placeholder="Input Week Number" required></input> 
+                <input type="text" class="form-control dialoginput" id="Week" name="week"  placeholder="Input Week Number" <?php if(isset($_GET['week'])) {$w=$_GET['week']; echo "value='".$w."'"; } ?> required></input> 
                 <br>    
                 <label for='QuizType'>QuizType</label>
                 <select class="form-control dialoginput" id="QuizType" form="submission" name="quiztype" required>
@@ -273,9 +288,15 @@
     $('.glyphicon-plus').on('click', function (){
         $('#dialogTitle').text("Add Quiz");
         $('#update').val(1);
-        for(i=0;i<$('.dialoginput').length;i++){                
-            $('.dialoginput').eq(i).val('');
-        }   
+        for(i=0;i<$('.dialoginput').length;i++){
+            if(i!=1){
+                $('.dialoginput').eq(i).val('');
+            } else {
+                <?php if(!isset($_GET['week'])){?>
+                    $('.dialoginput').eq(i).val('');
+                <?php } ?>
+            }            
+        }        
     }); 
     $('.glyphicon-remove').on('click', function (){
         if (confirm('[WARNING] Are you sure to remove this quiz? If you remove one quiz. All the questions and submission of this quiz will also get deleted (not recoverable). It includes learning material, questions and options, their submissions and your grading/feedback, not only the quiz itself.')) {
