@@ -38,13 +38,13 @@ DROP TABLE IF EXISTS `Bonus_Task_Record`;
 
 CREATE TABLE IF NOT EXISTS `School` (
     SchoolID MEDIUMINT AUTO_INCREMENT,
-    SchoolName TEXT,
+    SchoolName VARCHAR(190) UNIQUE,
     CONSTRAINT School_SchoolID_PK PRIMARY KEY (SchoolID)
 )  ENGINE=INNODB;
 
 CREATE TABLE IF NOT EXISTS `Class` (
     ClassID MEDIUMINT AUTO_INCREMENT,
-    ClassName TEXT,
+    ClassName VARCHAR(190) UNIQUE,
     SchoolID MEDIUMINT NOT NULL,
     # UnlockedProgress
     UnlockedProgress MEDIUMINT NOT NULL DEFAULT 10,
@@ -154,7 +154,7 @@ CREATE TABLE IF NOT EXISTS `Learning_Material` (
 
 CREATE TABLE IF NOT EXISTS `MCQ_Section` (
     QuizID MEDIUMINT,
-    Points MEDIUMINT,
+    Points MEDIUMINT DEFAULT 0,
     Questionnaires BOOLEAN DEFAULT 0,
     CONSTRAINT MCQ_Section_QuizID_PK PRIMARY KEY (QuizID),
     CONSTRAINT MCQ_Section_QuizID_FK FOREIGN KEY (QuizID)

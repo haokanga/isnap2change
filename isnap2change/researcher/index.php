@@ -309,9 +309,12 @@
                 "initComplete": function(settings, json) {
                     
                     $('.input-sm').eq(1).val($("#keyword").val().trim());                    
-                }
+                },
+                "aoColumnDefs": [
+                  { "bSearchable": false, "aTargets": [ 0 ] }
+                ]
         })
-        //search keyword (schoolname), exact match
+        //search keyword, exact match
         table.search(
             $("#keyword").val().trim(), true, false, true
         ).draw();     

@@ -7,70 +7,65 @@
     $overviewName = "school";
     
     //if update/insert/remove school
-    if($_SERVER["REQUEST_METHOD"] == "POST"){
-        if(isset($_POST['update'])){                          
-            $update = $_POST['update'];
-            //update
-            if($update == 0){
-                $schoolID = $_POST['schoolid'];
-                $schoolName = $_POST['schoolname'];
-                $update_stmt = "UPDATE School 
-                    SET SchoolName = ?
-                    WHERE SchoolID = ?";			
-                $update_stmt = $conn->prepare($update_stmt);                            
-                if(! $update_stmt -> execute(array($schoolName, $schoolID))){
-                    echo "<script language=\"javascript\">  alert(\"Error occurred to update ".$overviewName.". Contact with developers.\"); </script>";
-                } else{
+    try{
+        if($_SERVER["REQUEST_METHOD"] == "POST"){
+            if(isset($_POST['update'])){                          
+                $update = $_POST['update'];
+                //update
+                if($update == 0){
+                    $schoolID = $_POST['schoolid'];
+                    $schoolName = $_POST['schoolname'];
+                    $update_stmt = "UPDATE School 
+                        SET SchoolName = ?
+                        WHERE SchoolID = ?";			
+                    $update_stmt = $conn->prepare($update_stmt);                            
+                    $update_stmt->execute(array($schoolName, $schoolID));
                 }
+                // insert
+                else if($update == 1){ 
+                    
+                        $schoolName = $_POST['schoolname'];                 
+                        $update_stmt = "INSERT INTO School(SchoolName)
+                         VALUES (?);";			
+                        $update_stmt = $conn->prepare($update_stmt);                
+                        $update_stmt->execute(array($schoolName));
+                                    
+                }
+                // remove school (with help of DELETE CASCADE) 
+                else if($update == -1){
+                    $schoolID = $_POST['schoolid'];
+                    $update_stmt = "DELETE FROM School WHERE SchoolID = ?";			
+                    $update_stmt = $conn->prepare($update_stmt);
+                    $update_stmt->execute(array($schoolID));
+                }            
             }
-            // insert
-            else if($update == 1){ 
-                $schoolName = $_POST['schoolname'];                 
-                $update_stmt = "INSERT INTO School(SchoolName)
-                     VALUES (?);";			
-                $update_stmt = $conn->prepare($update_stmt);                
-                if(! $update_stmt -> execute(array($schoolName))){
-                    echo "<script language=\"javascript\">  alert(\"Error occurred to insert ".$overviewName.". Contact with developers.\"); </script>";
-                } else{
-                }             
-            }
-            // remove school (with help of DELETE CASCADE) 
-            else if($update == -1){
-                $schoolID = $_POST['schoolid'];
-                $update_stmt = "DELETE FROM School WHERE SchoolID = ?";			
-                $update_stmt = $conn->prepare($update_stmt);
-                if(! $update_stmt -> execute(array($schoolID))){
-                    echo "<script language=\"javascript\">  alert(\"Error occurred to delete ".$overviewName.". Contact with developers.\"); </script>";
-                } else{
-                } 
-            }            
         }
-    }
-
-    // get school
-    $schoolSql = "SELECT SchoolID, SchoolName
-               FROM School";
-    $schoolQuery = $conn->prepare($schoolSql);
-    $schoolQuery->execute();
-    $schoolResult = $schoolQuery->fetchAll(PDO::FETCH_OBJ);
+        // get school
+        $schoolSql = "SELECT SchoolID, SchoolName
+                   FROM School";
+        $schoolQuery = $conn->prepare($schoolSql);
+        $schoolQuery->execute();
+        $schoolResult = $schoolQuery->fetchAll(PDO::FETCH_OBJ);
+        
+        // get class
+        $classSql = "SELECT ClassID, ClassName, SchoolName
+                   FROM Class NATURAL JOIN School";
+        $classQuery = $conn->prepare($classSql);
+        $classQuery->execute();
+        $classResult = $classQuery->fetchAll(PDO::FETCH_OBJ);
+        
+        // get class number
+        $classNumSql = "SELECT count(*) as Count, SchoolID
+                   FROM School NATURAL JOIN Class
+                   GROUP BY SchoolID";
+        $classNumQuery = $conn->prepare($classNumSql);
+        $classNumQuery->execute();
+        $classNumResult = $classNumQuery->fetchAll(PDO::FETCH_OBJ);
+    } catch(Exception $e) {
+        debug_pdo_err($overviewName, $e);
+    } 
     
-    // get class
-    $classSql = "SELECT ClassID, ClassName, SchoolName
-               FROM Class NATURAL JOIN School";
-    $classQuery = $conn->prepare($classSql);
-    $classQuery->execute();
-    $classResult = $classQuery->fetchAll(PDO::FETCH_OBJ);
-    
-    // get class number
-    $classNumSql = "SELECT count(*) as Count, SchoolID
-               FROM School NATURAL JOIN Class
-               GROUP BY SchoolID";
-    $classNumQuery = $conn->prepare($classNumSql);
-    $classNumQuery->execute();
-    $classNumResult = $classNumQuery->fetchAll(PDO::FETCH_OBJ); 
-    
-    db_close($conn); 
-    
+    db_close($conn);    
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -241,7 +236,10 @@
     <script>    
     $(document).ready(function() {
         $('#dataTables-example').DataTable({
-                responsive: true
+                responsive: true,
+                "aoColumnDefs": [
+                  { "bSearchable": false, "aTargets": [ 0 ] }
+                ]
         });            
     }); 
     //DO NOT put them in $(document).ready() since the table has multi pages

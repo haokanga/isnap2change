@@ -16,7 +16,7 @@
                     SET Password = ?
                     WHERE StudentID = ?";			
                 $update_stmt = $conn->prepare($update_stmt);                            
-                if(! $update_stmt -> execute(array(md5('WelcomeToiSNAP2'), $studentID))){
+                if(! $update_stmt->execute(array(md5('WelcomeToiSNAP2'), $studentID))){
                     echo "<script language=\"javascript\">  alert(\"Error occurred to reset password. Contact with developers.\"); </script>";
                 } else{
                 }
@@ -26,7 +26,7 @@
                 $studentID = $_POST['studentid'];
                 $update_stmt = "DELETE FROM Student WHERE StudentID = ?";			
                 $update_stmt = $conn->prepare($update_stmt);
-                if(! $update_stmt -> execute(array($studentID))){
+                if(! $update_stmt->execute(array($studentID))){
                     echo "<script language=\"javascript\">  alert(\"Error occurred to delete student. Contact with developers.\"); </script>";
                 } else{
                 } 
@@ -184,7 +184,7 @@
               <h4 class="modal-title" id="dialogTitle">Reset Password</h4>
             </div>
             <div class="modal-body">
-            <form id="submission" method="post" action="<?php echo $_SERVER['PHP_SELF']; ?>">
+            <form id="submission" method="post" action="<?php if(isset($_GET['classid'])) echo $_SERVER['PHP_SELF'].'?classid='.$_GET['classid']; else echo $_SERVER['PHP_SELF']; ?>">
                 <!--if 0 update; else if -1 delete;-->
                 <input type=hidden name="update" id="update" value="1"></input>                
                 <?php for($i=0; $i<count($columnName); $i++) {
@@ -282,9 +282,10 @@
                 responsive: true,
                 "initComplete": function(settings, json) {                    
                     $('.input-sm').eq(1).val($("#keyword").val().trim());                    
-                }
+                },
+                "pageLength":50
         })
-        //search keyword (schoolname), exact match
+        //search keyword, exact match
         table.search(
             $("#keyword").val().trim(), true, false, true
         ).draw();
