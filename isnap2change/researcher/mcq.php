@@ -39,10 +39,10 @@
                     $update_stmt = $conn->prepare($update_stmt);                            
                     $update_stmt->execute(array($quizID, $points, $questionnaires, $points, $questionnaires)); 
                     //init empty Learning Material
-                    $update_stmt = "INSERT INTO Learning_Material(Content,QuizID)
-                     VALUES (?,?);";
+                    $content='<p>Learning materials for this quiz has not been added.</p>';
+                    $update_stmt = "INSERT INTO Learning_Material(Content,QuizID) VALUES (?,?);";
                     $update_stmt = $conn->prepare($update_stmt);                            
-                    $update_stmt->execute(array('<p>Learning materials for this quiz has not been added.</p>', $quizID)); 
+                    $update_stmt->execute(array($content, $quizID)); 
                     
                     $conn->commit();                    
                 } catch(Exception $e) {

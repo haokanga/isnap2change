@@ -16,28 +16,44 @@
         if(isset($_POST['update'])){                          
             $update = $_POST['update'];
             if($update == 1){
-                $week = $_POST['week'];
-                $quizType = $_POST['quiztype'];
-                $topicName = $_POST['topicname'];
-                //get topicID
-                $topicSql = "SELECT TopicID
-                           FROM Topic WHERE TopicName = ?";
-                $topicQuery = $conn->prepare($topicSql);
-                $topicQuery->execute(array($topicName));
-                $topicResult = $topicQuery->fetch(PDO::FETCH_OBJ);
-                
-                $update_stmt = "INSERT INTO Quiz(Week, QuizType, TopicID)
-                     VALUES (?,?,?);";			
-                $update_stmt = $conn->prepare($update_stmt);         
-                $update_stmt->execute(array($week, $quizType, $topicResult->TopicID));
-                $classID = $conn->lastInsertId();
-                if($classID <= 0){
-                    echo "<script language=\"javascript\">  alert(\"Error occurred to insert class. Contact with developers.\"); </script>";
-                } else{
-                }
-            }                       
-            else if($update == 0){
-                
+                try{
+                    $week = $_POST['week'];
+                    $quizType = $_POST['quiztype'];
+                    $topicName = $_POST['topicname'];
+                    $conn->beginTransaction();              
+                    
+                    //get topicID
+                    $topicSql = "SELECT TopicID
+                               FROM Topic WHERE TopicName = ?";
+                    $topicQuery = $conn->prepare($topicSql);
+                    $topicQuery->execute(array($topicName));
+                    $topicResult = $topicQuery->fetch(PDO::FETCH_OBJ);
+                    //insert quiz
+                    $update_stmt = "INSERT INTO Quiz(Week, QuizType, TopicID)
+                         VALUES (?,?,?);";			
+                    $update_stmt = $conn->prepare($update_stmt);         
+                    $update_stmt->execute(array($week, $quizType, $topicResult->TopicID));                     
+                    $quizID = $conn->lastInsertId(); 
+                    //if MCQ, insert MCQ_Section
+                    if($quizType=='MCQ'){                        
+                        $points = 0;
+                        $questionnaires = 0;
+                        $update_stmt = "INSERT INTO MCQ_Section(QuizID, Points, Questionnaires)
+                                    VALUES (?,?,?);";			
+                        $update_stmt = $conn->prepare($update_stmt);                            
+                        $update_stmt->execute(array($quizID, $points, $questionnaires)); 
+                    }                    
+                    //init empty Learning Material
+                    $content='<p>Learning materials for this quiz has not been added.</p>';
+                    $update_stmt = "INSERT INTO Learning_Material(Content,QuizID) VALUES (?,?);";
+                    $update_stmt = $conn->prepare($update_stmt);                            
+                    $update_stmt->execute(array($content, $quizID)); 
+                    
+                    $conn->commit();                    
+                } catch(Exception $e) {
+                    debug_pdo_err($overviewName, $e);
+                    $conn->rollback();
+                }                
             }
             else if($update == -1){  
                 $quizID = $_POST['quizid'];
@@ -156,7 +172,8 @@
                                             <td><?php echo $quizResult[$i]->Week ?></td>
                                             <td><?php if($quizResult[$i]->QuizType=='MCQ') {echo 'Multiple Choice';} else if($quizResult[$i]->QuizType=='SAQ') {echo 'Short Answer';} else {echo $quizResult[$i]->QuizType;} ?></a></td>
                                             <td><?php echo $quizResult[$i]->TopicName ?></td>
-                                            <td><?php echo getQuizPoints($quizResult[$i]->QuizID); ?><span class="glyphicon glyphicon-remove pull-right" aria-hidden="true"></span><span class="pull-right" aria-hidden="true">&nbsp;</span><span class="glyphicon glyphicon-edit pull-right" data-toggle="modal" data-target="#dialog" aria-hidden="true"></span></td>
+                                            <td><?php echo getQuizPoints($quizResult[$i]->QuizID); ?><span class="glyphicon glyphicon-remove pull-right" aria-hidden="true"></span><span class="pull-right" aria-hidden="true">&nbsp;</span><span class="glyphicon glyphicon-edit pull-right" aria-hidden="true"></span></td>
+                                            <!---->
                                         </tr>
                                     <?php } ?>    
                                     </tbody>
