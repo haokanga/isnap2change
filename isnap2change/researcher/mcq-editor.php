@@ -5,17 +5,48 @@
     require_once("/researcher-validation.php");
     require_once("/get-quiz-points.php");	    
     $conn = db_connect();
-    $overviewName = "quiz";
-    $columnName = array('QuizID','Week','TopicName','Points', 'Questions');     
+    $overviewName = "mcq-editor";
+    $columnName = array('QuizID','Week','TopicName','Points','Questionnaires','Questions');
     //edit/delete quiz
     if($_SERVER["REQUEST_METHOD"] == "POST"){
-        if(isset($_POST['update'])){                          
-            $update = $_POST['update'];
+        if(isset($_POST['metadataupdate'])){                          
+            $metadataupdate = $_POST['metadataupdate'];
             //update
-            if($update == 0){
-                
+            if($metadataupdate == 0){
+                try{
+                    $quizID = $_POST['quizid'];
+                    $week = $_POST['week'];
+                    $topicName = $_POST['topicname'];
+                    $points = $_POST['points'];
+                    $questionnaires = $_POST['questionnaires'];
+                    $conn->beginTransaction();              
+                    
+                    //get topicID
+                    $topicSql = "SELECT TopicID
+                               FROM Topic WHERE TopicName = ?";
+                    $topicQuery = $conn->prepare($topicSql);
+                    $topicQuery->execute(array($topicName));
+                    $topicResult = $topicQuery->fetch(PDO::FETCH_OBJ);
+                    //update quiz
+                    $update_stmt = "UPDATE Quiz 
+                            SET Week = ?, TopicID = ?
+                            WHERE QuizID = ?";			
+                    $update_stmt = $conn->prepare($update_stmt);         
+                    $update_stmt->execute(array($week, $topicResult->TopicID, $quizID)); 
+                    //update MCQ_Section
+                    $update_stmt = "UPDATE MCQ_Section
+                                    SET Points = ?, Questionnaires = ?
+                                    WHERE QuizID = ?;";			
+                    $update_stmt = $conn->prepare($update_stmt);                            
+                    $update_stmt->execute(array($points, $questionnaires, $quizID));
+                    
+                    $conn->commit();                    
+                } catch(Exception $e) {
+                    debug_pdo_err($overviewName, $e);
+                    $conn->rollback();
+                } 
             }
-            else if($update == 1){  
+            else if($metadataupdate == 1){  
                 $quizID = $_POST['quizid'];
                 $update_stmt = "DELETE FROM Quiz WHERE QuizID = ?";			
                 $update_stmt = $conn->prepare($update_stmt);
@@ -45,59 +76,62 @@
     } else{            
         echo "<script language=\"javascript\">  console.log(\"Learning Material Submitted. materialid: $materialid  quizid: $quizid\"); </script>";
     }  
-    */
+    */    
     
-    if($_SERVER["REQUEST_METHOD"] == "GET"){
-        if(isset($_GET['quizid'])){
-        $quizID = $_GET['quizid'];    
+    if(isset($_GET['quizid'])){
+        $quizID = $_GET['quizid'];
         // get quiz and topic
-        $quizSql = "SELECT QuizID, Week, TopicName, COUNT(*) AS Questions
-                   FROM Quiz NATURAL JOIN Topic NATURAL JOIN MCQ_Section NATURAL JOIN MCQ_Question WHERE QuizID = ?";
+        $quizSql = "SELECT QuizID, Week, TopicName, Points, Questionnaires, COUNT(MCQID) AS Questions
+                   FROM Quiz NATURAL JOIN Topic NATURAL JOIN MCQ_Section LEFT JOIN MCQ_Question USING (QuizID) WHERE QuizID = ? GROUP BY QuizID";
         $quizQuery = $conn->prepare($quizSql);
         $quizQuery->execute(array($quizID));
-        $quizResult = $quizQuery->fetch(PDO::FETCH_OBJ); 
-        }
-        //get topic list
-        $topicSql = "SELECT TopicID, TopicName FROM Topic ORDER BY TopicID";
-        $topicQuery = $conn->prepare($topicSql);
-        $topicQuery->execute(array());
-        $topicResult = $topicQuery->fetchAll(PDO::FETCH_OBJ); 
-        
-        $materialPreSql = "SELECT COUNT(*) 
-					   FROM   Learning_Material
-					   WHERE  QuizID = ?";							
-        $materialPreQuery = $conn->prepare($materialPreSql);
-        $materialPreQuery->execute(array($quizID));                
-        if($materialPreQuery->fetchColumn() != 1){
-                    
-        }                
-        $materialSql = "SELECT Content, TopicName 
-                        FROM   Learning_Material NATURAL JOIN Quiz
-                                                 NATURAL JOIN Topic
-                        WHERE  QuizID = ?";
-                                
-        $materialQuery = $conn->prepare($materialSql);
-        $materialQuery->execute(array($quizID));
-        $materialRes = $materialQuery->fetch(PDO::FETCH_OBJ);
+        $quizResult = $quizQuery->fetch(PDO::FETCH_OBJ);
+    }
+    
+    //get topic list
+    $topicSql = "SELECT TopicID, TopicName FROM Topic ORDER BY TopicID";
+    $topicQuery = $conn->prepare($topicSql);
+    $topicQuery->execute(array());
+    $topicResult = $topicQuery->fetchAll(PDO::FETCH_OBJ); 
+    
+    $materialPreSql = "SELECT COUNT(*) 
+                   FROM   Learning_Material
+                   WHERE  QuizID = ?";							
+    $materialPreQuery = $conn->prepare($materialPreSql);
+    $materialPreQuery->execute(array($quizID));                
+    if($materialPreQuery->fetchColumn() != 1){
+                
+    }                
+    $materialSql = "SELECT Content, TopicName 
+                    FROM   Learning_Material NATURAL JOIN Quiz
+                                             NATURAL JOIN Topic
+                    WHERE  QuizID = ?";
+                            
+    $materialQuery = $conn->prepare($materialSql);
+    $materialQuery->execute(array($quizID));
+    $materialRes = $materialQuery->fetch(PDO::FETCH_OBJ);
 
-        //get questions and options
-        $mcqSql = "SELECT MCQID, Question, CorrectChoice, Content, Explanation
-				   FROM   MCQ_Section NATURAL JOIN MCQ_Question
-								  NATURAL JOIN `Option`
-			       WHERE  QuizID = ?
-			       ORDER BY MCQID";
-								
-		$mcqQuery = $conn->prepare($mcqSql);
-		$mcqQuery->execute(array($quizID));
-        $mcqResult = $mcqQuery->fetchAll(PDO::FETCH_OBJ); 
+    //get questions and options
+    $mcqSql = "SELECT MCQID, Question, CorrectChoice, Content, Explanation
+               FROM   MCQ_Section NATURAL JOIN MCQ_Question
+                              NATURAL JOIN `Option`
+               WHERE  QuizID = ?
+               ORDER BY MCQID";
+                            
+    $mcqQuery = $conn->prepare($mcqSql);
+    $mcqQuery->execute(array($quizID));
+    $mcqResult = $mcqQuery->fetchAll(PDO::FETCH_OBJ);      
+    
 
-        //get max option num        
-        $optionNumSql = "SELECT MAX(OptionNum) AS MaxOptionNum FROM (SELECT COUNT(*) AS OptionNum FROM MCQ_Question natural JOIN `Option` WHERE QuizID = ? GROUP BY MCQID) AS OptionNumbTable;";								
-		$optionNumQuery = $conn->prepare($optionNumSql);
-		$optionNumQuery->execute(array($quizID));
-        $optionNumResult = $optionNumQuery->fetch(PDO::FETCH_OBJ);
-        $mcqQuesColName = array('MCQID','Question','Option', 'Explanation','Edit');
-	}   
+    //get max option num
+    /*    
+    $optionNumSql = "SELECT MAX(OptionNum) AS MaxOptionNum FROM (SELECT COUNT(*) AS OptionNum FROM MCQ_Question natural JOIN `Option` WHERE QuizID = ? GROUP BY MCQID) AS OptionNumbTable;";								
+    $optionNumQuery = $conn->prepare($optionNumSql);
+    $optionNumQuery->execute(array($quizID));
+    $optionNumResult = $optionNumQuery->fetch(PDO::FETCH_OBJ);
+    */
+    $mcqQuesColName = array('MCQID','Question','Option', 'Explanation','Edit');
+	   
     db_close($conn); 
     
 ?>
@@ -196,35 +230,41 @@
             <div class="row">
                 <div class="col-lg-12">
                     
-                    <!--MetaData-->
+                    <!-- MetaData -->
                     <div class="panel panel-default">
                         <div class="panel-heading">
                             Quiz MetaData
                         </div>
                         <!-- /.panel-heading -->
                         <div class="panel-body">
-                            <form id="submission" method="post" action="<?php echo $_SERVER['PHP_SELF']; ?>">
+                            <form id="metadatasubmission" method="post" action="<?php echo 'mcq-editor.php?quizid='.$quizID; ?>">
                                 <!--if 0 update; else if -1 delete;-->
-                                <input type=hidden name="update" id="update" value="1"></input>                
-                            <?php for($i=0; $i<count($columnName); $i++) {
-                                    if($columnName[$i]!='TopicName'){ ?>
-                                    <label for='<?php echo $columnName[$i]; ?>' <?php if ($i==0){ echo 'style="display:none"';} ?>><?php echo $columnName[$i]; ?></label>    
-                                    <input type="text" class="form-control metadatainput" id="<?php echo $columnName[$i]; ?>" name="<?php echo strtolower($columnName[$i]); ?>"  
-                                    <?php if ($i==0){ echo 'style="display:none"';} ?> value="<?php if($i!=3) {echo $quizResult->$columnName[$i];} else  {echo getQuizPoints($quizResult->QuizID);} ?>" required></input>
-                                <?php }
-                                else {?>
-                                    <label for='<?php echo $columnName[$i]; ?>' <?php if ($i==0){ echo 'style="display:none"';} ?>><?php echo $columnName[$i]; ?></label>
-                                    <select class="form-control metadatainput" id="<?php echo $columnName[$i]; ?>" form="submission" name="<?php echo strtolower($columnName[$i]);?>" required>
-                                      <?php for($j=0; $j<count($topicResult); $j++) {?>                  
-                                        <option value='<?php echo $topicResult[$j]->TopicName ?>' <?php if($topicResult[$j]->TopicName == $quizResult->$columnName[$i])echo 'selected' ?>><?php echo $topicResult[$j]->TopicName ?></option>
-                                      <?php } ?>
-                                    </select>                                     
-                                <?php } 
-                            }?>
+                                <input type=hidden name="metadataupdate" id="metadataupdate" value="1" required></input>
+                                <label for="QuizID" style="display:none">QuizID</label>
+                                <input type="text" class="form-control" id="QuizID" name="quizid" style="display:none" value="<?php echo $quizResult->QuizID; ?>"></input>
+                                <br>
+                                <label for="Week">Week</label>
+                                <input type="text" class="form-control" id="Week" name="week" placeholder="Input Week Number" value="<?php echo $quizResult->Week; ?>" required></input> 
+                                <br>  
+                                <label for='TopicName'>TopicName</label>
+                                <select class="form-control" id="TopicName" form="metadatasubmission" name="topicname" required>
+                                  <?php for($j=0; $j<count($topicResult); $j++) {?>                  
+                                    <option value='<?php echo $topicResult[$j]->TopicName ?>'><?php echo $topicResult[$j]->TopicName ?></option>
+                                  <?php } ?>
+                                </select>
+                                <br>
+                                <label for="Points">Points</label>
+                                <input type="text" class="form-control" id="Points" name="points" placeholder="Input Points" value="<?php echo $quizResult->Points; ?>" required></input>
+                                <br>
+                                <label for="Questionnaires">Questionnaires</label>
+                                <input type="hidden" class="form-control" id="Questionnaires" name="questionnaires" value="0"></input>
+                                <input type="checkbox" class="form-control" id="Questionnaires" name="questionnaires" value="1" <?php if($quizResult->Questionnaires!=0) echo 'checked';?>></input>
+                                <label for="Questions">Questions</label>
+                                <input type="text" class="form-control" id="Questions" name="questions" value="<?php echo $quizResult->Questions; ?>" disabled></input>
                                 <br>
                             </form>
                             <!--edit metadata-->
-                            <span class="glyphicon glyphicon-remove pull-right" aria-hidden="true"></span><span class="pull-right" aria-hidden="true">&nbsp;</span><span class="glyphicon glyphicon-edit pull-right" data-toggle="modal" data-target="#dialog" aria-hidden="true"></span>    
+                            <span class="glyphicon glyphicon-remove pull-right" id="metadataremove" aria-hidden="true"></span><span class="pull-right" aria-hidden="true">&nbsp;</span><span class="glyphicon glyphicon-edit pull-right" id="metadataedit" aria-hidden="true"></span>    
                         </div>                            
                         <!-- /.panel-body -->
                     </div>
@@ -318,33 +358,6 @@
 
     </div>
     <!-- /#wrapper -->
-    <!-- Modal -->
-      <div class="modal fade modal-xl" id="dialog" role="dialog">
-        <div class="modal-dialog">        
-          <!-- Modal content-->
-          <div class="modal-content">
-            <div class="modal-header">
-              <button type="button" class="close" data-dismiss="modal">&times;</button>
-              <h4 class="modal-title" id="dialogTitle">Edit Question</h4>
-            </div>
-            <div class="modal-body">
-            <form id="submission" method="post" action="<?php echo $_SERVER['PHP_SELF']; ?>">
-                <!--if 1, insert; else if 0 update; else if -1 delete;-->
-                <input type=hidden name="update" id="update" value="1"></input>
-                <label for="<?php echo $mcqQuesColName[0]; ?>" style="display:none"><?php echo $mcqQuesColName[0]; ?></label>
-                <input type="text" class="form-control dialoginput" id="<?php echo $mcqQuesColName[0]; ?>" name="<?php echo strtolower($mcqQuesColName[0]); ?>" style="display:none">
-                <br><label for="<?php echo $mcqQuesColName[1]; ?>"><?php echo $mcqQuesColName[1]; ?></label>
-                <input type="text" class="form-control dialoginput" id="<?php echo $mcqQuesColName[1]; ?>" name="<?php echo strtolower($mcqQuesColName[1]); ?>" required><br>
-            </form>            
-            </div>
-            <div class="modal-footer">            
-              <button type="button" id="btnSave" class="btn btn-default">Save</button>
-              <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-            </div>
-          </div>          
-        </div>
-      </div>
-      <input type=hidden name="keyword" id="keyword" value="<?php if(isset($_GET['week'])){ echo $_GET['week']; } ?>"></input>
     <!-- jQuery -->
     <script src="../bower_components/jquery/dist/jquery.min.js"></script>
 
@@ -373,29 +386,17 @@
     <!-- Page-Level Scripts -->
     <script>
     //DO NOT put them in $(document).ready() since the table has multi pages
-    $('.glyphicon-edit').on('click', function (){
-        $('#dialogTitle').text("Edit Question");
-        $('#update').val(0);
-        for(i=0;i<$('.dialoginput').length;i++){                
-            $('.dialoginput').eq(i).val($(this).parent().parent().children('td').eq(i).text());
-        }
-        //disable MCQID    
-        $('.dialoginput').eq(0).attr('disabled','disabled');        
-    });
+    /**
     $('.glyphicon-plus').on('click', function (){
-        $('#dialogTitle').text("Add Question");
+        $('#dialogTitle').text("Add MCQ");
         $('#update').val(1);
         for(i=0;i<$('.dialoginput').length;i++){                
             $('.dialoginput').eq(i).val('');
-        }
-        //disable MCQID
-        $('.dialoginput').eq(0).attr('disabled','disabled');         
+        }   
     }); 
     $('.glyphicon-remove').on('click', function (){
-        if (confirm('[WARNING] Are you sure to remove this class? All the quiz data in this class will also get deleted (not recoverable). It includes quiz information, their submissions of every task and your grading/feedback, not only the class itself.')) {
+        if (confirm('[WARNING] Are you sure to remove this quiz? If you remove one quiz. All the questions and submission of this quiz will also get deleted (not recoverable). It includes learning material, questions and options, their submissions and your grading/feedback, not only the quiz itself.')) {
             $('#update').val(-1);
-            //fill required input
-            $('.dialoginput').eq(0).prop('disabled',false);
             for(i=0;i<$('.dialoginput').length;i++){                
                 $('.dialoginput').eq(i).val($(this).parent().parent().children('td').eq(i).text());
             }
@@ -403,30 +404,48 @@
         }           
     });
     $('#btnSave').on('click', function (){
-        $('#submission').validate();        
-        //enable ClassID and EnrolledQuizs
-        $('.dialoginput').eq(0).prop('disabled',false);
+        $('#submission').validate({
+          rules: {
+            week: {
+              required: true,
+              digits: true
+            },
+            points: {
+              required: true,
+              digits: true
+            }
+          }
+        });   
         $('#submission').submit();
     });
+    */
+    
     //include html
     w3IncludeHTML();   
     $(document).ready(function() {
     var table = $('#datatables').DataTable({
             responsive: true,
-            "initComplete": function(settings, json) {                
-                $('.input-sm').eq(1).val($("#keyword").val().trim());                    
-            },
             //rows group for MCQID, Question and edit box
             rowsGroup: [1,4],
             "pageLength":100
         })
-        //search keyword, exact match
-        table.search(
-            $("#keyword").val().trim(), true, false, true
-        ).draw();
-         $('.metadatainput').eq(4).attr('disabled','disabled'); 
-        
-    });        
+        $('#metadataedit').on('click', function (){
+            $('#metadataupdate').val(0);
+            $('#metadatasubmission').validate({
+              rules: {
+                week: {
+                  required: true,
+                  digits: true
+                },
+                points: {
+                  required: true,
+                  digits: true
+                }
+              }
+            });   
+            $('#metadatasubmission').submit();
+        });        
+    });    
     </script>    
 </body>
 
