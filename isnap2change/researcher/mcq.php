@@ -310,7 +310,10 @@
         var table = $('#datatables').DataTable({
                 responsive: true,
                 "order": [[ 1, "asc" ]],
-                "pageLength":50
+                "pageLength":50,
+                "aoColumnDefs": [
+                  { "bSearchable": false, "aTargets": [ 0 ] }
+                ]
         })   
     });        
     </script>

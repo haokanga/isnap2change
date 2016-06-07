@@ -40,33 +40,32 @@
                 }            
             }
         }
+        // get school
+        $schoolSql = "SELECT SchoolID, SchoolName
+                   FROM School";
+        $schoolQuery = $conn->prepare($schoolSql);
+        $schoolQuery->execute();
+        $schoolResult = $schoolQuery->fetchAll(PDO::FETCH_OBJ);
+        
+        // get class
+        $classSql = "SELECT ClassID, ClassName, SchoolName
+                   FROM Class NATURAL JOIN School";
+        $classQuery = $conn->prepare($classSql);
+        $classQuery->execute();
+        $classResult = $classQuery->fetchAll(PDO::FETCH_OBJ);
+        
+        // get class number
+        $classNumSql = "SELECT count(*) as Count, SchoolID
+                   FROM School NATURAL JOIN Class
+                   GROUP BY SchoolID";
+        $classNumQuery = $conn->prepare($classNumSql);
+        $classNumQuery->execute();
+        $classNumResult = $classNumQuery->fetchAll(PDO::FETCH_OBJ);
     } catch(Exception $e) {
         debug_pdo_err($overviewName, $e);
     } 
-    // get school
-    $schoolSql = "SELECT SchoolID, SchoolName
-               FROM School";
-    $schoolQuery = $conn->prepare($schoolSql);
-    $schoolQuery->execute();
-    $schoolResult = $schoolQuery->fetchAll(PDO::FETCH_OBJ);
     
-    // get class
-    $classSql = "SELECT ClassID, ClassName, SchoolName
-               FROM Class NATURAL JOIN School";
-    $classQuery = $conn->prepare($classSql);
-    $classQuery->execute();
-    $classResult = $classQuery->fetchAll(PDO::FETCH_OBJ);
-    
-    // get class number
-    $classNumSql = "SELECT count(*) as Count, SchoolID
-               FROM School NATURAL JOIN Class
-               GROUP BY SchoolID";
-    $classNumQuery = $conn->prepare($classNumSql);
-    $classNumQuery->execute();
-    $classNumResult = $classNumQuery->fetchAll(PDO::FETCH_OBJ); 
-    
-    db_close($conn); 
-    
+    db_close($conn);    
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -237,7 +236,10 @@
     <script>    
     $(document).ready(function() {
         $('#dataTables-example').DataTable({
-                responsive: true
+                responsive: true,
+                "aoColumnDefs": [
+                  { "bSearchable": false, "aTargets": [ 0 ] }
+                ]
         });            
     }); 
     //DO NOT put them in $(document).ready() since the table has multi pages

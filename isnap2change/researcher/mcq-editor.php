@@ -427,7 +427,10 @@
             responsive: true,
             //rows group for MCQID, Question and edit box
             rowsGroup: [1,4],
-            "pageLength":100
+            "pageLength":100,
+            "aoColumnDefs": [
+              { "bSearchable": false, "aTargets": [ 0 ] }
+            ]
         })
         $('#metadataedit').on('click', function (){
             $('#metadataupdate').val(0);

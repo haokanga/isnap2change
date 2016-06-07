@@ -306,7 +306,10 @@
                     $('.input-sm').eq(1).val($("#keyword").val().trim());                    
                 },
                 "order": [[ 1, "asc" ]],
-                "pageLength":50
+                "pageLength":50,
+                "aoColumnDefs": [
+                  { "bSearchable": false, "aTargets": [ 0 ] }
+                ]
         })
         //search keyword, exact match
         table.search(

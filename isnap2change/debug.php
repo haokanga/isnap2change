@@ -11,6 +11,7 @@
     function debug_err($message){
         echo "<script language=\"javascript\">  alert(\"".$message."\"); </script>";
     }
+    
     function debug_pdo_err($pageName, $e){
         // duplicate entry
         if ($e->errorInfo[1] == 1062) {          
