@@ -36,9 +36,10 @@
 	}
 		
 	$conn = db_connect();
-	$conn->beginTransaction();
 	
-	try {	
+	try {
+		$conn->beginTransaction();
+		
 		//UPDATE Quiz_Record
 		if($action == "SAVE") {
 			$status = "UNSUBMITTED";
