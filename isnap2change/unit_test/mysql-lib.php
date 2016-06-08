@@ -49,7 +49,7 @@
     try{
         $studentID = 1;
         $conn->beginTransaction();              
-        $make_err = false;
+        $make_err = true;
         
         $update_stmt = "UPDATE Student 
                 SET Score = ?
@@ -74,7 +74,7 @@
         echo 'getStudentScore(1) '.getStudentScore(1).'<br>';
         
         $conn->commit();                    
-    } catch(Exception $e) {
+    } catch(PDOException $e) {
         debug_pdo_err($overviewName, $e);
         $conn->rollback();
     } 

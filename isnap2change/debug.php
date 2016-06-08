@@ -20,8 +20,8 @@
         // unclassfied error occurred
         else {          
             //debug_err("Unexpected MySQL Error occurred in ".$pageName.". Contact with developers.");        
-            //sql insert.. $e->getMessage();
-            INSERT INTO BugReport value($pagename, $getMessage);
+            //sql insert.. 
+            //Logger.write($pagename, $getMessage);
         }
     }
 ?>

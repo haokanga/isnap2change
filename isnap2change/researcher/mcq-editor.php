@@ -41,7 +41,7 @@
                     $update_stmt->execute(array($points, $questionnaires, $quizID));
                     
                     $conn->commit();                    
-                } catch(Exception $e) {
+                } catch(PDOException $e) {
                     debug_pdo_err($overviewName, $e);
                     $conn->rollback();
                 } 
