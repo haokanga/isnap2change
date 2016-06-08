@@ -29,6 +29,7 @@ DROP TABLE IF EXISTS `Matching_Question`;
 DROP TABLE IF EXISTS `Matching_Option`;
 DROP TABLE IF EXISTS `Poster_Section`;
 DROP TABLE IF EXISTS `Poster_Record`;
+DROP TABLE IF EXISTS `Misc_Section`;
 DROP TABLE IF EXISTS `Game`;
 DROP TABLE IF EXISTS `Game_Record`;
 DROP TABLE IF EXISTS `Bonus`;
@@ -120,7 +121,7 @@ CREATE TABLE IF NOT EXISTS `Topic` (
 CREATE TABLE IF NOT EXISTS `Quiz` (
     QuizID MEDIUMINT AUTO_INCREMENT,
     Week MEDIUMINT,
-    QuizType ENUM('MCQ', 'SAQ', 'Matching', 'Calculator', 'Poster'),    
+    QuizType ENUM('SAQ', 'MCQ', 'Matching', 'Poster', 'Misc'),    
     TopicID MEDIUMINT,
     CONSTRAINT Quiz_QuizID_PK PRIMARY KEY (QuizID),
     CONSTRAINT Quiz_TopicID_FK FOREIGN KEY (TopicID)
@@ -286,6 +287,16 @@ CREATE TABLE IF NOT EXISTS `Poster_Record` (
         ON DELETE CASCADE ON UPDATE CASCADE,
     CONSTRAINT Poster_Record_Record_QuizID_FK FOREIGN KEY (QuizID)
         REFERENCES Poster_Section (QuizID)
+        ON DELETE CASCADE ON UPDATE CASCADE
+)  ENGINE=INNODB;
+
+CREATE TABLE IF NOT EXISTS `Misc_Section` (
+    QuizID MEDIUMINT,
+    QuizSubType TEXT,
+    Points MEDIUMINT,
+    CONSTRAINT Misc_Section_QuizID_PK PRIMARY KEY (QuizID),
+    CONSTRAINT Misc_Section_QuizID_FK FOREIGN KEY (QuizID)
+        REFERENCES Quiz (QuizID)
         ON DELETE CASCADE ON UPDATE CASCADE
 )  ENGINE=INNODB;
 

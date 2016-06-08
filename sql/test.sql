@@ -35,4 +35,9 @@ SELECT QuizID, Week, TopicName, Points, Questionnaires, COUNT(MCQID) AS Question
                FROM Quiz NATURAL JOIN Topic NATURAL JOIN MCQ_Section LEFT JOIN MCQ_Question USING (QuizID) WHERE QuizType = 'MCQ' GROUP BY QuizID;
 SELECT Quiz.QuizID, Week, TopicName, Points, Questionnaires, Question, CorrectChoice
                FROM Quiz NATURAL JOIN Topic NATURAL JOIN MCQ_Section LEFT JOIN MCQ_Question ON MCQ_Section.QuizID = MCQ_Question.QuizID AND QuizType = 'MCQ';
-                   
+         
+SELECT MCQID,Question,`Option`,Explanation FROM MCQ_Question NATURAL JOIN `Option` WHERE MCQID = 1         
+
+# SELECT * FROM Quiz_Record NATURAL JOIN (MCQ_Section UNION Matching_Section UNION Poster_Section) ;
+# WHERE StudentID = 1
+
