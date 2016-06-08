@@ -3,7 +3,7 @@
     require_once("../connection.php");
     require_once("../debug.php");
     require_once("/researcher-validation.php");
-    require_once("/get-quiz-points.php");	    
+    require_once("../mysql-lib.php");	    
     $conn = db_connect();
     $overviewName = "mcq-editor";
     $columnName = array('QuizID','Week','TopicName','Points','Questionnaires','Questions');
@@ -326,7 +326,12 @@
                                             <td class ="<?php if ($mcqResult[$i]->Content == $mcqResult[$i]->CorrectChoice) {echo 'bg-success';} else {echo 'bg-danger';} ?>">
                                                 <?php echo $mcqResult[$i]->Content; ?>
                                             <td><?php echo $mcqResult[$i]->$mcqQuesColName[3] ?></td>
-                                            <td><span class="glyphicon glyphicon-remove pull-right " aria-hidden="true"></span><span class="pull-right" aria-hidden="true">&nbsp;</span><span class="glyphicon glyphicon-edit pull-right" data-toggle="modal" data-target="#dialog" aria-hidden="true"></span></td>            
+                                            <td>
+                                                <span class="glyphicon glyphicon-remove pull-right " aria-hidden="true"></span>
+                                                <span class="pull-right" aria-hidden="true">&nbsp;</span>
+                                                <a href="option-editor.php?mcqid=<?php echo $mcqResult[$i]->$mcqQuesColName[0]; ?>">
+                                                <span class="glyphicon glyphicon-edit pull-right" data-toggle="modal" data-target="#dialog" aria-hidden="true"></span></a>
+                                            </td>            
                                         </tr>
                                     <?php } ?>
                                     </tbody>
