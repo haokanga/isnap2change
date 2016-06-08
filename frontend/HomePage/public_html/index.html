@@ -10,89 +10,164 @@ and open the template in the editor.
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <link rel="stylesheet" type="text/css" href="css/home.css" />
-        <link rel="icon" href="http://example.com/favicon.png">
-
+        <script src="js/jquery-1.12.3.js"></script>
         <!-- Latest compiled and minified CSS -->
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
-        <script src="js/jquery-1.12.3.js"></script>
-        <script src="js/bootstrap.js"></script>
-        <script src="js/bootstrap.min.js"></script>
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js" integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS" crossorigin="anonymous"></script>
         <script>
             $(document).ready(function () {
 
                 $('#nav').affix({
                     offset: {
-                        top: $('header').height()
+                        top: $('header').height() - $('#nav').height()
                     }
                 });
 
-                /* var topOfPg1 = ($("#1").offset().top) / 3;
+                $('body').scrollspy({target: '#nav'});
+
+                $('.scroll-top').click(function () {
+                    $('body,html').animate({scrollTop: 0}, 1000);
+                });
+
+                /* smooth scrolling for nav sections */
+                $('#nav .navbar-nav li>a').click(function () {
+                    var link = $(this).attr('href');
+                    var posi = $(link).offset().top;
+                    $('body,html').animate({scrollTop: posi}, 700);
+                });
+
+                /*      $(window).on('scroll', function () {
+                 debugger;
+                 var y_scroll_pos = window.pageYOffset
+                 var pos1 = $( window ).height();
                  
-                 $(window).scroll(function () {
-                 if ($(window).scrollTop() > topOfPg1)
-                 {
+                 var pos2 = pos1*2;
+                 var pos3 = pos1*3;
+                 var pos4 = pos1*4;
+                 var pos5 = pos1*5;
+                 
+                 
+                 if (y_scroll_pos < pos1) {
                  $('html, body').animate({
-                 scrollTop: $("#2").offset().top + 'px'
-                 }, 1000, 'swing');
+                 scrollTop: $("#2").offset().top
+                 }, 500);
                  }
-                 });  */
+                 
+                 if ( y_scroll_pos < pos2) {
+                 $('html, body').animate({
+                 scrollTop: $("#3").offset().top
+                 }, 500);
+                 }
+                 
+                 if (y_scroll_pos < pos3) {
+                 $('html, body').animate({
+                 scrollTop: $("#4").offset().top
+                 }, 500);
+                 }
+                 
+                 if (y_scroll_pos < pos4) {
+                 $('html, body').animate({
+                 scrollTop: $("#5").offset().top
+                 }, 500);
+                 }
+                 
+                 if (y_scroll_pos < pos5) {
+                 $('html, body').animate({
+                 scrollTop: $("#6").offset().top
+                 }, 500);
+                 
+                 }  
+                 }); */
+
+                /*   $("#scrollDown").click(function () {
+                 $('html, body').animate({
+                 scrollTop: $("#2").offset().top
+                 }, 500);
+                 });   */
+
+                $("#scrollDown").click(function () {
+                    $(this).attr("src", "css/image/Icon_Placeholder.png");
+                    e.preventDefault();
+                });
             });
         </script>
 
     </head>
     <body>
-        <header class="masthead" id="1">
-            <div class="start">
-                <div class="logo" style="display:flex;justify-content:center;align-items:center;width:100%;height:70%;">
-                    <img src="css/image/Snap_Logo_Inverted.png" alt="SNAP" style="width:50%;height:68%;">
-                </div>
-                <div class="tagline" style="color: white; font-size: 2em; display:flex;justify-content:center;align-items:center; margin-top:35px;">
-                    To Inspire A Healthier You.
-                </div>
+
+        <header class="start" id="1">
+            <div class="logo" style="display:flex;justify-content:center;align-items:center;width:100%;height:70%;">
+                <img src="css/image/Snap_Logo_Inverted.png" alt="SNAP" style="width:50%;height:68%;">
+            </div>
+            <div class="tagline" style="color: white; font-size: 2em; display:flex;justify-content:center;align-items:center; margin-top:35px;">
+                To Inspire A Healthier You.
+                <!-- <input type="image" src="css/image/Refresh.png" name="saveForm" class="btTxt" id="scrollDown" style="border: none;" /> -->
             </div>
         </header>
 
-        <!-- Page 2 -->
 
-        <!-- Begin Navbar -->
-        <div id="nav">
-            <div class="navbar navbar-inverse navbar-static">
-                <div class="container">
-                    <!-- .btn-navbar is used as the toggle for collapsed navbar content -->
-                    <a class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
-                        <span class="glyphicon glyphicon-bar"></span>
-                        <span class="glyphicon glyphicon-bar"></span>
-                        <span class="glyphicon glyphicon-bar"></span>
-                    </a>
-                    <div class="navbar-collapse collapse">
-                        <ul class="nav navbar-nav">
-                            <li class="active">
-                                <a class="navbar-brand" href="#">
-                                    <img alt="Brand" src="css/image/Snap_Single_Wordform_White.png" style="height: 100%;">
-                                </a>
-                            </li>
-                            <li class="divider"></li>
-                            <li><a href="#">Snap Facts</a></li>
-                        </ul>
-                        <ul class="nav pull-right navbar-nav">
-                            <!-- <li>
-                                 <form class="navbar-form">
-                                     <input type="text" class="form-control" placeholder="Search">
-                                     <button type="submit" class="btn btn-default"><i class="glyphicon glyphicon-search"></i></button>
-                                 </form>
-                             </li> -->
-                            <li>
-                                <a href="#"><i class="glyphicon glyphicon-off"></i> LOGIN</a>
-                            </li>
-                        </ul>
-                    </div>		
+        <nav class="navbar navbar-inverse navbar-static-top" id="nav">
+            <div class="container">
+                <!-- .btn-navbar is used as the toggle for collapsed navbar content -->
+                <a class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                    <span class="glyphicon glyphicon-bar"></span>
+                    <span class="glyphicon glyphicon-bar"></span>
+                    <span class="glyphicon glyphicon-bar"></span>
+                </a>
+                <div class="navbar-collapse collapse">
+                    <ul class="nav navbar-nav">
+                        <li class="active">
+                            <a class="navbar-brand" href="#">
+                                <img alt="Brand" src="css/image/Snap_Single_Wordform_White.png" style="height: 100%;">
+                            </a>
+                        </li>
+                        <li class="divider"></li>
+                        <li><a href="#">Snap Facts</a></li>
+                    </ul>
+                    <ul class="nav pull-right navbar-nav">
+                        <!-- <li>
+                             <form class="navbar-form">
+                                 <input type="text" class="form-control" placeholder="Search">
+                                 <button type="submit" class="btn btn-default"><i class="glyphicon glyphicon-search"></i></button>
+                             </form>
+                         </li> -->
+                        <li>
+                            <a href="#" data-toggle="modal" data-target="#myModal"><i class="glyphicon glyphicon-off"></i> LOGIN</a>
+                        </li>
+                    </ul>
+                </div>		
+            </div>
+        </nav>
+        <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" style="width:100%;">
+            <div class="modal-dialog" role="document" style="height:90%;">
+                <div class="modal-content" style="height:90%;">
+                    <div class="modal-body">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close" style="color:white;"><span aria-hidden="true">&times;</span></button>
+                        <div class="col-xs-6 col-xs-offset-3">
+                            <img src="css/image/Snap_Logo_Inverted.png" style="height:20%; width: 100%;">
+                            <div class="input-group input-group-lg" style="margin-top:20%; text-align: center;">
+                                <input type="text" style="text-align: center; border-radius: 10px; color:yellow; border: none; background-color: black; opacity: 0.7;" class="form-control" placeholder="Username" aria-describedby="sizing-addon1">
+                            </div>
+                            <div class="input-group input-group-lg" style="margin-top:5%; text-align: center;">
+                                <input type="password" style="text-align: center; border-radius: 10px; border: none; color:yellow; background-color: black; opacity: 0.7;" class="form-control" placeholder="Password" aria-describedby="sizing-addon1">
+                            </div>
+                            <button type="button" data-dismiss="modal" aria-label="Close" class="btn btn-primary btn-lg btn-block" style="margin-top:5%; border-radius: 10px; border-color: yellow !important; color:yellow; background-color: black; opacity: 0.7;">Log In</button>
+                            <div style="text-align: center;">
+                            <span style="color: white;"> Don't have an account?</span>
+                            <a href='#' onclick="location.href = '/HomePage/SignUp.html';" style='color:yellow;'>Sign Up</a>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-            </div><!-- /.navbar -->
+            </div>
         </div>
 
+
+
+        <!-- Page 2 -->
         <div class="pg2" id="2">
-            <div class="pg2_div">
-                <div class="col-xs-4 col-xs-offset-2" style="margin-top:3%;">
+            <div class="pg2_div" style="margin-top:5%;">
+                <div class="col-xs-4 col-xs-offset-2" >
                     <div class="panel" style="background-color:black; border-radius:30px;">
                         <div class="panel-body" style="padding: 0px;">
                             <div class="col-xs-2">
@@ -119,7 +194,7 @@ and open the template in the editor.
                                         <li data-target="#carousel-example-generic" data-slide-to="2"></li>
                                     </ol>
 
-                                    <!-- Wrapper for slides -->
+
                                     <div class="carousel-inner" role="listbox">
                                         <div class="item active">
                                             <img src="css/image/Temple.png" alt="..." style="border-radius:30px;">
@@ -158,7 +233,7 @@ and open the template in the editor.
                                             </div>
                                         </div>
                                     </div>
-                                    <!-- Controls -->
+
                                     <a class="left carousel-control" href="#carousel-example-generic" role="button" data-slide="prev">
                                         <span class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span>
                                         <span class="sr-only">Previous</span>
@@ -170,10 +245,10 @@ and open the template in the editor.
                                 </div> 
                             </div>
                         </div>
-                    </div>
+                    </div>  
 
                 </div>
-                <div class="col-xs-4" style="background-color: black; margin-top:3%; padding-right:0px; padding-left:0px; padding-bottom:0px;">
+                <div class="col-xs-4" style="background-color: black; padding-right:0px; padding-left:0px; padding-bottom:0px;">
                     <div class="scoreboard">
                         <h3 style="text-align:center; color:white;">SNAP Leaderboard </h3>
                         <table class="table table-hover" style="background-color:white;">
@@ -228,11 +303,11 @@ and open the template in the editor.
                         </table>
                     </div>
                 </div>
-            </div>
+            </div> 
         </div>
 
         <!-- Page 3 div -->
-        <div class="pg3">
+        <div class="pg3" id="3">
             <div class="pg3_heading" style="display:flex;justify-content:center;align-items:center;width:100%;height:20%; font-family:'Museo Sans';">
                 <div style="width:50%;color:yellow; text-align:center; margin-top:2%;">
                     <span style="font-weight:700; font-size:30px;">FACTS</span>
@@ -295,11 +370,11 @@ and open the template in the editor.
                         <img src="css/image/Icon_Placeholder.png" style="">
                     </span>
                 </div>
-            </div> 
+            </div>  
         </div>
 
         <!-- Page 4 -->
-        <div class="pg4">           
+        <div class="pg4" id="4">           
             <div class="social" style="width:100%; height:100%;">
                 <div class="row" style="margin-left:0px; margin-right:0px; align-content:center; height:100%;">
                     <div class="col-xs-4 col-xs-offset-2 social1" style="margin-top:4%; height:90%;">
@@ -309,11 +384,11 @@ and open the template in the editor.
                         <img src="css/image/insta.png" style="height: 90%; width:95%;">
                     </div>
                 </div>
-            </div>
+            </div> 
         </div>
 
         <!-- Page 5 -->
-        <div class="pg5">           
+        <div class="pg5" id="5">           
             <div class="celebrity" style="width:100%; height:100%;">
                 <div class="col-xs-8 col-xs-offset-2 celeb1" style="margin-top:4%; height: 38%;">
                     <div class="row" style="height:100%;">
@@ -339,11 +414,11 @@ and open the template in the editor.
                         </div> 
                     </div>
                 </div>
-            </div>
+            </div> 
         </div>
 
         <!-- Page 6 -->
-        <div class="pg6">           
+        <div class="pg6" id="6">           
             <div class="contact" style="width:100%; height:100%;">
                 <div class="col-xs-6 col-xs-offset-1 contact1" style="margin-top:3%; height: 68%; color:white;">
                     Any questions or comments?
@@ -386,24 +461,22 @@ and open the template in the editor.
                         <span style="font-size:13px;">Back to Top</span>
                     </div>
                 </div> 
-                <div class="footer">
-                    <div class="containter">
+                <nav class="navbar navbar-inverse navbar-fixed-bottom">
+                    <div class="container">
                         <div class="navbar-collapse collapse">
-                        <ul class="nav navbar-nav">
-                            <li class="active">
-                                <a class="navbar-brand" href="#">
-                                    <img alt="Brand" src="css/image/Snap_Logo_Inverted.png" style="height: 100%;">
-                                </a>
-                            </li>
-                            <li class="divider"></li>
-                            <li><span class="navbar-text navbar-right">Legal stuff - All rights reserved</span></li>
-                        </ul>
-                       
+                            <ul class="nav navbar-nav">
+                                <li class="active">
+                                    <a class="navbar-brand" href="#">
+                                        <img alt="Brand" src="css/image/Snap_Logo_Inverted.png" style="height: 100%;">
+                                    </a>
+                                </li>
+                                <li class="divider"></li>
+                                <li><span class="navbar-text navbar-right">Legal stuff - All rights reserved</span></li>
+                            </ul>
+                        </div>
                     </div>
-                        
-                    </div>
-                </div>
-            </div>
+                </nav>
+            </div> 
         </div>
     </body>
 </html>

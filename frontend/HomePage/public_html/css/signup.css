@@ -1,0 +1,38 @@
+/*
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+*/
+/* 
+    Created on : 01/06/2016, 4:01:38 PM
+    Author     : Shivangi
+*/
+
+
+body
+{
+    margin: 0px !important;
+    background: url('image/miss_pacman.png') no-repeat center center fixed; 
+    background-size: cover;
+    -webkit-background-size: cover;
+    -moz-background-size: cover;
+    -o-background-size: cover;
+    height: 100vh;
+    width: 100%;   
+}
+
+input::-webkit-input-placeholder {
+color: yellow !important;
+}
+ 
+input:-moz-placeholder { /* Firefox 18- */
+color: yellow !important;  
+}
+ 
+input::-moz-placeholder {  /* Firefox 19+ */
+color: yellow !important;  
+}
+ 
+input:-ms-input-placeholder {  
+color: yellow !important;  
+}
