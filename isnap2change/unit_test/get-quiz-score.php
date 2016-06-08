@@ -7,10 +7,10 @@
     echo '###########################<br>';
     echo 'UNIT TEST<br>';
     echo '###########################<br>';
-    echo 'getQuizScore($quizID,$studentID)<br>';
+    echo 'getStuQuizScore($quizID,$studentID)<br>';
     for($i=-1;$i<10;$i++){
         for($j=-1;$j<10;$j++){
-            echo "getQuizScore($i,$j) ".getQuizScore($i,$j)."<br>";   
+            echo "getStuQuizScore($i,$j) ".getStuQuizScore($i,$j)."<br>";   
         }
     }	
     db_close($conn); 

@@ -1,5 +1,5 @@
 <?php  	
-    function getQuizScore($quizID, $studentID){
+    function getStuQuizScore($quizID, $studentID){
         $pointsBySection = array('MCQ', 'Matching', 'Poster', 'Misc');
         $pointsByQuestion = array('SAQ');
         $conn = db_connect(); 
