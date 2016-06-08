@@ -1,4 +1,7 @@
 <?php
+	
+	require_once("connection.php");
+	require_once("mysql-lib.php");
 
 	if($_SERVER["REQUEST_METHOD"] == "POST"){
 		if(isset($_POST['studentid']) && isset($_POST['quizid']) && isset($_POST['answerArr'])){
@@ -28,7 +31,12 @@
 	}
 	
 	if(count == 3) {
-		$feedback["result"] = "pass"; 
+		$feedback["result"] = "pass";
+		$conn = db_connect();
+		
+		
+		
+		
 	} else {
 		$feedback["result"] = "fail";
 	}
