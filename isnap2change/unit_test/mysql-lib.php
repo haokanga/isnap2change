@@ -13,6 +13,14 @@
             echo "getStuQuizScore($i,$j) ".getStuQuizScore($i,$j)."<br>";   
         }
     }	
+    
+    echo '###########################<br>';
+    echo 'UNIT TEST<br>';
+    echo '###########################<br>';
+    echo 'getStudentScore($studentID)<br>';
+    for($i=-1;$i<10;$i++){
+        echo "getStudentScore($i) ".getStudentScore($i)."<br>";   
+    }	
     db_close($conn); 
     
 ?>
