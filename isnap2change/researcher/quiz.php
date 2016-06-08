@@ -1,112 +1,102 @@
 <?php
+    /**
+    TODO: 
+    edit quiz (jump to different editor)
+    */
     session_start();
     require_once("../connection.php");
     require_once("../debug.php");
-    require_once("/researcher_validation.php");	  
+    require_once("/researcher-validation.php");
+    require_once("../mysql-lib.php");	    
     $conn = db_connect();
     $overviewName = "quiz";
+    $columnName = array('QuizID','Week','QuizType','TopicName','Points');    
+    //add/edit/delete quiz
     
-    //if update/insert/remove class
-    if($_SERVER["REQUEST_METHOD"] == "POST"){
-        if(isset($_POST['update'])){                          
-            $update = $_POST['update'];
-            //update
-            if($update == 0){
-                $classID = $_POST['classid'];
-                $className = $_POST['classname'];
-                $quizName = $_POST['schoolname'];
-                $teacherToken = $_POST['teachertoken'];
-                $studentToken = $_POST['studenttoken'];
-                // get school
-                $quizSql = "SELECT SchoolID
-                           FROM School WHERE SchoolName = ?";
-                $quizQuery = $conn->prepare($quizSql);
-                $quizQuery->execute(array($quizName));
-                $quizResult = $quizQuery->fetch(PDO::FETCH_OBJ);
-                // update class 
-                $update_stmt = "UPDATE Class 
-                    SET ClassName = ?, SchoolID = ?
-                    WHERE ClassID = ?";			
-                $update_stmt = $conn->prepare($update_stmt);                            
-                if(! $update_stmt -> execute(array($className, $quizResult->SchoolID, $classID))){
-                    echo "<script language=\"javascript\">  alert(\"Error occurred to update class. Contact with developers.\"); </script>";
-                } else{
+    try{
+        if($_SERVER["REQUEST_METHOD"] == "POST"){
+            if(isset($_POST['update'])){                          
+                $update = $_POST['update'];
+                if($update == 1){
+                    try{
+                        $week = $_POST['week'];
+                        $quizType = $_POST['quiztype'];
+                        $topicName = $_POST['topicname'];
+                        $conn->beginTransaction();              
+                        
+                        //get topicID
+                        $topicSql = "SELECT TopicID
+                                   FROM Topic WHERE TopicName = ?";
+                        $topicQuery = $conn->prepare($topicSql);
+                        $topicQuery->execute(array($topicName));
+                        $topicResult = $topicQuery->fetch(PDO::FETCH_OBJ);
+                        //insert quiz
+                        $update_stmt = "INSERT INTO Quiz(Week, QuizType, TopicID)
+                             VALUES (?,?,?);";			
+                        $update_stmt = $conn->prepare($update_stmt);         
+                        $update_stmt->execute(array($week, $quizType, $topicResult->TopicID));                     
+                        $quizID = $conn->lastInsertId(); 
+                        //if MCQ, insert MCQ_Section
+                        if($quizType=='MCQ'){                        
+                            $points = 0;
+                            $questionnaires = 0;
+                            $update_stmt = "INSERT INTO MCQ_Section(QuizID, Points, Questionnaires)
+                                        VALUES (?,?,?);";			
+                            $update_stmt = $conn->prepare($update_stmt);                            
+                            $update_stmt->execute(array($quizID, $points, $questionnaires)); 
+                        }                    
+                        //init empty Learning Material
+                        $content='<p>Learning materials for this quiz has not been added.</p>';
+                        $update_stmt = "INSERT INTO Learning_Material(Content,QuizID) VALUES (?,?);";
+                        $update_stmt = $conn->prepare($update_stmt);                            
+                        $update_stmt->execute(array($content, $quizID)); 
+                        
+                        $conn->commit();                    
+                    } catch(Exception $e) {
+                        debug_pdo_err($overviewName, $e);
+                        $conn->rollback();
+                    }                
                 }
-                // update token                     
-                $update_stmt = "UPDATE Token 
-                    SET TokenString = ?
-                    WHERE ClassID = ? AND `Type` = ?";			
-                $update_stmt = $conn->prepare($update_stmt);                            
-                if(! $update_stmt -> execute(array($teacherToken, $classID, "TEACHER"))){
-                    echo "<script language=\"javascript\">  alert(\"Error occurred to update teacherToken. Contact with developers.\"); </script>";
-                } else{
-                }
-                $update_stmt = "UPDATE Token 
-                    SET TokenString = ?
-                    WHERE ClassID = ? AND `Type` = ?";			
-                $update_stmt = $conn->prepare($update_stmt);                            
-                if(! $update_stmt -> execute(array($studentToken, $classID, "STUDENT"))){
-                    echo "<script language=\"javascript\">  alert(\"Error occurred to update studentToken. Contact with developers.\"); </script>";
-                } else{
-                }
+                else if($update == -1){  
+                    $quizID = $_POST['quizid'];
+                    $update_stmt = "DELETE FROM Quiz WHERE QuizID = ?";			
+                    $update_stmt = $conn->prepare($update_stmt);
+                    if(! $update_stmt->execute(array($quizID))){
+                        echo "<script language=\"javascript\">  alert(\"Error occurred to delete quiz. Contact with developers.\"); </script>";
+                    } else{
+                    } 
+                }            
             }
-            else if($update == 1){  
-                $className = $_POST['classname'];
-                $quizName = $_POST['schoolname'];
-                $teacherToken = $_POST['teachertoken'];
-                $studentToken = $_POST['studenttoken'];
-                // get school
-                $quizSql = "SELECT SchoolID
-                           FROM School WHERE SchoolName = ?";
-                $quizQuery = $conn->prepare($quizSql);
-                $quizQuery->execute(array($quizName));
-                $quizResult = $quizQuery->fetch(PDO::FETCH_OBJ);
-                // update class 
-                $update_stmt = "INSERT INTO Class(ClassName, SchoolID)
-                     VALUES (?,?);";			
-                $update_stmt = $conn->prepare($update_stmt);         
-                $update_stmt -> execute(array($className, $quizResult->SchoolID));
-                $classID = $conn -> lastInsertId();
-                if($classID <= 0){
-                    echo "<script language=\"javascript\">  alert(\"Error occurred to insert class. Contact with developers.\"); </script>";
-                } else{
-                }
-                // update token                     
-                $update_stmt = "REPLACE INTO Token(ClassID, `Type`, TokenString)
-                     VALUES (?,?,?);";			
-                $update_stmt = $conn->prepare($update_stmt);                            
-                if(! $update_stmt -> execute(array($classID, "TEACHER", $teacherToken))){
-                    echo "<script language=\"javascript\">  alert(\"Error occurred to insert teacherToken. Contact with developers.\"); </script>";
-                } else{
-                }
-                $update_stmt = "REPLACE INTO Token(ClassID, `Type`, TokenString)
-                     VALUES (?,?,?);";			
-                $update_stmt = $conn->prepare($update_stmt);                            
-                if(! $update_stmt -> execute(array($classID, "STUDENT", $studentToken))){
-                    echo "<script language=\"javascript\">  alert(\"Error occurred to insert studentToken. Contact with developers.\"); </script>";
-                } else{
-                }                
-            }else if($update == -1){
-                $classID = $_POST['classid'];
-                // remove class (with help of DELETE CASCADE) 
-                $update_stmt = "DELETE FROM Class WHERE ClassID = ?";			
-                $update_stmt = $conn->prepare($update_stmt);
-                if(! $update_stmt -> execute(array($classID))){
-                    echo "<script language=\"javascript\">  alert(\"Error occurred to delete class/token. Contact with developers.\"); </script>";
-                } else{
-                } 
-            }            
         }
-    }
+        
+        // get quiz and topic
+        if(isset($_GET['week'])){
+            $quizSql = "SELECT QuizID, Week, QuizType, TopicName
+                   FROM Quiz NATURAL JOIN Topic WHERE Week = ?";
+            $quizQuery = $conn->prepare($quizSql);
+            $quizQuery->execute(array($_GET['week']));
+            $quizResult = $quizQuery->fetchAll(PDO::FETCH_OBJ);
+        }else{
+            $quizSql = "SELECT QuizID, Week, QuizType, TopicName
+                   FROM Quiz NATURAL JOIN Topic";
+            $quizQuery = $conn->prepare($quizSql);
+            $quizQuery->execute();
+            $quizResult = $quizQuery->fetchAll(PDO::FETCH_OBJ);
+        }
+        
+        // list all editable quiz types    
+        $quizTypeArray = array('MCQ','SAQ','Matching','Poster');
+        
+        //get topic list
+        $topicSql = "SELECT TopicID, TopicName FROM Topic ORDER BY TopicID";
+        $topicQuery = $conn->prepare($topicSql);
+        $topicQuery->execute(array());
+        $topicResult = $topicQuery->fetchAll(PDO::FETCH_OBJ);  
+    } catch(Exception $e) {
+        debug_pdo_err($overviewName, $e);
+    }     
     
-    // get quiz and topic
-    $quizSql = "SELECT QuizID, Week, QuizType, TopicName
-               FROM Quiz NATURAL JOIN Topic";
-    $quizQuery = $conn->prepare($quizSql);
-    $quizQuery->execute();
-    $quizResult = $quizQuery->fetchAll(PDO::FETCH_OBJ); 
-    
-    db_close($conn); 
+    db_close($conn);      
     
 ?>
 <!DOCTYPE html>
@@ -160,13 +150,18 @@
 <body>
 
     <div id="wrapper">
-
         <div w3-include-html="navigation.html"></div> 
-
         <div id="page-wrapper">
             <div class="row">
-                <div class="col-lg-12">
-                    <h1 class="page-header">Quiz Overview</h1>
+                <div class="col-lg-12">                
+                    <h1 class="page-header">Quiz Overview 
+                    <?php if(isset($_GET['week'])) { ?>
+                        <div class="alert alert-info alert-dismissable" style="display: inline-block;">
+                            <button type="button" class="close" data-dismiss="alert" aria-hidden="true" onclick="location.href='quiz.php';" >×</button>
+                            <i class="fa fa-info-circle"></i>  <?php echo 'Week '.$_GET['week'];  ?> 
+                        </div>                    
+                    <?php } ?>
+                    </h1>
                 </div>
                 <!-- /.col-lg-12 -->
             </div>
@@ -183,11 +178,13 @@
                                 <table class="table table-striped table-bordered table-hover" id="datatables">
                                     <thead>
                                         <tr>
-                                            <th style="display:none">QuizID</th>
-                                            <th>Week</th>
-                                            <th>QuizType</th>
-                                            <th>TopicName</th>                                            
-                                            <th>Points</th>
+                                        <?php for($i=0; $i<count($columnName); $i++) {
+                                            if ($i==0){?>
+                                            <th style="display:none"><?php echo $columnName[$i]; ?></th>
+                                            <?php } else {?>                                            
+                                            <th><?php echo $columnName[$i]; ?></th>
+                                        <?php }
+                                        }?>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -195,12 +192,10 @@
                                         <tr class="<?php if($i % 2 == 0){echo "odd";} else {echo "even";} ?>">
                                             <td style="display:none"><?php echo $quizResult[$i]->QuizID ?></td>
                                             <td><?php echo $quizResult[$i]->Week ?></td>
-                                    <!-- 
-                                    <a href="<?php echo $quizResult[$i]->QuizID ?>">
-                                    -->
-                                    <td><?php if($quizResult[$i]->QuizType=='MCQ') {echo 'Multiple Choice';} else if($quizResult[$i]->QuizType=='SAQ') {echo 'Short Answer';} else {echo $quizResult[$i]->QuizType;} ?></a></td>
+                                            <td><?php if($quizResult[$i]->QuizType=='MCQ') {echo 'Multiple Choice';} else if($quizResult[$i]->QuizType=='SAQ') {echo 'Short Answer';} else {echo $quizResult[$i]->QuizType;} ?></a></td>
                                             <td><?php echo $quizResult[$i]->TopicName ?></td>
-                                            <td><!--points--><span class="glyphicon glyphicon-remove pull-right" aria-hidden="true"></span><span class="pull-right" aria-hidden="true">&nbsp;</span><span class="glyphicon glyphicon-edit pull-right" data-toggle="modal" data-target="#dialog" aria-hidden="true"></span></td>
+                                            <td><?php echo getQuizPoints($quizResult[$i]->QuizID); ?><span class="glyphicon glyphicon-remove pull-right" aria-hidden="true"></span><span class="pull-right" aria-hidden="true">&nbsp;</span><span class="glyphicon glyphicon-edit pull-right" aria-hidden="true"></span></td>
+                                            <!---->
                                         </tr>
                                     <?php } ?>    
                                     </tbody>
@@ -208,12 +203,12 @@
                             </div>
                             <!-- /.table-responsive -->
                             <div class="well row">
-                                <h4>Class Overview Notification</h4>
+                                <h4>Quiz Overview Notification</h4>
                                 <div class="alert alert-info">
-                                    <p>Navigate classes by filtering or searching. You can create/update/delete any class.</p>
+                                    <p>View quizzes by filtering or searching. You can create/update/delete any quiz.</p>
                                 </div>
                                 <div class="alert alert-danger">
-                                    <p><strong>Warning</strong> : If you remove one class. All the <strong>student data</strong> in this class will also get deleted (not recoverable).</p> It includes <strong>student information, their submissions of every task and your grading/feedback</strong>, not only the class itself.
+                                    <p><strong>Warning</strong> : If you remove one quiz. All the <strong>questions and submission</strong> of this quiz will also get deleted (not recoverable).</p> It includes <strong>learning material, questions and options, their submissions and your grading/feedback</strong>, not only the quiz itself.
                                 </div>
                             </div>
                         </div>
@@ -223,11 +218,9 @@
                 </div>
                 <!-- /.col-lg-12 -->
             </div>
-            <!-- /.row -->
-            
+            <!-- /.row -->            
         </div>
         <!-- /#page-wrapper -->
-
     </div>
     <!-- /#wrapper -->
     <!-- Modal -->
@@ -240,27 +233,30 @@
               <h4 class="modal-title" id="dialogTitle">Edit Class</h4>
             </div>
             <div class="modal-body">
-            <form id="submission" method="post" action="<?php echo $_SERVER['PHP_SELF']; ?>">
-                <!--if 1, insert; else if 0 update; else if -1 delete;-->
-                <input type=hidden name="update" id="update" value="1"></input>
-                <label for="ClassID" style="display:none">ClassID</label>
-                <input type="text" class="form-control dialoginput" id="ClassID" name="classid" style="display:none">
-                <br><label for="ClassName">ClassName</label>
-                <input type="text" class="form-control dialoginput" id="ClassName" name="classname" required>
-                <br><label for="SchoolName">SchoolName</label>
-                <select class="form-control dialoginput" id="SchoolName" form="submission" name="schoolname" required>
-                  <?php for($i=0; $i<count($quizResult); $i++) {?>                  
-                  <option value="<?php echo $quizResult[$i]->SchoolName ?>"><?php echo $quizResult[$i]->SchoolName ?></option>
+            <form id="submission" method="post" action="<?php if(isset($_GET['week'])) echo $_SERVER['PHP_SELF'].'?week='.$_GET['week']; else echo $_SERVER['PHP_SELF']; ?>">
+                <!--if 1, insert; else if -1 delete;-->
+                <input type=hidden name="update" id="update" value="1" required></input>
+                <label for="QuizID" style="display:none">QuizID</label>
+                <input type="text" class="form-control dialoginput" id="QuizID" name="quizid" style="display:none"></input>
+                <label for="Week">Week</label>
+                <input type="text" class="form-control dialoginput" id="Week" name="week"  placeholder="Input Week Number" <?php if(isset($_GET['week'])) {$w=$_GET['week']; echo "value='".$w."'"; } ?> required></input> 
+                <br>    
+                <label for='QuizType'>QuizType</label>
+                <select class="form-control dialoginput" id="QuizType" form="submission" name="quiztype" required>
+                  <option value="" disabled selected>Select Quiz Type</option>
+                  <?php for($i=0; $i<count($quizTypeArray); $i++) {?>                  
+                  <option value="<?php echo $quizTypeArray[$i] ?>"><?php echo $quizTypeArray[$i] ?></option>
                   <?php } ?>
-                </select>                
-                <br><label for="TeacherToken">TeacherToken</label><span class="glyphicon glyphicon-random pull-right"></span>
-                <input type="text" class="form-control dialoginput" id="TeacherToken" name="teachertoken" required></input>
-                <br><label for="StudentToken">StudentToken</label><span class="glyphicon glyphicon-random pull-right"></span>
-                <input type="text" class="form-control dialoginput" id="StudentToken" name="studenttoken" required></input>
-                <br><label for="EnrolledStudents">EnrolledStudents</label>
-                <input type="text" class="form-control dialoginput" id="EnrolledStudents" name="EnrolledStudents">
-                <br><label for="UnlockedProgress">UnlockedProgress</label>
-                <input type="text" class="form-control dialoginput" id="UnlockedProgress" name="UnlockedProgress">
+                </select>
+                <br>   
+                <label for='TopicName'>TopicName</label>
+                <select class="form-control dialoginput" id="TopicName" form="submission" name="topicname" required>
+                <option value="" disabled selected>Select Topic</option>
+                  <?php for($j=0; $j<count($topicResult); $j++) {?>                  
+                    <option value='<?php echo $topicResult[$j]->TopicName ?>'><?php echo $topicResult[$j]->TopicName ?></option>
+                  <?php } ?>
+                </select>
+                <br>
             </form>
             </div>
             <div class="modal-footer">            
@@ -292,54 +288,41 @@
 
     <!-- Page-Level Scripts -->
     <script>
-    function randomString(length) {
-        return Math.round((Math.pow(36, length + 1) - Math.random() * Math.pow(36, length))).toString(36).slice(1);
-    }
     //DO NOT put them in $(document).ready() since the table has multi pages
     $('.glyphicon-edit').on('click', function (){
-        $('#dialogTitle').text("Edit Class");
-        $('#update').val(0);
-        for(i=0;i<$('.dialoginput').length;i++){                
-            $('.dialoginput').eq(i).val($(this).parent().parent().children('td').eq(i).text());
-        }
-        //disable ClassID, EnrolledStudents, UnlockedProgress
-        $('.dialoginput').eq(0).attr('disabled','disabled');
-        $('.dialoginput').eq(5).attr('disabled','disabled');
-        $('.dialoginput').eq(6).attr('disabled','disabled');          
+        /*...*/        
     });
     $('.glyphicon-plus').on('click', function (){
-        $('#dialogTitle').text("Add Class");
+        $('#dialogTitle').text("Add Quiz");
         $('#update').val(1);
-        for(i=0;i<$('.dialoginput').length;i++){                
-            $('.dialoginput').eq(i).val('');
-        }
-        //disable ClassID, EnrolledStudents, UnlockedProgress
-        $('.dialoginput').eq(0).attr('disabled','disabled');
-        $('.dialoginput').eq(5).attr('disabled','disabled');    
-        $('.dialoginput').eq(6).attr('disabled','disabled');         
+        for(i=0;i<$('.dialoginput').length;i++){
+            if(i!=1){
+                $('.dialoginput').eq(i).val('');
+            } else {
+                <?php if(!isset($_GET['week'])){?>
+                    $('.dialoginput').eq(i).val('');
+                <?php } ?>
+            }            
+        }        
     }); 
     $('.glyphicon-remove').on('click', function (){
-        if (confirm('[WARNING] Are you sure to remove this class? All the student data in this class will also get deleted (not recoverable). It includes student information, their submissions of every task and your grading/feedback, not only the class itself.')) {
+        if (confirm('[WARNING] Are you sure to remove this quiz? If you remove one quiz. All the questions and submission of this quiz will also get deleted (not recoverable). It includes learning material, questions and options, their submissions and your grading/feedback, not only the quiz itself.')) {
             $('#update').val(-1);
-            //fill required input
-            $('.dialoginput').eq(0).prop('disabled',false);
             for(i=0;i<$('.dialoginput').length;i++){                
                 $('.dialoginput').eq(i).val($(this).parent().parent().children('td').eq(i).text());
             }
             $('#submission').submit();
         }           
     });
-     $('.glyphicon-random').on('click', function (){
-        var index = $(this).index();
-        if (index == $("#TeacherToken").index() - 1)
-            $('#TeacherToken').val(randomString(16)); 
-        else if (index == $("#StudentToken").index() - 1)
-            $('#StudentToken').val(randomString(16));
-    });
     $('#btnSave').on('click', function (){
-        $('#submission').validate();        
-        //enable ClassID and EnrolledStudents
-        $('.dialoginput').eq(0).prop('disabled',false);
+        $('#submission').validate({
+          rules: {
+            week: {
+              required: true,
+              digits: true
+            }
+          }
+        });   
         $('#submission').submit();
     });
     //include html
@@ -347,14 +330,18 @@
     $(document).ready(function() {
         var table = $('#datatables').DataTable({
                 responsive: true,
-                "initComplete": function(settings, json) {
-                    
-                    $('.input-sm').eq(1).val($("#keyword").val());                    
-                }
+                "initComplete": function(settings, json) {                    
+                    $('.input-sm').eq(1).val($("#keyword").val().trim());                    
+                },
+                "order": [[ 1, "asc" ]],
+                "pageLength":50,
+                "aoColumnDefs": [
+                  { "bSearchable": false, "aTargets": [ 0 ] }
+                ]
         })
-        //search keyword (schoolname), exact match
+        //search keyword, exact match
         table.search(
-            $("#keyword").val(), true, false, true
+            $("#keyword").val().trim(), true, false, true
         ).draw();     
     });        
     </script>

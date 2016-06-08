@@ -15,8 +15,6 @@
 		
 	}
 	
-	$DEBUG_MODE = true;
-	require_once("connection.php");
 	if($_SERVER["REQUEST_METHOD"] == "POST"){
 		
 		if(isset($_POST['MCQIDArr']) && isset($_POST['answerArr']) && isset($_POST['quizid'])){
@@ -68,7 +66,7 @@
 		
 		//UPDATE Quiz_Record
 		$status = "GRADED";
-		$update_stmt = "REPLACE INTO Quiz_Record(QuizID, StudentID, Status, Score)
+		$update_stmt = "INSERT INTO Quiz_Record(QuizID, StudentID, Status, Score)
 						VALUES (?,?,?,?);";			
 		$update_stmt = $conn->prepare($update_stmt);                            
 		if(! $update_stmt -> execute(array($quizid, $studentid, $status, $score_res -> Points))){
@@ -77,7 +75,7 @@
 		//	echo "<script language=\"javascript\">  console.log(\"Quiz Passed\"); </script>";
 		}
 		
-		$update_stmt = "REPLACE INTO MCQ_Question_Record(StudentID, MCQID, Choice)
+		$update_stmt = "INSERT INTO MCQ_Question_Record(StudentID, MCQID, Choice)
 							 VALUES (?,?,?);";			
 		$update_stmt = $conn->prepare($update_stmt);   
 			

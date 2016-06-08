@@ -2,139 +2,142 @@
 	session_start();
     require_once("../connection.php");
     require_once("../debug.php");
-    require_once("/researcher_validation.php");
+    require_once("/researcher-validation.php");
     $conn = db_connect();
     
     //if update/insert/remove class
-    if($_SERVER["REQUEST_METHOD"] == "POST"){
-        if(isset($_POST['update'])){                          
-            $update = $_POST['update'];
-            //update
-            if($update == 0){
-                $classID = $_POST['classid'];
-                $className = $_POST['classname'];
-                $schoolName = $_POST['schoolname'];
-                $teacherToken = $_POST['teachertoken'];
-                $studentToken = $_POST['studenttoken'];
-                // get school
-                $schoolSql = "SELECT SchoolID
-                           FROM School WHERE SchoolName = ?";
-                $schoolQuery = $conn->prepare($schoolSql);
-                $schoolQuery->execute(array($schoolName));
-                $schoolResult = $schoolQuery->fetch(PDO::FETCH_OBJ);
-                // update class 
-                $update_stmt = "UPDATE Class 
-                    SET ClassName = ?, SchoolID = ?
-                    WHERE ClassID = ?";			
-                $update_stmt = $conn->prepare($update_stmt);                            
-                if(! $update_stmt -> execute(array($className, $schoolResult->SchoolID, $classID))){
-                    echo "<script language=\"javascript\">  alert(\"Error occurred to update class. Contact with developers.\"); </script>";
-                } else{
+    try{
+        if($_SERVER["REQUEST_METHOD"] == "POST"){
+            if(isset($_POST['update'])){                          
+                $update = $_POST['update'];
+                //update
+                if($update == 0){
+                    $classID = $_POST['classid'];
+                    $className = $_POST['classname'];
+                    $schoolName = $_POST['schoolname'];
+                    $teacherToken = $_POST['teachertoken'];
+                    $studentToken = $_POST['studenttoken'];
+                    // get school
+                    $schoolSql = "SELECT SchoolID
+                               FROM School WHERE SchoolName = ?";
+                    $schoolQuery = $conn->prepare($schoolSql);
+                    $schoolQuery->execute(array($schoolName));
+                    $schoolResult = $schoolQuery->fetch(PDO::FETCH_OBJ);
+                    // update class 
+                    $update_stmt = "UPDATE Class 
+                        SET ClassName = ?, SchoolID = ?
+                        WHERE ClassID = ?";			
+                    $update_stmt = $conn->prepare($update_stmt);                            
+                    if(! $update_stmt->execute(array($className, $schoolResult->SchoolID, $classID))){
+                        echo "<script language=\"javascript\">  alert(\"Error occurred to update class. Contact with developers.\"); </script>";
+                    } else{
+                    }
+                    // update token                     
+                    $update_stmt = "UPDATE Token 
+                        SET TokenString = ?
+                        WHERE ClassID = ? AND `Type` = ?";			
+                    $update_stmt = $conn->prepare($update_stmt);                            
+                    if(! $update_stmt->execute(array($teacherToken, $classID, "TEACHER"))){
+                        echo "<script language=\"javascript\">  alert(\"Error occurred to update teacherToken. Contact with developers.\"); </script>";
+                    } else{
+                    }
+                    $update_stmt = "UPDATE Token 
+                        SET TokenString = ?
+                        WHERE ClassID = ? AND `Type` = ?";			
+                    $update_stmt = $conn->prepare($update_stmt);                            
+                    if(! $update_stmt->execute(array($studentToken, $classID, "STUDENT"))){
+                        echo "<script language=\"javascript\">  alert(\"Error occurred to update studentToken. Contact with developers.\"); </script>";
+                    } else{
+                    }
                 }
-                // update token                     
-                $update_stmt = "UPDATE Token 
-                    SET TokenString = ?
-                    WHERE ClassID = ? AND `Type` = ?";			
-                $update_stmt = $conn->prepare($update_stmt);                            
-                if(! $update_stmt -> execute(array($teacherToken, $classID, "TEACHER"))){
-                    echo "<script language=\"javascript\">  alert(\"Error occurred to update teacherToken. Contact with developers.\"); </script>";
-                } else{
-                }
-                $update_stmt = "UPDATE Token 
-                    SET TokenString = ?
-                    WHERE ClassID = ? AND `Type` = ?";			
-                $update_stmt = $conn->prepare($update_stmt);                            
-                if(! $update_stmt -> execute(array($studentToken, $classID, "STUDENT"))){
-                    echo "<script language=\"javascript\">  alert(\"Error occurred to update studentToken. Contact with developers.\"); </script>";
-                } else{
-                }
+                else if($update == 1){  
+                    $className = $_POST['classname'];
+                    $schoolName = $_POST['schoolname'];
+                    $teacherToken = $_POST['teachertoken'];
+                    $studentToken = $_POST['studenttoken'];
+                    // get school
+                    $schoolSql = "SELECT SchoolID
+                               FROM School WHERE SchoolName = ?";
+                    $schoolQuery = $conn->prepare($schoolSql);
+                    $schoolQuery->execute(array($schoolName));
+                    $schoolResult = $schoolQuery->fetch(PDO::FETCH_OBJ);
+                    // update class 
+                    $update_stmt = "INSERT INTO Class(ClassName, SchoolID)
+                         VALUES (?,?);";			
+                    $update_stmt = $conn->prepare($update_stmt);         
+                    $update_stmt->execute(array($className, $schoolResult->SchoolID));
+                    $classID = $conn->lastInsertId();
+                    if($classID <= 0){
+                        echo "<script language=\"javascript\">  alert(\"Error occurred to insert class. Contact with developers.\"); </script>";
+                    } else{
+                    }
+                    // update token                     
+                    $update_stmt = "INSERT INTO Token(ClassID, `Type`, TokenString)
+                                    VALUES (?,?,?) ON DUPLICATE KEY UPDATE TokenString = ?;";			
+                    $update_stmt = $conn->prepare($update_stmt);                            
+                    if(! $update_stmt->execute(array($classID, "TEACHER", $teacherToken, $teacherToken))){
+                        echo "<script language=\"javascript\">  alert(\"Error occurred to insert teacherToken. Contact with developers.\"); </script>";
+                    } else{
+                    }
+                    $update_stmt = "INSERT INTO Token(ClassID, `Type`, TokenString)
+                         VALUES (?,?,?) ON DUPLICATE KEY UPDATE TokenString = ?;";			
+                    $update_stmt = $conn->prepare($update_stmt);                            
+                    if(! $update_stmt->execute(array($classID, "STUDENT", $studentToken, $studentToken))){
+                        echo "<script language=\"javascript\">  alert(\"Error occurred to insert studentToken. Contact with developers.\"); </script>";
+                    } else{
+                    }                
+                }else if($update == -1){
+                    $classID = $_POST['classid'];
+                    // remove class (with help of DELETE CASCADE) 
+                    $update_stmt = "DELETE FROM Class WHERE ClassID = ?";			
+                    $update_stmt = $conn->prepare($update_stmt);
+                    if(! $update_stmt->execute(array($classID))){
+                        echo "<script language=\"javascript\">  alert(\"Error occurred to delete class/token. Contact with developers.\"); </script>";
+                    } else{
+                    } 
+                }            
             }
-            else if($update == 1){  
-                $className = $_POST['classname'];
-                $schoolName = $_POST['schoolname'];
-                $teacherToken = $_POST['teachertoken'];
-                $studentToken = $_POST['studenttoken'];
-                // get school
-                $schoolSql = "SELECT SchoolID
-                           FROM School WHERE SchoolName = ?";
-                $schoolQuery = $conn->prepare($schoolSql);
-                $schoolQuery->execute(array($schoolName));
-                $schoolResult = $schoolQuery->fetch(PDO::FETCH_OBJ);
-                // update class 
-                $update_stmt = "INSERT INTO Class(ClassName, SchoolID)
-                     VALUES (?,?);";			
-                $update_stmt = $conn->prepare($update_stmt);         
-                $update_stmt -> execute(array($className, $schoolResult->SchoolID));
-                $classID = $conn -> lastInsertId();
-                if($classID <= 0){
-                    echo "<script language=\"javascript\">  alert(\"Error occurred to insert class. Contact with developers.\"); </script>";
-                } else{
-                }
-                // update token                     
-                $update_stmt = "REPLACE INTO Token(ClassID, `Type`, TokenString)
-                     VALUES (?,?,?);";			
-                $update_stmt = $conn->prepare($update_stmt);                            
-                if(! $update_stmt -> execute(array($classID, "TEACHER", $teacherToken))){
-                    echo "<script language=\"javascript\">  alert(\"Error occurred to insert teacherToken. Contact with developers.\"); </script>";
-                } else{
-                }
-                $update_stmt = "REPLACE INTO Token(ClassID, `Type`, TokenString)
-                     VALUES (?,?,?);";			
-                $update_stmt = $conn->prepare($update_stmt);                            
-                if(! $update_stmt -> execute(array($classID, "STUDENT", $studentToken))){
-                    echo "<script language=\"javascript\">  alert(\"Error occurred to insert studentToken. Contact with developers.\"); </script>";
-                } else{
-                }                
-            }else if($update == -1){
-                $classID = $_POST['classid'];
-                // remove class (with help of DELETE CASCADE) 
-                $update_stmt = "DELETE FROM Class WHERE ClassID = ?";			
-                $update_stmt = $conn->prepare($update_stmt);
-                if(! $update_stmt -> execute(array($classID))){
-                    echo "<script language=\"javascript\">  alert(\"Error occurred to delete class/token. Contact with developers.\"); </script>";
-                } else{
-                } 
-            }            
         }
+        
+        // get max week
+        $weekSql = "select MAX(Week) as WeekNum from Quiz";
+        $weekQuery = $conn->prepare($weekSql);
+        $weekQuery->execute();
+        $weekResult = $weekQuery->fetch(PDO::FETCH_OBJ);
+
+        // get school
+        $schoolSql = "SELECT SchoolName
+                   FROM School";
+        $schoolQuery = $conn->prepare($schoolSql);
+        $schoolQuery->execute();
+        $schoolResult = $schoolQuery->fetchAll(PDO::FETCH_OBJ);
+        
+        // get class
+        $classSql = "SELECT ClassID, ClassName, SchoolName, UnlockedProgress
+                   FROM Class NATURAL JOIN School";
+        $classQuery = $conn->prepare($classSql);
+        $classQuery->execute();
+        $classResult = $classQuery->fetchAll(PDO::FETCH_OBJ);
+        
+        // get token
+        $tokenSql = "SELECT ClassID, `Type`, TokenString
+                   FROM Token NATURAL JOIN Class";
+        $tokenQuery = $conn->prepare($tokenSql);
+        $tokenQuery->execute();
+        $tokenResult = $tokenQuery->fetchAll(PDO::FETCH_OBJ);    
+        
+        // get students number
+        $studentNumSql = "SELECT count(*) as Count, ClassID
+                   FROM   Student NATURAL JOIN Class
+                   GROUP BY ClassID";
+        $studentNumQuery = $conn->prepare($studentNumSql);
+        $studentNumQuery->execute();
+        $studentNumResult = $studentNumQuery->fetchAll(PDO::FETCH_OBJ);
+    } catch(Exception $e) {
+        debug_pdo_err($overviewName, $e);
     }
     
-    // get max week
-    $weekSql = "select MAX(Week) as WeekNum from Quiz";
-    $weekQuery = $conn->prepare($weekSql);
-    $weekQuery->execute();
-    $weekResult = $weekQuery->fetch(PDO::FETCH_OBJ);
-
-    // get school
-    $schoolSql = "SELECT SchoolName
-               FROM School";
-    $schoolQuery = $conn->prepare($schoolSql);
-    $schoolQuery->execute();
-    $schoolResult = $schoolQuery->fetchAll(PDO::FETCH_OBJ);
-    
-    // get class
-    $classSql = "SELECT ClassID, ClassName, SchoolName, UnlockedProgress
-               FROM Class NATURAL JOIN School";
-    $classQuery = $conn->prepare($classSql);
-    $classQuery->execute();
-    $classResult = $classQuery->fetchAll(PDO::FETCH_OBJ);
-    
-    // get token
-    $tokenSql = "SELECT ClassID, `Type`, TokenString
-               FROM Token NATURAL JOIN Class";
-    $tokenQuery = $conn->prepare($tokenSql);
-    $tokenQuery->execute();
-    $tokenResult = $tokenQuery->fetchAll(PDO::FETCH_OBJ);    
-    
-    // get students number
-    $studentNumSql = "SELECT count(*) as Count, ClassID
-               FROM   Student NATURAL JOIN Class
-               GROUP BY ClassID";
-    $studentNumQuery = $conn->prepare($studentNumSql);
-    $studentNumQuery->execute();
-    $studentNumResult = $studentNumQuery->fetchAll(PDO::FETCH_OBJ);    
-    
-    db_close($conn); 
-    
+    db_close($conn);     
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -223,7 +226,7 @@
                                     <?php for($i=0; $i<count($classResult); $i++) {?>
                                         <tr class="<?php if($i % 2 == 0){echo "odd";} else {echo "even";} ?>">
                                             <td style="display:none"><?php echo $classResult[$i]->ClassID ?></td>
-                                            <td><?php echo $classResult[$i]->ClassName ?></td>
+                                            <td><a href="student.php?classid=<?php echo $classResult[$i]->ClassID ?>"><?php echo $classResult[$i]->ClassName ?></a></td>
                                             <td><?php echo $classResult[$i]->SchoolName ?></td>
                                             <td><?php for($j=0; $j<count($tokenResult); $j++){ if ($tokenResult[$j]->ClassID == $classResult[$i]->ClassID && $tokenResult[$j]->Type == 'TEACHER') echo $tokenResult[$j]->TokenString;} ?></td>
                                             <td><?php for($j=0; $j<count($tokenResult); $j++){ if ($tokenResult[$j]->ClassID == $classResult[$i]->ClassID && $tokenResult[$j]->Type == 'STUDENT') echo $tokenResult[$j]->TokenString;} ?></td>
@@ -238,7 +241,7 @@
                             <div class="well row">
                                 <h4>Class Overview Notification</h4>
                                 <div class="alert alert-info">
-                                    <p>Navigate classes by filtering or searching. You can create/update/delete any class.</p>
+                                    <p>View classes by filtering or searching. You can create/update/delete any class.</p>
                                 </div>
                                 <div class="alert alert-danger">
                                     <p><strong>Warning</strong> : If you remove one class. All the <strong>student data</strong> in this class will also get deleted (not recoverable).</p> It includes <strong>student information, their submissions of every task and your grading/feedback</strong>, not only the class itself.
@@ -268,9 +271,9 @@
               <h4 class="modal-title" id="dialogTitle">Edit Class</h4>
             </div>
             <div class="modal-body">
-            <form id="submission" method="post" action="<?php echo $_SERVER['PHP_SELF']; ?>">
+            <form id="submission" method="post" action="<?php if(isset($_GET['schoolid'])) echo $_SERVER['PHP_SELF'].'?schoolid='.$_GET['schoolid']; else echo $_SERVER['PHP_SELF']; ?>">
                 <!--if 1, insert; else if 0 update; else if -1 delete;-->
-                <input type=hidden name="update" id="update" value="1"></input>
+                <input type=hidden name="update" id="update" value="1" required></input>
                 <label for="ClassID" style="display:none">ClassID</label>
                 <input type="text" class="form-control dialoginput" id="ClassID" name="classid" style="display:none">
                 <br><label for="ClassName">ClassName</label>
@@ -298,7 +301,17 @@
           </div>          
         </div>
       </div>
-      <input type=hidden name="keyword" id="keyword" value="<?php if(isset($_GET['schoolname'])){ echo $_GET['schoolname']; } ?>"></input>
+      <input type=hidden name="keyword" id="keyword" value="
+      <?php if(isset($_GET['schoolid'])){
+        // get SchoolName
+        $schoolSql = "SELECT SchoolName
+                   FROM School WHERE SchoolID = ?";
+        $schoolQuery = $conn->prepare($schoolSql);
+        $schoolQuery->execute(array($_GET['schoolid']));
+        $schoolResult = $schoolQuery->fetch(PDO::FETCH_OBJ);
+        echo $schoolResult->SchoolName; 
+      } else echo ''; ?>">
+      </input>
     <!-- jQuery -->
     <script src="../bower_components/jquery/dist/jquery.min.js"></script>
 
@@ -375,14 +388,16 @@
     $(document).ready(function() {
         var table = $('#datatables').DataTable({
                 responsive: true,
-                "initComplete": function(settings, json) {
-                    
-                    $('.input-sm').eq(1).val($("#keyword").val());                    
-                }
+                "initComplete": function(settings, json) {                    
+                    $('.input-sm').eq(1).val($("#keyword").val().trim());                    
+                },
+                "aoColumnDefs": [
+                  { "bSearchable": false, "aTargets": [ 0 ] }
+                ]
         })
-        //search keyword (schoolname), exact match
+        //search keyword, exact match
         table.search(
-            $("#keyword").val(), true, false, true
+            $("#keyword").val().trim(), true, false, true
         ).draw();     
     });        
     </script>

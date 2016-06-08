@@ -27,6 +27,9 @@ DROP TABLE IF EXISTS `SAQ_Question_Record`;
 DROP TABLE IF EXISTS `Matching_Section`;
 DROP TABLE IF EXISTS `Matching_Question`;
 DROP TABLE IF EXISTS `Matching_Option`;
+DROP TABLE IF EXISTS `Poster_Section`;
+DROP TABLE IF EXISTS `Poster_Record`;
+DROP TABLE IF EXISTS `Misc_Section`;
 DROP TABLE IF EXISTS `Game`;
 DROP TABLE IF EXISTS `Game_Record`;
 DROP TABLE IF EXISTS `Bonus`;
@@ -36,14 +39,13 @@ DROP TABLE IF EXISTS `Bonus_Task_Record`;
 
 CREATE TABLE IF NOT EXISTS `School` (
     SchoolID MEDIUMINT AUTO_INCREMENT,
-    # Specified key was too long; max key length is 767 bytes, a UTF8 char is 4 bytes
     SchoolName VARCHAR(190) UNIQUE,
     CONSTRAINT School_SchoolID_PK PRIMARY KEY (SchoolID)
 )  ENGINE=INNODB;
 
 CREATE TABLE IF NOT EXISTS `Class` (
     ClassID MEDIUMINT AUTO_INCREMENT,
-    ClassName TEXT,
+    ClassName VARCHAR(190) UNIQUE,
     SchoolID MEDIUMINT NOT NULL,
     # UnlockedProgress
     UnlockedProgress MEDIUMINT NOT NULL DEFAULT 10,
@@ -67,7 +69,10 @@ CREATE TABLE IF NOT EXISTS `Student` (
     StudentID MEDIUMINT AUTO_INCREMENT,
     Username TEXT NOT NULL,
     Nickname TEXT,
+    FirstName TEXT,
+    LastName TEXT,
     `Password` TEXT NOT NULL,
+    Email TEXT,
     Gender TEXT,
     DOB DATE,
     Score MEDIUMINT DEFAULT 0,
@@ -115,8 +120,8 @@ CREATE TABLE IF NOT EXISTS `Topic` (
 
 CREATE TABLE IF NOT EXISTS `Quiz` (
     QuizID MEDIUMINT AUTO_INCREMENT,
-    Week TINYINT,
-    QuizType ENUM('MCQ', 'SAQ', 'Matching', 'Calculator', 'Poster'),    
+    Week MEDIUMINT,
+    QuizType ENUM('SAQ', 'MCQ', 'Matching', 'Poster', 'Misc'),    
     TopicID MEDIUMINT,
     CONSTRAINT Quiz_QuizID_PK PRIMARY KEY (QuizID),
     CONSTRAINT Quiz_TopicID_FK FOREIGN KEY (TopicID)
@@ -127,8 +132,7 @@ CREATE TABLE IF NOT EXISTS `Quiz` (
 CREATE TABLE IF NOT EXISTS `Quiz_Record` (
     QuizID MEDIUMINT,
     StudentID MEDIUMINT,    
-    `Status` ENUM('UNGRADED', 'GRADED') DEFAULT 'GRADED',
-    Score MEDIUMINT DEFAULT 0,
+    `Status` ENUM('UNSUBMITTED', 'UNGRADED', 'GRADED') DEFAULT 'GRADED',
     CONSTRAINT Quiz_Record_PK PRIMARY KEY (QuizID , StudentID),
     CONSTRAINT Quiz_Record_QuizID_FK FOREIGN KEY (QuizID)
         REFERENCES Quiz (QuizID)
@@ -150,7 +154,7 @@ CREATE TABLE IF NOT EXISTS `Learning_Material` (
 
 CREATE TABLE IF NOT EXISTS `MCQ_Section` (
     QuizID MEDIUMINT,
-    Points MEDIUMINT,
+    Points MEDIUMINT DEFAULT 0,
     Questionnaires BOOLEAN DEFAULT 0,
     CONSTRAINT MCQ_Section_QuizID_PK PRIMARY KEY (QuizID),
     CONSTRAINT MCQ_Section_QuizID_FK FOREIGN KEY (QuizID)
@@ -194,14 +198,17 @@ CREATE TABLE IF NOT EXISTS `MCQ_Question_Record` (
 )  ENGINE=INNODB;
 
 CREATE TABLE IF NOT EXISTS `SAQ_Section` (
-    QuizID MEDIUMINT AUTO_INCREMENT,
-    CONSTRAINT SAQ_Section_QuizID_PK PRIMARY KEY (QuizID)
+    QuizID MEDIUMINT,
+    CONSTRAINT SAQ_Section_QuizID_PK PRIMARY KEY (QuizID),
+    CONSTRAINT SAQ_Section_QuizID_FK FOREIGN KEY (QuizID)
+        REFERENCES Quiz (QuizID)
+        ON DELETE CASCADE ON UPDATE CASCADE
 )  ENGINE=INNODB;
 
 CREATE TABLE IF NOT EXISTS `SAQ_Question` (
     SAQID MEDIUMINT AUTO_INCREMENT,
     Question TEXT,
-    Points INT,
+    Points MEDIUMINT,
     QuizID MEDIUMINT,
     CONSTRAINT SAQ_Question_SAQID_PK PRIMARY KEY (SAQID),
     CONSTRAINT SAQ_Question_QuizID_FK FOREIGN KEY (QuizID)
@@ -214,7 +221,7 @@ CREATE TABLE IF NOT EXISTS `SAQ_Question_Record` (
     SAQID MEDIUMINT,
     Answer TEXT,
     Feedback TEXT,
-    Grading INT,
+    Grading MEDIUMINT,
     CONSTRAINT SAQ_Question_Record_PK PRIMARY KEY (StudentID , SAQID),
     CONSTRAINT SAQ_Question_Record_StudentID_FK FOREIGN KEY (StudentID)
         REFERENCES Student (StudentID)
@@ -258,10 +265,45 @@ CREATE TABLE IF NOT EXISTS `Matching_Option` (
         ON DELETE CASCADE ON UPDATE CASCADE
 )  ENGINE=INNODB;
 
+CREATE TABLE IF NOT EXISTS `Poster_Section` (
+    QuizID MEDIUMINT,
+    Question TEXT,
+    Points MEDIUMINT,
+    CONSTRAINT Poster_Section_QuizID_PK PRIMARY KEY (QuizID),
+    CONSTRAINT Poster_Section_QuizID_FK FOREIGN KEY (QuizID)
+        REFERENCES Quiz (QuizID)
+        ON DELETE CASCADE ON UPDATE CASCADE
+)  ENGINE=INNODB;
+
+CREATE TABLE IF NOT EXISTS `Poster_Record` (
+    StudentID MEDIUMINT,
+    QuizID MEDIUMINT,
+    ZwibblerDoc LONGTEXT,
+    ImageURL LONGTEXT,
+    Grading MEDIUMINT,
+    CONSTRAINT Poster_Record_Record_PK PRIMARY KEY (StudentID , QuizID),
+    CONSTRAINT Poster_Record_Record_StudentID_FK FOREIGN KEY (StudentID)
+        REFERENCES Student (StudentID)
+        ON DELETE CASCADE ON UPDATE CASCADE,
+    CONSTRAINT Poster_Record_Record_QuizID_FK FOREIGN KEY (QuizID)
+        REFERENCES Poster_Section (QuizID)
+        ON DELETE CASCADE ON UPDATE CASCADE
+)  ENGINE=INNODB;
+
+CREATE TABLE IF NOT EXISTS `Misc_Section` (
+    QuizID MEDIUMINT,
+    QuizSubType TEXT,
+    Points MEDIUMINT,
+    CONSTRAINT Misc_Section_QuizID_PK PRIMARY KEY (QuizID),
+    CONSTRAINT Misc_Section_QuizID_FK FOREIGN KEY (QuizID)
+        REFERENCES Quiz (QuizID)
+        ON DELETE CASCADE ON UPDATE CASCADE
+)  ENGINE=INNODB;
+
 CREATE TABLE IF NOT EXISTS `Game` (
     GameID MEDIUMINT AUTO_INCREMENT,
     Description TEXT,
-    Week TINYINT,
+    Week MEDIUMINT,
     Points MEDIUMINT,
     CONSTRAINT Game_GameID_PK PRIMARY KEY (GameID)
 )  ENGINE=INNODB;
@@ -269,7 +311,7 @@ CREATE TABLE IF NOT EXISTS `Game` (
 CREATE TABLE IF NOT EXISTS `Game_Record` (
     GameID MEDIUMINT,
     StudentID MEDIUMINT,
-    `Level` TINYINT DEFAULT 0,
+    `Level` MEDIUMINT DEFAULT 0,
     Score INT,
     CONSTRAINT Game_Record_PK PRIMARY KEY (GameID , StudentID, `Level`),
     CONSTRAINT Game_Record_GameID_FK FOREIGN KEY (GameID)
@@ -282,7 +324,7 @@ CREATE TABLE IF NOT EXISTS `Game_Record` (
 
 CREATE TABLE IF NOT EXISTS `Bonus` (
     BonusID MEDIUMINT AUTO_INCREMENT,
-    Week TINYINT,
+    Week MEDIUMINT,
     CONSTRAINT Bonus_BonusID_PK PRIMARY KEY (BonusID)
 )  ENGINE=INNODB;
 
@@ -301,7 +343,7 @@ CREATE TABLE IF NOT EXISTS `Bonus_Record` (
 CREATE TABLE IF NOT EXISTS `Bonus_Task` (
     BonusQuestionID MEDIUMINT AUTO_INCREMENT,
     Question TEXT,
-    Points INT,
+    Points MEDIUMINT,
     BonusID MEDIUMINT,
     CONSTRAINT Bonus_Task_BonusQuestionID_PK PRIMARY KEY (BonusQuestionID),
     CONSTRAINT Bonus_Task_BonusID_FK FOREIGN KEY (BonusID)
@@ -314,7 +356,7 @@ CREATE TABLE IF NOT EXISTS `Bonus_Task_Record` (
     BonusQuestionID MEDIUMINT,
     Answer TEXT,
     Feedback TEXT,
-    Grading INT,
+    Grading MEDIUMINT,
     CONSTRAINT Bonus_Task_Record_PK PRIMARY KEY (StudentID , BonusQuestionID),
     CONSTRAINT Bonus_Task_Record_StudentID FOREIGN KEY (StudentID)
         REFERENCES Student (StudentID)
@@ -345,29 +387,29 @@ INSERT IGNORE INTO Token(`Type`,TokenString,ClassID) VALUES('TEACHER','TOKENSTRI
 INSERT IGNORE INTO Token(`Type`,TokenString,ClassID) VALUES('STUDENT','TOKENSTRING03',4);
 INSERT IGNORE INTO Token(`Type`,TokenString,ClassID) VALUES('TEACHER','TOKENSTRING04',4);
 
-INSERT IGNORE INTO Student(Username,`Password`,Gender,DOB,ClassID) VALUES('Fernando','d59324e4d5acb950c4022cd5df834cc3','Male',"2003-10-20",1);
-INSERT IGNORE INTO Student(Username,`Password`,Gender,DOB,ClassID,Score) VALUES('Todd','d59324e4d5acb950c4022cd5df834cc3','Male',"2003-11-20",1,55);
-INSERT IGNORE INTO Student(Username,`Password`,Gender,DOB,ClassID,Score) VALUES('Theresa','d59324e4d5acb950c4022cd5df834cc3','Female',"2003-12-20",1,90);
-INSERT IGNORE INTO Student(Username,`Password`,Gender,DOB,ClassID,Score) VALUES('Hai','d59324e4d5acb950c4022cd5df834cc3','Male',"2003-10-22",1,30);
-INSERT IGNORE INTO Student(Username,`Password`,Gender,DOB,ClassID,Score) VALUES('Lee','d59324e4d5acb950c4022cd5df834cc3','Male',"2003-10-24",1,45);
-INSERT IGNORE INTO Student(Username,`Password`,Gender,DOB,ClassID,Score) VALUES('Tim','d59324e4d5acb950c4022cd5df834cc3','Male',"2003-10-25",1,60);
-INSERT IGNORE INTO Student(Username,`Password`,Gender,DOB,ClassID) VALUES('Clinton','d59324e4d5acb950c4022cd5df834cc3','Male',"2003-10-28",1);
-INSERT IGNORE INTO Student(Username,`Password`,Gender,DOB,ClassID) VALUES('Elbert','d59324e4d5acb950c4022cd5df834cc3','Male',"2003-10-22",1);
-INSERT IGNORE INTO Student(Username,`Password`,Gender,DOB,ClassID) VALUES('Ervin','d59324e4d5acb950c4022cd5df834cc3','Male',"2003-11-20",1);
-INSERT IGNORE INTO Student(Username,`Password`,Gender,DOB,ClassID) VALUES('Sheila','d59324e4d5acb950c4022cd5df834cc3','Female',"2003-10-20",1);
-INSERT IGNORE INTO Student(Username,`Password`,Gender,DOB,ClassID) VALUES('Grace','d59324e4d5acb950c4022cd5df834cc3','Female',"2003-10-29",1);
-INSERT IGNORE INTO Student(Username,`Password`,Gender,DOB,ClassID) VALUES('Ruby','d59324e4d5acb950c4022cd5df834cc3','Female',"2003-10-20",1);
-INSERT IGNORE INTO Student(Username,`Password`,Gender,DOB,ClassID) VALUES('Sonya','d59324e4d5acb950c4022cd5df834cc3','Female',"2003-10-20",1);
-INSERT IGNORE INTO Student(Username,`Password`,Gender,DOB,ClassID) VALUES('Donna','d59324e4d5acb950c4022cd5df834cc3','Female',"2003-10-20",1);
-INSERT IGNORE INTO Student(Username,`Password`,Gender,DOB,ClassID) VALUES('Stacy','d59324e4d5acb950c4022cd5df834cc3','Female',"2003-10-20",1);
-INSERT IGNORE INTO Student(Username,`Password`,Gender,DOB,ClassID) VALUES('Fannie','d59324e4d5acb950c4022cd5df834cc3','Female',"2003-10-28",1);
-INSERT IGNORE INTO Student(Username,`Password`,Gender,DOB,ClassID) VALUES('June','d59324e4d5acb950c4022cd5df834cc3','Female',"2003-10-20",1);
-INSERT IGNORE INTO Student(Username,`Password`,Gender,DOB,ClassID) VALUES('Melinda','d59324e4d5acb950c4022cd5df834cc3','Female',"2003-10-20",1);
-INSERT IGNORE INTO Student(Username,`Password`,Gender,DOB,ClassID) VALUES('Leo','d59324e4d5acb950c4022cd5df834cc3','Male',"2002-04-22",1);
-INSERT IGNORE INTO Student(Username,`Password`,Gender,DOB,ClassID) VALUES('Hector','d59324e4d5acb950c4022cd5df834cc3','Male',"2002-04-20",1);
-INSERT IGNORE INTO Student(Username,`Password`,Gender,DOB,ClassID) VALUES('Otis','d59324e4d5acb950c4022cd5df834cc3','Male',"2002-04-20",2);
-INSERT IGNORE INTO Student(Username,`Password`,Gender,DOB,ClassID) VALUES('Cassandra','d59324e4d5acb950c4022cd5df834cc3','Female',"2002-04-20",2);
-INSERT IGNORE INTO Student(Username,`Password`,Gender,DOB,ClassID) VALUES('Marilyn','d59324e4d5acb950c4022cd5df834cc3','Female',"2002-04-20",1);
+INSERT IGNORE INTO Student(Username,`Password`,Email,FirstName,LastName,Gender,DOB,ClassID) VALUES('Fernando','d59324e4d5acb950c4022cd5df834cc3','fernado@gmail.com','Fernando','Trump','Male',"2003-10-20",1);
+INSERT IGNORE INTO Student(Username,`Password`,Email,FirstName,LastName,Gender,DOB,ClassID,Score) VALUES('Todd','d59324e4d5acb950c4022cd5df834cc3','toddyy@gmail.com','Todd','Webb','Male',"2003-11-20",1,55);
+INSERT IGNORE INTO Student(Username,`Password`,Email,FirstName,LastName,Gender,DOB,ClassID,Score) VALUES('Theresa','d59324e4d5acb950c4022cd5df834cc3','theresa03@gmail.com','Theresa','Rios','Female',"2003-12-20",1,90);
+INSERT IGNORE INTO Student(Username,`Password`,Email,FirstName,LastName,Gender,DOB,ClassID,Score) VALUES('Hai','d59324e4d5acb950c4022cd5df834cc3','isnap2demo@gmail.com','Hai','Lam','Male',"2003-10-22",1,30);
+INSERT IGNORE INTO Student(Username,`Password`,Email,FirstName,LastName,Gender,DOB,ClassID,Score) VALUES('Lee','d59324e4d5acb950c4022cd5df834cc3','isnap2demo@gmail.com','Lee','Malone','Male',"2003-10-24",1,45);
+INSERT IGNORE INTO Student(Username,`Password`,Email,FirstName,LastName,Gender,DOB,ClassID,Score) VALUES('Tim','d59324e4d5acb950c4022cd5df834cc3','isnap2demo@gmail.com','Tim','Mason','Male',"2003-10-25",1,60);
+INSERT IGNORE INTO Student(Username,`Password`,Email,FirstName,LastName,Gender,DOB,ClassID) VALUES('Clinton','d59324e4d5acb950c4022cd5df834cc3','isnap2demo@gmail.com','Clinton','Snyder','Male',"2003-10-28",1);
+INSERT IGNORE INTO Student(Username,`Password`,Email,FirstName,LastName,Gender,DOB,ClassID) VALUES('Elbert','d59324e4d5acb950c4022cd5df834cc3','isnap2demo@gmail.com','Elbert','Chapman','Male',"2003-10-22",1);
+INSERT IGNORE INTO Student(Username,`Password`,Email,FirstName,LastName,Gender,DOB,ClassID) VALUES('Ervin','d59324e4d5acb950c4022cd5df834cc3','isnap2demo@gmail.com','Ervin','Murray','Male',"2003-11-20",1);
+INSERT IGNORE INTO Student(Username,`Password`,Email,FirstName,LastName,Gender,DOB,ClassID) VALUES('Sheila','d59324e4d5acb950c4022cd5df834cc3','isnap2demo@gmail.com','Sheila','Frank','Female',"2003-10-20",1);
+INSERT IGNORE INTO Student(Username,`Password`,Email,FirstName,LastName,Gender,DOB,ClassID) VALUES('Grace','d59324e4d5acb950c4022cd5df834cc3','isnap2demo@gmail.com','Grace','Austin','Female',"2003-10-29",1);
+INSERT IGNORE INTO Student(Username,`Password`,Email,FirstName,LastName,Gender,DOB,ClassID) VALUES('Ruby','d59324e4d5acb950c4022cd5df834cc3','isnap2demo@gmail.com','Ruby','Chavez','Female',"2003-10-20",1);
+INSERT IGNORE INTO Student(Username,`Password`,Email,FirstName,LastName,Gender,DOB,ClassID) VALUES('Sonya','d59324e4d5acb950c4022cd5df834cc3','isnap2demo@gmail.com','Sonya','Kelly','Female',"2003-10-20",1);
+INSERT IGNORE INTO Student(Username,`Password`,Email,FirstName,LastName,Gender,DOB,ClassID) VALUES('Donna','d59324e4d5acb950c4022cd5df834cc3','isnap2demo@gmail.com','Donna','Pratt','Female',"2003-10-20",1);
+INSERT IGNORE INTO Student(Username,`Password`,Email,FirstName,LastName,Gender,DOB,ClassID) VALUES('Stacy','d59324e4d5acb950c4022cd5df834cc3','isnap2demo@gmail.com','Stacy','Figueroa','Female',"2003-10-20",1);
+INSERT IGNORE INTO Student(Username,`Password`,Email,FirstName,LastName,Gender,DOB,ClassID) VALUES('Fannie','d59324e4d5acb950c4022cd5df834cc3','isnap2demo@gmail.com','Fannie','Waters','Female',"2003-10-28",1);
+INSERT IGNORE INTO Student(Username,`Password`,Email,FirstName,LastName,Gender,DOB,ClassID) VALUES('June','d59324e4d5acb950c4022cd5df834cc3','isnap2demo@gmail.com','June','West','Female',"2003-10-20",1);
+INSERT IGNORE INTO Student(Username,`Password`,Email,FirstName,LastName,Gender,DOB,ClassID) VALUES('Melinda','d59324e4d5acb950c4022cd5df834cc3','isnap2demo@gmail.com','Melinda','Kelley','Female',"2003-10-20",1);
+INSERT IGNORE INTO Student(Username,`Password`,Email,FirstName,LastName,Gender,DOB,ClassID) VALUES('Leo','d59324e4d5acb950c4022cd5df834cc3','isnap2demo@gmail.com','Leo','Potter','Male',"2002-04-22",1);
+INSERT IGNORE INTO Student(Username,`Password`,Email,FirstName,LastName,Gender,DOB,ClassID) VALUES('Hector','d59324e4d5acb950c4022cd5df834cc3','isnap2demo@gmail.com','Hector','Byrd','Male',"2002-04-20",1);
+INSERT IGNORE INTO Student(Username,`Password`,Email,FirstName,LastName,Gender,DOB,ClassID) VALUES('Otis','d59324e4d5acb950c4022cd5df834cc3','isnap2demo@gmail.com','Otis','Lawrence','Male',"2002-04-20",2);
+INSERT IGNORE INTO Student(Username,`Password`,Email,FirstName,LastName,Gender,DOB,ClassID) VALUES('Cassandra','d59324e4d5acb950c4022cd5df834cc3','isnap2demo@gmail.com','Cassandra','James','Female',"2002-04-20",2);
+INSERT IGNORE INTO Student(Username,`Password`,Email,FirstName,LastName,Gender,DOB,ClassID) VALUES('Marilyn','d59324e4d5acb950c4022cd5df834cc3','isnap2demo@gmail.com','Marilyn','Ryan','Female',"2002-04-20",1);
 INSERT IGNORE INTO Teacher(Username,`Password`,ClassID) VALUES('Lynette','d59324e4d5acb950c4022cd5df834cc3',1);
 INSERT IGNORE INTO Teacher(Username,`Password`,ClassID) VALUES('Rachael','d59324e4d5acb950c4022cd5df834cc3',2);
 INSERT IGNORE INTO Researcher(Username,`Password`) VALUES('Ann','d59324e4d5acb950c4022cd5df834cc3');
@@ -384,10 +426,10 @@ INSERT IGNORE INTO Topic(TopicName) VALUES('Introduction');
 # [Formal] insert MCQ section with multiple questions
 INSERT IGNORE INTO Quiz(Week,QuizType,TopicID) VALUES(1,'MCQ',2);
 SET @QUIZ_LAST_INSERT_ID = LAST_INSERT_ID();
-INSERT IGNORE INTO MCQ_Section(QuizID,Points,Questionnaires) VALUES(@QUIZ_LAST_INSERT_ID,30,1);
+INSERT IGNORE INTO MCQ_Section(QuizID,Points,Questionnaires) VALUES(@QUIZ_LAST_INSERT_ID,30,0);
 INSERT IGNORE INTO MCQ_Question(Question, CorrectChoice, QuizID) VALUES('Which of these breakfast foods will provide you with the most energy?', 'Whole grain cereal or oatmeal', @QUIZ_LAST_INSERT_ID);
 SET @MCQ_QUESTION_LAST_INSERT_ID = LAST_INSERT_ID();
-INSERT IGNORE INTO `Option`(Content, Explanation, MCQID) VALUES('Candy bar', 'Whole grains take your body longer to digest, giving you energy all morning!', @MCQ_QUESTION_LAST_INSERT_ID);
+INSERT IGNORE INTO `Option`(Content, Explanation, MCQID) VALUES('Candy bar', 'Candy bars will give you an instant burst of energy but will not last!', @MCQ_QUESTION_LAST_INSERT_ID);
 INSERT IGNORE INTO `Option`(Content, Explanation, MCQID) VALUES('Whole grain cereal or oatmeal', 'Whole grains take your body longer to digest, giving you energy all morning!', @MCQ_QUESTION_LAST_INSERT_ID);
 INSERT IGNORE INTO `Option`(Content, Explanation, MCQID) VALUES('Potato chips', 'Whole grains take your body longer to digest, giving you energy all morning!', @MCQ_QUESTION_LAST_INSERT_ID);
 
@@ -504,7 +546,7 @@ INSERT IGNORE INTO SAQ_Question(Question, Points, QuizID) VALUES('List 1 strateg
 INSERT IGNORE INTO SAQ_Question(Question, Points, QuizID) VALUES('List 3 the different ways that you have seen anti-smoking messages presented to the public. With each suggest if you think they have been ‘effective’ or ‘not effective’. Eg. Poster-Effective.', 20, @QUIZ_LAST_INSERT_ID);
 
 # [Sample] Answer and Grading Feedback of SAQ 
-INSERT IGNORE INTO Quiz_Record(QuizID, StudentID,`Status`,Score) VALUES(3, 1, 'GRADED', 34);
+INSERT IGNORE INTO Quiz_Record(QuizID, StudentID,`Status`) VALUES(3, 1, 'GRADED');
 INSERT IGNORE INTO SAQ_Question_Record(StudentID, SAQID, Answer, Feedback, Grading) VALUES(1, 1, "[ANSWER] Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque non justo et tellus venenatis consequat. Suspendisse laoreet rhoncus nulla, quis vulputate arcu interdum vel. Aenean at nisl at enim imperdiet rhoncus in non risus. Nam augue nisi, blandit sed feugiat eu, dapibus tristique ipsum. Vestibulum molestie orci risus, accumsan convallis sem sagittis mattis. Nulla ac justo sit amet erat lacinia vulputate. Aliquam accumsan pellentesque magna ac ultricies. Cras consequat feugiat suscipit. Vivamus suscipit lobortis nunc at aliquet. Nullam orci diam, viverra sed interdum ac, vehicula vel nisi. Cras blandit erat eget purus maximus condimentum. Nullam mattis pellentesque velit ac euismod. Nam vehicula est vel iaculis hendrerit. Vivamus pellentesque leo nec eleifend sodales. Phasellus eget condimentum metus.", "+10: Good job!", 10);
 INSERT IGNORE INTO SAQ_Question_Record(StudentID, SAQID, Answer, Feedback, Grading) VALUES(1, 2, "[ANSWER] Nunc rhoncus turpis eu risus pharetra, et pharetra libero euismod. Donec ac tellus consequat, aliquam ligula in, semper erat. Praesent ut justo auctor, imperdiet nisi quis, bibendum dolor. Nunc iaculis aliquet est ac maximus. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Suspendisse vel elit felis. Duis accumsan arcu cursus dapibus vulputate. Maecenas sit amet euismod orci. Sed imperdiet justo quis eros porta tristique eu a mi. Donec at est lacus. Vivamus viverra, purus ut tempor auctor, tellus massa hendrerit elit, tristique ornare mauris dolor vitae ante.", "+10: Well done!", 10);
 INSERT IGNORE INTO SAQ_Question_Record(StudentID, SAQID, Answer, Feedback, Grading) VALUES(1, 3, "[ANSWER] Nam odio tortor, finibus sit amet metus vitae, egestas venenatis arcu. Maecenas sodales, mi vitae tincidunt interdum, urna ipsum sagittis orci, semper mollis nisl ex ut felis. Vivamus lectus justo, interdum sit amet enim id, euismod posuere erat. Pellentesque auctor elit eget finibus placerat. Vivamus sodales dolor non ligula molestie aliquam. Ut at metus ut mauris consequat sollicitudin. Suspendisse non ipsum at neque molestie feugiat.", "+20: Nice try. <br> -2: You should also mention Poster-Effective.", 18);
@@ -520,7 +562,9 @@ INSERT IGNORE INTO SAQ_Question(Question, Points, QuizID) VALUES('What changes c
 
 
 # [Formal] Week 6
-INSERT IGNORE INTO Quiz(Week,QuizType,TopicID) VALUES(6,'Calculator',3);
+INSERT IGNORE INTO Quiz(Week,QuizType,TopicID) VALUES(6,'Misc',3);
+SET @QUIZ_LAST_INSERT_ID = LAST_INSERT_ID();
+INSERT IGNORE INTO Matching_Section(QuizID, Explanation, Points) VALUES(@QUIZ_LAST_INSERT_ID, 'Calculator', 20);
 INSERT IGNORE INTO Quiz(Week,QuizType,TopicID) VALUES(6,'MCQ',3);
 # [Formal] Matching quesitons
 INSERT IGNORE INTO Quiz(Week,QuizType,TopicID) VALUES(6,'Matching',2);
@@ -646,7 +690,53 @@ INSERT INTO `isnap2changedb`.`fact` (`Content`, `TopicID`) VALUES ('Up to 40% of
 INSERT INTO `isnap2changedb`.`fact` (`Content`, `TopicID`) VALUES ('People aged 18-64 years old should exercice at least 150 min per week at least, each of the session lasting 10 min as a minimum,', '4');
 INSERT INTO `isnap2changedb`.`fact` (`Content`, `TopicID`) VALUES ('Supportive environments and communities may help people to be more physically active.', '4');
 
+# [Example] insert a poster task into Quiz
+INSERT INTO `isnap2changedb`.`quiz` (`Week`, `QuizType`, `TopicID`) VALUES ('2', 'Poster', '3');
 
+INSERT IGNORE INTO Quiz(Week,QuizType,TopicID) VALUES(1,'MCQ',5);
+SET @QUIZ_LAST_INSERT_ID = LAST_INSERT_ID();
+INSERT IGNORE INTO MCQ_Section(QuizID,Points,Questionnaires) VALUES(@QUIZ_LAST_INSERT_ID,20,0);
+INSERT IGNORE INTO MCQ_Question(Question, CorrectChoice, QuizID) VALUES('0 option:', '0', @QUIZ_LAST_INSERT_ID);
+SET @MCQ_QUESTION_LAST_INSERT_ID = LAST_INSERT_ID();
+
+INSERT IGNORE INTO MCQ_Question(Question, CorrectChoice, QuizID) VALUES('1 option:', '1', @QUIZ_LAST_INSERT_ID);
+SET @MCQ_QUESTION_LAST_INSERT_ID = LAST_INSERT_ID();
+INSERT IGNORE INTO `Option`(Content, Explanation, MCQID) VALUES('1', "Correct", @MCQ_QUESTION_LAST_INSERT_ID);
+
+INSERT IGNORE INTO MCQ_Question(Question, CorrectChoice, QuizID) VALUES('2 option', '2', @QUIZ_LAST_INSERT_ID);
+SET @MCQ_QUESTION_LAST_INSERT_ID = LAST_INSERT_ID();
+INSERT IGNORE INTO `Option`(Content, Explanation, MCQID) VALUES('1', "Wrong", @MCQ_QUESTION_LAST_INSERT_ID);
+INSERT IGNORE INTO `Option`(Content, Explanation, MCQID) VALUES('2', "Correct", @MCQ_QUESTION_LAST_INSERT_ID);
+
+INSERT IGNORE INTO MCQ_Question(Question, CorrectChoice, QuizID) VALUES('3 option', '3',@QUIZ_LAST_INSERT_ID);
+SET @MCQ_QUESTION_LAST_INSERT_ID = LAST_INSERT_ID();
+INSERT IGNORE INTO `Option`(Content, Explanation, MCQID) VALUES('1', "Wrong", @MCQ_QUESTION_LAST_INSERT_ID);
+INSERT IGNORE INTO `Option`(Content, Explanation, MCQID) VALUES('3', "Correct", @MCQ_QUESTION_LAST_INSERT_ID);
+INSERT IGNORE INTO `Option`(Content, Explanation, MCQID) VALUES('2', "Wrong", @MCQ_QUESTION_LAST_INSERT_ID);
+
+INSERT IGNORE INTO MCQ_Question(Question, CorrectChoice, QuizID) VALUES('4 option', '4', @QUIZ_LAST_INSERT_ID);
+SET @MCQ_QUESTION_LAST_INSERT_ID = LAST_INSERT_ID();
+INSERT IGNORE INTO `Option`(Content, Explanation, MCQID) VALUES('1', "Wrong", @MCQ_QUESTION_LAST_INSERT_ID);
+INSERT IGNORE INTO `Option`(Content, Explanation, MCQID) VALUES('2', "Wrong", @MCQ_QUESTION_LAST_INSERT_ID);
+INSERT IGNORE INTO `Option`(Content, Explanation, MCQID) VALUES('3', "Wrong", @MCQ_QUESTION_LAST_INSERT_ID);
+INSERT IGNORE INTO `Option`(Content, Explanation, MCQID) VALUES('4', "Correct", @MCQ_QUESTION_LAST_INSERT_ID);
+
+INSERT IGNORE INTO MCQ_Question(Question, CorrectChoice, QuizID) VALUES('5 option', '5', @QUIZ_LAST_INSERT_ID);
+SET @MCQ_QUESTION_LAST_INSERT_ID = LAST_INSERT_ID();
+INSERT IGNORE INTO `Option`(Content, Explanation, MCQID) VALUES('1', "Wrong", @MCQ_QUESTION_LAST_INSERT_ID);
+INSERT IGNORE INTO `Option`(Content, Explanation, MCQID) VALUES('2', "Wrong", @MCQ_QUESTION_LAST_INSERT_ID);
+INSERT IGNORE INTO `Option`(Content, Explanation, MCQID) VALUES('3', "Wrong", @MCQ_QUESTION_LAST_INSERT_ID);
+INSERT IGNORE INTO `Option`(Content, Explanation, MCQID) VALUES('4', "Wrong", @MCQ_QUESTION_LAST_INSERT_ID);
+INSERT IGNORE INTO `Option`(Content, Explanation, MCQID) VALUES('5', "Correct", @MCQ_QUESTION_LAST_INSERT_ID);
+
+INSERT IGNORE INTO Learning_Material(Content,QuizID) VALUES('
+<p>Learning materials for this quiz has not been added.</p>',9);
+
+# [Example] insert a poster task into Poster_Section
+INSERT INTO `isnap2changedb`.`poster_section` (`QuizID`, `Points`) VALUES ('9', '20');
+
+# [Example] insert a learning material for a Poster task with QuizID = 9
+INSERT INTO `isnap2changedb`.`learning_material` (`Content`, `QuizID`) VALUES ('<p>Learning materials for this quiz has not been added.</p>', '9');
 /*
 #TEST
 

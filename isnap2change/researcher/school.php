@@ -2,75 +2,70 @@
     session_start();
     require_once("../connection.php");
     require_once("../debug.php");
-    require_once("/researcher_validation.php");
+    require_once("/researcher-validation.php");
     $conn = db_connect();
     $overviewName = "school";
     
     //if update/insert/remove school
-    if($_SERVER["REQUEST_METHOD"] == "POST"){
-        if(isset($_POST['update'])){                          
-            $update = $_POST['update'];
-            //update
-            if($update == 0){
-                $schoolID = $_POST['schoolid'];
-                $schoolName = $_POST['schoolname'];
-                $update_stmt = "UPDATE School 
-                    SET SchoolName = ?
-                    WHERE SchoolID = ?";			
-                $update_stmt = $conn->prepare($update_stmt);                            
-                if(! $update_stmt -> execute(array($schoolName, $schoolID))){
-                    echo "<script language=\"javascript\">  alert(\"Error occurred to update ".$overviewName.". Contact with developers.\"); </script>";
-                } else{
+    try{
+        if($_SERVER["REQUEST_METHOD"] == "POST"){
+            if(isset($_POST['update'])){                          
+                $update = $_POST['update'];
+                //update
+                if($update == 0){
+                    $schoolID = $_POST['schoolid'];
+                    $schoolName = $_POST['schoolname'];
+                    $update_stmt = "UPDATE School 
+                        SET SchoolName = ?
+                        WHERE SchoolID = ?";			
+                    $update_stmt = $conn->prepare($update_stmt);                            
+                    $update_stmt->execute(array($schoolName, $schoolID));
                 }
+                // insert
+                else if($update == 1){ 
+                    
+                        $schoolName = $_POST['schoolname'];                 
+                        $update_stmt = "INSERT INTO School(SchoolName)
+                         VALUES (?);";			
+                        $update_stmt = $conn->prepare($update_stmt);                
+                        $update_stmt->execute(array($schoolName));
+                                    
+                }
+                // remove school (with help of DELETE CASCADE) 
+                else if($update == -1){
+                    $schoolID = $_POST['schoolid'];
+                    $update_stmt = "DELETE FROM School WHERE SchoolID = ?";			
+                    $update_stmt = $conn->prepare($update_stmt);
+                    $update_stmt->execute(array($schoolID));
+                }            
             }
-            // insert
-            else if($update == 1){ 
-                $schoolName = $_POST['schoolname'];                 
-                $update_stmt = "INSERT INTO School(SchoolName)
-                     VALUES (?);";			
-                $update_stmt = $conn->prepare($update_stmt);                
-                if(! $update_stmt -> execute(array($schoolName))){
-                    echo "<script language=\"javascript\">  alert(\"Error occurred to insert ".$overviewName.". Contact with developers.\"); </script>";
-                } else{
-                }             
-            }
-            // remove school (with help of DELETE CASCADE) 
-            else if($update == -1){
-                $schoolID = $_POST['schoolid'];
-                $update_stmt = "DELETE FROM School WHERE SchoolID = ?";			
-                $update_stmt = $conn->prepare($update_stmt);
-                if(! $update_stmt -> execute(array($schoolID))){
-                    echo "<script language=\"javascript\">  alert(\"Error occurred to delete ".$overviewName.". Contact with developers.\"); </script>";
-                } else{
-                } 
-            }            
         }
-    }
-
-    // get school
-    $schoolSql = "SELECT SchoolID, SchoolName
-               FROM School";
-    $schoolQuery = $conn->prepare($schoolSql);
-    $schoolQuery->execute();
-    $schoolResult = $schoolQuery->fetchAll(PDO::FETCH_OBJ);
+        // get school
+        $schoolSql = "SELECT SchoolID, SchoolName
+                   FROM School";
+        $schoolQuery = $conn->prepare($schoolSql);
+        $schoolQuery->execute();
+        $schoolResult = $schoolQuery->fetchAll(PDO::FETCH_OBJ);
+        
+        // get class
+        $classSql = "SELECT ClassID, ClassName, SchoolName
+                   FROM Class NATURAL JOIN School";
+        $classQuery = $conn->prepare($classSql);
+        $classQuery->execute();
+        $classResult = $classQuery->fetchAll(PDO::FETCH_OBJ);
+        
+        // get class number
+        $classNumSql = "SELECT count(*) as Count, SchoolID
+                   FROM School NATURAL JOIN Class
+                   GROUP BY SchoolID";
+        $classNumQuery = $conn->prepare($classNumSql);
+        $classNumQuery->execute();
+        $classNumResult = $classNumQuery->fetchAll(PDO::FETCH_OBJ);
+    } catch(Exception $e) {
+        debug_pdo_err($overviewName, $e);
+    } 
     
-    // get class
-    $classSql = "SELECT ClassID, ClassName, SchoolName
-               FROM Class NATURAL JOIN School";
-    $classQuery = $conn->prepare($classSql);
-    $classQuery->execute();
-    $classResult = $classQuery->fetchAll(PDO::FETCH_OBJ);
-    
-    // get class number
-    $classNumSql = "SELECT count(*) as Count, SchoolID
-               FROM School NATURAL JOIN Class
-               GROUP BY SchoolID";
-    $classNumQuery = $conn->prepare($classNumSql);
-    $classNumQuery->execute();
-    $classNumResult = $classNumQuery->fetchAll(PDO::FETCH_OBJ); 
-    
-    db_close($conn); 
-    
+    db_close($conn);    
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -155,7 +150,7 @@
                                     <?php for($i=0; $i<count($schoolResult); $i++) {?>
                                         <tr class="<?php if($i % 2 == 0){echo "odd";} else {echo "even";} ?>">
                                             <td style="display:none"><?php echo $schoolResult[$i]->SchoolID ?></td>
-                                            <td><a href="class.php?schoolname=<?php echo $schoolResult[$i]->SchoolName ?>"><?php echo $schoolResult[$i]->SchoolName ?></a></td>
+                                            <td><a href="class.php?schoolid=<?php echo $schoolResult[$i]->SchoolID ?>"><?php echo $schoolResult[$i]->SchoolName ?></a></td>
                                             <td><?php $count=0; for($j=0; $j<count($classNumResult); $j++){ if ($classNumResult[$j]->SchoolID == $schoolResult[$i]->SchoolID) $count=$classNumResult[$j]->Count; } echo $count; ?><span class="glyphicon glyphicon-remove pull-right" aria-hidden="true"></span><span class="pull-right" aria-hidden="true">&nbsp;</span><span class="glyphicon glyphicon-edit pull-right" data-toggle="modal" data-target="#dialog" aria-hidden="true"></span></td>
                                         </tr>
                                     <?php } ?>    
@@ -166,7 +161,7 @@
                             <div class="well row">
                                 <h4>School Overview Notification</h4>
                                 <div class="alert alert-info">
-                                    <p>Navigate schools by filtering or searching. You can create/update/delete any school.</p>
+                                    <p>View schools by filtering or searching. You can create/update/delete any school.</p>
                                 </div>
                                 <div class="alert alert-danger">
                                     <p><strong>Reminder</strong> : If you remove one school. All the student data in this school will also get deleted (not recoverable).</p> It includes <strong>student information, their submissions of every task and your grading/feedback</strong>, not only the school itself.
@@ -241,7 +236,10 @@
     <script>    
     $(document).ready(function() {
         $('#dataTables-example').DataTable({
-                responsive: true
+                responsive: true,
+                "aoColumnDefs": [
+                  { "bSearchable": false, "aTargets": [ 0 ] }
+                ]
         });            
     }); 
     //DO NOT put them in $(document).ready() since the table has multi pages

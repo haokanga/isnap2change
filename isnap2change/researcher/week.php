@@ -2,7 +2,7 @@
 	session_start();
     require_once("../connection.php");
     require_once("../debug.php");
-    require_once("/researcher_validation.php");    
+    require_once("/researcher-validation.php");    
     $conn = db_connect();
     $overviewName = "week";
     
@@ -13,7 +13,7 @@
             UPDATE Quiz SET Week = NULL WHERE Week = ?;
             SET SQL_SAFE_UPDATES=1;";			
         $update_stmt = $conn->prepare($update_stmt);                            
-        if(! $update_stmt -> execute(array($week))){
+        if(! $update_stmt->execute(array($week))){
             echo "<script language=\"javascript\">  alert(\"Error occurred to delete ".$overviewName.". Contact with developers.\"); </script>";
         } else{
         }         
@@ -121,7 +121,7 @@
                                         for($j=0; $j<count($weekResult); $j++){ 
                                             if ($weekResult[$j]->Week == $i){ ?>
                                         <tr class="<?php if(($i - 1) % 2 == 0){echo "odd";} else {echo "even";} ?>">
-                                            <td><a id="<?php echo $i; ?>" href="quiz.php?week=<?php echo $i; ?>"><?php echo "Week ".$i; ?></a>
+                                            <td><a id="<?php echo $i; ?>" href="quiz.php?week=<?php echo $i; ?>"><?php echo $i; ?></a>
                                             </td>
                                             <td><?php echo $weekResult[$j]->QuizNum; ?><span class="glyphicon glyphicon-remove pull-right" aria-hidden="true" data-toggle="modal" data-target="#dialog"></span></td>
                                         </tr>
@@ -129,7 +129,7 @@
                                         }                                        
                                         if(!$notEmpty){ ?>
                                         <tr class="<?php if(($i - 1) % 2 == 0){echo "odd";} else {echo "even";} ?>">
-                                            <td><a id="<?php echo $i; ?>" href="quiz.php?week=<?php echo $i; ?>"><?php echo "Week ".$i; ?></a>
+                                            <td><a id="<?php echo $i; ?>" href="quiz.php?week=<?php echo $i; ?>"><?php echo $i; ?></a>
                                             </td>
                                             <td><?php echo 0; ?><span class="glyphicon glyphicon-remove pull-right" aria-hidden="true" data-toggle="modal" data-target="#dialog"></span></td>
                                         </tr>    
@@ -142,7 +142,7 @@
                             <div class="well row">
                                 <h4>School Overview Notification</h4>
                                 <div class="alert alert-info">
-                                    <p>Navigate weeks by filtering or searching. You can create/delete any week.</p>
+                                    <p>View weeks by filtering or searching. You can create/delete any week.</p>
                                 </div>
                                 <div class="alert alert-warning">
                                     <p>If you need to add another week, you don't need to explictly add it in this page. Go to <a href="quiz.php">Quiz Overview</a> to add a new quiz with that week number can simply work.</p>
@@ -216,7 +216,8 @@
     <script>    
     $(document).ready(function() {
         $('#dataTables-example').DataTable({
-                responsive: true
+                responsive: true,                
+                "pageLength":25
         });            
     });    
     $('.glyphicon-remove').on('click', function (){

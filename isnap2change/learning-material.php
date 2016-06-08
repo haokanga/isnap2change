@@ -66,16 +66,25 @@
             function beginQuiz()
 			{
                 //list of question type
-				<?php if($quiztype == "MCQ"){ ?>
-							document.getElementById("formQuizBegin").setAttribute("action", "multiple-choice-question.php");
-				<?php }					  
-					  else if($quiztype == "SAQ"){ ?>
-						  document.getElementById("formQuizBegin").setAttribute("action", "short-answer-question.php");
-                <?php }					  
-					  else if($quiztype == "Matching"){ ?>
-						  document.getElementById("formQuizBegin").setAttribute("action", "matching-question.php");
-				<?php } ?>
-					
+				<?php 
+					switch($quiztype) {
+						case "MCQ": 
+							echo 'document.getElementById("formQuizBegin").setAttribute("action", "multiple-choice-question.php");';
+							break;
+						case "SAQ":
+							 echo 'document.getElementById("formQuizBegin").setAttribute("action", "short-answer-question.php");';
+							 break;
+						case "Matching":
+							echo 'document.getElementById("formQuizBegin").setAttribute("action", "matching-question.php");';
+							break;
+						case "Poster":
+							echo 'document.getElementById("formQuizBegin").setAttribute("action", "poster-editor.php");';
+							break;
+						default:
+							break;
+					}
+				?>
+				
 				document.getElementById("formQuizBegin").submit();
 			}
         </script>

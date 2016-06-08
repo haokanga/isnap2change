@@ -2,11 +2,11 @@
 	
 	$studentid = $_POST["studentid"];
 	$tmpid = rand();
-	$target_path = "./tmp_poster_image/".$studentid."_".$tmpid."_tmp";
+	$target_path = "./tmp_poster_img/".$studentid."_".$tmpid."_tmp";
 	
 	while(file_exists($target_path)) {
 		$tmpid = rand();
-		$target_path = "./tmp_poster_image/".$studentid."_".$tmpid."_tmp";
+		$target_path = "./tmp_poster_img/".$studentid."_".$tmpid."_tmp";
 	}
 	
 	$fileid = $studentid."_".$tmpid."_tmp";

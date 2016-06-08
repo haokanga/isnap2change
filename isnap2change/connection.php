@@ -2,26 +2,26 @@
 
         function db_connect(){
 
-                $conn;
+			$conn;
 
-                $servername = "localhost";
-                $username = "root";
-                $password = ".kHdGCD2Un%P";
+			$servername = "localhost";
+			$username = "root";
+			$password = ".kHdGCD2Un%P";
 
-                try {
-                        $conn = new PDO("mysql:host=$servername; dbname=isnap2changedb", $username, $password);
-                        // set the PDO error mode to exception
-                        $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-                }
-                catch(PDOException $e){
-                        echo "Connection failed: " . $e->getMessage();
-                }
+			try {
+				$conn = new PDO("mysql:host=$servername; dbname=isnap2changedb", $username, $password);
+				// set the PDO error mode to exception
+				$conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+			} catch(PDOException $e){
+				echo "Connection failed: " . $e->getMessage();
+				exit;
+			}
 
-                return $conn;
+			return $conn;
         }
 
         function db_close($connection){
-                $connection = null;
+			$connection = null;
         }
 
 ?>
