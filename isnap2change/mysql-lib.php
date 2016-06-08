@@ -39,16 +39,18 @@
         $pointsBySection = array('MCQ', 'Matching', 'Poster', 'Misc');
         $pointsByQuestion = array('SAQ');
         $conn = db_connect();
+        $points = 0;        
         
         $quizTypeSql = "SELECT QuizType FROM Quiz WHERE QuizID = ?";
         $quizTypeQuery = $conn->prepare($quizTypeSql);
-        $quizTypeQuery->execute(array($quizID));
-        if($quizTypeQuery->fetchColumn() > 0){ 
+        $quizTypeQuery->execute(array($quizID));       
+        if($quizTypeQuery->fetchColumn() > 0){
             $quizTypeSql = "SELECT QuizType FROM Quiz WHERE QuizID = ?";
             $quizTypeQuery = $conn->prepare($quizTypeSql);
             $quizTypeQuery->execute(array($quizID));
             $quizTypeResult = $quizTypeQuery->fetch(PDO::FETCH_OBJ);
             $quizType = $quizTypeResult->QuizType;
+            
             if(in_array($quizType, $pointsBySection)){
                 $pointsSql = "SELECT * FROM Quiz NATURAL JOIN ".$quizType."_Section WHERE QuizID = ?";
                 $pointsQuery = $conn->prepare($pointsSql);
@@ -78,6 +80,7 @@
         for($i=0; $i<count($quizResult);$i++){
             $score+= getStuQuizScore($quizResult[$i]->QuizID, $studentID);
         }
+        db_close($conn); 
         return $score;
     } 
 ?>
