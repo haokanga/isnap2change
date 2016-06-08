@@ -66,7 +66,7 @@
         return $points;
     } 
     
-    function getStudentScore($studentID){
+    function calculateStudentScore($studentID){
         $conn = db_connect();            
         $score = 0;
         
@@ -82,13 +82,30 @@
         return $score;
     } 
     
-    function updateStudentScore($conn, $studentID){
+    function getStudentScore($studentID){
+        $conn = db_connect();
+        $score = 0;
         
+        $scoreSql = "SELECT COUNT(*) FROM Student WHERE StudentID = ? ";
+        $scoreQuery = $conn->prepare($scoreSql);
+        $scoreQuery->execute(array($studentID));
+        if($scoreQuery->fetchColumn() > 0){
+            $scoreSql = "SELECT * FROM Student WHERE StudentID = ? ";
+            $scoreQuery = $conn->prepare($scoreSql);
+            $scoreQuery->execute(array($studentID));
+            $scoreResult = $scoreQuery->fetch(PDO::FETCH_OBJ);
+            $score = $scoreResult->Score;
+        }
+        
+        db_close($conn); 
+        return $score;
+    }
+    
+    function setStudentScore($conn, $studentID){        
         $update_stmt = "UPDATE Student 
                 SET Score = ?
                 WHERE StudentID = ?";			
         $update_stmt = $conn->prepare($update_stmt);         
-        $update_stmt->execute(array(getStudentScore($studentID), $studentID));
-        
+        $update_stmt->execute(array(calculateStudentScore($studentID), $studentID));        
     }
 ?>
