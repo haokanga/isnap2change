@@ -32,6 +32,7 @@
 	} else {
 		$feedback["result"] = "fail";
 	}
-
+	
+	echo json_encode($feedback);
 	
 ?>

@@ -27,6 +27,14 @@
 <script src="js/jquery-1.12.3.js"></script>
 <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-slider/7.1.0/bootstrap-slider.js"></script>
 <script>
+	function parseFeedback(response) {
+		
+		
+		
+	}
+
+
+
 
 	function submitQuiz() {
 		
@@ -40,7 +48,7 @@
 		var xmlhttp = new XMLHttpRequest();
 			xmlhttp.onreadystatechange = function() {
 				if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
-				//	parseFeedback(xmlhttp.responseText);
+					parseFeedback(xmlhttp.responseText);
 				} 
 			};
 				
