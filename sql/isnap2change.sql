@@ -564,8 +564,11 @@ INSERT IGNORE INTO SAQ_Question(Question, Points, QuizID) VALUES('What changes c
 # [Formal] Week 6
 INSERT IGNORE INTO Quiz(Week,QuizType,TopicID) VALUES(6,'Misc',3);
 SET @QUIZ_LAST_INSERT_ID = LAST_INSERT_ID();
-INSERT IGNORE INTO Matching_Section(QuizID, Explanation, Points) VALUES(@QUIZ_LAST_INSERT_ID, 'Calculator', 20);
+INSERT IGNORE INTO Misc_Section(QuizID, QuizSubType, Points) VALUES(@QUIZ_LAST_INSERT_ID, 'Calculator', 20);
+
 INSERT IGNORE INTO Quiz(Week,QuizType,TopicID) VALUES(6,'MCQ',3);
+SET @QUIZ_LAST_INSERT_ID = LAST_INSERT_ID();
+INSERT IGNORE INTO MCQ_Section(QuizID,Points,Questionnaires) VALUES(@QUIZ_LAST_INSERT_ID,30,0);
 # [Formal] Matching quesitons
 INSERT IGNORE INTO Quiz(Week,QuizType,TopicID) VALUES(6,'Matching',2);
 SET @QUIZ_LAST_INSERT_ID = LAST_INSERT_ID();

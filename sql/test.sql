@@ -8,7 +8,7 @@ SELECT MAX(Week) AS WeekNum FROM Quiz;
 SET SQL_SAFE_UPDATES=0;
 UPDATE Quiz SET Week = NULL WHERE Week = 1;
 SET SQL_SAFE_UPDATES=1;
-*/
+
 SELECT * FROM Student natural JOIN Class;
 SELECT * FROM Quiz NATURAL JOIN MCQ_Section;
 SELECT * FROM Quiz NATURAL JOIN (SELECT QuizID, Points FROM MCQ_Section AS MCQPoints UNION SELECT QuizID , Points FROM Matching_Section AS MatchingPoints) AS QuizPoints;
@@ -41,20 +41,25 @@ SELECT MCQID,Question,`Option`,Explanation FROM MCQ_Question NATURAL JOIN `Optio
 # SELECT * FROM Quiz_Record NATURAL JOIN (MCQ_Section UNION Matching_Section UNION Poster_Section) ;
 # WHERE StudentID = 1
 
-SELECT * FROM Quiz NATURAL JOIN (SELECT QuizID, Points FROM MCQ_Section UNION SELECT QuizID , Points FROM Matching_Section UNION SELECT QuizID , Points FROM Poster_Section UNION SELECT QuizID , Points FROM Misc_Section ) AS QuizPoints WHERE QuizID = 1;
+
+SELECT * FROM Quiz NATURAL JOIN Quiz_Record WHERE StudentID = 2 AND `Status`='GRADED';
+SELECT * FROM Quiz NATURAL JOIN Quiz_Record;
+
+SELECT QuizType FROM Quiz WHERE QuizID = 9;
+
 
 SELECT * FROM Quiz natural join Quiz_Record WHERE QuizID=1 AND StudentID = 2 AND `Status`='GRADED' ;
-
-SELECT QuizID, StudentID, SUM(Grading) AS SumPoints FROM Quiz NATURAL JOIN SAQ_Section NATURAL JOIN SAQ_Question NATURAL JOIN SAQ_Question_Record WHERE QuizID = 3 AND StudentID = 1;
-
+*/
 
 
 
 
+SELECT * FROM Quiz NATURAL JOIN (SELECT QuizID, Points FROM MCQ_Section UNION SELECT QuizID , Points FROM Matching_Section UNION SELECT QuizID , Points FROM Poster_Section UNION SELECT QuizID , Points FROM Misc_Section ) AS QuizPoints 
+#WHERE QuizID = 1
+;
 
-
-
-
-
+SELECT QuizID, StudentID, SUM(Grading) AS SumPoints FROM Quiz NATURAL JOIN SAQ_Section NATURAL JOIN SAQ_Question NATURAL JOIN SAQ_Question_Record 
+#WHERE QuizID = 3 AND StudentID = 1
+;
 
 
