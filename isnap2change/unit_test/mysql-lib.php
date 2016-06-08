@@ -17,6 +17,16 @@
     echo '###########################<br>';
     echo 'UNIT TEST<br>';
     echo '###########################<br>';
+    echo 'getQuizPoints($quizID)<br>';
+    for($i=-1;$i<10;$i++){
+        echo "getQuizPoints($i) ".getQuizPoints($i)."<br>";   
+    }	
+    
+    
+    
+    echo '###########################<br>';
+    echo 'UNIT TEST<br>';
+    echo '###########################<br>';
     echo 'getStudentScore($studentID)<br>';
     for($i=-1;$i<10;$i++){
         echo "getStudentScore($i) ".getStudentScore($i)."<br>";   
