@@ -153,8 +153,15 @@
         <div w3-include-html="navigation.html"></div> 
         <div id="page-wrapper">
             <div class="row">
-                <div class="col-lg-12">
-                    <h1 class="page-header">Quiz Overview <?php if(isset($_GET['week'])) echo '- Week '.$_GET['week'] ?></h1>
+                <div class="col-lg-12">                
+                    <h1 class="page-header">Quiz Overview 
+                    <?php if(isset($_GET['week'])) { ?>
+                        <div class="alert alert-info alert-dismissable" style="display: inline-block;">
+                            <button type="button" class="close" data-dismiss="alert" aria-hidden="true" onclick="location.href='quiz.php';" >×</button>
+                            <i class="fa fa-info-circle"></i>  <?php echo 'Week '.$_GET['week'];  ?> 
+                        </div>                    
+                    <?php } ?>
+                    </h1>
                 </div>
                 <!-- /.col-lg-12 -->
             </div>
