@@ -217,10 +217,7 @@
     $(document).ready(function() {
         $('#dataTables-example').DataTable({
                 responsive: true,                
-                "pageLength":25,
-                "aoColumnDefs": [
-                  { "bSearchable": false, "aTargets": [ 0 ] }
-                ]
+                "pageLength":25
         });            
     });    
     $('.glyphicon-remove').on('click', function (){

@@ -244,12 +244,12 @@
                                 <input type="text" class="form-control" id="QuizID" name="quizid" style="display:none" value="<?php echo $quizResult->QuizID; ?>"></input>
                                 <br>
                                 <label for="Week">Week</label>
-                                <input type="text" class="form-control" id="Week" name="week" placeholder="Input Week Number" value="<?php echo $quizResult->Week; ?>" required></input> 
+                                <input type="text" class="form-control" id="Week" name="week" placeholder="Input Week Number" value="<?php echo $quizResult->Week; ?>"></input> 
                                 <br>  
                                 <label for='TopicName'>TopicName</label>
                                 <select class="form-control" id="TopicName" form="metadatasubmission" name="topicname" required>
                                   <?php for($j=0; $j<count($topicResult); $j++) {?>                  
-                                    <option value='<?php echo $topicResult[$j]->TopicName ?>'><?php echo $topicResult[$j]->TopicName ?></option>
+                                    <option value='<?php echo $topicResult[$j]->TopicName ?>' <?php if($topicResult[$j]->TopicName==$quizResult->TopicName) echo 'selected' ?> ><?php echo $topicResult[$j]->TopicName ?></option>
                                   <?php } ?>
                                 </select>
                                 <br>
