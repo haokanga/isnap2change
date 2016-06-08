@@ -2,7 +2,7 @@
     session_start();
     require_once("../connection.php");
     require_once("../debug.php");
-    require_once("../get-quiz-score.php");	      
+    require_once("../mysql-lib.php");	      
     $conn = db_connect();
     echo '###########################<br>';
     echo 'UNIT TEST<br>';
