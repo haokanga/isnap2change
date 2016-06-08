@@ -71,8 +71,9 @@
     } 
     
     function getStudentScore($studentID){
-        $conn = db_connect();         
+        $conn = db_connect();            
         $score = 0;
+        
         $quizSql = "SELECT * FROM Quiz NATURAL JOIN Quiz_Record WHERE StudentID = ? AND `Status`='GRADED'";
         $quizQuery = $conn->prepare($quizSql);
         $quizQuery->execute(array($studentID));
@@ -80,7 +81,20 @@
         for($i=0; $i<count($quizResult);$i++){
             $score+= getStuQuizScore($quizResult[$i]->QuizID, $studentID);
         }
+        
         db_close($conn); 
         return $score;
     } 
+    
+    function updateStudentScore($studentID){
+        $conn = db_connect();         
+        
+        $update_stmt = "UPDATE Student 
+                SET Score = ?
+                WHERE StudentID = ?";			
+        $update_stmt = $conn->prepare($update_stmt);         
+        $update_stmt->execute(array(getStudentScore($studentID), $studentID)); 
+        
+        db_close($conn); 
+    }
 ?>

@@ -30,6 +30,15 @@
     echo 'getStudentScore($studentID)<br>';
     for($i=-1;$i<10;$i++){
         echo "getStudentScore($i) ".getStudentScore($i)."<br>";   
+    }
+
+    echo '###########################<br>';
+    echo 'UNIT TEST<br>';
+    echo '###########################<br>';
+    echo 'updateStudentScore($studentID)<br>';
+    for($i=-1;$i<10;$i++){
+        echo "updateStudentScore($i) ".updateStudentScore($i)."<br>";  
+        echo getStudentScore($i),"<br>";
     }	
     db_close($conn); 
     
