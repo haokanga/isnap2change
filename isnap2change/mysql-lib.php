@@ -82,15 +82,13 @@
         return $score;
     } 
     
-    function updateStudentScore($studentID){
-        $conn = db_connect();         
+    function updateStudentScore($conn, $studentID){
         
         $update_stmt = "UPDATE Student 
                 SET Score = ?
                 WHERE StudentID = ?";			
         $update_stmt = $conn->prepare($update_stmt);         
-        $update_stmt->execute(array(getStudentScore($studentID), $studentID)); 
+        $update_stmt->execute(array(getStudentScore($studentID), $studentID));
         
-        db_close($conn); 
     }
 ?>

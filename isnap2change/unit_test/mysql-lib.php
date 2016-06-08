@@ -37,7 +37,7 @@
     echo '###########################<br>';
     echo 'updateStudentScore($studentID)<br>';
     for($i=-1;$i<10;$i++){
-        echo "updateStudentScore($i) ".updateStudentScore($i)."<br>";  
+        echo "updateStudentScore($i) ".updateStudentScore($conn, $i)."<br>";  
         echo getStudentScore($i),"<br>";
     }	
     db_close($conn); 
