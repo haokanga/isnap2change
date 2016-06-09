@@ -44,7 +44,7 @@
                         $update_stmt->execute(array($content, $optionID)); 
                         
                         $conn->commit();                    
-                    } catch(Exception $e) {
+                    } catch(PDOException $e) {
                         debug_pdo_err($overviewName, $e);
                         $conn->rollback();
                     } 
@@ -79,7 +79,7 @@
         $optionQuery->execute(array($_GET['mcqid']));
         $optionResult = $optionQuery->fetchAll(PDO::FETCH_OBJ);    
     
-    } catch(Exception $e) {
+    } catch(PDOException $e) {
         debug_pdo_err($overviewName, $e);
     }
     

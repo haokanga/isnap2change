@@ -61,7 +61,7 @@
         $classNumQuery = $conn->prepare($classNumSql);
         $classNumQuery->execute();
         $classNumResult = $classNumQuery->fetchAll(PDO::FETCH_OBJ);
-    } catch(Exception $e) {
+    } catch(PDOException $e) {
         debug_pdo_err($overviewName, $e);
     } 
     

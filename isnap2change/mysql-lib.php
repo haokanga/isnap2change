@@ -5,7 +5,7 @@
         $conn = db_connect(); 
         $score = 0;
         
-        $quizTypeSql = "SELECT * FROM Quiz NATURAL JOIN Quiz_Record WHERE QuizID = ? AND StudentID = ? AND `Status`='GRADED'";
+        $quizTypeSql = "SELECT COUNT(*) FROM Quiz NATURAL JOIN Quiz_Record WHERE QuizID = ? AND StudentID = ? AND `Status`='GRADED'";
         $quizTypeQuery = $conn->prepare($quizTypeSql);
         $quizTypeQuery->execute(array($quizID, $studentID));
         if($quizTypeQuery->fetchColumn() > 0){            
@@ -41,7 +41,7 @@
         $conn = db_connect();
         $points = 0;        
         
-        $quizTypeSql = "SELECT QuizType FROM Quiz WHERE QuizID = ?";
+        $quizTypeSql = "SELECT COUNT(*) FROM Quiz WHERE QuizID = ?";
         $quizTypeQuery = $conn->prepare($quizTypeSql);
         $quizTypeQuery->execute(array($quizID));       
         if($quizTypeQuery->fetchColumn() > 0){
@@ -52,27 +52,24 @@
             $quizType = $quizTypeResult->QuizType;
             
             if(in_array($quizType, $pointsBySection)){
-                $pointsSql = "SELECT * FROM Quiz NATURAL JOIN ".$quizType."_Section WHERE QuizID = ?";
-                $pointsQuery = $conn->prepare($pointsSql);
-                $pointsQuery->execute(array($quizID));
-                $pointsResult = $pointsQuery->fetch(PDO::FETCH_OBJ);
-                $points = $pointsResult->Points;
+                $pointsSql = "SELECT Points AS SumPoints FROM Quiz NATURAL JOIN ".$quizType."_Section WHERE QuizID = ?";
             } else if(in_array($quizType, $pointsByQuestion)){
                 $pointsSql = "SELECT SUM(Points) AS SumPoints FROM Quiz NATURAL JOIN SAQ_Section NATURAL JOIN SAQ_Question WHERE QuizID = ?";
-                $pointsQuery = $conn->prepare($pointsSql);
-                $pointsQuery->execute(array($quizID));
-                $pointsResult = $pointsQuery->fetch(PDO::FETCH_OBJ);
-                $points = $pointsResult->SumPoints;
             }
+            $pointsQuery = $conn->prepare($pointsSql);
+            $pointsQuery->execute(array($quizID));
+            $pointsResult = $pointsQuery->fetch(PDO::FETCH_OBJ);
+            $points = $pointsResult->SumPoints;
         }
         
         db_close($conn); 
         return $points;
     } 
     
-    function getStudentScore($studentID){
-        $conn = db_connect();         
+    function calculateStudentScore($studentID){
+        $conn = db_connect();            
         $score = 0;
+        
         $quizSql = "SELECT * FROM Quiz NATURAL JOIN Quiz_Record WHERE StudentID = ? AND `Status`='GRADED'";
         $quizQuery = $conn->prepare($quizSql);
         $quizQuery->execute(array($studentID));
@@ -80,7 +77,35 @@
         for($i=0; $i<count($quizResult);$i++){
             $score+= getStuQuizScore($quizResult[$i]->QuizID, $studentID);
         }
+        
         db_close($conn); 
         return $score;
     } 
+    
+    function getStudentScore($studentID){
+        $conn = db_connect();
+        $score = 0;
+        
+        $scoreSql = "SELECT COUNT(*) FROM Student WHERE StudentID = ? ";
+        $scoreQuery = $conn->prepare($scoreSql);
+        $scoreQuery->execute(array($studentID));
+        if($scoreQuery->fetchColumn() > 0){
+            $scoreSql = "SELECT * FROM Student WHERE StudentID = ? ";
+            $scoreQuery = $conn->prepare($scoreSql);
+            $scoreQuery->execute(array($studentID));
+            $scoreResult = $scoreQuery->fetch(PDO::FETCH_OBJ);
+            $score = $scoreResult->Score;
+        }
+        
+        db_close($conn); 
+        return $score;
+    }
+    
+    function setStudentScore($conn, $studentID){        
+        $update_stmt = "UPDATE Student 
+                SET Score = ?
+                WHERE StudentID = ?";			
+        $update_stmt = $conn->prepare($update_stmt);         
+        $update_stmt->execute(array(calculateStudentScore($studentID), $studentID));        
+    }
 ?>

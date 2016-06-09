@@ -133,7 +133,7 @@
         $studentNumQuery = $conn->prepare($studentNumSql);
         $studentNumQuery->execute();
         $studentNumResult = $studentNumQuery->fetchAll(PDO::FETCH_OBJ);
-    } catch(Exception $e) {
+    } catch(PDOException $e) {
         debug_pdo_err($overviewName, $e);
     }
     

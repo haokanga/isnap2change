@@ -19,8 +19,9 @@
         } 
         // unclassfied error occurred
         else {          
-            debug_err("Unexpected MySQL Error occurred in ".$pageName.". Contact with developers.");        
-            echo $e->getMessage();
+            //debug_err("Unexpected MySQL Error occurred in ".$pageName.". Contact with developers.");        
+            //sql insert.. 
+            //Logger.write($pagename, $getMessage);
         }
     }
 ?>

@@ -27,10 +27,60 @@
     echo '###########################<br>';
     echo 'UNIT TEST<br>';
     echo '###########################<br>';
-    echo 'getStudentScore($studentID)<br>';
+    echo 'calculateStudentScore($studentID)<br>';
     for($i=-1;$i<10;$i++){
-        echo "getStudentScore($i) ".getStudentScore($i)."<br>";   
+        echo "calculateStudentScore($i) ".calculateStudentScore($i)."<br>";   
+    }
+
+    echo '###########################<br>';
+    echo 'UNIT TEST<br>';
+    echo '###########################<br>';
+    echo 'setStudentScore($studentID)<br>';
+    for($i=-1;$i<10;$i++){
+        echo "setStudentScore($i) ".setStudentScore($conn, $i)."<br>";  
+        echo getStudentScore($i),"<br>";
     }	
+    
+    echo '###########################<br>';
+    echo 'UNIT TEST<br>';
+    echo '###########################<br>';
+    echo 'beginTransaction()<br>';
+    echo 'getStudentScore(1) '.getStudentScore(1).'<br>';
+    try{
+        $studentID = 1;
+        $conn->beginTransaction();              
+        $make_err = true;
+        
+        $update_stmt = "UPDATE Student 
+                SET Score = ?
+                WHERE StudentID = ?";			
+        $update_stmt = $conn->prepare($update_stmt);         
+        $update_stmt->execute(array(100, $studentID)); 
+        echo 'getStudentScore(1) '.getStudentScore(1).'<br>';
+        
+        if($make_err){
+            $overviewName = 'mysql-lib';
+            $schoolName = 'Sample School';                 
+            $update_stmt = "INSERT INTO School(SchoolName)
+             VALUES (?);";			
+            $update_stmt = $conn->prepare($update_stmt);                
+            $update_stmt->execute(array($schoolName));
+        }    
+        $update_stmt = "UPDATE Student 
+                SET Score = ?
+                WHERE StudentID = ?";			
+        $update_stmt = $conn->prepare($update_stmt);         
+        $update_stmt->execute(array(1000, $studentID));          
+        echo 'getStudentScore(1) '.getStudentScore(1).'<br>';
+        
+        $conn->commit();                    
+    } catch(PDOException $e) {
+        debug_pdo_err($overviewName, $e);
+        $conn->rollback();
+    } 
+    echo 'getStudentScore(1) '.getStudentScore(1).'<br>';
+    
     db_close($conn); 
+    
     
 ?>

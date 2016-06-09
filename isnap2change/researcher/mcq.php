@@ -46,7 +46,7 @@
                         $update_stmt->execute(array($content, $quizID)); 
                         
                         $conn->commit();                    
-                    } catch(Exception $e) {
+                    } catch(PDOException $e) {
                         debug_pdo_err($overviewName, $e);
                         $conn->rollback();
                     } 
@@ -78,7 +78,7 @@
         $topicQuery = $conn->prepare($topicSql);
         $topicQuery->execute(array());
         $topicResult = $topicQuery->fetchAll(PDO::FETCH_OBJ);    
-    } catch(Exception $e) {
+    } catch(PDOException $e) {
         debug_pdo_err($overviewName, $e);
     }
     
