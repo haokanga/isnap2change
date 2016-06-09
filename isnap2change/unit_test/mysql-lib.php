@@ -7,19 +7,19 @@
     echo '###########################<br>';
     echo 'UNIT TEST<br>';
     echo '###########################<br>';
-    echo 'getStuQuizScore($quizID,$studentID)<br>';
+    echo 'getStuQuizScore(\$conn, $quizID, $studentID)<br>';
     for($i=-1;$i<10;$i++){
         for($j=-1;$j<10;$j++){
-            echo "getStuQuizScore($i,$j) ".getStuQuizScore($i,$j)."<br>";   
+            echo "getStuQuizScore(\$conn, $i, $j) ".getStuQuizScore($conn, $i, $j)."<br>";   
         }
     }	
     
     echo '###########################<br>';
     echo 'UNIT TEST<br>';
     echo '###########################<br>';
-    echo 'getQuizPoints($quizID)<br>';
+    echo 'getQuizPoints(\$conn, $quizID)<br>';
     for($i=-1;$i<10;$i++){
-        echo "getQuizPoints($i) ".getQuizPoints($i)."<br>";   
+        echo "getQuizPoints(\$conn, $i) ".getQuizPoints($conn, $i)."<br>";   
     }	
     
     
@@ -27,9 +27,9 @@
     echo '###########################<br>';
     echo 'UNIT TEST<br>';
     echo '###########################<br>';
-    echo 'calculateStudentScore($studentID)<br>';
+    echo 'calculateStudentScore(\$conn, $studentID)<br>';
     for($i=-1;$i<10;$i++){
-        echo "calculateStudentScore($i) ".calculateStudentScore($i)."<br>";   
+        echo "calculateStudentScore(\$conn, $i) ".calculateStudentScore($conn, $i)."<br>";   
     }
 
     echo '###########################<br>';
@@ -37,26 +37,26 @@
     echo '###########################<br>';
     echo 'setStudentScore($studentID)<br>';
     for($i=-1;$i<10;$i++){
-        echo "setStudentScore($i) ".setStudentScore($conn, $i)."<br>";  
-        echo getStudentScore($i),"<br>";
+        echo "setStudentScore(\$conn, $i) ".setStudentScore($conn, $i)."<br>";  
+        echo getStudentScore($conn, $i),"<br>";
     }	
     
     echo '###########################<br>';
     echo 'UNIT TEST<br>';
     echo '###########################<br>';
     echo 'beginTransaction()<br>';
-    echo 'getStudentScore(1) '.getStudentScore(1).'<br>';
+    echo 'getStudentScore(\$conn, 1) '.getStudentScore($conn, 1).'<br>';
     try{
         $studentID = 1;
         $conn->beginTransaction();              
-        $make_err = true;
+        $make_err = false;
         
         $update_stmt = "UPDATE Student 
                 SET Score = ?
                 WHERE StudentID = ?";			
         $update_stmt = $conn->prepare($update_stmt);         
         $update_stmt->execute(array(100, $studentID)); 
-        echo 'getStudentScore(1) '.getStudentScore(1).'<br>';
+        echo 'getStudentScore(\$conn, 1) '.getStudentScore($conn, 1).'<br>';
         
         if($make_err){
             $overviewName = 'mysql-lib';
@@ -71,14 +71,14 @@
                 WHERE StudentID = ?";			
         $update_stmt = $conn->prepare($update_stmt);         
         $update_stmt->execute(array(1000, $studentID));          
-        echo 'getStudentScore(1) '.getStudentScore(1).'<br>';
+        echo 'getStudentScore(\$conn, 1) '.getStudentScore($conn, 1).'<br>';
         
         $conn->commit();                    
     } catch(PDOException $e) {
         debug_pdo_err($overviewName, $e);
         $conn->rollback();
     } 
-    echo 'getStudentScore(1) '.getStudentScore(1).'<br>';
+    echo 'getStudentScore(\$conn, 1) '.getStudentScore($conn, 1).'<br>';
     
     db_close($conn); 
     
