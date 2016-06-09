@@ -7,13 +7,13 @@
     require_once("../mysql-lib.php");
     require_once("../debug.php");
     require_once("/researcher-validation.php");
-    	    
-    $conn = db_connect();
     $pageName = "quiz";
-    $columnName = array('QuizID','Week','QuizType','TopicName','Points');    
-    //add/edit/delete quiz
+    $columnName = array('QuizID','Week','QuizType','TopicName','Points');
+    // list all editable quiz types    
+    $quizTypeArray = array('MCQ','SAQ','Matching','Poster');
     
-    try{
+    try{   	    
+        $conn = db_connect();
         if($_SERVER["REQUEST_METHOD"] == "POST"){
             if(isset($_POST['update'])){                          
                 $update = $_POST['update'];
@@ -22,34 +22,21 @@
                         $week = $_POST['week'];
                         $quizType = $_POST['quiztype'];
                         $topicName = $_POST['topicname'];
+                        
                         $conn->beginTransaction();              
                         
-                        //get topicID
-                        $topicSql = "SELECT TopicID
-                                   FROM Topic WHERE TopicName = ?";
-                        $topicQuery = $conn->prepare($topicSql);
-                        $topicQuery->execute(array($topicName));
-                        $topicResult = $topicQuery->fetch(PDO::FETCH_OBJ);
-                        //insert quiz
-                        $updateSql = "INSERT INTO Quiz(Week, QuizType, TopicID)
-                             VALUES (?,?,?);";			
-                        $updateSql = $conn->prepare($updateSql);         
-                        $updateSql->execute(array($week, $quizType, $topicResult->TopicID));                     
-                        $quizID = $conn->lastInsertId(); 
+                        //insert and get topicID
+                        $topicResult = getTopicByName($conn, $topicName);                        
+                        $quizID = createQuiz($conn, $week, $quizType, $topicResult->TopicID);
                         //if MCQ, insert MCQ_Section
                         if($quizType=='MCQ'){                        
                             $points = 0;
                             $questionnaires = 0;
-                            $updateSql = "INSERT INTO MCQ_Section(QuizID, Points, Questionnaires)
-                                        VALUES (?,?,?);";			
-                            $updateSql = $conn->prepare($updateSql);                            
-                            $updateSql->execute(array($quizID, $points, $questionnaires)); 
-                        }                    
-                        //init empty Learning Material
-                        $content='<p>Learning materials for this quiz has not been added.</p>';
-                        $updateSql = "INSERT INTO Learning_Material(Content,QuizID) VALUES (?,?);";
-                        $updateSql = $conn->prepare($updateSql);                            
-                        $updateSql->execute(array($content, $quizID)); 
+                            createMCQSection($conn, $quizID, $points, $questionnaires);
+                        } else {
+                            /* TODO */
+                        }     
+                        createEmptyLearningMaterial($conn, $quizID);
                         
                         $conn->commit();                    
                     } catch(PDOException $e) {
@@ -57,44 +44,27 @@
                         $conn->rollback();
                     }                
                 }
-                else if($update == -1){  
+                else if($update == -1){                      
                     $quizID = $_POST['quizid'];
-                    $updateSql = "DELETE FROM Quiz WHERE QuizID = ?";			
-                    $updateSql = $conn->prepare($updateSql);
-                    if(! $updateSql->execute(array($quizID))){
-                        echo "<script language=\"javascript\">  alert(\"Error occurred to delete quiz. Contact with developers.\"); </script>";
-                    } else{
-                    } 
+                    deleteQuiz($conn, $quizID);
                 }            
             }
-        }
-        
-        // get quiz and topic
-        if(isset($_GET['week'])){
-            $quizSql = "SELECT QuizID, Week, QuizType, TopicName
-                   FROM Quiz NATURAL JOIN Topic WHERE Week = ?";
-            $quizQuery = $conn->prepare($quizSql);
-            $quizQuery->execute(array($_GET['week']));
-            $quizResult = $quizQuery->fetchAll(PDO::FETCH_OBJ);
-        }else{
-            $quizSql = "SELECT QuizID, Week, QuizType, TopicName
-                   FROM Quiz NATURAL JOIN Topic";
-            $quizQuery = $conn->prepare($quizSql);
-            $quizQuery->execute();
-            $quizResult = $quizQuery->fetchAll(PDO::FETCH_OBJ);
-        }
-        
-        // list all editable quiz types    
-        $quizTypeArray = array('MCQ','SAQ','Matching','Poster');
-        
-        //get topic list
-        $topicSql = "SELECT TopicID, TopicName FROM Topic ORDER BY TopicID";
-        $topicQuery = $conn->prepare($topicSql);
-        $topicQuery->execute(array());
-        $topicResult = $topicQuery->fetchAll(PDO::FETCH_OBJ);  
+        } 
     } catch(PDOException $e) {
         debug_pdo_err($pageName, $e);
     }     
+    
+    
+    try{    
+        if(isset($_GET['week'])){
+            $quizResult = getQuizzesByWeek($conn, $_GET['week']);
+        }else{
+            $quizResult = getQuizzes($conn);
+        } 
+        $topicResult = getTopics($conn); 
+    } catch(PDOException $e) {
+        debug_pdo_err($pageName, $e);
+    }  
     
     db_close($conn);      
     

@@ -1,6 +1,6 @@
-Backend rearrange:
-Finished: school class week
-student
-TODO: learning-material-editor.php mcq mcq-editor option-editor quiz
+Backend rearrange mysql-lib.php:
+Finished: school class week student quiz mcq mcq-editor
+
+TODO: learning-material-editor.php option-editor 
 
 TODO: index

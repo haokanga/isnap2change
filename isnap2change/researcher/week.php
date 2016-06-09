@@ -19,7 +19,7 @@
     
     try{        
         $weekResult = getQuizNum($conn);
-        $weekNumResult = getWeekNum($conn);    
+        $weekNumResult = getMaxWeek($conn);    
     } catch(PDOException $e) {
         debug_pdo_err($pageName, $e);
     }

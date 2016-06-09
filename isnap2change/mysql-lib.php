@@ -219,7 +219,7 @@
         return $updateSql;
     }
     
-    function getWeekNum($conn){
+    function getMaxWeek($conn){
         $weekSql = "select MAX(Week) as WeekNum from Quiz";
         $weekQuery = $conn->prepare($weekSql);
         $weekQuery->execute();
@@ -227,6 +227,29 @@
         return $weekResult;
     }
     /* Week */
+       
+    /* Quiz */
+    function createQuiz($conn, $week, $quizType, $topicID){
+        $updateSql = "INSERT INTO Quiz(Week, QuizType, TopicID)
+             VALUES (?,?,?);";			
+        $updateSql = $conn->prepare($updateSql);         
+        $updateSql->execute(array($week, $quizType, $topicID));                     
+        return $conn->lastInsertId(); 
+    }
+    
+    function updateQuiz($conn, $quizID, $topicID, $week){
+        $updateSql = "UPDATE Quiz 
+                SET Week = ?, TopicID = ?
+                WHERE QuizID = ?";			
+        $updateSql = $conn->prepare($updateSql);         
+        $updateSql->execute(array($week, $topicID, $quizID)); 
+    }
+    
+    function deleteQuiz($conn, $quizID){
+        $updateSql = "DELETE FROM Quiz WHERE QuizID = ?";			
+        $updateSql = $conn->prepare($updateSql);
+        $updateSql->execute(array($quizID));
+    }
     
     function getStuQuizScore($conn, $quizID, $studentID){
         $pointsBySection = array('MCQ', 'Matching', 'Poster', 'Misc');
@@ -260,9 +283,8 @@
         }  
         
         return $score;
-    }    
+    } 
     
-    /* Quiz */
     function getQuizNum($conn){
         $weekSql = "SELECT Week, COUNT(*) AS QuizNum FROM Quiz GROUP BY Week";
         $weekQuery = $conn->prepare($weekSql);
@@ -271,8 +293,23 @@
         return $weekResult;
     }
     
+    function getQuizzes($conn){
+        $quizSql = "SELECT QuizID, Week, QuizType, TopicName
+                   FROM Quiz NATURAL JOIN Topic";
+        $quizQuery = $conn->prepare($quizSql);
+        $quizQuery->execute();
+        $quizResult = $quizQuery->fetchAll(PDO::FETCH_OBJ);
+        return $quizResult;
+    }
     
-    /* Quiz */
+    function getQuizzesByWeek($conn, $week){
+        $quizSql = "SELECT QuizID, Week, QuizType, TopicName
+                   FROM Quiz NATURAL JOIN Topic WHERE Week = ?";
+        $quizQuery = $conn->prepare($quizSql);
+        $quizQuery->execute(array($week));
+        $quizResult = $quizQuery->fetchAll(PDO::FETCH_OBJ);
+        return $quizResult;
+    }
     
     function getQuizPoints($conn, $quizID){
         $pointsBySection = array('MCQ', 'Matching', 'Poster', 'Misc');
@@ -301,7 +338,122 @@
         }
         
         return $points;
-    } 
+    }           
+    /* Quiz */
+    
+    /* Topic */    
+    function getTopic($conn, $topicID){
+        $topicSql = "SELECT * FROM Topic WHERE TopicID = ?";
+        $topicQuery = $conn->prepare($topicSql);
+        $topicQuery->execute(array($topicID));
+        $topicResult = $topicQuery->fetch(PDO::FETCH_OBJ);
+        return $topicResult;
+    }
+
+    function getTopicByName($conn, $topicName){
+        $topicSql = "SELECT * FROM Topic WHERE TopicName = ?";
+        $topicQuery = $conn->prepare($topicSql);
+        $topicQuery->execute(array($topicName));
+        $topicResult = $topicQuery->fetch(PDO::FETCH_OBJ);
+        return $topicResult;
+    }
+    
+    function getTopics($conn){
+        $topicSql = "SELECT * FROM Topic ORDER BY TopicID";
+        $topicQuery = $conn->prepare($topicSql);
+        $topicQuery->execute(array());
+        $topicResult = $topicQuery->fetchAll(PDO::FETCH_OBJ); 
+        return $topicResult;
+    }
+    /* Topic */
+    
+    /* MCQ */
+    
+    function createMCQSection($conn, $quizID, $points, $questionnaires){
+        $updateSql = "INSERT INTO MCQ_Section(QuizID, Points, Questionnaires)
+                    VALUES (?,?,?);";			
+        $updateSql = $conn->prepare($updateSql);                            
+        $updateSql->execute(array($quizID, $points, $questionnaires)); 
+    }
+    
+    function updateMCQSection($conn, $quizID, $points, $questionnaires){
+        $updateSql = "UPDATE MCQ_Section
+                    SET Points = ?, Questionnaires = ?
+                    WHERE QuizID = ?;";			
+        $updateSql = $conn->prepare($updateSql);                            
+        $updateSql->execute(array($points, $questionnaires, $quizID));
+    }
+    
+    function getMCQQuiz($conn, $quizID){
+        $quizSql = "SELECT QuizID, Week, TopicName, Points, Questionnaires, COUNT(MCQID) AS Questions
+                   FROM Quiz NATURAL JOIN Topic NATURAL JOIN MCQ_Section LEFT JOIN MCQ_Question USING (QuizID) WHERE QuizID = ? GROUP BY QuizID";
+        $quizQuery = $conn->prepare($quizSql);
+        $quizQuery->execute(array($quizID));
+        $quizResult = $quizQuery->fetch(PDO::FETCH_OBJ);
+        return $quizResult;
+    }
+    
+    function getMCQQuizzes($conn){
+        $quizSql = "SELECT QuizID, Week, TopicName, Points, Questionnaires, COUNT(MCQID) AS Questions
+                   FROM Quiz NATURAL JOIN Topic NATURAL JOIN MCQ_Section LEFT JOIN MCQ_Question USING (QuizID) WHERE QuizType = 'MCQ' GROUP BY QuizID";
+        $quizQuery = $conn->prepare($quizSql);
+        $quizQuery->execute();
+        $quizResult = $quizQuery->fetchAll(PDO::FETCH_OBJ); 
+        return $quizResult;
+    }    
+    /* MCQ */
+    
+    /* Option */
+    function getOptions($conn, $quizID){
+        $mcqQuesSql = "SELECT MCQID, Question, CorrectChoice, Content, Explanation
+                   FROM   MCQ_Section NATURAL JOIN MCQ_Question
+                                  NATURAL JOIN `Option`
+                   WHERE  QuizID = ?
+                   ORDER BY MCQID";                                
+        $mcqQuesQuery = $conn->prepare($mcqQuesSql);
+        $mcqQuesQuery->execute(array($quizID));
+        $mcqQuesResult = $mcqQuesQuery->fetchAll(PDO::FETCH_OBJ); 
+        return $mcqQuesResult;
+    }
+    
+    function getMaxOptionNum($conn, $quizID){
+        $optionNumSql = "SELECT MAX(OptionNum) AS MaxOptionNum FROM (SELECT COUNT(*) AS OptionNum FROM MCQ_Question natural JOIN `Option` WHERE QuizID = ? GROUP BY MCQID) AS OptionNumbTable;";								
+        $optionNumQuery = $conn->prepare($optionNumSql);
+        $optionNumQuery->execute(array($quizID));
+        $optionNumResult = $optionNumQuery->fetch(PDO::FETCH_OBJ);
+        return $optionNumResult;
+    }
+    /* Option */
+    
+    /* Learning_Material */
+    function createEmptyLearningMaterial($conn, $quizID){
+        $content='<p>Learning materials for this quiz has not been added.</p>';
+        $updateSql = "INSERT INTO Learning_Material(Content,QuizID) VALUES (?,?);";
+        $updateSql = $conn->prepare($updateSql);                            
+        $updateSql->execute(array($content, $quizID));
+    }
+    
+    function getLearningMaterial($conn, $quizID){
+        $materialPreSql = "SELECT COUNT(*) 
+                       FROM   Learning_Material
+                       WHERE  QuizID = ?";							
+        $materialPreQuery = $conn->prepare($materialPreSql);
+        $materialPreQuery->execute(array($quizID));                
+        if($materialPreQuery->fetchColumn() != 1){
+                    
+        }                
+        $materialSql = "SELECT Content, TopicName 
+                        FROM   Learning_Material NATURAL JOIN Quiz
+                                                 NATURAL JOIN Topic
+                        WHERE  QuizID = ?";
+                                
+        $materialQuery = $conn->prepare($materialSql);
+        $materialQuery->execute(array($quizID));
+        $materialRes = $materialQuery->fetch(PDO::FETCH_OBJ);
+        return $materialRes;
+    }
+    /* Learning_Material */
+    
     
     function calculateStudentScore($conn, $studentID){
         $score = 0;

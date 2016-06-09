@@ -3,24 +3,29 @@
     require_once("../mysql-lib.php");
     require_once("../debug.php");
     require_once("/researcher-validation.php");
-    $conn = db_connect();    
+    $pageName = "student"; 
     $columnName = array('StudentID','ClassName','Username','FirstName','LastName','Email','Gender','DOB','Score','SubmissionDate');
     
-    if($_SERVER["REQUEST_METHOD"] == "POST"){
-        if(isset($_POST['update'])){                          
-            $update = $_POST['update'];
-            //reset student password
-            if($update == 0){                
-                $studentID = $_POST['studentid'];        
-                resetPassword($conn, $studentID);
+    try{  
+        $conn = db_connect();   
+        if($_SERVER["REQUEST_METHOD"] == "POST"){
+            if(isset($_POST['update'])){                          
+                $update = $_POST['update'];
+                //reset student password
+                if($update == 0){                
+                    $studentID = $_POST['studentid'];        
+                    resetPassword($conn, $studentID);
+                }
+                //delete student (with help of DELETE CASCADE)            
+                else if($update == -1){                
+                    $studentID = $_POST['studentid'];
+                    deleteStudent($conn, $studentID);
+                }            
             }
-            //delete student (with help of DELETE CASCADE)            
-            else if($update == -1){                
-                $studentID = $_POST['studentid'];
-                deleteStudent($conn, $studentID);
-            }            
-        }
-    }  
+        }  
+    } catch(PDOException $e) {
+        debug_pdo_err($pageName, $e);
+    }
     
     try{  
         $studentResult = getStudents($conn);  

@@ -46,7 +46,7 @@
     }    
     
     try{     
-        $weekResult = getWeekNum($conn);
+        $weekResult = getMaxWeek($conn);
         $schoolResult = getSchools($conn);
         $classResult = getClasses($conn);
         $tokenResult = getTokens($conn);
