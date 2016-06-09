@@ -245,4 +245,12 @@
         $updateSql = $conn->prepare($updateSql);         
         $updateSql->execute(array(calculateStudentScore($conn, $studentID), $studentID));        
     }
+	
+	function updateQuizRecord($conn, $quizID, $studentID, $status){
+		$updateQuizRecordSql = "INSERT INTO Quiz_Record(QuizID, StudentID, Status)
+							    VALUES (?,?,?) ON DUPLICATE KEY UPDATE Status = ?;";			
+		
+		$updateQuizRecordQuery = $conn->prepare($updateQuizRecordSql);                            
+		$updateQuizRecordQuery->execute(array($quizid, $studentid, $status, $status));
+	}
 ?>
