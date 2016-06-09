@@ -44,13 +44,7 @@
 			$conn->beginTransaction();
 			
 			//UPDATE Quiz_Record	
-			$status = "GRADED";
-			
-			$costCalSubmitSql = "INSERT INTO Quiz_Record(QuizID, StudentID, Status)
-								 VALUES (?,?,?) ON DUPLICATE KEY UPDATE Status = ?;";			
-		
-			$costCalSubmitQuery = $conn->prepare($costCalSubmitSql);                            
-			$costCalSubmitQuery->execute(array($quizid, $studentid, $status, $status));
+			updateQuizRecord($conn, $quizID, $studentID, "GRADED");
 			
 			//UPDATE Student Score
 			setStudentScore($conn, $studentid);
