@@ -60,7 +60,7 @@
     }
 
     
-    
+    /*
     echo '###########################<br>';
     echo 'UNIT TEST<br>';
     echo '###########################<br>';
@@ -99,6 +99,26 @@
         $conn->rollback();
     } 
     echo 'getStudentScore(\$conn, 1) '.getStudentScore($conn, 1).'<br>';
+    */
+    
+    function generateRandomString($length = 10) {
+    $characters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+    $charactersLength = strlen($characters);
+    $randomString = '';
+    for ($i = 0; $i < $length; $i++) {
+        $randomString .= $characters[rand(0, $charactersLength - 1)];
+    }
+    return $randomString;
+}
+    
+    echo '###########################<br>';
+    echo 'UNIT TEST<br>';
+    echo '###########################<br>';
+    echo 'createClass(\$conn, \$schoolID, \$className)<br>';
+    for($i=-1;$i<10;$i++){
+        echo "createClass(\$conn, \$schoolID, \$className)".createClass($conn, 1, generateRandomString())."<br>";
+    }
+    
     
     db_close($conn); 
     

@@ -5,7 +5,7 @@
     { 
         session_start(); 
     }    
-	require_once('connection.php');
+	require_once('mysql-lib.php');
     require_once('retrieve-stored-score.php');
     if ($_SERVER["REQUEST_METHOD"] == "GET") {
         if(isset($_GET["score"]) && isset($_GET["gameid"])){

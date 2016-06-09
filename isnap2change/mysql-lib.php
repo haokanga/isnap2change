@@ -35,6 +35,37 @@
     /* db connection*/
          
     /* School */
+    function createSchool($conn, $schoolName){                
+        $updateSql = "INSERT INTO School(SchoolName)
+         VALUES (?);";			
+        $updateSql = $conn->prepare($updateSql);                
+        $updateSql->execute(array($schoolName));
+    }
+    
+    function updateSchool($conn, $schoolID, $schoolName){
+        $updateSql = "UPDATE School 
+            SET SchoolName = ?
+            WHERE SchoolID = ?";			
+        $updateSql = $conn->prepare($updateSql);                            
+        $updateSql->execute(array($schoolName, $schoolID));
+    }
+    
+    function deleteSchool($conn, $schoolID){
+        $updateSql = "DELETE FROM School WHERE SchoolID = ?";			
+        $updateSql = $conn->prepare($updateSql);
+        $updateSql->execute(array($schoolID));
+    }
+
+    
+    function getSchool($conn, $schoolName){
+        $schoolSql = "SELECT SchoolID
+                   FROM School WHERE SchoolName = ?";
+        $schoolQuery = $conn->prepare($schoolSql);
+        $schoolQuery->execute(array($schoolName));
+        $schoolResult = $schoolQuery->fetch(PDO::FETCH_OBJ);
+        return $schoolResult;
+    }
+    
     function getSchools($conn){
         $schoolSql = "SELECT SchoolID, SchoolName
                    FROM School";
@@ -42,6 +73,47 @@
         $schoolQuery->execute();
         $schoolResult = $schoolQuery->fetchAll(PDO::FETCH_OBJ);
         return $schoolResult;
+    }
+    /* School */    
+    
+    /* Class */
+    function createClass($conn, $schoolID, $className){                
+        $updateSql = "INSERT INTO Class(ClassName, SchoolID)
+             VALUES (?,?)";			
+        $updateSql = $conn->prepare($updateSql);         
+        $updateSql->execute(array($className, $schoolID));
+        return $conn->lastInsertId();
+    }
+    
+    function updateClass($conn, $classID, $schoolID, $className){
+         $updateSql = "UPDATE Class 
+            SET ClassName = ?, SchoolID = ?
+            WHERE ClassID = ?";			
+        $updateSql = $conn->prepare($updateSql);                            
+        $updateSql->execute(array($className, $schoolID, $classID));
+    }
+    
+    function updateToken($conn, $classID, $type, $tokenString){
+        $updateSql = "INSERT INTO Token(ClassID, `Type`, TokenString)
+                                    VALUES (?,?,?) ON DUPLICATE KEY UPDATE TokenString = ?";			
+        $updateSql = $conn->prepare($updateSql);                            
+        $updateSql->execute(array($classID, $type, $tokenString, $tokenString));
+    }
+    
+    function deleteClass($conn, $classID){
+        $updateSql = "DELETE FROM Class WHERE ClassID = ?";			
+        $updateSql = $conn->prepare($updateSql);
+        $updateSql->execute(array($classID));
+    }
+
+    
+    function getClass($conn, $className){
+        $classSql = "SELECT ClassID
+                   FROM Class WHERE ClassName = ?";
+        $classQuery = $conn->prepare($classSql);
+        $classQuery->execute(array($className));
+        $classResult = $classQuery->fetch(PDO::FETCH_OBJ);
+        return $classResult;
     }
     
     function getClassNum($conn){
@@ -54,28 +126,6 @@
         return $classNumResult;
     }
     
-    function updateSchool($conn, $schoolName, $schoolID){
-        $updateSql = "UPDATE School 
-            SET SchoolName = ?
-            WHERE SchoolID = ?";			
-        $updateSql = $conn->prepare($updateSql);                            
-        $updateSql->execute(array($schoolName, $schoolID));
-    }
-    
-    function createSchool($conn, $schoolName){                
-        $updateSql = "INSERT INTO School(SchoolName)
-         VALUES (?);";			
-        $updateSql = $conn->prepare($updateSql);                
-        $updateSql->execute(array($schoolName));
-    }
-    
-    function deleteSchool($conn, $schoolID){
-        $updateSql = "DELETE FROM School WHERE SchoolID = ?";			
-        $updateSql = $conn->prepare($updateSql);
-        $updateSql->execute(array($schoolID));
-    }   
-    /* School */    
-    
     function getClasses($conn){
         $classSql = "SELECT ClassID, ClassName, SchoolName
                    FROM Class NATURAL JOIN School";
@@ -83,7 +133,15 @@
         $classQuery->execute();
         $classResult = $classQuery->fetchAll(PDO::FETCH_OBJ);
         return $classResult;
-    }
+    }    
+    /* Class */
+    
+    
+    $weekSql = "select MAX(Week) as WeekNum from Quiz";
+        $weekQuery = $conn->prepare($weekSql);
+        $weekQuery->execute();
+        $weekResult = $weekQuery->fetch(PDO::FETCH_OBJ);
+    
     
     
     function getStuQuizScore($conn, $quizID, $studentID){

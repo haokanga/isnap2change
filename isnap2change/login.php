@@ -3,7 +3,7 @@
 	$DEBUG_MODE = true;
     
 	session_start();
-    require_once("connection.php");
+    require_once("mysql-lib.php");
     $conn;
        
     if($DEBUG_MODE) {

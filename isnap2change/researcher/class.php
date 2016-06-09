@@ -17,84 +17,27 @@
                     $schoolName = $_POST['schoolname'];
                     $teacherToken = $_POST['teachertoken'];
                     $studentToken = $_POST['studenttoken'];
-                    // get school
-                    $schoolSql = "SELECT SchoolID
-                               FROM School WHERE SchoolName = ?";
-                    $schoolQuery = $conn->prepare($schoolSql);
-                    $schoolQuery->execute(array($schoolName));
-                    $schoolResult = $schoolQuery->fetch(PDO::FETCH_OBJ);
-                    // update class 
-                    $updateSql = "UPDATE Class 
-                        SET ClassName = ?, SchoolID = ?
-                        WHERE ClassID = ?";			
-                    $updateSql = $conn->prepare($updateSql);                            
-                    if(! $updateSql->execute(array($className, $schoolResult->SchoolID, $classID))){
-                        echo "<script language=\"javascript\">  alert(\"Error occurred to update class. Contact with developers.\"); </script>";
-                    } else{
-                    }
-                    // update token                     
-                    $updateSql = "UPDATE Token 
-                        SET TokenString = ?
-                        WHERE ClassID = ? AND `Type` = ?";			
-                    $updateSql = $conn->prepare($updateSql);                            
-                    if(! $updateSql->execute(array($teacherToken, $classID, "TEACHER"))){
-                        echo "<script language=\"javascript\">  alert(\"Error occurred to update teacherToken. Contact with developers.\"); </script>";
-                    } else{
-                    }
-                    $updateSql = "UPDATE Token 
-                        SET TokenString = ?
-                        WHERE ClassID = ? AND `Type` = ?";			
-                    $updateSql = $conn->prepare($updateSql);                            
-                    if(! $updateSql->execute(array($studentToken, $classID, "STUDENT"))){
-                        echo "<script language=\"javascript\">  alert(\"Error occurred to update studentToken. Contact with developers.\"); </script>";
-                    } else{
-                    }
+                    
+                    $schoolResult = getSchool($conn, $schoolName);
+                    updateClass($conn, $classID, $schoolResult->SchoolID, $className);
+                    updateToken($conn, $classID, "TEACHER", $teacherToken);
+                    updateToken($conn, $classID, "STUDENT", $studentToken);
                 }
                 else if($update == 1){  
                     $className = $_POST['classname'];
                     $schoolName = $_POST['schoolname'];
                     $teacherToken = $_POST['teachertoken'];
                     $studentToken = $_POST['studenttoken'];
-                    // get school
-                    $schoolSql = "SELECT SchoolID
-                               FROM School WHERE SchoolName = ?";
-                    $schoolQuery = $conn->prepare($schoolSql);
-                    $schoolQuery->execute(array($schoolName));
-                    $schoolResult = $schoolQuery->fetch(PDO::FETCH_OBJ);
-                    // update class 
-                    $updateSql = "INSERT INTO Class(ClassName, SchoolID)
-                         VALUES (?,?);";			
-                    $updateSql = $conn->prepare($updateSql);         
-                    $updateSql->execute(array($className, $schoolResult->SchoolID));
-                    $classID = $conn->lastInsertId();
-                    if($classID <= 0){
-                        echo "<script language=\"javascript\">  alert(\"Error occurred to insert class. Contact with developers.\"); </script>";
-                    } else{
-                    }
-                    // update token                     
-                    $updateSql = "INSERT INTO Token(ClassID, `Type`, TokenString)
-                                    VALUES (?,?,?) ON DUPLICATE KEY UPDATE TokenString = ?;";			
-                    $updateSql = $conn->prepare($updateSql);                            
-                    if(! $updateSql->execute(array($classID, "TEACHER", $teacherToken, $teacherToken))){
-                        echo "<script language=\"javascript\">  alert(\"Error occurred to insert teacherToken. Contact with developers.\"); </script>";
-                    } else{
-                    }
-                    $updateSql = "INSERT INTO Token(ClassID, `Type`, TokenString)
-                         VALUES (?,?,?) ON DUPLICATE KEY UPDATE TokenString = ?;";			
-                    $updateSql = $conn->prepare($updateSql);                            
-                    if(! $updateSql->execute(array($classID, "STUDENT", $studentToken, $studentToken))){
-                        echo "<script language=\"javascript\">  alert(\"Error occurred to insert studentToken. Contact with developers.\"); </script>";
-                    } else{
-                    }                
+                    
+                    $schoolResult = getSchool($conn, $schoolName);                                      
+                    $classID = createClass($conn, $schoolResult->SchoolID, $className);                     
+                    updateToken($conn, $classID, "TEACHER", $teacherToken);
+                    updateToken($conn, $classID, "STUDENT", $studentToken);
+                    
                 }else if($update == -1){
                     $classID = $_POST['classid'];
-                    // remove class (with help of DELETE CASCADE) 
-                    $updateSql = "DELETE FROM Class WHERE ClassID = ?";			
-                    $updateSql = $conn->prepare($updateSql);
-                    if(! $updateSql->execute(array($classID))){
-                        echo "<script language=\"javascript\">  alert(\"Error occurred to delete class/token. Contact with developers.\"); </script>";
-                    } else{
-                    } 
+                    
+                    deleteClass($conn, $classID);                    
                 }            
             }
         }

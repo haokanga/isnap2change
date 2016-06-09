@@ -1,6 +1,5 @@
 <?php
 	
-	require_once("connection.php");
 	require_once("mysql-lib.php");
 	require_once("debug.php");
 

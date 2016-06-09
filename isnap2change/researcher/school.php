@@ -15,7 +15,7 @@
                 if($update == 0){                    
                     $schoolID = $_POST['schoolid'];
                     $schoolName = $_POST['schoolname'];
-                    updateSchool($conn, $schoolName, $schoolID);
+                    updateSchool($conn, $schoolID, $schoolName);
                 }
                 // insert
                 else if($update == 1){                                     

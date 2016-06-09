@@ -1,7 +1,7 @@
 <?php
 
 	session_start();
-	require_once("connection.php");
+	require_once("mysql-lib.php");
 	
 	if(! isset($_SESSION["studentid"])) {
 		
