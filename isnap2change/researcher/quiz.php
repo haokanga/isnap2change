@@ -26,8 +26,9 @@
                         $conn->beginTransaction();              
                         
                         //insert and get topicID
-                        $topicResult = getTopicByName($conn, $topicName);                        
-                        $quizID = createQuiz($conn, $week, $quizType, $topicResult->TopicID);
+                        $topicResult = getTopicByName($conn, $topicName);  
+                        $topicID = $topicResult->TopicID;                        
+                        $quizID = createQuiz($conn, $topicID, $quizType, $week); 
                         //if MCQ, insert MCQ_Section
                         if($quizType=='MCQ'){                        
                             $points = 0;
@@ -279,7 +280,7 @@
         if (confirm('[WARNING] Are you sure to remove this quiz? If you remove one quiz. All the questions and submission of this quiz will also get deleted (not recoverable). It includes learning material, questions and options, their submissions and your grading/feedback, not only the quiz itself.')) {
             $('#update').val(-1);
             for(i=0;i<$('.dialoginput').length;i++){                
-                $('.dialoginput').eq(i).val($(this).parent().parent().children('td').eq(i).text());
+                $('.dialoginput').eq(i).val($(this).parent().parent().children('td').eq(i).text().trim());
             }
             $('#submission').submit();
         }           

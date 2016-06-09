@@ -223,7 +223,7 @@
         $('#dialogTitle').text("Edit School");
         $('#update').val(0);
         for(i=0;i<$('.dialoginput').length;i++){                
-            $('.dialoginput').eq(i).val($(this).parent().parent().children('td').eq(i).text());
+            $('.dialoginput').eq(i).val($(this).parent().parent().children('td').eq(i).text().trim());
         }
         //disable SchoolID and Classes
         $('.dialoginput').eq(0).attr('disabled','disabled');
@@ -245,7 +245,7 @@
             //fill required input
             $('.dialoginput').eq(0).prop('disabled',false);
             for(i=0;i<$('.dialoginput').length;i++){                
-                $('.dialoginput').eq(i).val($(this).parent().parent().children('td').eq(i).text());
+                $('.dialoginput').eq(i).val($(this).parent().parent().children('td').eq(i).text().trim());
             }
             $('#submission').submit();
         }           

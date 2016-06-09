@@ -223,7 +223,8 @@
       <?php 
       if(isset($_GET['schoolid'])){
         try{
-            $schoolResult = getSchool($conn, $_GET['schoolid']);
+            $schoolID = $_GET['schoolid'];
+            $schoolResult = getSchool($conn, $schoolID);
             echo $schoolResult->SchoolName; 
         } catch(PDOException $e) {
             debug_pdo_err($pageName, $e);
@@ -262,7 +263,7 @@
         $('#dialogTitle').text("Edit Class");
         $('#update').val(0);
         for(i=0;i<$('.dialoginput').length;i++){                
-            $('.dialoginput').eq(i).val($(this).parent().parent().children('td').eq(i).text());
+            $('.dialoginput').eq(i).val($(this).parent().parent().children('td').eq(i).text().trim());
         }
         //disable ClassID, EnrolledStudents, UnlockedProgress
         $('.dialoginput').eq(0).attr('disabled','disabled');
@@ -286,7 +287,7 @@
             //fill required input
             $('.dialoginput').eq(0).prop('disabled',false);
             for(i=0;i<$('.dialoginput').length;i++){                
-                $('.dialoginput').eq(i).val($(this).parent().parent().children('td').eq(i).text());
+                $('.dialoginput').eq(i).val($(this).parent().parent().children('td').eq(i).text().trim());
             }
             $('#submission').submit();
         }           

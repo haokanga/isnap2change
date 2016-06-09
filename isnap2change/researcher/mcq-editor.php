@@ -67,7 +67,7 @@
             $quizResult = getMCQQuiz($conn, $quizID);
             $topicResult = getTopics($conn);
             $materialRes = getLearningMaterial($conn, $quizID);
-            $mcqQuesResult = getOptions($conn, $quizID);
+            $mcqQuesResult = getOptionsByQuiz($conn, $quizID);
         }
     } catch(PDOException $e) {
         debug_pdo_err($pageName, $e);
@@ -205,7 +205,7 @@
                                 <br>
                             </form>
                             <!--edit metadata-->
-                            <span class="glyphicon glyphicon-remove pull-right" id="metadataremove" aria-hidden="true"></span><span class="pull-right" aria-hidden="true">&nbsp;</span><span class="glyphicon glyphicon-edit pull-right" id="metadataedit" aria-hidden="true"></span>    
+                            <span class="glyphicon glyphicon-remove pull-right" id="metadataremove" aria-hidden="true"></span><span class="pull-right" aria-hidden="true">&nbsp;</span><span class="glyphicon glyphicon-floppy-saved pull-right" id="metadataedit" aria-hidden="true"></span>    
                         </div>                            
                         <!-- /.panel-body -->
                     </div>
@@ -270,7 +270,7 @@
                                             <td>
                                                 <span class="glyphicon glyphicon-remove pull-right " aria-hidden="true"></span>
                                                 <span class="pull-right" aria-hidden="true">&nbsp;</span>
-                                                <a href="option-editor.php?mcqid=<?php echo $mcqQuesResult[$i]->$mcqQuesColName[0]; ?>">
+                                                <a href="mcq-option-editor.php?mcqid=<?php echo $mcqQuesResult[$i]->$mcqQuesColName[0]; ?>">
                                                 <span class="glyphicon glyphicon-edit pull-right" data-toggle="modal" data-target="#dialog" aria-hidden="true"></span></a>
                                             </td>            
                                         </tr>
@@ -344,7 +344,7 @@
         if (confirm('[WARNING] Are you sure to remove this quiz? If you remove one quiz. All the questions and submission of this quiz will also get deleted (not recoverable). It includes learning material, questions and options, their submissions and your grading/feedback, not only the quiz itself.')) {
             $('#update').val(-1);
             for(i=0;i<$('.dialoginput').length;i++){                
-                $('.dialoginput').eq(i).val($(this).parent().parent().children('td').eq(i).text());
+                $('.dialoginput').eq(i).val($(this).parent().parent().children('td').eq(i).text().trim());
             }
             $('#submission').submit();
         }           
@@ -369,7 +369,7 @@
     //include html
     w3IncludeHTML();   
     $(document).ready(function() {
-    var table = $('#datatables').DataTable({
+        var table = $('#datatables').DataTable({
             responsive: true,
             //rows group for MCQID, Question and edit box
             rowsGroup: [1,4],

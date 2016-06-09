@@ -204,7 +204,8 @@
       if(isset($_GET['classid'])){ 
         // get ClassName
         try{
-            $classResult = getClass($conn, $_GET['classid']);
+            $classID = $_GET['classid'];
+            $classResult = getClass($conn, $classID);
             echo $classResult->ClassName; 
         } catch(PDOException $e) {
             debug_pdo_err($pageName, $e);

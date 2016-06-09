@@ -229,7 +229,7 @@
     /* Week */
        
     /* Quiz */
-    function createQuiz($conn, $week, $quizType, $topicID){
+    function createQuiz($conn, $topicID, $quizType, $week){
         $updateSql = "INSERT INTO Quiz(Week, QuizType, TopicID)
              VALUES (?,?,?);";			
         $updateSql = $conn->prepare($updateSql);         
@@ -379,10 +379,32 @@
     function updateMCQSection($conn, $quizID, $points, $questionnaires){
         $updateSql = "UPDATE MCQ_Section
                     SET Points = ?, Questionnaires = ?
-                    WHERE QuizID = ?;";			
+                    WHERE QuizID = ?";			
         $updateSql = $conn->prepare($updateSql);                            
         $updateSql->execute(array($points, $questionnaires, $quizID));
     }
+    
+    function updateMCQQuestion($conn, $mcqID, $question){
+        $updateSql = "UPDATE MCQ_Question
+                    SET Question = ? 
+                    WHERE MCQID = ?";			
+        $updateSql = $conn->prepare($updateSql);                            
+        $updateSql->execute(array($question, $mcqID));
+    }
+    
+    function deleteMCQQuestion($conn, $mcqID){
+        $updateSql = "DELETE FROM MCQ_Question WHERE MCQID = ?";			
+        $updateSql = $conn->prepare($updateSql);
+        $updateSql->execute(array($mcqID));
+    }
+    
+    function getMCQQuestion($conn, $mcqID){
+        $mcqQuesSql = "SELECT * FROM MCQ_Question WHERE MCQID = ?";                                
+        $mcqQuesQuery = $conn->prepare($mcqQuesSql);
+        $mcqQuesQuery->execute(array($mcqID));
+        $mcqQuesResult = $mcqQuesQuery->fetch(PDO::FETCH_OBJ);
+        return $mcqQuesResult;
+    } 
     
     function getMCQQuiz($conn, $quizID){
         $quizSql = "SELECT QuizID, Week, TopicName, Points, Questionnaires, COUNT(MCQID) AS Questions
@@ -404,7 +426,37 @@
     /* MCQ */
     
     /* Option */
-    function getOptions($conn, $quizID){
+    function createOption($conn, $mcqID, $content, $explanation){
+        $updateSql = "INSERT INTO `Option`(Content, Explanation, MCQID)
+             VALUES (?,?,?)";
+        $updateSql = $conn->prepare($updateSql);         
+        $updateSql->execute(array($content, $explanation, $mcqID));
+        return $conn->lastInsertId(); 
+    }
+    
+    function updateOption($conn, $optionID, $content, $explanation){
+        $updateSql = "UPDATE `Option` 
+                SET Content = ?, Explanation = ?
+                WHERE OptionID = ?";			
+        $updateSql = $conn->prepare($updateSql);         
+        $updateSql->execute(array($content, $explanation, $optionID)); 
+    }
+    
+    function deleteOption($conn, $optionID){
+        $updateSql = "DELETE FROM `Option` WHERE OptionID = ?";			
+        $updateSql = $conn->prepare($updateSql);
+        $updateSql->execute(array($optionID));
+    }
+    function getOptions($conn, $mcqID){
+        $optionSql = "SELECT *
+                   FROM MCQ_Question NATURAL JOIN `Option` WHERE MCQID = ? ";
+        $optionQuery = $conn->prepare($optionSql);
+        $optionQuery->execute(array($mcqID));
+        $optionResult = $optionQuery->fetchAll(PDO::FETCH_OBJ); 
+        return $optionResult;
+    }
+    
+    function getOptionsByQuiz($conn, $quizID){
         $mcqQuesSql = "SELECT MCQID, Question, CorrectChoice, Content, Explanation
                    FROM   MCQ_Section NATURAL JOIN MCQ_Question
                                   NATURAL JOIN `Option`
