@@ -1,8 +1,8 @@
 <?php
     session_start();
-    require_once("../connection.php");
+    require_once("../mysql-lib.php");
     require_once("../debug.php");
-    require_once("../mysql-lib.php");	      
+    	      
     $conn = db_connect();
     echo '###########################<br>';
     echo 'UNIT TEST<br>';
@@ -31,15 +31,35 @@
     for($i=-1;$i<10;$i++){
         echo "calculateStudentScore(\$conn, $i) ".calculateStudentScore($conn, $i)."<br>";   
     }
+    
+    echo '###########################<br>';
+    echo 'UNIT TEST<br>';
+    echo '###########################<br>';
+    echo 'getStudentScore(\$conn, $studentID)<br>';
+    for($i=-1;$i<10;$i++){
+        echo "getStudentScore(\$conn, $i) ".getStudentScore($conn, $i)."<br>";   
+    }
 
     echo '###########################<br>';
     echo 'UNIT TEST<br>';
     echo '###########################<br>';
-    echo 'setStudentScore($studentID)<br>';
+    echo 'updateStudentScore($studentID)<br>';
     for($i=-1;$i<10;$i++){
-        echo "setStudentScore(\$conn, $i) ".setStudentScore($conn, $i)."<br>";  
+        echo "updateStudentScore(\$conn, $i) ".updateStudentScore($conn, $i)."<br>";  
         echo getStudentScore($conn, $i),"<br>";
-    }	
+    }
+    
+
+    echo '###########################<br>';
+    echo 'UNIT TEST<br>';
+    echo '###########################<br>';
+    echo 'updateStudentScore($studentID)<br>';
+    for($i=-1;$i<10;$i++){
+        echo "updateStudentScore(\$conn, $i) ".updateStudentScore($conn, $i)."<br>";  
+        echo getStudentScore($conn, $i),"<br>";
+    }
+
+    
     
     echo '###########################<br>';
     echo 'UNIT TEST<br>';
@@ -51,26 +71,26 @@
         $conn->beginTransaction();              
         $make_err = false;
         
-        $update_stmt = "UPDATE Student 
+        $updateSql = "UPDATE Student 
                 SET Score = ?
                 WHERE StudentID = ?";			
-        $update_stmt = $conn->prepare($update_stmt);         
-        $update_stmt->execute(array(100, $studentID)); 
+        $updateSql = $conn->prepare($updateSql);         
+        $updateSql->execute(array(100, $studentID)); 
         echo 'getStudentScore(\$conn, 1) '.getStudentScore($conn, 1).'<br>';
         
         if($make_err){
             $overviewName = 'mysql-lib';
             $schoolName = 'Sample School';                 
-            $update_stmt = "INSERT INTO School(SchoolName)
+            $updateSql = "INSERT INTO School(SchoolName)
              VALUES (?);";			
-            $update_stmt = $conn->prepare($update_stmt);                
-            $update_stmt->execute(array($schoolName));
+            $updateSql = $conn->prepare($updateSql);                
+            $updateSql->execute(array($schoolName));
         }    
-        $update_stmt = "UPDATE Student 
+        $updateSql = "UPDATE Student 
                 SET Score = ?
                 WHERE StudentID = ?";			
-        $update_stmt = $conn->prepare($update_stmt);         
-        $update_stmt->execute(array(1000, $studentID));          
+        $updateSql = $conn->prepare($updateSql);         
+        $updateSql->execute(array(1000, $studentID));          
         echo 'getStudentScore(\$conn, 1) '.getStudentScore($conn, 1).'<br>';
         
         $conn->commit();                    

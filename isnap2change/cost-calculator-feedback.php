@@ -47,7 +47,7 @@
 			updateQuizRecord($conn, $quizID, $studentID, "GRADED");
 			
 			//UPDATE Student Score
-			setStudentScore($conn, $studentid);
+			updateStudentScore($conn, $studentid);
 			
 			$conn->commit();
 		} catch(PDOException $e) {

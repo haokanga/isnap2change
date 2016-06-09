@@ -1,9 +1,9 @@
 <?php
     session_start();
-    require_once("../connection.php");
+    require_once("../mysql-lib.php");
     require_once("../debug.php");
     require_once("/researcher-validation.php");
-    require_once("../mysql-lib.php");	    
+    	    
     $conn = db_connect();
     $overviewName = "mcq-editor";
     $columnName = array('QuizID','Week','TopicName','Points','Questionnaires','Questions');
@@ -28,17 +28,17 @@
                     $topicQuery->execute(array($topicName));
                     $topicResult = $topicQuery->fetch(PDO::FETCH_OBJ);
                     //update quiz
-                    $update_stmt = "UPDATE Quiz 
+                    $updateSql = "UPDATE Quiz 
                             SET Week = ?, TopicID = ?
                             WHERE QuizID = ?";			
-                    $update_stmt = $conn->prepare($update_stmt);         
-                    $update_stmt->execute(array($week, $topicResult->TopicID, $quizID)); 
+                    $updateSql = $conn->prepare($updateSql);         
+                    $updateSql->execute(array($week, $topicResult->TopicID, $quizID)); 
                     //update MCQ_Section
-                    $update_stmt = "UPDATE MCQ_Section
+                    $updateSql = "UPDATE MCQ_Section
                                     SET Points = ?, Questionnaires = ?
                                     WHERE QuizID = ?;";			
-                    $update_stmt = $conn->prepare($update_stmt);                            
-                    $update_stmt->execute(array($points, $questionnaires, $quizID));
+                    $updateSql = $conn->prepare($updateSql);                            
+                    $updateSql->execute(array($points, $questionnaires, $quizID));
                     
                     $conn->commit();                    
                 } catch(PDOException $e) {
@@ -48,9 +48,9 @@
             }
             else if($metadataupdate == 1){  
                 $quizID = $_POST['quizid'];
-                $update_stmt = "DELETE FROM Quiz WHERE QuizID = ?";			
-                $update_stmt = $conn->prepare($update_stmt);
-                if(! $update_stmt->execute(array($quizID))){
+                $updateSql = "DELETE FROM Quiz WHERE QuizID = ?";			
+                $updateSql = $conn->prepare($updateSql);
+                if(! $updateSql->execute(array($quizID))){
                     echo "<script language=\"javascript\">  alert(\"Error occurred to delete quiz. Contact with developers.\"); </script>";
                 } else{
                 } 
@@ -68,10 +68,10 @@
     echo "<h2>Preview</h2>";       
     echo $content;
     
-    $update_stmt = "REPLACE INTO Learning_Material(MaterialID,Content,QuizID)
+    $updateSql = "REPLACE INTO Learning_Material(MaterialID,Content,QuizID)
                  VALUES (?,?,?);";			
-    $update_stmt = $conn->prepare($update_stmt);                            
-    if(! $update_stmt->execute(array($materialid, $content, $quizid))){
+    $updateSql = $conn->prepare($updateSql);                            
+    if(! $updateSql->execute(array($materialid, $content, $quizid))){
         echo "<script language=\"javascript\">  alert(\"Error occurred to submit learning material. Report this bug to reseachers.\"); </script>";
     } else{            
         echo "<script language=\"javascript\">  console.log(\"Learning Material Submitted. materialid: $materialid  quizid: $quizid\"); </script>";

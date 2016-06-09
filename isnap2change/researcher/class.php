@@ -1,6 +1,6 @@
 <?php
 	session_start();
-    require_once("../connection.php");
+    require_once("../mysql-lib.php");
     require_once("../debug.php");
     require_once("/researcher-validation.php");
     $conn = db_connect();
@@ -24,28 +24,28 @@
                     $schoolQuery->execute(array($schoolName));
                     $schoolResult = $schoolQuery->fetch(PDO::FETCH_OBJ);
                     // update class 
-                    $update_stmt = "UPDATE Class 
+                    $updateSql = "UPDATE Class 
                         SET ClassName = ?, SchoolID = ?
                         WHERE ClassID = ?";			
-                    $update_stmt = $conn->prepare($update_stmt);                            
-                    if(! $update_stmt->execute(array($className, $schoolResult->SchoolID, $classID))){
+                    $updateSql = $conn->prepare($updateSql);                            
+                    if(! $updateSql->execute(array($className, $schoolResult->SchoolID, $classID))){
                         echo "<script language=\"javascript\">  alert(\"Error occurred to update class. Contact with developers.\"); </script>";
                     } else{
                     }
                     // update token                     
-                    $update_stmt = "UPDATE Token 
+                    $updateSql = "UPDATE Token 
                         SET TokenString = ?
                         WHERE ClassID = ? AND `Type` = ?";			
-                    $update_stmt = $conn->prepare($update_stmt);                            
-                    if(! $update_stmt->execute(array($teacherToken, $classID, "TEACHER"))){
+                    $updateSql = $conn->prepare($updateSql);                            
+                    if(! $updateSql->execute(array($teacherToken, $classID, "TEACHER"))){
                         echo "<script language=\"javascript\">  alert(\"Error occurred to update teacherToken. Contact with developers.\"); </script>";
                     } else{
                     }
-                    $update_stmt = "UPDATE Token 
+                    $updateSql = "UPDATE Token 
                         SET TokenString = ?
                         WHERE ClassID = ? AND `Type` = ?";			
-                    $update_stmt = $conn->prepare($update_stmt);                            
-                    if(! $update_stmt->execute(array($studentToken, $classID, "STUDENT"))){
+                    $updateSql = $conn->prepare($updateSql);                            
+                    if(! $updateSql->execute(array($studentToken, $classID, "STUDENT"))){
                         echo "<script language=\"javascript\">  alert(\"Error occurred to update studentToken. Contact with developers.\"); </script>";
                     } else{
                     }
@@ -62,36 +62,36 @@
                     $schoolQuery->execute(array($schoolName));
                     $schoolResult = $schoolQuery->fetch(PDO::FETCH_OBJ);
                     // update class 
-                    $update_stmt = "INSERT INTO Class(ClassName, SchoolID)
+                    $updateSql = "INSERT INTO Class(ClassName, SchoolID)
                          VALUES (?,?);";			
-                    $update_stmt = $conn->prepare($update_stmt);         
-                    $update_stmt->execute(array($className, $schoolResult->SchoolID));
+                    $updateSql = $conn->prepare($updateSql);         
+                    $updateSql->execute(array($className, $schoolResult->SchoolID));
                     $classID = $conn->lastInsertId();
                     if($classID <= 0){
                         echo "<script language=\"javascript\">  alert(\"Error occurred to insert class. Contact with developers.\"); </script>";
                     } else{
                     }
                     // update token                     
-                    $update_stmt = "INSERT INTO Token(ClassID, `Type`, TokenString)
+                    $updateSql = "INSERT INTO Token(ClassID, `Type`, TokenString)
                                     VALUES (?,?,?) ON DUPLICATE KEY UPDATE TokenString = ?;";			
-                    $update_stmt = $conn->prepare($update_stmt);                            
-                    if(! $update_stmt->execute(array($classID, "TEACHER", $teacherToken, $teacherToken))){
+                    $updateSql = $conn->prepare($updateSql);                            
+                    if(! $updateSql->execute(array($classID, "TEACHER", $teacherToken, $teacherToken))){
                         echo "<script language=\"javascript\">  alert(\"Error occurred to insert teacherToken. Contact with developers.\"); </script>";
                     } else{
                     }
-                    $update_stmt = "INSERT INTO Token(ClassID, `Type`, TokenString)
+                    $updateSql = "INSERT INTO Token(ClassID, `Type`, TokenString)
                          VALUES (?,?,?) ON DUPLICATE KEY UPDATE TokenString = ?;";			
-                    $update_stmt = $conn->prepare($update_stmt);                            
-                    if(! $update_stmt->execute(array($classID, "STUDENT", $studentToken, $studentToken))){
+                    $updateSql = $conn->prepare($updateSql);                            
+                    if(! $updateSql->execute(array($classID, "STUDENT", $studentToken, $studentToken))){
                         echo "<script language=\"javascript\">  alert(\"Error occurred to insert studentToken. Contact with developers.\"); </script>";
                     } else{
                     }                
                 }else if($update == -1){
                     $classID = $_POST['classid'];
                     // remove class (with help of DELETE CASCADE) 
-                    $update_stmt = "DELETE FROM Class WHERE ClassID = ?";			
-                    $update_stmt = $conn->prepare($update_stmt);
-                    if(! $update_stmt->execute(array($classID))){
+                    $updateSql = "DELETE FROM Class WHERE ClassID = ?";			
+                    $updateSql = $conn->prepare($updateSql);
+                    if(! $updateSql->execute(array($classID))){
                         echo "<script language=\"javascript\">  alert(\"Error occurred to delete class/token. Contact with developers.\"); </script>";
                     } else{
                     } 

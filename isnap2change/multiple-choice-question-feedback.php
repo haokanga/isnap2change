@@ -66,18 +66,18 @@
 		
 		//UPDATE Quiz_Record
 		$status = "GRADED";
-		$update_stmt = "INSERT INTO Quiz_Record(QuizID, StudentID, Status, Score)
+		$updateSql = "INSERT INTO Quiz_Record(QuizID, StudentID, Status, Score)
 						VALUES (?,?,?,?);";			
-		$update_stmt = $conn->prepare($update_stmt);                            
-		if(! $update_stmt -> execute(array($quizid, $studentid, $status, $score_res -> Points))){
+		$updateSql = $conn->prepare($updateSql);                            
+		if(! $updateSql -> execute(array($quizid, $studentid, $status, $score_res -> Points))){
 		//	echo "<script language=\"javascript\">  alert(\"Error occurred to submit your answer. Report this bug to reseachers.\"); </script>";
 		} else{ 
 		//	echo "<script language=\"javascript\">  console.log(\"Quiz Passed\"); </script>";
 		}
 		
-		$update_stmt = "INSERT INTO MCQ_Question_Record(StudentID, MCQID, Choice)
+		$updateSql = "INSERT INTO MCQ_Question_Record(StudentID, MCQID, Choice)
 							 VALUES (?,?,?);";			
-		$update_stmt = $conn->prepare($update_stmt);   
+		$updateSql = $conn->prepare($updateSql);   
 			
 		$mcqGradeSql = "SELECT CorrectChoice
 						FROM   MCQ_Question
@@ -92,7 +92,7 @@
 		//UPDATE MCQ_Question_Record
 		for($i=0; $i<count($MCQIDArr); $i++){
 	
-			if(! $update_stmt -> execute(array($studentid, $MCQIDArr[$i], $answerArr[$i]))){
+			if(! $updateSql -> execute(array($studentid, $MCQIDArr[$i], $answerArr[$i]))){
 			//	echo "<script language=\"javascript\">  alert(\"Error occurred to submit your answer. Report this bug to reseachers.\"); </script>";
 			}
 			
