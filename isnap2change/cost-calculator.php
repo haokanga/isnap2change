@@ -1,8 +1,6 @@
 <?php
 	$studentid = 1;
-	$quizid = 10;
-
-
+	$quizid = 5;
 ?>
 <html>
 <head>
@@ -27,17 +25,28 @@
 <script src="js/jquery-1.12.3.js"></script>
 <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-slider/7.1.0/bootstrap-slider.js"></script>
 <script>
+	function goBack() {
+			document.getElementById("goBack").submit();
+	}
+
 	function parseFeedback(response) {
+		var feedback = JSON.parse(response);
 		
+		if(feedback.message != "success") {
+			alert(feedback.message + ". Please try again!");
+			return;
+		}
 		
+		if(feedback.result == "pass") {
+			alert("Congratulation! You have passed this quiz.");
+			$("#submitBtn").attr("disabled","disabled");
+		} else if(feedback.result == "fail") {
+			alert("Sorry! You have failed this quiz.");
+		}
 		
 	}
 
-
-
-
-	function submitQuiz() {
-		
+	function submitQuiz() {		
 		var answerArr = new Array(3);	
 		
 		$("input:text[name='studentAns']").each(function(i) {
@@ -100,7 +109,11 @@
 		<h4>What would the cost be of smoking 40 cigarettes a day for 20 years if a packet of 20 cigarettes costs $25?</h4>
 		<input type="text" name="studentAns">
 		<br><br>
-		<button id="submitAns" onclick="submitQuiz()">Submit</button>
+		<button id="submitBtn" type="button" onclick="submitQuiz()">Submit</button>
+		<form id="goBack" method=post action=weekly-task.php>
+			<button type="button" onclick="goBack()">GO BACK</button> 
+			<input type=hidden name="week" value=<?php echo $week; ?>></input>
+		</form>
 	</div>
 <script>
 	

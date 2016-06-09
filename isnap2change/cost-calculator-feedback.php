@@ -2,7 +2,10 @@
 	
 	require_once("connection.php");
 	require_once("mysql-lib.php");
+	require_once("debug.php");
 
+	$pageName = "cost-calculator-feedback";
+	
 	if($_SERVER["REQUEST_METHOD"] == "POST"){
 		if(isset($_POST['studentid']) && isset($_POST['quizid']) && isset($_POST['answerArr'])){
 			$studentid = $_POST['studentid'];
@@ -18,29 +21,26 @@
 	$feedback = array();
 	$feedback["detail"] = array();
 	
-	$correctAns = [];
+	$correctAns = array("12.12", "13.13", "14.14");
 	
-	$count = 0;
+	$correctCount = 0;
 	
 	for($i = 0; $i < count($answerArr); $i++) {
 		if($ansArr[$i] == $correctAns[$i]) {
-			count++;
+			$correctcount++;
 		} else {
 			array_push($feedback["detail"], ($i+1));
 		}
 	}
 	
-	if(count == 3) {
+	if($correctCount == 3) {
 		$feedback["result"] = "pass";
 		
-		$conn = db_connect();
-		
-		if($conn == null) {
-			$feedback["message"] = "Failed to connect database";
-			exit;
-		}
+		$conn = null;
 		
 		try {
+			$conn = db_connect();
+			
 			$conn->beginTransaction();
 			
 			//UPDATE Quiz_Record	
@@ -52,11 +52,19 @@
 			$costCalSubmitQuery = $conn->prepare($posterQuizSaveSql);                            
 			$costCalSubmitQuery->execute(array($quizid, $studentid, $status, $status));
 			
-			$conn->commit();
+			//UPDATE Student Score
+			setStudentScore($conn, $studentid);
 			
-		} catch(Exception $e) {
-			$conn->rollback();
+			$conn->commit();
+		} catch(PDOException $e) {
+			if($conn != null) {
+				$conn->rollback();
+				db_close($conn);
+			}
+			
+			debug_pdo_err($pageName, $e);
 			$feedback["message"] = "Failed to update database";
+			echo json_encode($feedback);
 			exit;
 		}
 		
@@ -66,6 +74,7 @@
 		$feedback["result"] = "fail";
 	}
 	
+	$feedback["message"] = "success";
 	echo json_encode($feedback);
 	
 ?>
