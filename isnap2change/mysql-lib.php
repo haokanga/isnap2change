@@ -1,8 +1,7 @@
 <?php  	
-    function getStuQuizScore($quizID, $studentID){
+    function getStuQuizScore($conn, $quizID, $studentID){
         $pointsBySection = array('MCQ', 'Matching', 'Poster', 'Misc');
         $pointsByQuestion = array('SAQ');
-        $conn = db_connect(); 
         $score = 0;
         
         $quizTypeSql = "SELECT COUNT(*) FROM Quiz NATURAL JOIN Quiz_Record WHERE QuizID = ? AND StudentID = ? AND `Status`='GRADED'";
@@ -29,16 +28,14 @@
                 $pointsResult = $pointsQuery->fetch(PDO::FETCH_OBJ);
                 $score = $pointsResult->SumPoints;
             }
-        }        
+        }  
         
-        db_close($conn); 
         return $score;
     }    
     
-    function getQuizPoints($quizID){
+    function getQuizPoints($conn, $quizID){
         $pointsBySection = array('MCQ', 'Matching', 'Poster', 'Misc');
         $pointsByQuestion = array('SAQ');
-        $conn = db_connect();
         $points = 0;        
         
         $quizTypeSql = "SELECT COUNT(*) FROM Quiz WHERE QuizID = ?";
@@ -62,12 +59,10 @@
             $points = $pointsResult->SumPoints;
         }
         
-        db_close($conn); 
         return $points;
     } 
     
-    function calculateStudentScore($studentID){
-        $conn = db_connect();            
+    function calculateStudentScore($conn, $studentID){
         $score = 0;
         
         $quizSql = "SELECT * FROM Quiz NATURAL JOIN Quiz_Record WHERE StudentID = ? AND `Status`='GRADED'";
@@ -75,15 +70,13 @@
         $quizQuery->execute(array($studentID));
         $quizResult = $quizQuery->fetchAll(PDO::FETCH_OBJ);
         for($i=0; $i<count($quizResult);$i++){
-            $score+= getStuQuizScore($quizResult[$i]->QuizID, $studentID);
+            $score+= getStuQuizScore($conn, $quizResult[$i]->QuizID, $studentID);
         }
         
-        db_close($conn); 
         return $score;
     } 
     
-    function getStudentScore($studentID){
-        $conn = db_connect();
+    function getStudentScore($conn, $studentID){
         $score = 0;
         
         $scoreSql = "SELECT COUNT(*) FROM Student WHERE StudentID = ? ";
@@ -97,7 +90,6 @@
             $score = $scoreResult->Score;
         }
         
-        db_close($conn); 
         return $score;
     }
     
@@ -106,6 +98,6 @@
                 SET Score = ?
                 WHERE StudentID = ?";			
         $update_stmt = $conn->prepare($update_stmt);         
-        $update_stmt->execute(array(calculateStudentScore($studentID), $studentID));        
+        $update_stmt->execute(array(calculateStudentScore($conn, $studentID), $studentID));        
     }
 ?>
