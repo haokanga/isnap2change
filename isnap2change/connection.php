@@ -12,12 +12,11 @@
 				$conn = new PDO("mysql:host=$servername; dbname=isnap2changedb", $username, $password);
 				// set the PDO error mode to exception
 				$conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+				return $conn;
 			} catch(PDOException $e){
-				echo "Connection failed: " . $e->getMessage();
-				exit;
+				return null;
 			}
-
-			return $conn;
+			
         }
 
         function db_close($connection){
