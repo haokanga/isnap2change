@@ -55,24 +55,24 @@
     }
     
     function updateSchool($conn, $schoolName, $schoolID){
-        $update_stmt = "UPDATE School 
+        $updateSql = "UPDATE School 
             SET SchoolName = ?
             WHERE SchoolID = ?";			
-        $update_stmt = $conn->prepare($update_stmt);                            
-        $update_stmt->execute(array($schoolName, $schoolID));
+        $updateSql = $conn->prepare($updateSql);                            
+        $updateSql->execute(array($schoolName, $schoolID));
     }
     
     function createSchool($conn, $schoolName){                
-        $update_stmt = "INSERT INTO School(SchoolName)
+        $updateSql = "INSERT INTO School(SchoolName)
          VALUES (?);";			
-        $update_stmt = $conn->prepare($update_stmt);                
-        $update_stmt->execute(array($schoolName));
+        $updateSql = $conn->prepare($updateSql);                
+        $updateSql->execute(array($schoolName));
     }
     
     function deleteSchool($conn, $schoolID){
-        $update_stmt = "DELETE FROM School WHERE SchoolID = ?";			
-        $update_stmt = $conn->prepare($update_stmt);
-        $update_stmt->execute(array($schoolID));
+        $updateSql = "DELETE FROM School WHERE SchoolID = ?";			
+        $updateSql = $conn->prepare($updateSql);
+        $updateSql->execute(array($schoolID));
     }   
     /* School */    
     
@@ -181,10 +181,10 @@
     }
     
     function updateStudentScore($conn, $studentID){        
-        $update_stmt = "UPDATE Student 
+        $updateSql = "UPDATE Student 
                 SET Score = ?
                 WHERE StudentID = ?";			
-        $update_stmt = $conn->prepare($update_stmt);         
-        $update_stmt->execute(array(calculateStudentScore($conn, $studentID), $studentID));        
+        $updateSql = $conn->prepare($updateSql);         
+        $updateSql->execute(array(calculateStudentScore($conn, $studentID), $studentID));        
     }
 ?>

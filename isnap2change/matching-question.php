@@ -74,10 +74,10 @@
             //if submission            
             if($status == "GRADED"){
                 $quizid = $_POST["quizid"];
-                $update_stmt = "INSERT INTO Quiz_Record(QuizID, StudentID, `Status`, Score)
+                $updateSql = "INSERT INTO Quiz_Record(QuizID, StudentID, `Status`, Score)
                                              VALUES (?,?,?,?) ON DUPLICATE KEY UPDATE Score = ?";			
-                $update_stmt = $conn->prepare($update_stmt);                
-                if(! $update_stmt -> execute(array($quizid, $studentid, $status, $score, $score))){
+                $updateSql = $conn->prepare($updateSql);                
+                if(! $updateSql -> execute(array($quizid, $studentid, $status, $score, $score))){
                     echo "<script language=\"javascript\">  alert(\"Error occurred to update your score. Report this bug to reseachers.\"); </script>";
                 }
             }

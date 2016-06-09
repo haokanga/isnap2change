@@ -31,25 +31,25 @@
                         $topicQuery->execute(array($topicName));
                         $topicResult = $topicQuery->fetch(PDO::FETCH_OBJ);
                         //insert quiz
-                        $update_stmt = "INSERT INTO Quiz(Week, QuizType, TopicID)
+                        $updateSql = "INSERT INTO Quiz(Week, QuizType, TopicID)
                              VALUES (?,?,?);";			
-                        $update_stmt = $conn->prepare($update_stmt);         
-                        $update_stmt->execute(array($week, $quizType, $topicResult->TopicID));                     
+                        $updateSql = $conn->prepare($updateSql);         
+                        $updateSql->execute(array($week, $quizType, $topicResult->TopicID));                     
                         $quizID = $conn->lastInsertId(); 
                         //if MCQ, insert MCQ_Section
                         if($quizType=='MCQ'){                        
                             $points = 0;
                             $questionnaires = 0;
-                            $update_stmt = "INSERT INTO MCQ_Section(QuizID, Points, Questionnaires)
+                            $updateSql = "INSERT INTO MCQ_Section(QuizID, Points, Questionnaires)
                                         VALUES (?,?,?);";			
-                            $update_stmt = $conn->prepare($update_stmt);                            
-                            $update_stmt->execute(array($quizID, $points, $questionnaires)); 
+                            $updateSql = $conn->prepare($updateSql);                            
+                            $updateSql->execute(array($quizID, $points, $questionnaires)); 
                         }                    
                         //init empty Learning Material
                         $content='<p>Learning materials for this quiz has not been added.</p>';
-                        $update_stmt = "INSERT INTO Learning_Material(Content,QuizID) VALUES (?,?);";
-                        $update_stmt = $conn->prepare($update_stmt);                            
-                        $update_stmt->execute(array($content, $quizID)); 
+                        $updateSql = "INSERT INTO Learning_Material(Content,QuizID) VALUES (?,?);";
+                        $updateSql = $conn->prepare($updateSql);                            
+                        $updateSql->execute(array($content, $quizID)); 
                         
                         $conn->commit();                    
                     } catch(PDOException $e) {
@@ -59,9 +59,9 @@
                 }
                 else if($update == -1){  
                     $quizID = $_POST['quizid'];
-                    $update_stmt = "DELETE FROM Quiz WHERE QuizID = ?";			
-                    $update_stmt = $conn->prepare($update_stmt);
-                    if(! $update_stmt->execute(array($quizID))){
+                    $updateSql = "DELETE FROM Quiz WHERE QuizID = ?";			
+                    $updateSql = $conn->prepare($updateSql);
+                    if(! $updateSql->execute(array($quizID))){
                         echo "<script language=\"javascript\">  alert(\"Error occurred to delete quiz. Contact with developers.\"); </script>";
                     } else{
                     } 

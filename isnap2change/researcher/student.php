@@ -12,11 +12,11 @@
             //reset student password
             if($update == 0){
                 $studentID = $_POST['studentid'];
-                $update_stmt = "UPDATE Student 
+                $updateSql = "UPDATE Student 
                     SET Password = ?
                     WHERE StudentID = ?";			
-                $update_stmt = $conn->prepare($update_stmt);                            
-                if(! $update_stmt->execute(array(md5('WelcomeToiSNAP2'), $studentID))){
+                $updateSql = $conn->prepare($updateSql);                            
+                if(! $updateSql->execute(array(md5('WelcomeToiSNAP2'), $studentID))){
                     echo "<script language=\"javascript\">  alert(\"Error occurred to reset password. Contact with developers.\"); </script>";
                 } else{
                 }
@@ -24,9 +24,9 @@
             //delete student (with help of DELETE CASCADE)            
             else if($update == -1){
                 $studentID = $_POST['studentid'];
-                $update_stmt = "DELETE FROM Student WHERE StudentID = ?";			
-                $update_stmt = $conn->prepare($update_stmt);
-                if(! $update_stmt->execute(array($studentID))){
+                $updateSql = "DELETE FROM Student WHERE StudentID = ?";			
+                $updateSql = $conn->prepare($updateSql);
+                if(! $updateSql->execute(array($studentID))){
                     echo "<script language=\"javascript\">  alert(\"Error occurred to delete student. Contact with developers.\"); </script>";
                 } else{
                 } 

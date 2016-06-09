@@ -9,17 +9,17 @@
     //if update/insert/remove school
     if($_SERVER["REQUEST_METHOD"] == "POST"){        
         $week = $_POST['week'];
-        $update_stmt = "SET SQL_SAFE_UPDATES=0;
+        $updateSql = "SET SQL_SAFE_UPDATES=0;
             UPDATE Quiz SET Week = NULL WHERE Week = ?;
             SET SQL_SAFE_UPDATES=1;";			
-        $update_stmt = $conn->prepare($update_stmt);                            
-        if(! $update_stmt->execute(array($week))){
+        $updateSql = $conn->prepare($updateSql);                            
+        if(! $updateSql->execute(array($week))){
             echo "<script language=\"javascript\">  alert(\"Error occurred to delete ".$overviewName.". Contact with developers.\"); </script>";
         } else{
         }         
     }
     //General error: 2014 Cannot execute queries while other unbuffered queries are active. Consider using PDOStatement::fetchAll().
-    unset($update_stmt);
+    unset($updateSql);
 
     // get week and quiz count
     $weekSql = "SELECT Week, COUNT(*) AS QuizNum FROM Quiz GROUP BY Week";

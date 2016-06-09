@@ -11,10 +11,10 @@
         echo "<h2>Preview</h2>";       
 		echo $content;
         
-        $update_stmt = "REPLACE INTO Learning_Material(MaterialID,Content,QuizID)
+        $updateSql = "REPLACE INTO Learning_Material(MaterialID,Content,QuizID)
                      VALUES (?,?,?);";			
-        $update_stmt = $conn->prepare($update_stmt);                            
-        if(! $update_stmt->execute(array($materialid, $content, $quizid))){
+        $updateSql = $conn->prepare($updateSql);                            
+        if(! $updateSql->execute(array($materialid, $content, $quizid))){
             echo "<script language=\"javascript\">  alert(\"Error occurred to submit learning material. Report this bug to reseachers.\"); </script>";
         } else{            
             echo "<script language=\"javascript\">  console.log(\"Learning Material Submitted. materialid: $materialid  quizid: $quizid\"); </script>";

@@ -84,17 +84,17 @@
         $saqid = $_POST["saqid"];    
         $answer = $_POST["answer"];
         for($i=0; $i<count($saqid); $i++) {
-            $update_stmt = "INSERT INTO SAQ_Question_Record(StudentID, SAQID, Answer)
+            $updateSql = "INSERT INTO SAQ_Question_Record(StudentID, SAQID, Answer)
                                      VALUES (?,?,?) ON DUPLICATE KEY UPDATE Answer = ?";			
-            $update_stmt = $conn->prepare($update_stmt);                
-            if(! $update_stmt -> execute(array($studentid, $saqid[$i], htmlspecialchars($answer[$i]), htmlspecialchars($answer[$i])))){
+            $updateSql = $conn->prepare($updateSql);                
+            if(! $updateSql -> execute(array($studentid, $saqid[$i], htmlspecialchars($answer[$i]), htmlspecialchars($answer[$i])))){
                 echo "<script language=\"javascript\">  alert(\"Error occurred to submit your answer. Report this bug to reseachers.\"); </script>";
             }
         }
-        $update_stmt = "INSERT INTO Quiz_Record(QuizID, StudentID, `Status`, Score)
+        $updateSql = "INSERT INTO Quiz_Record(QuizID, StudentID, `Status`, Score)
                                      VALUES (?,?,?,?) ON DUPLICATE KEY UPDATE Score = ?";			
-        $update_stmt = $conn->prepare($update_stmt);                
-        if(! $update_stmt -> execute(array($quizid, $studentid, "UNGRADED", $score, $score))){
+        $updateSql = $conn->prepare($updateSql);                
+        if(! $updateSql -> execute(array($quizid, $studentid, "UNGRADED", $score, $score))){
             echo "<script language=\"javascript\">  alert(\"Error occurred to update your score. Report this bug to reseachers.\"); </script>";
         }        
         $saqresult = null;

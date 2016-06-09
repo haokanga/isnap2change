@@ -71,26 +71,26 @@
         $conn->beginTransaction();              
         $make_err = false;
         
-        $update_stmt = "UPDATE Student 
+        $updateSql = "UPDATE Student 
                 SET Score = ?
                 WHERE StudentID = ?";			
-        $update_stmt = $conn->prepare($update_stmt);         
-        $update_stmt->execute(array(100, $studentID)); 
+        $updateSql = $conn->prepare($updateSql);         
+        $updateSql->execute(array(100, $studentID)); 
         echo 'getStudentScore(\$conn, 1) '.getStudentScore($conn, 1).'<br>';
         
         if($make_err){
             $overviewName = 'mysql-lib';
             $schoolName = 'Sample School';                 
-            $update_stmt = "INSERT INTO School(SchoolName)
+            $updateSql = "INSERT INTO School(SchoolName)
              VALUES (?);";			
-            $update_stmt = $conn->prepare($update_stmt);                
-            $update_stmt->execute(array($schoolName));
+            $updateSql = $conn->prepare($updateSql);                
+            $updateSql->execute(array($schoolName));
         }    
-        $update_stmt = "UPDATE Student 
+        $updateSql = "UPDATE Student 
                 SET Score = ?
                 WHERE StudentID = ?";			
-        $update_stmt = $conn->prepare($update_stmt);         
-        $update_stmt->execute(array(1000, $studentID));          
+        $updateSql = $conn->prepare($updateSql);         
+        $updateSql->execute(array(1000, $studentID));          
         echo 'getStudentScore(\$conn, 1) '.getStudentScore($conn, 1).'<br>';
         
         $conn->commit();                    

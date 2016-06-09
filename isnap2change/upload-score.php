@@ -30,12 +30,12 @@
     {
         global $gameid, $studentid, $score, $highscore;
         $conn = db_connect();
-        $update_stmt = "INSERT INTO Game_Record(GameID,StudentID,`Level`,Score)
+        $updateSql = "INSERT INTO Game_Record(GameID,StudentID,`Level`,Score)
                      VALUES (?,?,?,?) ON DUPLICATE KEY UPDATE Score = ?";			
-        $update_stmt = $conn->prepare($update_stmt);
+        $updateSql = $conn->prepare($updateSql);
         for($level=1; $level<=count($score); $level++){
             if($score[$level-1]>$highscore[$level-1]){
-                if(! $update_stmt -> execute(array($gameid, $studentid, $level, $score[$level-1], $score[$level-1]))){
+                if(! $updateSql -> execute(array($gameid, $studentid, $level, $score[$level-1], $score[$level-1]))){
                     echo "<script language=\"javascript\">  alert(\"Error occurred to submit game score. Report this bug to reseachers.\"); </script>";
                 } else{            
                     echo "<script language=\"javascript\">  console.log(\"Game Record Submitted. gameid: $gameid  studentid: $studentid\"); </script>";
