@@ -18,7 +18,7 @@
                     $teacherToken = $_POST['teachertoken'];
                     $studentToken = $_POST['studenttoken'];
                     
-                    $schoolResult = getSchool($conn, $schoolName);
+                    $schoolResult = getSchoolByName($conn, $schoolName);
                     updateClass($conn, $classID, $schoolResult->SchoolID, $className);
                     updateToken($conn, $classID, "TEACHER", $teacherToken);
                     updateToken($conn, $classID, "STUDENT", $studentToken);
@@ -29,7 +29,7 @@
                     $teacherToken = $_POST['teachertoken'];
                     $studentToken = $_POST['studenttoken'];
                     
-                    $schoolResult = getSchool($conn, $schoolName);                                      
+                    $schoolResult = getSchoolByName($conn, $schoolName);                                      
                     $classID = createClass($conn, $schoolResult->SchoolID, $className);                     
                     updateToken($conn, $classID, "TEACHER", $teacherToken);
                     updateToken($conn, $classID, "STUDENT", $studentToken);
@@ -41,44 +41,15 @@
                 }            
             }
         }
-        
-        // get max week
-        $weekSql = "select MAX(Week) as WeekNum from Quiz";
-        $weekQuery = $conn->prepare($weekSql);
-        $weekQuery->execute();
-        $weekResult = $weekQuery->fetch(PDO::FETCH_OBJ);
-
-        // get school
-        $schoolSql = "SELECT SchoolName
-                   FROM School";
-        $schoolQuery = $conn->prepare($schoolSql);
-        $schoolQuery->execute();
-        $schoolResult = $schoolQuery->fetchAll(PDO::FETCH_OBJ);
-        
-        // get class
-        $classSql = "SELECT ClassID, ClassName, SchoolName, UnlockedProgress
-                   FROM Class NATURAL JOIN School";
-        $classQuery = $conn->prepare($classSql);
-        $classQuery->execute();
-        $classResult = $classQuery->fetchAll(PDO::FETCH_OBJ);
-        
-        // get token
-        $tokenSql = "SELECT ClassID, `Type`, TokenString
-                   FROM Token NATURAL JOIN Class";
-        $tokenQuery = $conn->prepare($tokenSql);
-        $tokenQuery->execute();
-        $tokenResult = $tokenQuery->fetchAll(PDO::FETCH_OBJ);    
-        
-        // get students number
-        $studentNumSql = "SELECT count(*) as Count, ClassID
-                   FROM   Student NATURAL JOIN Class
-                   GROUP BY ClassID";
-        $studentNumQuery = $conn->prepare($studentNumSql);
-        $studentNumQuery->execute();
-        $studentNumResult = $studentNumQuery->fetchAll(PDO::FETCH_OBJ);
     } catch(PDOException $e) {
         debug_pdo_err($overviewName, $e);
-    }
+    }    
+        
+    $weekResult = getWeekNum($conn);
+    $schoolResult = getSchools($conn);
+    $classResult = getClasses($conn);
+    $tokenResult = getTokens($conn);
+    $studentNumResult = getStudentNum($conn);
     
     db_close($conn);     
 ?>
@@ -247,11 +218,7 @@
       <input type=hidden name="keyword" id="keyword" value="
       <?php if(isset($_GET['schoolid'])){
         // get SchoolName
-        $schoolSql = "SELECT SchoolName
-                   FROM School WHERE SchoolID = ?";
-        $schoolQuery = $conn->prepare($schoolSql);
-        $schoolQuery->execute(array($_GET['schoolid']));
-        $schoolResult = $schoolQuery->fetch(PDO::FETCH_OBJ);
+        $schoolResult = getSchool($conn, $$_GET['schoolid']);
         echo $schoolResult->SchoolName; 
       } else echo ''; ?>">
       </input>
