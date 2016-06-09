@@ -8,6 +8,8 @@
     get...: SELECT fetch
     get...s: SELECT fetchAll
     
+    variables order: $conn, $pkCol(alphabetical order), $non-pkCol(alphabetical order)
+    e.g. $conn, $questionID, $studentID, $status, $week
     */
 
     /* db connection*/
