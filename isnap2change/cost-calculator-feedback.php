@@ -53,7 +53,7 @@
 			$costCalSubmitQuery->execute(array($quizid, $studentid, $status, $status));
 			
 			//UPDATE Student Score
-			setStudentScore($conn, $studentid);
+			updateStudentScore($conn, $studentid);
 			
 			$conn->commit();
 		} catch(PDOException $e) {

@@ -43,9 +43,9 @@
     echo '###########################<br>';
     echo 'UNIT TEST<br>';
     echo '###########################<br>';
-    echo 'setStudentScore($studentID)<br>';
+    echo 'updateStudentScore($studentID)<br>';
     for($i=-1;$i<10;$i++){
-        echo "setStudentScore(\$conn, $i) ".setStudentScore($conn, $i)."<br>";  
+        echo "updateStudentScore(\$conn, $i) ".updateStudentScore($conn, $i)."<br>";  
         echo getStudentScore($conn, $i),"<br>";
     }
     
@@ -53,9 +53,9 @@
     echo '###########################<br>';
     echo 'UNIT TEST<br>';
     echo '###########################<br>';
-    echo 'setStudentScore($studentID)<br>';
+    echo 'updateStudentScore($studentID)<br>';
     for($i=-1;$i<10;$i++){
-        echo "setStudentScore(\$conn, $i) ".setStudentScore($conn, $i)."<br>";  
+        echo "updateStudentScore(\$conn, $i) ".updateStudentScore($conn, $i)."<br>";  
         echo getStudentScore($conn, $i),"<br>";
     }
 

@@ -1,5 +1,14 @@
 <?php  	
-
+    /*
+    Naming Convention:
+    
+    Create: INSERT
+    Update: UPDATE
+    Delete: DELETE
+    get...: SELECT fetch
+    get...s: SELECT fetchAll
+    
+    */
 
     /* db connection*/
     function db_connect(){
@@ -22,7 +31,7 @@
         $connection = null;
     }
     /* db connection*/
-    
+         
     /* School */
     function getSchools($conn){
         $schoolSql = "SELECT SchoolID, SchoolName
@@ -43,7 +52,7 @@
         return $classNumResult;
     }
     
-    function setSchool($conn, $schoolName, $schoolID){
+    function updateSchool($conn, $schoolName, $schoolID){
         $update_stmt = "UPDATE School 
             SET SchoolName = ?
             WHERE SchoolID = ?";			
@@ -51,7 +60,7 @@
         $update_stmt->execute(array($schoolName, $schoolID));
     }
     
-    function addSchool($conn, $schoolName){                
+    function createSchool($conn, $schoolName){                
         $update_stmt = "INSERT INTO School(SchoolName)
          VALUES (?);";			
         $update_stmt = $conn->prepare($update_stmt);                
@@ -169,7 +178,7 @@
         return $score;
     }
     
-    function setStudentScore($conn, $studentID){        
+    function updateStudentScore($conn, $studentID){        
         $update_stmt = "UPDATE Student 
                 SET Score = ?
                 WHERE StudentID = ?";			

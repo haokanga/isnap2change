@@ -15,12 +15,12 @@
                 if($update == 0){                    
                     $schoolID = $_POST['schoolid'];
                     $schoolName = $_POST['schoolname'];
-                    setSchool($conn, $schoolName, $schoolID);
+                    updateSchool($conn, $schoolName, $schoolID);
                 }
                 // insert
                 else if($update == 1){                                     
                     $schoolName = $_POST['schoolname']; 
-                    addSchool($conn, $schoolName);                
+                    createSchool($conn, $schoolName);                
                 }
                 // remove school (with help of DELETE CASCADE) 
                 else if($update == -1){                                        
