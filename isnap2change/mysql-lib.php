@@ -1,4 +1,7 @@
 <?php  	
+
+
+    /* db connection*/
     function db_connect(){
 
         $conn;
@@ -18,7 +21,60 @@
     function db_close($connection){
         $connection = null;
     }
-
+    /* db connection*/
+    
+    /* School */
+    function getSchools($conn){
+        $schoolSql = "SELECT SchoolID, SchoolName
+                   FROM School";
+        $schoolQuery = $conn->prepare($schoolSql);
+        $schoolQuery->execute();
+        $schoolResult = $schoolQuery->fetchAll(PDO::FETCH_OBJ);
+        return $schoolResult;
+    }
+    
+    function getClassNum($conn){
+        $classNumSql = "SELECT count(*) as Count, SchoolID
+                   FROM School NATURAL JOIN Class
+                   GROUP BY SchoolID";
+        $classNumQuery = $conn->prepare($classNumSql);
+        $classNumQuery->execute();
+        $classNumResult = $classNumQuery->fetchAll(PDO::FETCH_OBJ);
+        return $classNumResult;
+    }
+    
+    function setSchool($conn, $schoolName, $schoolID){
+        $update_stmt = "UPDATE School 
+            SET SchoolName = ?
+            WHERE SchoolID = ?";			
+        $update_stmt = $conn->prepare($update_stmt);                            
+        $update_stmt->execute(array($schoolName, $schoolID));
+    }
+    
+    function addSchool($conn, $schoolName){                
+        $update_stmt = "INSERT INTO School(SchoolName)
+         VALUES (?);";			
+        $update_stmt = $conn->prepare($update_stmt);                
+        $update_stmt->execute(array($schoolName));
+    }
+    
+    function deleteSchool($conn, $schoolID){
+        $update_stmt = "DELETE FROM School WHERE SchoolID = ?";			
+        $update_stmt = $conn->prepare($update_stmt);
+        $update_stmt->execute(array($schoolID));
+    }   
+    /* School */    
+    
+    function getClasses($conn){
+        $classSql = "SELECT ClassID, ClassName, SchoolName
+                   FROM Class NATURAL JOIN School";
+        $classQuery = $conn->prepare($classSql);
+        $classQuery->execute();
+        $classResult = $classQuery->fetchAll(PDO::FETCH_OBJ);
+        return $classResult;
+    }
+    
+    
     function getStuQuizScore($conn, $quizID, $studentID){
         $pointsBySection = array('MCQ', 'Matching', 'Poster', 'Misc');
         $pointsByQuestion = array('SAQ');

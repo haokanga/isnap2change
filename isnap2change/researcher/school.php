@@ -12,58 +12,30 @@
             if(isset($_POST['update'])){                          
                 $update = $_POST['update'];
                 //update
-                if($update == 0){
+                if($update == 0){                    
                     $schoolID = $_POST['schoolid'];
                     $schoolName = $_POST['schoolname'];
-                    $update_stmt = "UPDATE School 
-                        SET SchoolName = ?
-                        WHERE SchoolID = ?";			
-                    $update_stmt = $conn->prepare($update_stmt);                            
-                    $update_stmt->execute(array($schoolName, $schoolID));
+                    setSchool($conn, $schoolName, $schoolID);
                 }
                 // insert
-                else if($update == 1){ 
-                    
-                        $schoolName = $_POST['schoolname'];                 
-                        $update_stmt = "INSERT INTO School(SchoolName)
-                         VALUES (?);";			
-                        $update_stmt = $conn->prepare($update_stmt);                
-                        $update_stmt->execute(array($schoolName));
-                                    
+                else if($update == 1){                                     
+                    $schoolName = $_POST['schoolname']; 
+                    addSchool($conn, $schoolName);                
                 }
                 // remove school (with help of DELETE CASCADE) 
-                else if($update == -1){
+                else if($update == -1){                                        
                     $schoolID = $_POST['schoolid'];
-                    $update_stmt = "DELETE FROM School WHERE SchoolID = ?";			
-                    $update_stmt = $conn->prepare($update_stmt);
-                    $update_stmt->execute(array($schoolID));
+                    deleteSchool($conn, $schoolID);
                 }            
             }
         }
-        // get school
-        $schoolSql = "SELECT SchoolID, SchoolName
-                   FROM School";
-        $schoolQuery = $conn->prepare($schoolSql);
-        $schoolQuery->execute();
-        $schoolResult = $schoolQuery->fetchAll(PDO::FETCH_OBJ);
         
-        // get class
-        $classSql = "SELECT ClassID, ClassName, SchoolName
-                   FROM Class NATURAL JOIN School";
-        $classQuery = $conn->prepare($classSql);
-        $classQuery->execute();
-        $classResult = $classQuery->fetchAll(PDO::FETCH_OBJ);
-        
-        // get class number
-        $classNumSql = "SELECT count(*) as Count, SchoolID
-                   FROM School NATURAL JOIN Class
-                   GROUP BY SchoolID";
-        $classNumQuery = $conn->prepare($classNumSql);
-        $classNumQuery->execute();
-        $classNumResult = $classNumQuery->fetchAll(PDO::FETCH_OBJ);
     } catch(PDOException $e) {
         debug_pdo_err($overviewName, $e);
-    } 
+    }     
+        
+    $schoolResult = getSchools($conn);
+    $classNumResult = getClassNum($conn);
     
     db_close($conn);    
 ?>
@@ -202,7 +174,7 @@
                 <input type="text" class="form-control dialoginput" id="Classes" name="Classes">
                 <br>
                 <div class="alert alert-danger">
-                    <p><strong>Reminder</strong> : School Name should be unique and no duplicate name is allowed.</p>
+                    <p><strong>Reminder</strong> : School Name should be unique and no duplicate names are allowed.</p>
                 </div>
             </form>
             </div>

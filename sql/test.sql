@@ -58,8 +58,8 @@ SELECT * FROM Quiz NATURAL JOIN (SELECT QuizID, Points FROM MCQ_Section UNION SE
 #WHERE QuizID = 1
 ;
 
-SELECT QuizID, StudentID, SUM(Grading) AS SumPoints FROM Quiz NATURAL JOIN SAQ_Section NATURAL JOIN SAQ_Question NATURAL JOIN SAQ_Question_Record 
-#WHERE QuizID = 3 AND StudentID = 1
+SELECT SUM(Points) AS SumPoints FROM Quiz NATURAL JOIN SAQ_Section NATURAL JOIN SAQ_Question 
+WHERE QuizID = 4
 ;
 
 
