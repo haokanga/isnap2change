@@ -1,9 +1,9 @@
 <?php
     session_start();
-    require_once("../connection.php");
+    require_once("../mysql-lib.php");
     require_once("../debug.php");
     require_once("/researcher-validation.php");
-    require_once("../mysql-lib.php");	    
+    	    
     $conn = db_connect();
     $overviewName = "mcq-editor";
     $columnName = array('QuizID','Week','TopicName','Points','Questionnaires','Questions');

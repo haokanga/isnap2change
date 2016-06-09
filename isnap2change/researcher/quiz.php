@@ -4,10 +4,10 @@
     edit quiz (jump to different editor)
     */
     session_start();
-    require_once("../connection.php");
+    require_once("../mysql-lib.php");
     require_once("../debug.php");
     require_once("/researcher-validation.php");
-    require_once("../mysql-lib.php");	    
+    	    
     $conn = db_connect();
     $overviewName = "quiz";
     $columnName = array('QuizID','Week','QuizType','TopicName','Points');    
