@@ -3,11 +3,11 @@
     require_once("../mysql-lib.php");
     require_once("../debug.php");
     require_once("/researcher-validation.php");
-    $conn = db_connect();
-    $overviewName = "school";
+    $pageName = "school";
     
     //if update/insert/remove school
-    try{
+    try{        
+        $conn = db_connect();
         if($_SERVER["REQUEST_METHOD"] == "POST"){
             if(isset($_POST['update'])){                          
                 $update = $_POST['update'];
@@ -31,11 +31,15 @@
         }
         
     } catch(PDOException $e) {
-        debug_pdo_err($overviewName, $e);
-    }     
-        
-    $schoolResult = getSchools($conn);
-    $classNumResult = getClassNum($conn);
+        debug_pdo_err($pageName, $e);
+    }
+    
+    try{  
+        $schoolResult = getSchools($conn);
+        $classNumResult = getClassNum($conn);
+    } catch(PDOException $e) {
+        debug_pdo_err($pageName, $e);
+    } 
     
     db_close($conn);    
 ?>

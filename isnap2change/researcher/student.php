@@ -10,36 +10,23 @@
         if(isset($_POST['update'])){                          
             $update = $_POST['update'];
             //reset student password
-            if($update == 0){
-                $studentID = $_POST['studentid'];
-                $updateSql = "UPDATE Student 
-                    SET Password = ?
-                    WHERE StudentID = ?";			
-                $updateSql = $conn->prepare($updateSql);                            
-                if(! $updateSql->execute(array(md5('WelcomeToiSNAP2'), $studentID))){
-                    echo "<script language=\"javascript\">  alert(\"Error occurred to reset password. Contact with developers.\"); </script>";
-                } else{
-                }
+            if($update == 0){                
+                $studentID = $_POST['studentid'];        
+                resetPassword($conn, $studentID);
             }
             //delete student (with help of DELETE CASCADE)            
-            else if($update == -1){
+            else if($update == -1){                
                 $studentID = $_POST['studentid'];
-                $updateSql = "DELETE FROM Student WHERE StudentID = ?";			
-                $updateSql = $conn->prepare($updateSql);
-                if(! $updateSql->execute(array($studentID))){
-                    echo "<script language=\"javascript\">  alert(\"Error occurred to delete student. Contact with developers.\"); </script>";
-                } else{
-                } 
+                deleteStudent($conn, $studentID);
             }            
         }
-    }   
+    }  
     
-    // get student
-    $studentSql = "SELECT StudentID, ClassName, Username, FirstName, LastName, Email, Gender, DOB, Score, DATE(SubmissionTime) AS SubmissionDate FROM Student NATURAL JOIN Class
-               ORDER BY ClassID";
-    $studentQuery = $conn->prepare($studentSql);
-    $studentQuery->execute();
-    $studentResult = $studentQuery->fetchAll(PDO::FETCH_OBJ);    
+    try{  
+        $studentResult = getStudents($conn);  
+    } catch(PDOException $e) {
+        debug_pdo_err($pageName, $e);
+    }
     
     db_close($conn); 
     
@@ -208,15 +195,18 @@
         </div>
       </div>
       <input type=hidden name="keyword" id="keyword" value="
-      <?php if(isset($_GET['classid'])){ 
+      <?php 
+      if(isset($_GET['classid'])){ 
         // get ClassName
-        $classSql = 'SELECT ClassName
-                   FROM Class WHERE ClassID = ?';
-        $classQuery = $conn->prepare($classSql);
-        $classQuery->execute(array($_GET['classid']));
-        $classResult = $classQuery->fetch(PDO::FETCH_OBJ);
-        echo $classResult->ClassName; 
-      } else echo '';
+        try{
+            $classResult = getClass($conn, $_GET['classid']);
+            echo $classResult->ClassName; 
+        } catch(PDOException $e) {
+            debug_pdo_err($pageName, $e);
+            echo '';
+        }
+      } else 
+          echo '';
       ?>"></input>
     <!-- jQuery -->
     <script src="../bower_components/jquery/dist/jquery.min.js"></script>

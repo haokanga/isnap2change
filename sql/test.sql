@@ -62,4 +62,13 @@ SELECT SUM(Points) AS SumPoints FROM Quiz NATURAL JOIN SAQ_Section NATURAL JOIN 
 WHERE QuizID = 4
 ;
 
+SELECT * FROM Class;
+SELECT *  FROM Class NATURAL JOIN School NATURAL JOIN Token;
 
+INSERT INTO Quiz_Record(QuizID, StudentID, Status)
+							    VALUES (10,10,'GRADED') ON DUPLICATE KEY UPDATE Status = 'GRADED';
+SELECT * FROM    Quiz_Record;                             
+                                
+                                
+                                
+                                

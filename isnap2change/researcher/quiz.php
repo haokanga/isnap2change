@@ -9,7 +9,7 @@
     require_once("/researcher-validation.php");
     	    
     $conn = db_connect();
-    $overviewName = "quiz";
+    $pageName = "quiz";
     $columnName = array('QuizID','Week','QuizType','TopicName','Points');    
     //add/edit/delete quiz
     
@@ -53,7 +53,7 @@
                         
                         $conn->commit();                    
                     } catch(PDOException $e) {
-                        debug_pdo_err($overviewName, $e);
+                        debug_pdo_err($pageName, $e);
                         $conn->rollback();
                     }                
                 }
@@ -93,7 +93,7 @@
         $topicQuery->execute(array());
         $topicResult = $topicQuery->fetchAll(PDO::FETCH_OBJ);  
     } catch(PDOException $e) {
-        debug_pdo_err($overviewName, $e);
+        debug_pdo_err($pageName, $e);
     }     
     
     db_close($conn);      

@@ -2,37 +2,28 @@
 	session_start();
     require_once("../mysql-lib.php");
     require_once("../debug.php");
-    require_once("/researcher-validation.php");    
-    $conn = db_connect();
-    $overviewName = "week";
+    require_once("/researcher-validation.php"); 
+    $pageName = "week";
     
-    //if update/insert/remove school
-    if($_SERVER["REQUEST_METHOD"] == "POST"){        
-        $week = $_POST['week'];
-        $updateSql = "SET SQL_SAFE_UPDATES=0;
-            UPDATE Quiz SET Week = NULL WHERE Week = ?;
-            SET SQL_SAFE_UPDATES=1;";			
-        $updateSql = $conn->prepare($updateSql);                            
-        if(! $updateSql->execute(array($week))){
-            echo "<script language=\"javascript\">  alert(\"Error occurred to delete ".$overviewName.". Contact with developers.\"); </script>";
-        } else{
-        }         
+    try{
+        $conn = db_connect();
+        if($_SERVER["REQUEST_METHOD"] == "POST"){        
+            $week = $_POST['week'];
+            $updateSql = removeWeek($conn, $week);         
+        }
+        //General error: 2014 Cannot execute queries while other unbuffered queries are active. Consider using PDOStatement::fetchAll().
+        unset($updateSql);
+    } catch(PDOException $e) {
+        debug_pdo_err($pageName, $e);
     }
-    //General error: 2014 Cannot execute queries while other unbuffered queries are active. Consider using PDOStatement::fetchAll().
-    unset($updateSql);
-
-    // get week and quiz count
-    $weekSql = "SELECT Week, COUNT(*) AS QuizNum FROM Quiz GROUP BY Week";
-    $weekQuery = $conn->prepare($weekSql);
-    $weekQuery->execute();
-    $weekResult = $weekQuery->fetchAll(PDO::FETCH_OBJ);     
     
-    // get max week
-    $weekNumSql = "SELECT MAX(Week) AS WeekNum FROM Quiz";
-    $weekNumQuery = $conn->prepare($weekNumSql);
-    $weekNumQuery->execute();
-    $weekNumResult = $weekNumQuery->fetch(PDO::FETCH_OBJ);    
-        
+    try{        
+        $weekResult = getQuizNum($conn);
+        $weekNumResult = getWeekNum($conn);    
+    } catch(PDOException $e) {
+        debug_pdo_err($pageName, $e);
+    }
+    
     db_close($conn); 
     
 ?>

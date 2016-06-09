@@ -79,7 +79,7 @@
         echo 'getStudentScore(\$conn, 1) '.getStudentScore($conn, 1).'<br>';
         
         if($make_err){
-            $overviewName = 'mysql-lib';
+            $pageName = 'mysql-lib';
             $schoolName = 'Sample School';                 
             $updateSql = "INSERT INTO School(SchoolName)
              VALUES (?);";			
@@ -95,7 +95,7 @@
         
         $conn->commit();                    
     } catch(PDOException $e) {
-        debug_pdo_err($overviewName, $e);
+        debug_pdo_err($pageName, $e);
         $conn->rollback();
     } 
     echo 'getStudentScore(\$conn, 1) '.getStudentScore($conn, 1).'<br>';

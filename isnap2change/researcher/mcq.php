@@ -5,7 +5,7 @@
     require_once("/researcher-validation.php");
     	    
     $conn = db_connect();
-    $overviewName = "mcq";
+    $pageName = "mcq";
     $columnName = array('QuizID','Week','TopicName','Points','Questionnaires','Questions');
     
     try{
@@ -47,7 +47,7 @@
                         
                         $conn->commit();                    
                     } catch(PDOException $e) {
-                        debug_pdo_err($overviewName, $e);
+                        debug_pdo_err($pageName, $e);
                         $conn->rollback();
                     } 
                 }                       
@@ -79,7 +79,7 @@
         $topicQuery->execute(array());
         $topicResult = $topicQuery->fetchAll(PDO::FETCH_OBJ);    
     } catch(PDOException $e) {
-        debug_pdo_err($overviewName, $e);
+        debug_pdo_err($pageName, $e);
     }
     
     db_close($conn); 

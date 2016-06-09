@@ -5,7 +5,7 @@
     require_once("/researcher-validation.php");
     	    
     $conn = db_connect();
-    $overviewName = "mcq-editor";
+    $pageName = "mcq-editor";
     $columnName = array('QuizID','Week','TopicName','Points','Questionnaires','Questions');
     //edit/delete quiz
     if($_SERVER["REQUEST_METHOD"] == "POST"){
@@ -42,7 +42,7 @@
                     
                     $conn->commit();                    
                 } catch(PDOException $e) {
-                    debug_pdo_err($overviewName, $e);
+                    debug_pdo_err($pageName, $e);
                     $conn->rollback();
                 } 
             }

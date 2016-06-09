@@ -2,11 +2,12 @@
 	session_start();
     require_once("../mysql-lib.php");
     require_once("../debug.php");
-    require_once("/researcher-validation.php");
-    $conn = db_connect();
+    require_once("/researcher-validation.php");    
+    $pageName = "class";
     
     //if update/insert/remove class
     try{
+        $conn = db_connect();
         if($_SERVER["REQUEST_METHOD"] == "POST"){
             if(isset($_POST['update'])){                          
                 $update = $_POST['update'];
@@ -20,8 +21,8 @@
                     
                     $schoolResult = getSchoolByName($conn, $schoolName);
                     updateClass($conn, $classID, $schoolResult->SchoolID, $className);
-                    updateToken($conn, $classID, "TEACHER", $teacherToken);
-                    updateToken($conn, $classID, "STUDENT", $studentToken);
+                    updateToken($conn, $classID, $teacherToken, "TEACHER");
+                    updateToken($conn, $classID, $studentToken, "STUDENT");
                 }
                 else if($update == 1){  
                     $className = $_POST['classname'];
@@ -31,25 +32,28 @@
                     
                     $schoolResult = getSchoolByName($conn, $schoolName);                                      
                     $classID = createClass($conn, $schoolResult->SchoolID, $className);                     
-                    updateToken($conn, $classID, "TEACHER", $teacherToken);
-                    updateToken($conn, $classID, "STUDENT", $studentToken);
+                    updateToken($conn, $classID, $teacherToken, "TEACHER");
+                    updateToken($conn, $classID, $studentToken, "STUDENT");
                     
                 }else if($update == -1){
-                    $classID = $_POST['classid'];
-                    
+                    $classID = $_POST['classid'];                    
                     deleteClass($conn, $classID);                    
                 }            
             }
         }
     } catch(PDOException $e) {
-        debug_pdo_err($overviewName, $e);
+        debug_pdo_err($pageName, $e);
     }    
-        
-    $weekResult = getWeekNum($conn);
-    $schoolResult = getSchools($conn);
-    $classResult = getClasses($conn);
-    $tokenResult = getTokens($conn);
-    $studentNumResult = getStudentNum($conn);
+    
+    try{     
+        $weekResult = getWeekNum($conn);
+        $schoolResult = getSchools($conn);
+        $classResult = getClasses($conn);
+        $tokenResult = getTokens($conn);
+        $studentNumResult = getStudentNum($conn);
+    } catch(PDOException $e) {
+        debug_pdo_err($pageName, $e);
+    }
     
     db_close($conn);     
 ?>
@@ -216,11 +220,18 @@
         </div>
       </div>
       <input type=hidden name="keyword" id="keyword" value="
-      <?php if(isset($_GET['schoolid'])){
-        // get SchoolName
-        $schoolResult = getSchool($conn, $$_GET['schoolid']);
-        echo $schoolResult->SchoolName; 
-      } else echo ''; ?>">
+      <?php 
+      if(isset($_GET['schoolid'])){
+        try{
+            $schoolResult = getSchool($conn, $_GET['schoolid']);
+            echo $schoolResult->SchoolName; 
+        } catch(PDOException $e) {
+            debug_pdo_err($pageName, $e);
+            echo '';
+        }        
+      } else 
+          echo '';
+      ?>">
       </input>
     <!-- jQuery -->
     <script src="../bower_components/jquery/dist/jquery.min.js"></script>

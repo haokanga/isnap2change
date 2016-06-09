@@ -4,7 +4,7 @@
     require_once("../debug.php");
     require_once("/researcher-validation.php");
     $conn = db_connect();
-    $overviewName = "mcq-option-editor";
+    $pageName = "mcq-option-editor";
     $columnName = array('OptionID','Content','Explanation','MCQID');
     try{
         //edit/delete option
@@ -45,7 +45,7 @@
                         
                         $conn->commit();                    
                     } catch(PDOException $e) {
-                        debug_pdo_err($overviewName, $e);
+                        debug_pdo_err($pageName, $e);
                         $conn->rollback();
                     } 
                 }                       
@@ -80,7 +80,7 @@
         $optionResult = $optionQuery->fetchAll(PDO::FETCH_OBJ);    
     
     } catch(PDOException $e) {
-        debug_pdo_err($overviewName, $e);
+        debug_pdo_err($pageName, $e);
     }
     
     db_close($conn); 

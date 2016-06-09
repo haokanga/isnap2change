@@ -1,15 +1,25 @@
 <?php  	
     /*
-    Naming Convention:
+    ```Naming Convention```
     
-    Create: INSERT
-    Update: UPDATE
-    Delete: DELETE
+    create: INSERT
+    update: UPDATE
+    delete: DELETE
     get...: SELECT fetch
     get...s: SELECT fetchAll
     
-    variables order: $conn, $pkCol(alphabetical order), $non-pkCol(alphabetical order)
+    ```variables order```
+    $conn, $pkCol(alphabetical order), $non-pkCol(alphabetical order)
     e.g. $conn, $questionID, $studentID, $status, $week
+    
+    ```Function Order```
+    create
+    update
+    delete
+    get...
+    get...s
+    misc
+    
     */
 
     /* db connection*/
@@ -108,8 +118,17 @@
         $updateSql->execute(array($classID));
     }
     
+    function getClass($conn, $classID){
+        $classSql = "SELECT *
+                   FROM Class WHERE ClassID = ?";
+        $classQuery = $conn->prepare($classSql);
+        $classQuery->execute(array($classID));
+        $classResult = $classQuery->fetch(PDO::FETCH_OBJ);
+        return $classResult;
+    }
+    
     function getClassByName($conn, $className){
-        $classSql = "SELECT ClassID
+        $classSql = "SELECT *
                    FROM Class WHERE ClassName = ?";
         $classQuery = $conn->prepare($classSql);
         $classQuery->execute(array($className));
@@ -148,7 +167,7 @@
     /* Class */
     
     /* Token */    
-    function updateToken($conn, $classID, $type, $tokenString){
+    function updateToken($conn, $classID, $tokenString, $type){
         $updateSql = "INSERT INTO Token(ClassID, `Type`, TokenString)
                                     VALUES (?,?,?) ON DUPLICATE KEY UPDATE TokenString = ?";			
         $updateSql = $conn->prepare($updateSql);                            
@@ -165,6 +184,41 @@
     } 
     /* Token */
     
+    /* Student */   
+    function deleteStudent($conn, $studentID){
+        $updateSql = "DELETE FROM Student WHERE StudentID = ?";			
+        $updateSql = $conn->prepare($updateSql);
+        $updateSql->execute(array($studentID));
+    }
+    
+    function getStudents($conn){        
+        $studentSql = "SELECT * , DATE(SubmissionTime) AS SubmissionDate FROM Student NATURAL JOIN Class
+               ORDER BY ClassID";
+        $studentQuery = $conn->prepare($studentSql);
+        $studentQuery->execute();
+        $studentResult = $studentQuery->fetchAll(PDO::FETCH_OBJ);  
+        return $studentResult;
+    }
+    
+    function resetPassword($conn, $studentID){
+        $updateSql = "UPDATE Student 
+            SET Password = ?
+            WHERE StudentID = ?";			
+        $updateSql = $conn->prepare($updateSql);                            
+        $updateSql->execute(array(md5('WelcomeToiSNAP2'), $studentID));
+    }    
+    /* Student */
+    
+    /* Week */
+    function removeWeek($conn, $week){
+        $updateSql = "SET SQL_SAFE_UPDATES=0;
+            UPDATE Quiz SET Week = NULL WHERE Week = ?;
+            SET SQL_SAFE_UPDATES=1;";			
+        $updateSql = $conn->prepare($updateSql);                            
+        $updateSql->execute(array($week));
+        return $updateSql;
+    }
+    
     function getWeekNum($conn){
         $weekSql = "select MAX(Week) as WeekNum from Quiz";
         $weekQuery = $conn->prepare($weekSql);
@@ -172,6 +226,7 @@
         $weekResult = $weekQuery->fetch(PDO::FETCH_OBJ);
         return $weekResult;
     }
+    /* Week */
     
     function getStuQuizScore($conn, $quizID, $studentID){
         $pointsBySection = array('MCQ', 'Matching', 'Poster', 'Misc');
@@ -206,6 +261,18 @@
         
         return $score;
     }    
+    
+    /* Quiz */
+    function getQuizNum($conn){
+        $weekSql = "SELECT Week, COUNT(*) AS QuizNum FROM Quiz GROUP BY Week";
+        $weekQuery = $conn->prepare($weekSql);
+        $weekQuery->execute();
+        $weekResult = $weekQuery->fetchAll(PDO::FETCH_OBJ); 
+        return $weekResult;
+    }
+    
+    
+    /* Quiz */
     
     function getQuizPoints($conn, $quizID){
         $pointsBySection = array('MCQ', 'Matching', 'Poster', 'Misc');
