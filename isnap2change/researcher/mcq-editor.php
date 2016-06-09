@@ -65,11 +65,10 @@
         if(isset($_GET['quizid'])){
             $quizID = $_GET['quizid'];
             $quizResult = getMCQQuiz($conn, $quizID);
+            $topicResult = getTopics($conn);
+            $materialRes = getLearningMaterial($conn, $quizID);
+            $mcqQuesResult = getOptions($conn, $quizID);
         }
-        
-        $topicResult = getTopics($conn);
-        $materialRes = getLearningMaterial($conn, $quizID);
-        $mcqQuesResult = getOptions($conn, $quizID);
     } catch(PDOException $e) {
         debug_pdo_err($pageName, $e);
     }

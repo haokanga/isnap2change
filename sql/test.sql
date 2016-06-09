@@ -70,5 +70,10 @@ INSERT INTO Quiz_Record(QuizID, StudentID, Status)
 SELECT * FROM    Quiz_Record;                             
                                 
                                 
-                                
-                                
+                                SELECT *
+				   FROM   MCQ_Section NATURAL JOIN MCQ_Question
+								  NATURAL JOIN `Option`
+			       WHERE  QuizID = 1
+			       ORDER BY MCQID;  
+SELECT QuizID, Week, TopicName, Points, Questionnaires, COUNT(MCQID) AS Questions
+                   FROM Quiz NATURAL JOIN Topic NATURAL JOIN MCQ_Section LEFT JOIN MCQ_Question USING (QuizID) WHERE QuizType = 'MCQ' GROUP BY QuizID ;                               

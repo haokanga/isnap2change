@@ -164,7 +164,7 @@
                                             <td><?php echo $quizResult[$i]->Week ?></td>
                                             <td><?php if($quizResult[$i]->QuizType=='MCQ') {echo 'Multiple Choice';} else if($quizResult[$i]->QuizType=='SAQ') {echo 'Short Answer';} else {echo $quizResult[$i]->QuizType;} ?></a></td>
                                             <td><?php echo $quizResult[$i]->TopicName ?></td>
-                                            <td><?php echo getQuizPoints($quizResult[$i]->QuizID); ?><span class="glyphicon glyphicon-remove pull-right" aria-hidden="true"></span><span class="pull-right" aria-hidden="true">&nbsp;</span><span class="glyphicon glyphicon-edit pull-right" aria-hidden="true"></span></td>
+                                            <td><?php echo getQuizPoints($conn, $quizResult[$i]->QuizID); ?><span class="glyphicon glyphicon-remove pull-right" aria-hidden="true"></span><span class="pull-right" aria-hidden="true">&nbsp;</span><span class="glyphicon glyphicon-edit pull-right" aria-hidden="true"></span></td>
                                             <!---->
                                         </tr>
                                     <?php } ?>    

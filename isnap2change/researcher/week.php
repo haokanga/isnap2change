@@ -9,10 +9,10 @@
         $conn = db_connect();
         if($_SERVER["REQUEST_METHOD"] == "POST"){        
             $week = $_POST['week'];
-            $updateSql = removeWeek($conn, $week);         
-        }
-        //General error: 2014 Cannot execute queries while other unbuffered queries are active. Consider using PDOStatement::fetchAll().
-        unset($updateSql);
+            $updateSql = removeWeek($conn, $week);  
+            //General error: 2014 Cannot execute queries while other unbuffered queries are active. Consider using PDOStatement::fetchAll().
+            unset($updateSql);            
+        }        
     } catch(PDOException $e) {
         debug_pdo_err($pageName, $e);
     }
