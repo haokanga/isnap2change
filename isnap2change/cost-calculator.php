@@ -1,6 +1,7 @@
 <?php
 	$studentid = 1;
 	$quizid = 5;
+	$week = 6;
 ?>
 <html>
 <head>

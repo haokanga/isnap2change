@@ -26,8 +26,8 @@
 	$correctCount = 0;
 	
 	for($i = 0; $i < count($answerArr); $i++) {
-		if($ansArr[$i] == $correctAns[$i]) {
-			$correctcount++;
+		if($answerArr[$i] == $correctAns[$i]) {
+			$correctCount++;
 		} else {
 			array_push($feedback["detail"], ($i+1));
 		}
@@ -49,7 +49,7 @@
 			$costCalSubmitSql = "INSERT INTO Quiz_Record(QuizID, StudentID, Status)
 								 VALUES (?,?,?) ON DUPLICATE KEY UPDATE Status = ?;";			
 		
-			$costCalSubmitQuery = $conn->prepare($posterQuizSaveSql);                            
+			$costCalSubmitQuery = $conn->prepare($costCalSubmitSql);                            
 			$costCalSubmitQuery->execute(array($quizid, $studentid, $status, $status));
 			
 			//UPDATE Student Score
