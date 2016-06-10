@@ -500,8 +500,9 @@
         $materialPreQuery = $conn->prepare($materialPreSql);
         $materialPreQuery->execute(array($quizID));                
         if($materialPreQuery->fetchColumn() != 1){
-                    
-        }                
+			throw new Exception("Failed to get learning material");
+        }
+		
         $materialSql = "SELECT Content, TopicName 
                         FROM   Learning_Material NATURAL JOIN Quiz
                                                  NATURAL JOIN Topic
@@ -581,6 +582,21 @@
 		}
 	}
 	
+	function updatePosterSavedDoc($conn, $quizID, $studentID, $zwibblerDoc){
+		$posterRecordSaveSql = "INSERT INTO Poster_Record(QuizID, StudentID, ZwibblerDoc)
+							    VALUES (?,?,?) ON DUPLICATE KEY UPDATE ZwibblerDoc= ?;";
+		$posterRecordSaveQuery = $conn->prepare($posterRecordSaveSql);
+		$posterRecordSaveQuery->execute(array($quizID, $studentID, $zwibblerDoc, $zwibblerDoc));
+	}
+	
+	function updatePosterSubmittedDoc($conn, $quizID, $studentID, $zwibblerDoc, $imageUrl){
+		$posterRecordSubmittedSql = "INSERT INTO Poster_Record(QuizID, StudentID, ZwibblerDoc, ImageURL)
+									 VALUES (?,?,?,?) ON DUPLICATE KEY UPDATE ZwibblerDoc = ? , ImageURL = ?;";
+			
+		$posterRecordSubmittedQuery = $conn->prepare($posterRecordSubmittedSql);
+		$posterRecordSubmittedQuery -> execute(array($quizID, $studentID, $zwibblerDoc, $imageUrl, $zwibblerDoc, $imageUrl));
+	}
+	
 	function getPosterSavedDoc($conn, $quizID, $studentID){
 		$posterSql = "SELECT COUNT(*)
 					  FROM   Poster_Record
@@ -601,4 +617,6 @@
 		
 		return $posterRes;
 	}
+	
+	
 ?>

@@ -1,49 +1,46 @@
 <?php
 	session_start();
 	require_once('mysql-lib.php');
+	require_once('debug.php');
 	
-	if(!isset($_SESSION["studentid"])){
+	$pageName = "learning-material";
+	
+	//check login status
+	if(!isset($_SESSION["studentID"])){
 		
 	}
-		
+	
+	//check whether a request is GET or POST 
 	if ($_SERVER["REQUEST_METHOD"] == "POST") {
-		
-		if(isset($_POST["quizid"]) && isset($_POST["quiztype"]) && isset($_POST["week"]) && isset($_POST["status"])){
-			
-			$quizid = $_POST["quizid"];
-			$quiztype = $_POST["quiztype"];
+		if(isset($_POST["quizID"]) && isset($_POST["quizType"]) && isset($_POST["week"])){
+			$quizID = $_POST["quizID"];
+			$quizType = $_POST["quizType"];
 			$week = $_POST["week"];
-			$status = $_POST["status"];
-			
 		} else {
 			
 		}
-	
 	} else {
 		
 	}
 	
-	$conn = db_connect();
+	$conn = null;
 	
-	$materialPreSql = "SELECT COUNT(*) 
-					   FROM   Learning_Material
-					   WHERE  QuizID = ?";
-							
-	$materialPreQuery = $conn->prepare($materialPreSql);
-	$materialPreQuery->execute(array($quizid));
+	try {
+		$conn = db_connect();
+		
+		//get learning material
+		getLearningMaterial($conn, $quizID);
+		
+	} catch(Exception $e){
+		if($conn != null) {
+			db_close($conn);
+		}
 			
-	if($materialPreQuery->fetchColumn() != 1){
-				
+		debug_pdo_err($pageName, $e);
+		$feedback["message"] = $e->getMessage();
+		echo json_encode($feedback);
+		exit;
 	}
-			
-	$materialSql = "SELECT Content, TopicName 
-					FROM   Learning_Material NATURAL JOIN Quiz
-									         NATURAL JOIN Topic
-					WHERE  QuizID = ?";
-							
-	$materialQuery = $conn->prepare($materialSql);
-	$materialQuery->execute(array($quizid));
-	$materialRes = $materialQuery->fetch(PDO::FETCH_OBJ);
 	
 	db_close($conn);
 
@@ -67,7 +64,7 @@
 			{
                 //list of question type
 				<?php 
-					switch($quiztype) {
+					switch($quizType) {
 						case "MCQ": 
 							echo 'document.getElementById("formQuizBegin").setAttribute("action", "multiple-choice-question.php");';
 							break;
@@ -113,8 +110,8 @@
                         <br>
 						<form id="formQuizBegin" method=post>
                             <button type="button" onclick="beginQuiz()" class="btn btn-default btn-lg btn-block" style="background-color:darkseagreen;">BEGIN QUIZ </button>
-							<input  type=hidden name="quizid" value=<?php echo $quizid; ?>></input>
-                            <input  type=hidden name="quiztype" value=<?php echo $quiztype; ?>></input>
+							<input  type=hidden name="quizID" value=<?php echo $quizID; ?>></input>
+                            <input  type=hidden name="quizType" value=<?php echo $quizType; ?>></input>
 							<input  type=hidden name="week" value=<?php echo $week; ?>></input>
                             <input  type=hidden name="status" value=<?php echo $status; ?>></input>
                            <!--

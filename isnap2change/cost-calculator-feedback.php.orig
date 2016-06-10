@@ -1,4 +1,8 @@
 <?php
+<<<<<<< HEAD
+=======
+	
+>>>>>>> 0f6922b21a9785cbb01e2ef63131165a42bd5733
 	require_once("mysql-lib.php");
 	require_once("debug.php");
 
@@ -48,14 +52,14 @@
 			updateStudentScore($conn, $studentID);
 			
 			$conn->commit();
-		} catch(Exception $e) {
+		} catch(PDOException $e) {
 			if($conn != null) {
 				$conn->rollback();
 				db_close($conn);
 			}
 			
-			debug_err($pageName, $e);
-			$feedback["message"] = $e->getMessage();
+			debug_pdo_err($pageName, $e);
+			$feedback["message"] = "Failed to update database";
 			echo json_encode($feedback);
 			exit;
 		}

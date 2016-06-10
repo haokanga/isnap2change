@@ -3,6 +3,8 @@
 	session_start();
 	require_once("mysql-lib.php");
 	
+	$pageName = "poster-editor";
+	
 	//check student login status
 	if(! isset($_SESSION["studentID"])){
 		
@@ -29,12 +31,11 @@
         //check quiz status	
 		$status = getQuizStatus($conn, $quizID, $studentID);
 		//if quiz is answered, saved poster will be read from database.
-		if($status != "UNANSWERED") {
+		if($status != "UNANSWERED"){
 			$posterRes = getPosterSavedDoc($conn, $quizID, $studentID);	
-		}
-		
+		}	
 	}catch(Exception $e){
-		if($conn != null) {
+		if($conn != null){
 			db_close($conn);
 		}
 		
@@ -98,38 +99,42 @@
 					$("#submitBtn").attr("disabled","disabled");
 		<?php	} ?>
 		
-		function parseSaveFeedback(saveResponse) {
-			if(saveResponse == "success") {
-				alert("Saved Successfully!");
-			} else {
+		function parseSaveFeedback(saveResponse){
+			var feedback = JSON.parse(saveResponse);
+			
+			if(feedback.message != "success"){
 				alert("Fail to save. Please try again!");
-			}
+			} 
+			
+			alert("Saved Successfully!");
 		}
 		
-		function parseSubmitFeedback(submitResponse) {
-			if(submitResponse == "success") {
-				alert("Submitted Successfully!");
-				zwibbler.setConfig("readOnly", true);
-				$("#saveBtn").attr("disabled","disabled");
-				$("#submitBtn").attr("disabled","disabled");
-			} else {
+		function parseSubmitFeedback(submitResponse){
+			var feedback = JSON.parse(submitResponse);
+			
+			if(feedback.message != "success"){
 				alert("Fail to submit. Please try again!");
 			}
+			
+			alert("Submitted Successfully!");
+			zwibbler.setConfig("readOnly", true);
+			$("#saveBtn").attr("disabled","disabled");
+			$("#submitBtn").attr("disabled","disabled");
 		}
 		
-        function onSave() {		
+        function onSave(){		
             var zwibblerDoc = zwibbler.save("zwibbler3");
 			
 			var xmlhttp = new XMLHttpRequest();
-			xmlhttp.onreadystatechange = function() {
-				if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
+			xmlhttp.onreadystatechange = function(){
+				if (xmlhttp.readyState == 4 && xmlhttp.status == 200){
 					parseSaveFeedback(xmlhttp.responseText);
 				} 
 			};
 			
 			xmlhttp.open("POST", "poster-feedback.php", true);
 			xmlhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-			xmlhttp.send("quizID="+<?php echo $quizID; ?>+"&studentID="+<?php echo $studentID; ?>+"&action=SAVE"+"&zwibblerdoc="+zwibblerDoc.substr(10));
+			xmlhttp.send("quizID="+<?php echo $quizID; ?>+"&studentID="+<?php echo $studentID; ?>+"&action=SAVE"+"&zwibblerDoc="+zwibblerDoc.substr(10));
         }
 
         function onSubmit() {		
@@ -145,7 +150,7 @@
 			
 			xmlhttp.open("POST", "poster-feedback.php", true);
 			xmlhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-			xmlhttp.send("quizID="+<?php echo $quizID; ?>+"&studentID="+<?php echo $studentID; ?>+"&action=SUBMIT"+"&zwibblerdoc="+zwibblerDoc.substr(10)+"&dataurl="+dataUrl);
+			xmlhttp.send("quizID="+<?php echo $quizID; ?>+"&studentID="+<?php echo $studentID; ?>+"&action=SUBMIT"+"&zwibblerDoc="+zwibblerDoc.substr(10)+"&dataUrl="+dataUrl);
         }
 		
 		function goBack() {
