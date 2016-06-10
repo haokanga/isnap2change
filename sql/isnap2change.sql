@@ -143,10 +143,9 @@ CREATE TABLE IF NOT EXISTS `Quiz_Record` (
 )  ENGINE=INNODB;
 
 CREATE TABLE IF NOT EXISTS `Learning_Material` (
-    MaterialID MEDIUMINT AUTO_INCREMENT,
-    Content LONGTEXT,
     QuizID MEDIUMINT,
-    CONSTRAINT Learning_Material_MaterialID_PK PRIMARY KEY (MaterialID),
+    Content LONGTEXT,
+    CONSTRAINT Learning_Material_QuizID_PK PRIMARY KEY (QuizID),
     CONSTRAINT Learning_Material_QuizID_FK FOREIGN KEY (QuizID)
         REFERENCES Quiz (QuizID)
         ON DELETE CASCADE ON UPDATE CASCADE

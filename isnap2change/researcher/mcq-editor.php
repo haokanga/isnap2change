@@ -194,14 +194,14 @@
 								<i>	<?php echo $materialRes->TopicName; ?> </i>                          
                                 </h1> 
                             </div>
-                   
+                            <!--
                             <div class="para" style="padding-left:15px; padding-right:15px; padding-top:8px; text-align:center;">
                                 <div style="color:black; justify-content:center; align-items:center;">
                                 <i>
                                   <?php echo $materialRes->Content; ?></i>
                                 </div>
                             </div>                        
-                        
+                            -->
                             <span class="glyphicon glyphicon-remove pull-right" aria-hidden="true"></span><span class="pull-right" aria-hidden="true">&nbsp;</span><a href="learning-material-editor.php?quizid=<?php echo $quizResult->QuizID ?>"><span class="glyphicon glyphicon-edit pull-right" aria-hidden="true"></span></a>
                             <!-- data-toggle="modal" data-target="#dialog" -->                            
                         </div>                            
@@ -253,10 +253,10 @@
                             <div class="well row">
                                 <h4>Multiple Choice Quiz Overview Notification</h4>
                                 <div class="alert alert-info">
-                                    <p>View quizzes by filtering or searching. You can create/update/delete any class.</p>
+                                    <p>View multiple choice questions in this quiz by filtering or searching. You can create/update/delete any question.</p>
                                 </div>
                                 <div class="alert alert-danger">
-                                    <p><strong>Warning</strong> : If you remove one question. All the <strong>option and student answers</strong> of this quiz will also get deleted (not recoverable), not only the quiz itself.</p>
+                                    <p><strong>Warning</strong> : If you remove one question. All the <strong>options and student answers</strong> of this question will also get deleted (not recoverable), not only the question itself.</p>
                                 </div>
                             </div>
                         </div>
@@ -315,13 +315,11 @@
         }   
     });
     $('td > .glyphicon-remove').on('click', function (){
-        if (confirm('[WARNING] Are you sure to remove this question? If you remove one question. All the options and students answers of this question will also get deleted (not recoverable). Not only the question itself.')) {
-            $('#update').val(-1);
-            for(i=0;i<$('.dialoginput').length;i++){                
-                $('.dialoginput').eq(i).val($(this).parent().parent().children('td').eq(i).text().trim());
-            }
-            $('#submission').submit();
-        }                   
+        $('#update').val(-1);
+        for(i=0;i<$('.dialoginput').length;i++){                
+            $('.dialoginput').eq(i).val($(this).parent().parent().children('td').eq(i).text().trim());
+        }
+        $('#submission').submit();                           
     });    
     $('#btnSave').on('click', function (){
         $('#submission').validate();   

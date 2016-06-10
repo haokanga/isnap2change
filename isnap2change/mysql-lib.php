@@ -493,6 +493,14 @@
         $updateSql->execute(array($content, $quizID));
     }
     
+    function updateLearningMaterial($conn, $quizID, $content){
+        $updateSql = "UPDATE Learning_Material 
+            SET Content = ?
+            WHERE QuizID = ?";			
+        $updateSql = $conn->prepare($updateSql);                            
+        $updateSql->execute(array($content, $quizID));   
+    }
+    
     function getLearningMaterial($conn, $quizID){
         $materialPreSql = "SELECT COUNT(*) 
                        FROM   Learning_Material
