@@ -384,12 +384,20 @@
         $updateSql->execute(array($points, $questionnaires, $quizID));
     }
     
-    function updateMCQQuestion($conn, $mcqID, $question){
+    function createMCQQuestion($conn, $quizID, $question){
+        $updateSql = "INSERT INTO MCQ_Question(Question, QuizID)
+                    VALUES (?,?);";			
+        $updateSql = $conn->prepare($updateSql);                            
+        $updateSql->execute(array($question)); 
+        return $conn->lastInsertId();
+    }
+    
+    function updateMCQQuestion($conn, $mcqID, $correctChoice, $question){
         $updateSql = "UPDATE MCQ_Question
-                    SET Question = ? 
+                    SET Question = ?, CorrectChoice = ?
                     WHERE MCQID = ?";			
         $updateSql = $conn->prepare($updateSql);                            
-        $updateSql->execute(array($question, $mcqID));
+        $updateSql->execute(array($question, $correctChoice, $mcqID));
     }
     
     function deleteMCQQuestion($conn, $mcqID){
@@ -405,6 +413,18 @@
         $mcqQuesResult = $mcqQuesQuery->fetch(PDO::FETCH_OBJ);
         return $mcqQuesResult;
     } 
+    
+    function getMCQQuestions($conn, $quizID){
+        $mcqQuesSql = "SELECT MCQID, Question, CorrectChoice, Content, Explanation
+                    FROM MCQ_Section NATURAL JOIN MCQ_Question
+                    NATURAL JOIN `Option`
+                    WHERE QuizID = ?
+                    ORDER BY MCQID";                                
+        $mcqQuesQuery = $conn->prepare($mcqQuesSql);
+        $mcqQuesQuery->execute(array($quizID));
+        $mcqQuesResult = $mcqQuesQuery->fetchAll(PDO::FETCH_OBJ); 
+        return $mcqQuesResult;
+    }
     
     function getMCQQuiz($conn, $quizID){
         $quizSql = "SELECT QuizID, Week, TopicName, Points, Questionnaires, COUNT(MCQID) AS Questions
@@ -454,18 +474,6 @@
         $optionQuery->execute(array($mcqID));
         $optionResult = $optionQuery->fetchAll(PDO::FETCH_OBJ); 
         return $optionResult;
-    }
-    
-    function getOptionsByQuiz($conn, $quizID){
-        $mcqQuesSql = "SELECT MCQID, Question, CorrectChoice, Content, Explanation
-                   FROM   MCQ_Section NATURAL JOIN MCQ_Question
-                                  NATURAL JOIN `Option`
-                   WHERE  QuizID = ?
-                   ORDER BY MCQID";                                
-        $mcqQuesQuery = $conn->prepare($mcqQuesSql);
-        $mcqQuesQuery->execute(array($quizID));
-        $mcqQuesResult = $mcqQuesQuery->fetchAll(PDO::FETCH_OBJ); 
-        return $mcqQuesResult;
     }
     
     function getMaxOptionNum($conn, $quizID){
@@ -565,7 +573,7 @@
 			$statusQuery = $conn->prepare($statusSql);
 			$statusQuery->execute(array($quizID, $studentID));
 			
-			return $statusQuery->`Status`; 
+			return $statusQuery->Status; 
 		} else if($statusQuery->fetchColumn() == 0){
 			return "UNANSWERED";
 		} else{

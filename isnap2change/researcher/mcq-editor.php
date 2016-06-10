@@ -37,6 +37,15 @@
                     deleteQuiz($conn, $quizID);
                 }            
             }
+            if(isset($_POST['update'])){                          
+                $update = $_POST['update'];
+                if($update == 1){
+                    $quizID = $_POST['quizid'];
+                    $question = $_POST['question'];
+                    $mcqID = createMCQQuestion($conn, $quizID, $question);
+                    header('Location: mcq-option-editor.php?quizid=$quizID&mcqid=$mcqID');
+                }             
+            }
         }
     } catch(Exception $e) {
         debug_err($pageName, $e);
@@ -67,7 +76,7 @@
             $quizResult = getMCQQuiz($conn, $quizID);
             $topicResult = getTopics($conn);
             $materialRes = getLearningMaterial($conn, $quizID);
-            $mcqQuesResult = getOptionsByQuiz($conn, $quizID);
+            $mcqQuesResult = getMCQQuestions($conn, $quizID);
         }
     } catch(Exception $e) {
         debug_err($pageName, $e);
@@ -80,42 +89,8 @@
 <html lang="en">
 
 <head>
-
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="description" content="">
-    <meta name="author" content="">
-
-    <title>iSNAP2Change Admin</title>
-
-    <!-- Bootstrap Core CSS -->
-    <link href="../bower_components/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
-
-    <!-- MetisMenu CSS -->
-    <link href="../bower_components/metisMenu/dist/metisMenu.min.css" rel="stylesheet">
-
-    <!-- DataTables CSS -->
-    <link href="../bower_components/datatables-plugins/integration/bootstrap/3/dataTables.bootstrap.css" rel="stylesheet">
-
-    <!-- DataTables Responsive CSS -->
-    <!-- <link href="../bower_components/datatables-responsive/css/dataTables.responsive.css" rel="stylesheet"> -->
-
-    <!-- Custom CSS -->
-    <link href="../dist/css/sb-admin-2.css" rel="stylesheet">
-
-    <!-- Custom Fonts -->
-    <link href="../bower_components/font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css">
-
-    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
-    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
-    <!--[if lt IE 9]>
-        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
-        <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
-    <![endif]-->
-
-    <!--w3data.js to include html-->
-    <script src="../js/w3data.js"></script>
+    <!-- Header Library -->
+    <?php include('/header-lib.php'); ?>
     <script src="//cdn.tinymce.com/4/tinymce.min.js"></script>
     <script>
       /**
@@ -142,16 +117,7 @@
       ]
      });
      */
-    </script>
-    <style>
-    .glyphicon:hover {
-        background-color: rgb(153, 153, 102);
-    }
-    .modal-xl {
-        width: 90%;
-       max-width:1200px;
-    }
-    </style> 
+    </script> 
 </head>
 
 <body>
@@ -242,7 +208,8 @@
                     <!-- Options -->
                     <div class="panel panel-default">
                         <div class="panel-heading">
-                            Questions and Options 
+                            Questions and Options
+                            <span class="glyphicon glyphicon-plus pull-right" data-toggle="modal" data-target="#dialog"></span>
                         </div>
                         <!-- /.panel-heading -->
                         <div class="panel-body">
@@ -270,7 +237,7 @@
                                             <td>
                                                 <span class="glyphicon glyphicon-remove pull-right " aria-hidden="true"></span>
                                                 <span class="pull-right" aria-hidden="true">&nbsp;</span>
-                                                <a href="mcq-option-editor.php?mcqid=<?php echo $mcqQuesResult[$i]->$mcqQuesColName[0]; ?>">
+                                                <a href="mcq-option-editor.php?quizid=<?php echo $quizID ?>&mcqid=<?php echo $mcqQuesResult[$i]->$mcqQuesColName[0]; ?>">
                                                 <span class="glyphicon glyphicon-edit pull-right" data-toggle="modal" data-target="#dialog" aria-hidden="true"></span></a>
                                             </td>            
                                         </tr>
@@ -291,64 +258,55 @@
                         </div>
                         <!-- /.panel-body -->
                     </div>
-                    
-                    
-                    
+                    <!-- /.panel -->
                 </div>
                 <!-- /.col-lg-12 -->
             </div>
-            <!-- /.row -->
-            
+            <!-- /.row -->            
         </div>
         <!-- /#page-wrapper -->
-
     </div>
     <!-- /#wrapper -->
-    <!-- jQuery -->
-    <script src="../bower_components/jquery/dist/jquery.min.js"></script>
-
-    <!-- Bootstrap Core JavaScript -->
-    <script src="../bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
-
-    <!-- Metis Menu Plugin JavaScript -->
-    <script src="../bower_components/metisMenu/dist/metisMenu.min.js"></script>
-
-    <!-- DataTables JavaScript -->
-    <script src="../bower_components/datatables/media/js/jquery.dataTables.min.js"></script>
-    <script src="../bower_components/datatables-plugins/integration/bootstrap/3/dataTables.bootstrap.min.js"></script>
-
-    <!-- Custom Theme JavaScript -->
-    <script src="../dist/js/sb-admin-2.js"></script>    
-    
-    <!--jQuery Validate plugin-->
-    <script src="http://ajax.aspnetcdn.com/ajax/jquery.validate/1.15.0/jquery.validate.min.js"></script>
-
-    <!-- DataTables rowsGroup Plugin -->
-    <script src="../bower_components/datatables-plugins/rowsgroup/dataTables.rowsGroup.js "></script>
-    
-    <link rel="stylesheet" href="https://code.jquery.com/ui/1.11.4/themes/ui-lightness/jquery-ui.css" />
-    <link rel="stylesheet" href="https://code.jquery.com/qunit/qunit-1.18.0.css" />  
-    
+    <!-- Modal -->
+      <div class="modal fade" id="dialog" role="dialog">
+        <div class="modal-dialog">        
+          <!-- Modal content-->
+          <div class="modal-content">
+            <div class="modal-header">
+              <button type="button" class="close" data-dismiss="modal">&times;</button>
+              <h4 class="modal-title" id="dialogTitle">Edit Question</h4>
+            </div>
+            <div class="modal-body">
+            <form id="submission" method="post" action="<?php echo $phpself; ?>">
+                <input type=hidden name="update" id="update" value="1" required></input>
+                <label for="Question">Question</label>
+                <input type="text" class="form-control" id="Question" name="question" value="" required></input>
+                <br>
+                <label for="QuizID" style="display:none">QuizID</label>
+                <input type="text" class="form-control dialoginput" id="QuizID" name="quizid" style="display:none" value="<?php echo $quizID; ?>" required></input>
+            </form>
+            </div>
+            <div class="modal-footer">            
+              <button type="button" id="btnSave" class="btn btn-default">Save</button>
+              <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+          </div>          
+        </div>
+      </div>    
+      
+    <!-- SB Admin Library -->  
+    <?php include('/sb-admin-lib.php'); ?>   
     <!-- Page-Level Scripts -->
     <script>
     //DO NOT put them in $(document).ready() since the table has multi pages
-    /**
+    
     $('.glyphicon-plus').on('click', function (){
-        $('#dialogTitle').text("Add MCQ");
+        $('#dialogTitle').text("Add Question");
         $('#update').val(1);
         for(i=0;i<$('.dialoginput').length;i++){                
             $('.dialoginput').eq(i).val('');
         }   
     }); 
-    $('.glyphicon-remove').on('click', function (){
-        if (confirm('[WARNING] Are you sure to remove this quiz? If you remove one quiz. All the questions and submission of this quiz will also get deleted (not recoverable). It includes learning material, questions and options, their submissions and your grading/feedback, not only the quiz itself.')) {
-            $('#update').val(-1);
-            for(i=0;i<$('.dialoginput').length;i++){                
-                $('.dialoginput').eq(i).val($(this).parent().parent().children('td').eq(i).text().trim());
-            }
-            $('#submission').submit();
-        }           
-    });
     $('#btnSave').on('click', function (){
         $('#submission').validate({
           rules: {
@@ -364,7 +322,6 @@
         });   
         $('#submission').submit();
     });
-    */
     
     //include html
     w3IncludeHTML();   
