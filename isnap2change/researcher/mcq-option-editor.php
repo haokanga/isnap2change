@@ -3,53 +3,58 @@
     require_once("../mysql-lib.php");
     require_once("../debug.php");
     require_once("/researcher-validation.php");
-    $pageName = "mcq";
-    $columnName = array('QuizID','Week','TopicName','Points','Questionnaires','Questions');
+    $pageName = "mcq-option-editor";
+    $columnName = array('OptionID','Content','Explanation','Edit');
     
     try{
-        $conn = db_connect();
-        //edit/delete quiz
+        $conn = db_connect();        
         if($_SERVER["REQUEST_METHOD"] == "POST"){
+            if(isset($_POST['metadataupdate'])){                          
+                $metadataupdate = $_POST['metadataupdate'];
+                if($metadataupdate == 0){
+                    $mcqID = $_POST['mcqid'];
+                    $question = $_POST['question'];
+                    updateMCQQuestion($conn, $mcqID, $question);
+                }
+                else if($metadataupdate == -1){
+                    $mcqID = $_POST['mcqid'];                    
+                    deleteMCQQuestion($conn, $mcqID); 
+                }             
+            }            
             if(isset($_POST['update'])){                          
                 $update = $_POST['update'];
                 if($update == 1){
-                    try{
-                        $week = $_POST['week'];
-                        $quizType = 'MCQ';
-                        $topicName = $_POST['topicname'];
-                        $points = $_POST['points'];
-                        $questionnaires = $_POST['questionnaires'];
-                        $conn->beginTransaction();              
-                        
-                        //insert and get topicID
-                        $topicResult = getTopicByName($conn, $topicName);  
-                        $topicID = $topicResult->TopicID;                        
-                        $quizID = createQuiz($conn, $topicID, $quizType, $week);                        
-                        createMCQSection($conn, $quizID, $points, $questionnaires);
-                        createEmptyLearningMaterial($conn, $quizID);
-                        
-                        $conn->commit();                    
-                    } catch(PDOException $e) {
-                        debug_pdo_err($pageName, $e);
-                        $conn->rollback();
-                    } 
-                } 
+                    $mcqID = $_POST['mcqid'];
+                    $content = $_POST['content'];
+                    $explanation = $_POST['explanation'];
+                    createOption($conn, $mcqID, $content, $explanation);
+                }
+                else if($update == 0){
+                    $optionID = $_POST['optionid'];
+                    $content = $_POST['content'];
+                    $explanation = $_POST['explanation'];
+                    updateOption($conn, $optionID, $content, $explanation);
+                }
                 else if($update == -1){  
-                    $quizID = $_POST['quizid'];
-                    deleteQuiz($conn, $quizID);
+                    $optionID = $_POST['optionid'];
+                    deleteOption($conn, $optionID); 
                 }             
             }
-        } 
+        }      
     } catch(PDOException $e) {
         debug_pdo_err($pageName, $e);
     }
-            
-    try {    
-        $quizResult = getMCQQuizzes($conn); 
-        $topicResult = getTopics($conn); 
+    
+    try{
+        if(isset($_GET['mcqid'])){
+            $mcqID = $_GET['mcqid'];
+            $mcqQuesResult = getMCQQuestion($conn, $mcqID); 
+            $optionResult = getOptions($conn, $mcqID);  
+        }
     } catch(PDOException $e) {
         debug_pdo_err($pageName, $e);
     }
+    
     db_close($conn); 
     
 ?>
@@ -110,16 +115,41 @@
         <div id="page-wrapper">
             <div class="row">
                 <div class="col-lg-12">
-                    <h1 class="page-header">Multiple Choice Quiz Overview</h1>
+                    <h1 class="page-header">Multiple Choice Question Editor</h1>
                 </div>
                 <!-- /.col-lg-12 -->
             </div>
             <!-- /.row -->
             <div class="row">
                 <div class="col-lg-12">
+                    <!-- MetaData -->
                     <div class="panel panel-default">
                         <div class="panel-heading">
-                            Multiple Choice Quiz Information Table <span class="glyphicon glyphicon-plus pull-right" data-toggle="modal" data-target="#dialog"></span>
+                            Multiple Choice Question MetaData
+                        </div>
+                        <!-- /.panel-heading -->
+                        <div class="panel-body">
+                            <form id="metadatasubmission" method="post" action="<?php echo $pageName.'.php?mcqid='.$mcqID; ?>">
+                                <!--if 0 update; else if -1 delete;-->
+                                <input type=hidden name="metadataupdate" id="metadataupdate" value="1" required></input>
+                                <label for="MCQID" style="display:none">MCQID</label>
+                                <input type="text" class="form-control" id="MCQID" name="mcqid" style="display:none" value="<?php echo $mcqQuesResult->MCQID; ?>" required></input>
+                                <br>
+                                <label for="Question">Question</label>
+                                <input type="text" class="form-control" id="Question" name="question" value="<?php echo $mcqQuesResult->Question; ?>" required></input>
+                                <br>
+                            </form>
+                            <!--edit metadata-->
+                            <span class="glyphicon glyphicon-remove pull-right" id="metadataremove" aria-hidden="true"></span><span class="pull-right" aria-hidden="true">&nbsp;</span><span class="glyphicon glyphicon-floppy-saved pull-right" id="metadataedit" aria-hidden="true"></span>    
+                        </div>                            
+                        <!-- /.panel-body -->
+                    </div>
+                    <!-- /.panel -->
+                
+                
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            Option Information Table <span class="glyphicon glyphicon-plus pull-right" data-toggle="modal" data-target="#dialog"></span>
                         </div>
                         <!-- /.panel-heading -->
                         <div class="panel-body">
@@ -133,27 +163,20 @@
                                         </tr>
                                     </thead>
                                     <tbody>
-                                    <?php for($i=0; $i<count($quizResult); $i++) {?>
+                                    <?php for($i=0; $i<count($optionResult); $i++) {?>
                                         <tr class="<?php if($i % 2 == 0){echo "odd";} else {echo "even";} ?>">
                                             <?php for($j=0; $j<count($columnName); $j++){ ?>
-                                                <td <?php if ($j==0){ echo 'style="display:none"';} ?>>                                                
+                                                <td <?php if ($j==0){ echo 'style="display:none"';} ?>>
                                                     <?php 
-                                                        // Questionnaires: if 1, true; else if 0, false
-                                                        if($j==count($columnName)-2){
-                                                            echo $quizResult[$i]->$columnName[$j] ? 'True' : 'False';
-                                                        } 
-                                                        else {
-                                                            echo $quizResult[$i]->$columnName[$j];  
-                                                        }                                                        
-                                                    ?> 
-                                                    <?php if($j==count($columnName)-1){?>
+                                                    if($j!=count($columnName)-1) 
+                                                        echo $optionResult[$i]->$columnName[$j]; 
+                                                    else { ?>
                                                         <span class="glyphicon glyphicon-remove pull-right" aria-hidden="true"></span>
                                                         <span class="pull-right" aria-hidden="true">&nbsp;</span>
-                                                        <a href="mcq-editor.php?quizid=<?php echo $quizResult[$i]->QuizID ?>">
-                                                        <span class="glyphicon glyphicon-edit pull-right" aria-hidden="true"></span></a>
+                                                        <span class="glyphicon glyphicon-edit pull-right" data-toggle="modal" data-target="#dialog" aria-hidden="true"></span>
                                                     <?php } ?>
                                                 </td>
-                                            <?php }?>
+                                            <?php } ?>                                            
                                         </tr>
                                     <?php } ?>    
                                     </tbody>
@@ -161,12 +184,9 @@
                             </div>
                             <!-- /.table-responsive -->
                             <div class="well row">
-                                <h4>Multiple Choice Quiz Overview Notification</h4>
+                                <h4>Multiple Choice Question Editor Notification</h4>
                                 <div class="alert alert-info">
-                                    <p>View quizzes by filtering or searching. You can create/update/delete any quiz.</p>
-                                </div>
-                                <div class="alert alert-danger">
-                                    <p><strong>Warning</strong> : If you remove one quiz. All the <strong>questions and submission</strong> of this quiz will also get deleted (not recoverable).</p> It includes <strong>learning material, questions and options, their submissions and your grading/feedback</strong>, not only the quiz itself.
+                                    <p>You can create/update/delete any options of this multiple choice question or the question itself.</p>
                                 </div>
                             </div>
                         </div>
@@ -190,30 +210,22 @@
           <div class="modal-content">
             <div class="modal-header">
               <button type="button" class="close" data-dismiss="modal">&times;</button>
-              <h4 class="modal-title" id="dialogTitle">Edit Quiz</h4>
+              <h4 class="modal-title" id="dialogTitle">Edit Option</h4>
             </div>
             <div class="modal-body">
-            <form id="submission" method="post" action="<?php echo $_SERVER['PHP_SELF']; ?>">
+            <form id="submission" method="post" action="<?php echo $pageName.'.php?mcqid='.$mcqID; ?>">
                 <!--if 1, insert; else if -1 delete;-->
                 <input type=hidden name="update" id="update" value="1" required></input>
-                <label for="QuizID" style="display:none">QuizID</label>
-                <input type="text" class="form-control dialoginput" id="QuizID" name="quizid" style="display:none"></input>
-                <label for="Week">Week</label>
-                <input type="text" class="form-control dialoginput" id="Week" name="week"  placeholder="Input Week Number" required></input> 
+                <label for="OptionID" style="display:none">OptionID</label>                
+                <input type="text" class="form-control dialoginput" id="OptionID" name="optionid" style="display:none"></input>
+                <label for="Content">Content</label>
+                <input type="text" class="form-control dialoginput" id="Content" name="content"  placeholder="Input Content" required></input> 
                 <br>  
-                <label for='TopicName'>TopicName</label>
-                <select class="form-control dialoginput" id="TopicName" form="submission" name="topicname" required>
-                    <option value="" disabled selected>Select Topic</option>
-                  <?php for($j=0; $j<count($topicResult); $j++) {?>                  
-                    <option value='<?php echo $topicResult[$j]->TopicName ?>'><?php echo $topicResult[$j]->TopicName ?></option>
-                  <?php } ?>
-                </select>
+                <label for="Explanation">Explanation</label>
+                <input type="text" class="form-control dialoginput" id="Explanation" name="explanation"  placeholder="Input Explanation" required></input> 
                 <br>
-                <label for="Points">Points</label>
-                <input type="text" class="form-control dialoginput" id="Points" name="points"  placeholder="Input Points" required></input>
-                <br>
-                <label for="Questionnaires">Questionnaires</label>
-                <input type="checkbox" class="form-control" id="Questionnaires" name="questionnaires" value="1"></input>
+                <label for="MCQID" style="display:none">MCQID</label>
+                <input type="text" class="form-control dialoginput" id="MCQID" name="mcqid" style="display:none" value="<?php echo $mcqQuesResult->MCQID; ?>" required></input>
             </form>
             </div>
             <div class="modal-footer">            
@@ -244,49 +256,56 @@
 
     <!-- Page-Level Scripts -->
     <script>
-    //DO NOT put them in $(document).ready() since the table has multi pages    
+    //DO NOT put them in $(document).ready() since the table has multi pages 
     $('.glyphicon-plus').on('click', function (){
-        $('#dialogTitle').text("Add MCQ");
+        $('#dialogTitle').text("Add Option");
         $('#update').val(1);
-        for(i=0;i<$('.dialoginput').length;i++){                
+        for(i=0;i<$('.dialoginput').length-1;i++){                
             $('.dialoginput').eq(i).val('');
         }   
-    }); 
-    $('.glyphicon-remove').on('click', function (){
-        if (confirm('[WARNING] Are you sure to remove this quiz? If you remove one quiz. All the questions and submission of this quiz will also get deleted (not recoverable). It includes learning material, questions and options, their submissions and your grading/feedback, not only the quiz itself.')) {
-            $('#update').val(-1);
-            for(i=0;i<$('.dialoginput').length;i++){                
-                $('.dialoginput').eq(i).val($(this).parent().parent().children('td').eq(i).text().trim());
-            }
-            $('#submission').submit();
-        }           
+    });     
+    $('td > .glyphicon-edit').on('click', function (){
+        $('#dialogTitle').text("Edit Option");
+        $('#update').val(0);
+        for(i=0;i<$('.dialoginput').length-1;i++){                
+            $('.dialoginput').eq(i).val($(this).parent().parent().children('td').eq(i).text().trim());
+        }   
+    });     
+    $('td > .glyphicon-remove').on('click', function (){        
+        $('#update').val(-1);
+        for(i=0;i<$('.dialoginput').length-1;i++){                
+            $('.dialoginput').eq(i).val($(this).parent().parent().children('td').eq(i).text().trim());
+        }
+        $('#submission').submit();                   
     });
     $('#btnSave').on('click', function (){
-        $('#submission').validate({
-          rules: {
-            week: {
-              required: true,
-              digits: true
-            },
-            points: {
-              required: true,
-              digits: true
-            }
-          }
-        });   
+        $('#submission').validate();
+        for(i=0;i<$('.dialoginput').length;i++){                
+            console.log($('.dialoginput').eq(i).val());
+        }        
         $('#submission').submit();
     });
+    
     //include html
     w3IncludeHTML();   
     $(document).ready(function() {
         var table = $('#datatables').DataTable({
                 responsive: true,
                 "order": [[ 1, "asc" ]],
-                "pageLength":50,
+                "pageLength":10,
                 "aoColumnDefs": [
                   { "bSearchable": false, "aTargets": [ 0 ] }
                 ]
-        })   
+        })
+        $('#metadataedit').on('click', function (){
+            $('#metadataupdate').val(0);
+            $('#metadatasubmission').validate();   
+            $('#metadatasubmission').submit();
+        }); 
+        $('#metadataremove').on('click', function (){
+            $('#metadataupdate').val(-1);   
+            $('#metadatasubmission').submit();
+        });
     });        
     </script>
 </body>

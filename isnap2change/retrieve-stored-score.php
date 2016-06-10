@@ -6,7 +6,7 @@
     { 
         session_start(); 
     }   
-	require_once('connection.php');
+	require_once('mysql-lib.php');
     if ($_SERVER["REQUEST_METHOD"] == "GET") {        
         if(isset($_GET["command"]) && isset($_GET["gameid"])){
             $gameid = $_GET["gameid"];

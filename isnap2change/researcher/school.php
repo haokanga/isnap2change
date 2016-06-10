@@ -3,11 +3,11 @@
     require_once("../mysql-lib.php");
     require_once("../debug.php");
     require_once("/researcher-validation.php");
-    $conn = db_connect();
-    $overviewName = "school";
+    $pageName = "school";
     
     //if update/insert/remove school
-    try{
+    try{        
+        $conn = db_connect();
         if($_SERVER["REQUEST_METHOD"] == "POST"){
             if(isset($_POST['update'])){                          
                 $update = $_POST['update'];
@@ -15,7 +15,7 @@
                 if($update == 0){                    
                     $schoolID = $_POST['schoolid'];
                     $schoolName = $_POST['schoolname'];
-                    updateSchool($conn, $schoolName, $schoolID);
+                    updateSchool($conn, $schoolID, $schoolName);
                 }
                 // insert
                 else if($update == 1){                                     
@@ -31,11 +31,15 @@
         }
         
     } catch(PDOException $e) {
-        debug_pdo_err($overviewName, $e);
-    }     
-        
-    $schoolResult = getSchools($conn);
-    $classNumResult = getClassNum($conn);
+        debug_pdo_err($pageName, $e);
+    }
+    
+    try{  
+        $schoolResult = getSchools($conn);
+        $classNumResult = getClassNum($conn);
+    } catch(PDOException $e) {
+        debug_pdo_err($pageName, $e);
+    } 
     
     db_close($conn);    
 ?>
@@ -219,7 +223,7 @@
         $('#dialogTitle').text("Edit School");
         $('#update').val(0);
         for(i=0;i<$('.dialoginput').length;i++){                
-            $('.dialoginput').eq(i).val($(this).parent().parent().children('td').eq(i).text());
+            $('.dialoginput').eq(i).val($(this).parent().parent().children('td').eq(i).text().trim());
         }
         //disable SchoolID and Classes
         $('.dialoginput').eq(0).attr('disabled','disabled');
@@ -241,7 +245,7 @@
             //fill required input
             $('.dialoginput').eq(0).prop('disabled',false);
             for(i=0;i<$('.dialoginput').length;i++){                
-                $('.dialoginput').eq(i).val($(this).parent().parent().children('td').eq(i).text());
+                $('.dialoginput').eq(i).val($(this).parent().parent().children('td').eq(i).text().trim());
             }
             $('#submission').submit();
         }           

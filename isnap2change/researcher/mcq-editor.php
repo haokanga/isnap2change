@@ -3,61 +3,44 @@
     require_once("../mysql-lib.php");
     require_once("../debug.php");
     require_once("/researcher-validation.php");
-    	    
-    $conn = db_connect();
-    $overviewName = "mcq-editor";
-    $columnName = array('QuizID','Week','TopicName','Points','Questionnaires','Questions');
-    //edit/delete quiz
-    if($_SERVER["REQUEST_METHOD"] == "POST"){
-        if(isset($_POST['metadataupdate'])){                          
-            $metadataupdate = $_POST['metadataupdate'];
-            //update
-            if($metadataupdate == 0){
-                try{
-                    $quizID = $_POST['quizid'];
-                    $week = $_POST['week'];
-                    $topicName = $_POST['topicname'];
-                    $points = $_POST['points'];
-                    $questionnaires = $_POST['questionnaires'];
-                    $conn->beginTransaction();              
-                    
-                    //get topicID
-                    $topicSql = "SELECT TopicID
-                               FROM Topic WHERE TopicName = ?";
-                    $topicQuery = $conn->prepare($topicSql);
-                    $topicQuery->execute(array($topicName));
-                    $topicResult = $topicQuery->fetch(PDO::FETCH_OBJ);
-                    //update quiz
-                    $updateSql = "UPDATE Quiz 
-                            SET Week = ?, TopicID = ?
-                            WHERE QuizID = ?";			
-                    $updateSql = $conn->prepare($updateSql);         
-                    $updateSql->execute(array($week, $topicResult->TopicID, $quizID)); 
-                    //update MCQ_Section
-                    $updateSql = "UPDATE MCQ_Section
-                                    SET Points = ?, Questionnaires = ?
-                                    WHERE QuizID = ?;";			
-                    $updateSql = $conn->prepare($updateSql);                            
-                    $updateSql->execute(array($points, $questionnaires, $quizID));
-                    
-                    $conn->commit();                    
-                } catch(PDOException $e) {
-                    debug_pdo_err($overviewName, $e);
-                    $conn->rollback();
-                } 
-            }
-            else if($metadataupdate == 1){  
-                $quizID = $_POST['quizid'];
-                $updateSql = "DELETE FROM Quiz WHERE QuizID = ?";			
-                $updateSql = $conn->prepare($updateSql);
-                if(! $updateSql->execute(array($quizID))){
-                    echo "<script language=\"javascript\">  alert(\"Error occurred to delete quiz. Contact with developers.\"); </script>";
-                } else{
-                } 
-            }            
-        }
-    }
+    $pageName = "mcq-editor";
+    $columnName = array('QuizID','Week','TopicName','Points','Questionnaires','Questions');   
+    $mcqQuesColName = array('MCQID','Question','Option', 'Explanation','Edit');
     
+    try { 	    
+        $conn = db_connect();
+        if($_SERVER["REQUEST_METHOD"] == "POST"){
+            if(isset($_POST['metadataupdate'])){                          
+                $metadataupdate = $_POST['metadataupdate'];
+                //update
+                if($metadataupdate == 0){
+                    try{
+                        $quizID = $_POST['quizid'];
+                        $week = $_POST['week'];
+                        $topicName = $_POST['topicname'];
+                        $points = $_POST['points'];
+                        $questionnaires = $_POST['questionnaires'];
+                        $conn->beginTransaction();              
+                        
+                        $topicResult = getTopicByName($conn, $topicName);
+                        updateQuiz($conn, $quizID, $topicResult->TopicID, $week);
+                        updateMCQSection($conn, $quizID, $points, $questionnaires);
+                        
+                        $conn->commit();                    
+                    } catch(PDOException $e) {
+                        debug_pdo_err($pageName, $e);
+                        $conn->rollback();
+                    } 
+                }
+                else if($metadataupdate == 1){  
+                    $quizID = $_POST['quizid'];
+                    deleteQuiz($conn, $quizID);
+                }            
+            }
+        }
+    } catch(PDOException $e) {
+        debug_pdo_err($pageName, $e);
+    }
     /**
     //learning-material-editor
     if(isset($_POST['richcontenttextarea'])){
@@ -78,60 +61,18 @@
     }  
     */    
     
-    if(isset($_GET['quizid'])){
-        $quizID = $_GET['quizid'];
-        // get quiz and topic
-        $quizSql = "SELECT QuizID, Week, TopicName, Points, Questionnaires, COUNT(MCQID) AS Questions
-                   FROM Quiz NATURAL JOIN Topic NATURAL JOIN MCQ_Section LEFT JOIN MCQ_Question USING (QuizID) WHERE QuizID = ? GROUP BY QuizID";
-        $quizQuery = $conn->prepare($quizSql);
-        $quizQuery->execute(array($quizID));
-        $quizResult = $quizQuery->fetch(PDO::FETCH_OBJ);
+    try{
+        if(isset($_GET['quizid'])){
+            $quizID = $_GET['quizid'];
+            $quizResult = getMCQQuiz($conn, $quizID);
+            $topicResult = getTopics($conn);
+            $materialRes = getLearningMaterial($conn, $quizID);
+            $mcqQuesResult = getOptionsByQuiz($conn, $quizID);
+        }
+    } catch(PDOException $e) {
+        debug_pdo_err($pageName, $e);
     }
     
-    //get topic list
-    $topicSql = "SELECT TopicID, TopicName FROM Topic ORDER BY TopicID";
-    $topicQuery = $conn->prepare($topicSql);
-    $topicQuery->execute(array());
-    $topicResult = $topicQuery->fetchAll(PDO::FETCH_OBJ); 
-    
-    $materialPreSql = "SELECT COUNT(*) 
-                   FROM   Learning_Material
-                   WHERE  QuizID = ?";							
-    $materialPreQuery = $conn->prepare($materialPreSql);
-    $materialPreQuery->execute(array($quizID));                
-    if($materialPreQuery->fetchColumn() != 1){
-                
-    }                
-    $materialSql = "SELECT Content, TopicName 
-                    FROM   Learning_Material NATURAL JOIN Quiz
-                                             NATURAL JOIN Topic
-                    WHERE  QuizID = ?";
-                            
-    $materialQuery = $conn->prepare($materialSql);
-    $materialQuery->execute(array($quizID));
-    $materialRes = $materialQuery->fetch(PDO::FETCH_OBJ);
-
-    //get questions and options
-    $mcqSql = "SELECT MCQID, Question, CorrectChoice, Content, Explanation
-               FROM   MCQ_Section NATURAL JOIN MCQ_Question
-                              NATURAL JOIN `Option`
-               WHERE  QuizID = ?
-               ORDER BY MCQID";
-                            
-    $mcqQuery = $conn->prepare($mcqSql);
-    $mcqQuery->execute(array($quizID));
-    $mcqResult = $mcqQuery->fetchAll(PDO::FETCH_OBJ);      
-    
-
-    //get max option num
-    /*    
-    $optionNumSql = "SELECT MAX(OptionNum) AS MaxOptionNum FROM (SELECT COUNT(*) AS OptionNum FROM MCQ_Question natural JOIN `Option` WHERE QuizID = ? GROUP BY MCQID) AS OptionNumbTable;";								
-    $optionNumQuery = $conn->prepare($optionNumSql);
-    $optionNumQuery->execute(array($quizID));
-    $optionNumResult = $optionNumQuery->fetch(PDO::FETCH_OBJ);
-    */
-    $mcqQuesColName = array('MCQID','Question','Option', 'Explanation','Edit');
-	   
     db_close($conn); 
     
 ?>
@@ -264,7 +205,7 @@
                                 <br>
                             </form>
                             <!--edit metadata-->
-                            <span class="glyphicon glyphicon-remove pull-right" id="metadataremove" aria-hidden="true"></span><span class="pull-right" aria-hidden="true">&nbsp;</span><span class="glyphicon glyphicon-edit pull-right" id="metadataedit" aria-hidden="true"></span>    
+                            <span class="glyphicon glyphicon-remove pull-right" id="metadataremove" aria-hidden="true"></span><span class="pull-right" aria-hidden="true">&nbsp;</span><span class="glyphicon glyphicon-floppy-saved pull-right" id="metadataedit" aria-hidden="true"></span>    
                         </div>                            
                         <!-- /.panel-body -->
                     </div>
@@ -319,17 +260,17 @@
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        <?php for($i=0; $i<count($mcqResult); $i++) {?>
+                                        <?php for($i=0; $i<count($mcqQuesResult); $i++) {?>
                                         <tr class="<?php if($i % 2 == 0){echo "odd";} else {echo "even";} ?>">
-                                            <td style="display:none"><?php echo $mcqResult[$i]->$mcqQuesColName[0]; ?></td>
-                                            <td><?php echo $mcqResult[$i]->$mcqQuesColName[1] ?></td>
-                                            <td class ="<?php if ($mcqResult[$i]->Content == $mcqResult[$i]->CorrectChoice) {echo 'bg-success';} else {echo 'bg-danger';} ?>">
-                                                <?php echo $mcqResult[$i]->Content; ?>
-                                            <td><?php echo $mcqResult[$i]->$mcqQuesColName[3] ?></td>
+                                            <td style="display:none"><?php echo $mcqQuesResult[$i]->$mcqQuesColName[0]; ?></td>
+                                            <td><?php echo $mcqQuesResult[$i]->$mcqQuesColName[1] ?></td>
+                                            <td class ="<?php if ($mcqQuesResult[$i]->Content == $mcqQuesResult[$i]->CorrectChoice) {echo 'bg-success';} else {echo 'bg-danger';} ?>">
+                                                <?php echo $mcqQuesResult[$i]->Content; ?>
+                                            <td><?php echo $mcqQuesResult[$i]->$mcqQuesColName[3] ?></td>
                                             <td>
                                                 <span class="glyphicon glyphicon-remove pull-right " aria-hidden="true"></span>
                                                 <span class="pull-right" aria-hidden="true">&nbsp;</span>
-                                                <a href="option-editor.php?mcqid=<?php echo $mcqResult[$i]->$mcqQuesColName[0]; ?>">
+                                                <a href="mcq-option-editor.php?mcqid=<?php echo $mcqQuesResult[$i]->$mcqQuesColName[0]; ?>">
                                                 <span class="glyphicon glyphicon-edit pull-right" data-toggle="modal" data-target="#dialog" aria-hidden="true"></span></a>
                                             </td>            
                                         </tr>
@@ -403,7 +344,7 @@
         if (confirm('[WARNING] Are you sure to remove this quiz? If you remove one quiz. All the questions and submission of this quiz will also get deleted (not recoverable). It includes learning material, questions and options, their submissions and your grading/feedback, not only the quiz itself.')) {
             $('#update').val(-1);
             for(i=0;i<$('.dialoginput').length;i++){                
-                $('.dialoginput').eq(i).val($(this).parent().parent().children('td').eq(i).text());
+                $('.dialoginput').eq(i).val($(this).parent().parent().children('td').eq(i).text().trim());
             }
             $('#submission').submit();
         }           
@@ -428,7 +369,7 @@
     //include html
     w3IncludeHTML();   
     $(document).ready(function() {
-    var table = $('#datatables').DataTable({
+        var table = $('#datatables').DataTable({
             responsive: true,
             //rows group for MCQID, Question and edit box
             rowsGroup: [1,4],

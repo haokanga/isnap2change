@@ -2,7 +2,7 @@
     //if true, echo debug output in dev mode, else production mode
 	$DEBUG_MODE = true;
 	session_start();
-	require_once('connection.php');	
+	require_once('mysql-lib.php');	
 	if(isset($_SESSION["studentid"])){
 		$studentid = $_SESSION["studentid"];
 	} else {

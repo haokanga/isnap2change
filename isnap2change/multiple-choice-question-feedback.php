@@ -3,7 +3,7 @@
 	$DEBUG_MODE = true;
     //session and import
 	session_start();
-    require_once("connection.php");
+    require_once("mysql-lib.php");
 	
     if($DEBUG_MODE){
    //     echo "<script language=\"javascript\">  console.log(\"SUBMISSION.\"); </script>";

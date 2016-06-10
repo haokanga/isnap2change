@@ -62,4 +62,19 @@ SELECT SUM(Points) AS SumPoints FROM Quiz NATURAL JOIN SAQ_Section NATURAL JOIN 
 WHERE QuizID = 4
 ;
 
+SELECT * FROM Class;
+SELECT *  FROM Class NATURAL JOIN School NATURAL JOIN Token;
 
+INSERT INTO Quiz_Record(QuizID, StudentID, Status)
+							    VALUES (10,10,'GRADED') ON DUPLICATE KEY UPDATE Status = 'GRADED';
+SELECT * FROM    Quiz_Record;                             
+                                
+                                
+                                SELECT *
+				   FROM   MCQ_Section NATURAL JOIN MCQ_Question
+								  NATURAL JOIN `Option`
+			       WHERE  QuizID = 1
+			       ORDER BY MCQID;  
+SELECT QuizID, Week, TopicName, Points, Questionnaires, COUNT(MCQID) AS Questions
+                   FROM Quiz NATURAL JOIN Topic NATURAL JOIN MCQ_Section LEFT JOIN MCQ_Question USING (QuizID) WHERE QuizType = 'MCQ' GROUP BY QuizID ;      
+SELECT * FROM MCQ_Question NATURAL JOIN `Option` WHERE MCQID = 1;                   
