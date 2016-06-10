@@ -1,6 +1,6 @@
 <?php
-	$studentid = 1;
-	$quizid = 5;
+	$studentID = 1;
+	$quizID = 5;
 	$week = 6;
 ?>
 <html>
@@ -64,7 +64,7 @@
 				
 			xmlhttp.open("POST", "cost-calculator-feedback.php", true);
 			xmlhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-			xmlhttp.send("studentid="+<?php echo $studentid;?>+"&quizid="+<?php echo $quizid;?>+"&answerArr="+JSON.stringify(answerArr));
+			xmlhttp.send("studentID="+<?php echo $studentID;?>+"&quizID="+<?php echo $quizID;?>+"&answerArr="+JSON.stringify(answerArr));
 	}
 	
 </script>

@@ -548,9 +548,49 @@
 	
 	function updateQuizRecord($conn, $quizID, $studentID, $status){
 		$updateQuizRecordSql = "INSERT INTO Quiz_Record(QuizID, StudentID, Status)
-							    VALUES (?,?,?) ON DUPLICATE KEY UPDATE Status = ?;";			
-		
+							    VALUES (?,?,?) ON DUPLICATE KEY UPDATE Status = ?;";				
 		$updateQuizRecordQuery = $conn->prepare($updateQuizRecordSql);                            
-		$updateQuizRecordQuery->execute(array($quizid, $studentid, $status, $status));
+		$updateQuizRecordQuery->execute(array($quizID, $studentID, $status, $status));
+	}
+	
+	function getQuizStatus($conn, $quizID, $studentID){
+		$statusSql = "SELECT COUNT(*) FROM Quiz_Record
+					  WHERE QuizID = ? AND StudentID = ?";
+		$statusQuery = $conn->prepare($statusSql);
+        $statusQuery->execute(array($quizID, $studentID));
+		
+		if($statusQuery->fetchColumn() == 1){
+			$statusSql = "SELECT `Status` FROM Quiz_Record
+						  WHERE QuizID = ? AND StudentID = ?";
+			$statusQuery = $conn->prepare($statusSql);
+			$statusQuery->execute(array($quizID, $studentID));
+			
+			return $statusQuery->`Status`; 
+		} else if($statusQuery->fetchColumn() == 0){
+			return "UNANSWERED";
+		} else{
+			
+		}
+	}
+	
+	function getPosterSavedDoc($conn, $quizID, $studentID){
+		$posterSql = "SELECT COUNT(*)
+					  FROM   Poster_Record
+					  WHERE  StudentID=? AND QuizID=?";
+		$posterQuery = $conn->prepare($posterSql);
+		$posterQuery->execute(array($studentID, $quizID));
+	
+		if($posterQuery->fetchColumn() != 1){
+			throw new Exception("Failed to get saved poster");
+		}
+	
+		$posterSql = "SELECT ZwibblerDoc
+					  FROM   Poster_Record
+					  WHERE  StudentID=? AND QuizID=?";
+		$posterQuery = $conn->prepare($posterSql);
+		$posterQuery->execute(array($studentID, $quizID));
+		$posterRes = $posterQuery->fetch(PDO::FETCH_OBJ);
+		
+		return $posterRes;
 	}
 ?>

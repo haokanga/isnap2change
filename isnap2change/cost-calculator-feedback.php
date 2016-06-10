@@ -1,19 +1,18 @@
 <?php
-	
 	require_once("mysql-lib.php");
 	require_once("debug.php");
 
 	$pageName = "cost-calculator-feedback";
 	
 	if($_SERVER["REQUEST_METHOD"] == "POST"){
-		if(isset($_POST['studentid']) && isset($_POST['quizid']) && isset($_POST['answerArr'])){
-			$studentid = $_POST['studentid'];
-			$quizid = $_POST['quizid'];
+		if(isset($_POST['studentID']) && isset($_POST['quizID']) && isset($_POST['answerArr'])){
+			$studentID = $_POST['studentID'];
+			$quizID = $_POST['quizID'];
 			$answerArr = json_decode($_POST['answerArr']);
-		} else {
+		} else{
 			
 		}
-	} else {
+	} else{
 		
 	}
 	
@@ -42,11 +41,11 @@
 			
 			$conn->beginTransaction();
 			
-			//UPDATE Quiz_Record	
+			//update Quiz_Record	
 			updateQuizRecord($conn, $quizID, $studentID, "GRADED");
 			
-			//UPDATE Student Score
-			updateStudentScore($conn, $studentid);
+			//update student score
+			updateStudentScore($conn, $studentID);
 			
 			$conn->commit();
 		} catch(Exception $e) {
