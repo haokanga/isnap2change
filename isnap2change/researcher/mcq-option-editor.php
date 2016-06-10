@@ -41,8 +41,8 @@
                 }             
             }
         }      
-    } catch(PDOException $e) {
-        debug_pdo_err($pageName, $e);
+    } catch(Exception $e) {
+        debug_err($pageName, $e);
     }
     
     try{
@@ -51,8 +51,8 @@
             $mcqQuesResult = getMCQQuestion($conn, $mcqID); 
             $optionResult = getOptions($conn, $mcqID);  
         }
-    } catch(PDOException $e) {
-        debug_pdo_err($pageName, $e);
+    } catch(Exception $e) {
+        debug_err($pageName, $e);
     }
     
     db_close($conn); 

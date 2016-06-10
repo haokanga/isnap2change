@@ -30,15 +30,15 @@
             }
         }
         
-    } catch(PDOException $e) {
-        debug_pdo_err($pageName, $e);
+    } catch(Exception $e) {
+        debug_err($pageName, $e);
     }
     
     try{  
         $schoolResult = getSchools($conn);
         $classNumResult = getClassNum($conn);
-    } catch(PDOException $e) {
-        debug_pdo_err($pageName, $e);
+    } catch(Exception $e) {
+        debug_err($pageName, $e);
     } 
     
     db_close($conn);    

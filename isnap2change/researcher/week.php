@@ -13,15 +13,15 @@
             //General error: 2014 Cannot execute queries while other unbuffered queries are active. Consider using PDOStatement::fetchAll().
             unset($updateSql);            
         }        
-    } catch(PDOException $e) {
-        debug_pdo_err($pageName, $e);
+    } catch(Exception $e) {
+        debug_err($pageName, $e);
     }
     
     try{        
         $weekResult = getQuizNum($conn);
         $weekNumResult = getMaxWeek($conn);    
-    } catch(PDOException $e) {
-        debug_pdo_err($pageName, $e);
+    } catch(Exception $e) {
+        debug_err($pageName, $e);
     }
     
     db_close($conn); 

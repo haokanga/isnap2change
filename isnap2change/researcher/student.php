@@ -23,14 +23,14 @@
                 }            
             }
         }  
-    } catch(PDOException $e) {
-        debug_pdo_err($pageName, $e);
+    } catch(Exception $e) {
+        debug_err($pageName, $e);
     }
     
     try{  
         $studentResult = getStudents($conn);  
-    } catch(PDOException $e) {
-        debug_pdo_err($pageName, $e);
+    } catch(Exception $e) {
+        debug_err($pageName, $e);
     }
     
     db_close($conn); 
@@ -207,8 +207,8 @@
             $classID = $_GET['classid'];
             $classResult = getClass($conn, $classID);
             echo $classResult->ClassName; 
-        } catch(PDOException $e) {
-            debug_pdo_err($pageName, $e);
+        } catch(Exception $e) {
+            debug_err($pageName, $e);
             echo '';
         }
       } else 

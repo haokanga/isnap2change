@@ -49,13 +49,13 @@
 			updateStudentScore($conn, $studentid);
 			
 			$conn->commit();
-		} catch(PDOException $e) {
+		} catch(Exception $e) {
 			if($conn != null) {
 				$conn->rollback();
 				db_close($conn);
 			}
 			
-			debug_pdo_err($pageName, $e);
+			debug_err($pageName, $e);
 			$feedback["message"] = "Failed to update database";
 			echo json_encode($feedback);
 			exit;

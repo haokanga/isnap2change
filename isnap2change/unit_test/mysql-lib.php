@@ -94,8 +94,8 @@
         echo 'getStudentScore(\$conn, 1) '.getStudentScore($conn, 1).'<br>';
         
         $conn->commit();                    
-    } catch(PDOException $e) {
-        debug_pdo_err($pageName, $e);
+    } catch(Exception $e) {
+        debug_err($pageName, $e);
         $conn->rollback();
     } 
     echo 'getStudentScore(\$conn, 1) '.getStudentScore($conn, 1).'<br>';
