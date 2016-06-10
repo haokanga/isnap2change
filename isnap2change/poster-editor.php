@@ -1,41 +1,48 @@
 <?php
 
 	session_start();
-	require_once("connection.php");
+	require_once("mysql-lib.php");
 	
-	if(! isset($_SESSION["studentid"])) {
+	//check student login status
+	if(! isset($_SESSION["studentID"])){
 		
 	}
 	
-	$studentid = $_SESSION["studentid"];
+	$studentID = $_SESSION["studentID"];
 	
-	if($_SERVER["REQUEST_METHOD"] == "POST") {
-		
-		if(isset($_POST["quizid"]) && isset($_POST["quiztype"]) && isset($_POST["week"]) && isset($_POST["status"])){
-			$quizid = $_POST["quizid"];
-			$quiztype = $_POST["quiztype"];
+	//check whether a request is GET or POST 
+	if($_SERVER["REQUEST_METHOD"] == "POST"){
+		if(isset($_POST["quizID"]) && isset($_POST["week"])){
+			$quizID = $_POST["quizID"];
 			$week = $_POST["week"];
-			$status = $_POST["status"];
-		} else {
+		} else{
 			
 		}
-		
-	} else {
+	} else{
 		
 	}
 	
-	$conn = db_connect();
+	$conn = null;
+	
+	try{
+		$conn = db_connect();
+        //check quiz status	
+		$status = getQuizStatus($conn, $quizID, $studentID);
+		//if quiz is answered, saved poster will be read from database.
+		if($status != "UNANSWERED") {
+			$posterRes = getPosterSavedDoc($conn, $quizID, $studentID);	
+		}
 		
-	if($status != "UNANSWERED") {
-		$posterSql = "SELECT ZwibblerDoc
-					  FROM   Poster_Record
-					  WHERE StudentID=? AND QuizID=?";
-							  
-		$posterQuery = $conn->prepare($posterSql);
-		$posterQuery->execute(array($studentid, $quizid));
-		$posterRes = $posterQuery->fetch(PDO::FETCH_OBJ);	
+	}catch(Exception $e){
+		if($conn != null) {
+			db_close($conn);
+		}
+		
+		debug_pdo_err($pageName, $e);
+		//to do: handle sql error
+		//...
+		exit;
 	}
-			
 		
 ?>
 
@@ -51,7 +58,7 @@
 	</form>
 	<form style="display:none" method=post enctype="multipart/form-data" action="upload-handler.php">
 		<input type=file name=file id=fileinput accept="image/*">
-		<input type=hidden name="studentid" value=<?php echo $studentid;?>>
+		<input type=hidden name="studentID" value=<?php echo $studentID;?>>
     </form>
 	
     <script src="http://code.jquery.com/jquery-1.8.2.min.js"></script>
@@ -76,6 +83,7 @@
         });
 		
 		<?php
+				//if quiz is answered, saved poster will be loaded to canvas.
 				if($status != "UNANSWERED") { ?>
 					var saved = "zwibbler3.";
 					saved = saved + '<?php echo $posterRes->ZwibblerDoc ?>';
@@ -83,6 +91,7 @@
 		<?php	} ?>
 
 		<?php
+				//if quiz is submitted, canvas and submit button will be disabled.
 				if($status == "UNGRADED" || $status == "GRADED") { ?>
 					zwibbler.setConfig("readOnly", true);
 					$("#saveBtn").attr("disabled","disabled");
@@ -120,7 +129,7 @@
 			
 			xmlhttp.open("POST", "poster-feedback.php", true);
 			xmlhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-			xmlhttp.send("quizid="+<?php echo $quizid; ?>+"&studentid="+<?php echo $studentid; ?>+"&action=SAVE"+"&zwibblerdoc="+zwibblerDoc.substr(10));
+			xmlhttp.send("quizID="+<?php echo $quizID; ?>+"&studentID="+<?php echo $studentID; ?>+"&action=SAVE"+"&zwibblerdoc="+zwibblerDoc.substr(10));
         }
 
         function onSubmit() {		
@@ -136,7 +145,7 @@
 			
 			xmlhttp.open("POST", "poster-feedback.php", true);
 			xmlhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-			xmlhttp.send("quizid="+<?php echo $quizid; ?>+"&studentid="+<?php echo $studentid; ?>+"&action=SUBMIT"+"&zwibblerdoc="+zwibblerDoc.substr(10)+"&dataurl="+dataUrl);
+			xmlhttp.send("quizID="+<?php echo $quizID; ?>+"&studentID="+<?php echo $studentID; ?>+"&action=SUBMIT"+"&zwibblerdoc="+zwibblerDoc.substr(10)+"&dataurl="+dataUrl);
         }
 		
 		function goBack() {
