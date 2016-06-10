@@ -1,101 +1,102 @@
 <?php
 	
 	require_once("mysql-lib.php");
+	$pageName = "poster-feedback";
 	
-	if($_SERVER["REQUEST_METHOD"] == "POST") {
+	//check whether a request is GET or POST
+	if($_SERVER["REQUEST_METHOD"] == "POST"){
 		
-		if(isset($_POST['quizid']) && isset($_POST['studentid']) && isset($_POST['action'])) {
+		if(isset($_POST['quizID']) && isset($_POST['studentID']) && isset($_POST['action'])){
 			
-			$quizid = $_POST['quizid'];
-			$studentid = $_POST['studentid'];
+			$quizID = $_POST['quizID'];
+			$studentID = $_POST['studentID'];
 			$action = $_POST['action'];
 			
-			if($action == "SAVE") {
-				if(isset($_POST['zwibblerdoc'])){
-					$zwibblerdoc = $_POST['zwibblerdoc'];
-				} else {
+			if($action == "SAVE"){
+				if(isset($_POST['zwibblerDoc'])){
+					$zwibblerDoc = $_POST['zwibblerDoc'];
+				} else{
 					
 				}
 			}
 				
-			if($action == "SUBMIT") {
-				if(isset($_POST['zwibblerdoc']) && isset($_POST['dataurl'])) {
-					$zwibblerdoc = $_POST['zwibblerdoc'];
-					$dataurl = $_POST['dataurl'];
-				} else {
+			if($action == "SUBMIT"){
+				if(isset($_POST['zwibblerDoc']) && isset($_POST['dataUrl'])){
+					$zwibblerDoc = $_POST['zwibblerDoc'];
+					$dataUrl = $_POST['dataUrl'];
+				}else{
 					
 				}
 			}
 			
-		} else {
+		} else{
 			
 		}
 		
-	} else {
+	} else{
 		
 	}
-		
-	$conn = db_connect();
 	
+	$feedback = array();
+	$conn = null;
+		
 	try {
+		$conn = db_connect();
+		
 		$conn->beginTransaction();
 		
-		//UPDATE Quiz_Record
-		if($action == "SAVE") {
+		//update Quiz_Record	
+		if($action == "SAVE"){
 			$status = "UNSUBMITTED";
 		}
 		
-		if($action == "SUBMIT") {
+		if($action == "SUBMIT"){
 			$status = "UNGRADED";
 		}
 		
-		$posterQuizSaveSql = "INSERT INTO Quiz_Record(QuizID, StudentID, Status)
-							  VALUES (?,?,?) ON DUPLICATE KEY UPDATE Status = ?;";			
+		updateQuizRecord($conn, $quizID, $studentID, $status);
 		
-		$posterQuizSaveQuery = $conn->prepare($posterQuizSaveSql);                            
-		$posterQuizSaveQuery->execute(array($quizid, $studentid, $status, $status));
-		
-		//UPDATE Poster_Record
-		if($action == "SAVE") {
-			$posterRecordSaveSql = "INSERT INTO Poster_Record(QuizID, StudentID, ZwibblerDoc)
-									VALUES (?,?,?) ON DUPLICATE KEY UPDATE ZwibblerDoc= ?;";
-		
-			$posterRecordSaveQuery = $conn->prepare($posterRecordSaveSql);
-			$posterRecordSaveQuery->execute(array($quizid, $studentid, $zwibblerdoc, $zwibblerdoc));
+		//if save, update poster document in the Poster_Record
+		if($action == "SAVE"){
+			updatePosterSavedDoc($conn, $quizID, $studentID, $zwibblerDoc);
 		}
 		
-		if($action == "SUBMIT") {
-			//CONVERT Base64 TO PNG IMAGE
+		//if submit, update poster document and image url in the Poster_Record
+		if($action == "SUBMIT"){
+			//convert Base64 TO Image
 			$tmpid = rand();
-			$posterurl = "./poster_img/".$studentid."_".$quizid."_".$tmpid.".png";
+			$imageUrl = "./poster_img/".$studentID."_".$quizID."_".$tmpid.".png";
 		
-			while(file_exists($posterurl)) {
+			while(file_exists($imageUrl)){
 				$tmpid = rand();
-				$posterurl = "./poster_img/".$studentid."_".$quizid."_".$tmpid.".png";
+				$imageUrl = "./poster_img/".$studentID."_".$quizID."_".$tmpid.".png";
 			}
 		
-			base64_to_jpeg($dataurl, $posterurl);
+			base64_to_img($dataUrl, $imageUrl);
 			
-			$posterRecordSaveSql = "INSERT INTO Poster_Record(QuizID, StudentID, ZwibblerDoc, ImageURL)
-									VALUES (?,?,?,?) ON DUPLICATE KEY UPDATE ZwibblerDoc = ? , ImageURL = ?;";
-			
-			$posterRecordSaveQuery = $conn->prepare($posterRecordSaveSql);
-			$posterRecordSaveQuery -> execute(array($quizid, $studentid, $zwibblerdoc, $posterurl, $zwibblerdoc, $posterurl));
-			
+			updatePosterSubmittedDoc($conn, $quizID, $studentID, $zwibblerDoc, $imageUrl);
 		}
 		
 		$conn->commit();
-			
-		//FEEDBACK
-		echo "success";
+		
+		
 	} catch(Exception $e) {
-		echo $e->getMessage();
-		$conn->rollback();
+		if($conn != null) {
+			$conn->rollback();
+			db_close($conn);
+		}
+			
+		debug_pdo_err($pageName, $e);
+		$feedback["message"] = $e->getMessage();
+		echo json_encode($feedback);
+		exit;
 	}
   	
-	db_close($conn);	
+	db_close($conn);
+	$feedback["message"] = "success";
+	echo json_encode($feedback);	
 		
-	function base64_to_jpeg($base64_string, $output_file) {
+	function base64_to_img($base64_string, $output_file) {
 		$ifp = fopen($output_file, "wb");
 		
 		if($ifp == false) {
