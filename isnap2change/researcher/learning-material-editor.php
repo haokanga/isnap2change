@@ -34,7 +34,7 @@
 
 <!DOCTYPE html>
 <html>
-<head>
+<head> 
   <script src="//cdn.tinymce.com/4/tinymce.min.js"></script>
   <script>
   tinymce.init({
@@ -49,6 +49,7 @@
   ],
   toolbar1: 'insertfile undo redo | styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image',
   toolbar2: 'print preview media | forecolor backcolor emoticons',
+  imagetools_toolbar: "rotateleft rotateright | flipv fliph | editimage imageoptions",
   image_advtab: true,
   templates: [
     { title: 'Test template 1', content: 'Test 1' },
@@ -68,7 +69,7 @@
     <textarea name="richcontenttextarea">
         <?php echo $materialRes->Content; ?>
     </textarea>
-    <input type="submit" name='submitbutton' value="Submit" class='submit'/><br>
+    <input type="submit" name='submitbutton' value="Save" class='submit'/><br>
 </form>
 </body>
 </html>

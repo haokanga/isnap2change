@@ -511,7 +511,7 @@
 			throw new Exception("Failed to get learning material");
         }
 		
-        $materialSql = "SELECT Content, TopicName 
+        $materialSql = "SELECT * 
                         FROM   Learning_Material NATURAL JOIN Quiz
                                                  NATURAL JOIN Topic
                         WHERE  QuizID = ?";

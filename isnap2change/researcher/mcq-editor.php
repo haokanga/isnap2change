@@ -52,26 +52,7 @@
         }
     } catch(Exception $e) {
         debug_err($pageName, $e);
-    }
-    /**
-    //learning-material-editor
-    if(isset($_POST['richcontenttextarea'])){
-    $conn = db_connect();
-    $content = $_POST['richcontenttextarea'];
-    $materialid = 1;   
-    $quizid = 1;
-    echo "<h2>Preview</h2>";       
-    echo $content;
-    
-    $updateSql = "REPLACE INTO Learning_Material(MaterialID,Content,QuizID)
-                 VALUES (?,?,?);";			
-    $updateSql = $conn->prepare($updateSql);                            
-    if(! $updateSql->execute(array($materialid, $content, $quizid))){
-        echo "<script language=\"javascript\">  alert(\"Error occurred to submit learning material. Report this bug to reseachers.\"); </script>";
-    } else{            
-        echo "<script language=\"javascript\">  console.log(\"Learning Material Submitted. materialid: $materialid  quizid: $quizid\"); </script>";
-    }  
-    */    
+    }    
     
     try{
         if(isset($_GET['quizid'])){
@@ -95,33 +76,6 @@
 <head>
     <!-- Header Library -->
     <?php include('/header-lib.php'); ?>
-    <script src="//cdn.tinymce.com/4/tinymce.min.js"></script>
-    <script>
-      /**
-      tinymce.init({
-      selector: 'textarea',
-      height: 500,
-      theme: 'modern',
-      plugins: [
-        'advlist autolink lists link image charmap print preview hr anchor pagebreak',
-        'searchreplace wordcount visualblocks visualchars code fullscreen',
-        'insertdatetime media nonbreaking save table contextmenu directionality',
-        'emoticons template paste textcolor colorpicker textpattern imagetools'
-      ],
-      toolbar1: 'insertfile undo redo | styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image',
-      toolbar2: 'print preview media | forecolor backcolor emoticons',
-      image_advtab: true,
-      templates: [
-        { title: 'Test template 1', content: 'Test 1' },
-        { title: 'Test template 2', content: 'Test 2' }
-      ],
-      content_css: [
-        '//fast.fonts.net/cssapi/e6dc9b99-64fe-4292-ad98-6974f93cd2a2.css',
-        '//www.tinymce.com/css/codepen.min.css'
-      ]
-     });
-     */
-    </script> 
 </head>
 
 <body>
@@ -185,7 +139,7 @@
                     <!--Learning Material-->
                     <div class="panel panel-default">
                         <div class="panel-heading">
-                            Learning Material 
+                            Learning Material Editor
                         </div>
                         <!-- /.panel-heading -->
                         <div class="panel-body">
@@ -194,16 +148,7 @@
 								<i>	<?php echo $materialRes->TopicName; ?> </i>                          
                                 </h1> 
                             </div>
-                            <!--
-                            <div class="para" style="padding-left:15px; padding-right:15px; padding-top:8px; text-align:center;">
-                                <div style="color:black; justify-content:center; align-items:center;">
-                                <i>
-                                  <?php echo $materialRes->Content; ?></i>
-                                </div>
-                            </div>                        
-                            -->
-                            <span class="glyphicon glyphicon-remove pull-right" aria-hidden="true"></span><span class="pull-right" aria-hidden="true">&nbsp;</span><a href="learning-material-editor.php?quizid=<?php echo $quizResult->QuizID ?>"><span class="glyphicon glyphicon-edit pull-right" aria-hidden="true"></span></a>
-                            <!-- data-toggle="modal" data-target="#dialog" -->                            
+                            <iframe id="cp_embed_YydQoj" src="learning-material-editor.php?quizid=<?php echo $quizID; ?>" scrolling="no" frameborder="0" allowtransparency="true" allowfullscreen="true" name="Learning Material Editor" title="Learning Material Editor" style="width: 100%; height:100%;" ></iframe>                          
                         </div>                            
                         <!-- /.panel-body -->
                     </div>

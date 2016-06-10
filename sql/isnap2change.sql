@@ -731,9 +731,6 @@ INSERT IGNORE INTO `Option`(Content, Explanation, MCQID) VALUES('3', "Wrong", @M
 INSERT IGNORE INTO `Option`(Content, Explanation, MCQID) VALUES('4', "Wrong", @MCQ_QUESTION_LAST_INSERT_ID);
 INSERT IGNORE INTO `Option`(Content, Explanation, MCQID) VALUES('5', "Correct", @MCQ_QUESTION_LAST_INSERT_ID);
 
-INSERT IGNORE INTO Learning_Material(Content,QuizID) VALUES('
-<p>Learning materials for this quiz has not been added.</p>',9);
-
 # [Example] insert a poster task into Poster_Section
 INSERT INTO `isnap2changedb`.`poster_section` (`QuizID`, `Points`) VALUES ('9', '20');
 
