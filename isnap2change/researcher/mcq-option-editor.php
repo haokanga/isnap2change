@@ -18,8 +18,10 @@
                     updateMCQQuestion($conn, $mcqID, $correctChoice, $question);
                 }
                 else if($metadataupdate == -1){
-                    $mcqID = $_POST['mcqid'];                    
-                    deleteMCQQuestion($conn, $mcqID); 
+                    $mcqID = $_POST['mcqid'];
+                    $quizID = getMCQQuestion($conn, $mcqID)->QuizID;                    
+                    deleteMCQQuestion($conn, $mcqID);               
+                    header('Location: mcq-editor.php?quizid='.$quizID);
                 }             
             }            
             if(isset($_POST['update'])){                          

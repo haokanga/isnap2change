@@ -388,7 +388,7 @@
         $updateSql = "INSERT INTO MCQ_Question(Question, QuizID)
                     VALUES (?,?);";			
         $updateSql = $conn->prepare($updateSql);                            
-        $updateSql->execute(array($question)); 
+        $updateSql->execute(array($question, $quizID)); 
         return $conn->lastInsertId();
     }
     
@@ -415,9 +415,9 @@
     } 
     
     function getMCQQuestions($conn, $quizID){
-        $mcqQuesSql = "SELECT MCQID, Question, CorrectChoice, Content, Explanation
+        $mcqQuesSql = "SELECT *
                     FROM MCQ_Section NATURAL JOIN MCQ_Question
-                    NATURAL JOIN `Option`
+                    LEFT JOIN `Option` USING (MCQID)
                     WHERE QuizID = ?
                     ORDER BY MCQID";                                
         $mcqQuesQuery = $conn->prepare($mcqQuesSql);

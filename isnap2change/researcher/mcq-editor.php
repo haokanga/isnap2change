@@ -43,8 +43,11 @@
                     $quizID = $_POST['quizid'];
                     $question = $_POST['question'];
                     $mcqID = createMCQQuestion($conn, $quizID, $question);
-                    header('Location: mcq-option-editor.php?quizid=$quizID&mcqid=$mcqID');
-                }             
+                    header('Location: mcq-option-editor.php?quizid='.$quizID.'&mcqid='.$mcqID);
+                } else if($update == -1){
+                    $mcqID = $_POST['mcqid'];
+                    deleteMCQQuestion($conn, $mcqID); 
+                }            
             }
         }
     } catch(Exception $e) {
@@ -77,6 +80,7 @@
             $topicResult = getTopics($conn);
             $materialRes = getLearningMaterial($conn, $quizID);
             $mcqQuesResult = getMCQQuestions($conn, $quizID);
+            $phpself = $pageName.'.php?quizid='.$quizID;
         }
     } catch(Exception $e) {
         debug_err($pageName, $e);
@@ -144,7 +148,7 @@
                         </div>
                         <!-- /.panel-heading -->
                         <div class="panel-body">
-                            <form id="metadatasubmission" method="post" action="<?php echo 'mcq-editor.php?quizid='.$quizID; ?>">
+                            <form id="metadatasubmission" method="post" action="<?php echo $phpself; ?>">
                                 <!--if 0 update; else if -1 delete;-->
                                 <input type=hidden name="metadataupdate" id="metadataupdate" value="1" required></input>
                                 <label for="QuizID" style="display:none">QuizID</label>
@@ -231,7 +235,7 @@
                                         <tr class="<?php if($i % 2 == 0){echo "odd";} else {echo "even";} ?>">
                                             <td style="display:none"><?php echo $mcqQuesResult[$i]->$mcqQuesColName[0]; ?></td>
                                             <td><?php echo $mcqQuesResult[$i]->$mcqQuesColName[1] ?></td>
-                                            <td class ="<?php if ($mcqQuesResult[$i]->Content == $mcqQuesResult[$i]->CorrectChoice) {echo 'bg-success';} else {echo 'bg-danger';} ?>">
+                                            <td class ="<?php if ($mcqQuesResult[$i]->Content == $mcqQuesResult[$i]->CorrectChoice && strlen($mcqQuesResult[$i]->Content) > 0 ) {echo 'bg-success';} else {echo 'bg-danger';} ?>">
                                                 <?php echo $mcqQuesResult[$i]->Content; ?>
                                             <td><?php echo $mcqQuesResult[$i]->$mcqQuesColName[3] ?></td>
                                             <td>
@@ -252,7 +256,7 @@
                                     <p>View quizzes by filtering or searching. You can create/update/delete any class.</p>
                                 </div>
                                 <div class="alert alert-danger">
-                                    <p><strong>Warning</strong> : If you remove one quiz. All the <strong>questions and submission</strong> of this quiz will also get deleted (not recoverable).</p> It includes <strong>learning material, questions and options, their submissions and your grading/feedback</strong>, not only the quiz itself.
+                                    <p><strong>Warning</strong> : If you remove one question. All the <strong>option and student answers</strong> of this quiz will also get deleted (not recoverable), not only the quiz itself.</p>
                                 </div>
                             </div>
                         </div>
@@ -279,11 +283,14 @@
             <div class="modal-body">
             <form id="submission" method="post" action="<?php echo $phpself; ?>">
                 <input type=hidden name="update" id="update" value="1" required></input>
+                <label for="MCQID" style="display:none">MCQID</label>
+                <input type="text" class="form-control dialoginput" id="MCQID" name="mcqid" style="display:none"></input>
                 <label for="Question">Question</label>
-                <input type="text" class="form-control" id="Question" name="question" value="" required></input>
+                <input type="text" class="form-control dialoginput" id="Question" name="question" value="" required></input>
                 <br>
                 <label for="QuizID" style="display:none">QuizID</label>
-                <input type="text" class="form-control dialoginput" id="QuizID" name="quizid" style="display:none" value="<?php echo $quizID; ?>" required></input>
+                <input type="text" class="form-control" id="QuizID" name="quizid" style="display:none" value="<?php echo $quizID; ?>" required></input>
+                <br>
             </form>
             </div>
             <div class="modal-footer">            
@@ -306,20 +313,18 @@
         for(i=0;i<$('.dialoginput').length;i++){                
             $('.dialoginput').eq(i).val('');
         }   
-    }); 
-    $('#btnSave').on('click', function (){
-        $('#submission').validate({
-          rules: {
-            week: {
-              required: true,
-              digits: true
-            },
-            points: {
-              required: true,
-              digits: true
+    });
+    $('td > .glyphicon-remove').on('click', function (){
+        if (confirm('[WARNING] Are you sure to remove this question? If you remove one question. All the options and students answers of this question will also get deleted (not recoverable). Not only the question itself.')) {
+            $('#update').val(-1);
+            for(i=0;i<$('.dialoginput').length;i++){                
+                $('.dialoginput').eq(i).val($(this).parent().parent().children('td').eq(i).text().trim());
             }
-          }
-        });   
+            $('#submission').submit();
+        }                   
+    });    
+    $('#btnSave').on('click', function (){
+        $('#submission').validate();   
         $('#submission').submit();
     });
     

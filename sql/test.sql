@@ -78,3 +78,15 @@ SELECT * FROM    Quiz_Record;
 SELECT QuizID, Week, TopicName, Points, Questionnaires, COUNT(MCQID) AS Questions
                    FROM Quiz NATURAL JOIN Topic NATURAL JOIN MCQ_Section LEFT JOIN MCQ_Question USING (QuizID) WHERE QuizType = 'MCQ' GROUP BY QuizID ;      
 SELECT * FROM MCQ_Question NATURAL JOIN `Option` WHERE MCQID = 1;                   
+SELECT * FROM Quiz;
+SELECT *
+FROM MCQ_Section NATURAL JOIN MCQ_Question
+LEFT JOIN `Option` USING(MCQID)
+WHERE QuizID = 6
+ORDER BY MCQID;
+SELECT *
+FROM MCQ_Section NATURAL JOIN MCQ_Question
+WHERE QuizID = 6
+ORDER BY MCQID;
+INSERT INTO MCQ_Question(Question, QuizID)
+                    VALUES ('q1',6);
