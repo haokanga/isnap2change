@@ -8,20 +8,24 @@
         }
     }
     
-    function debug_err($message){
+    function debug_alert($message){
         echo "<script language=\"javascript\">  alert(\"".$message."\"); </script>";
     }
     
-    function debug_pdo_err($pageName, $e){
-        // duplicate entry
-        if ($e->errorInfo[1] == 1062) {          
-            debug_err("Duplicate names are not allowed!");
-        } 
-        // unclassfied error occurred
-        else {          
-            //debug_err("Unexpected MySQL Error occurred in ".$pageName.". Contact with developers.");        
-            //sql insert.. 
-            //Logger.write($pagename, $getMessage);
-        }
+    function debug_err($pageName, $e){
+        if($e instanceof PDOException){
+            // duplicate entry
+            if ($e->errorInfo[1] == 1062) {          
+                debug_alert("Duplicate names are not allowed!");
+            } 
+            // unclassfied error occurred
+            else {          
+                //debug_alert("Unexpected MySQL Error occurred in ".$pageName.". Contact with developers.");        
+                //sql insert.. 
+                //Logger.write($pagename, $getMessage);
+            }
+        } else {
+            echo $e->getMessage();
+        }        
     }
 ?>

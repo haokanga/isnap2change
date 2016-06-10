@@ -27,8 +27,8 @@
                         updateMCQSection($conn, $quizID, $points, $questionnaires);
                         
                         $conn->commit();                    
-                    } catch(PDOException $e) {
-                        debug_pdo_err($pageName, $e);
+                    } catch(Exception $e) {
+                        debug_err($pageName, $e);
                         $conn->rollback();
                     } 
                 }
@@ -38,8 +38,8 @@
                 }            
             }
         }
-    } catch(PDOException $e) {
-        debug_pdo_err($pageName, $e);
+    } catch(Exception $e) {
+        debug_err($pageName, $e);
     }
     /**
     //learning-material-editor
@@ -69,8 +69,8 @@
             $materialRes = getLearningMaterial($conn, $quizID);
             $mcqQuesResult = getOptionsByQuiz($conn, $quizID);
         }
-    } catch(PDOException $e) {
-        debug_pdo_err($pageName, $e);
+    } catch(Exception $e) {
+        debug_err($pageName, $e);
     }
     
     db_close($conn); 

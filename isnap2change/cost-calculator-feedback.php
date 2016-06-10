@@ -48,13 +48,13 @@
 			updateStudentScore($conn, $studentID);
 			
 			$conn->commit();
-		} catch(PDOException $e){
+		} catch(Exception $e) {
 			if($conn != null) {
 				$conn->rollback();
 				db_close($conn);
 			}
 			
-			debug_pdo_err($pageName, $e);
+			debug_err($pageName, $e);
 			$feedback["message"] = $e->getMessage();
 			echo json_encode($feedback);
 			exit;

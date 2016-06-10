@@ -40,8 +40,8 @@
                         createEmptyLearningMaterial($conn, $quizID);
                         
                         $conn->commit();                    
-                    } catch(PDOException $e) {
-                        debug_pdo_err($pageName, $e);
+                    } catch(Exception $e) {
+                        debug_err($pageName, $e);
                         $conn->rollback();
                     }                
                 }
@@ -51,8 +51,8 @@
                 }            
             }
         } 
-    } catch(PDOException $e) {
-        debug_pdo_err($pageName, $e);
+    } catch(Exception $e) {
+        debug_err($pageName, $e);
     }     
     
     
@@ -63,8 +63,8 @@
             $quizResult = getQuizzes($conn);
         } 
         $topicResult = getTopics($conn); 
-    } catch(PDOException $e) {
-        debug_pdo_err($pageName, $e);
+    } catch(Exception $e) {
+        debug_err($pageName, $e);
     }  
     
     db_close($conn);      
