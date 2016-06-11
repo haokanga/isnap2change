@@ -112,7 +112,6 @@
 							<input  type=hidden name="quizID" value=<?php echo $quizID; ?>></input>
                             <input  type=hidden name="quizType" value=<?php echo $quizType; ?>></input>
 							<input  type=hidden name="week" value=<?php echo $week; ?>></input>
-                            <input  type=hidden name="status" value=<?php echo $status; ?>></input>
                            <!--
 						   implement logic 
 						   -->
