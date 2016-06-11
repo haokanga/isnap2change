@@ -39,7 +39,7 @@
 			db_close($conn);
 		}
 		
-		debug_pdo_err($pageName, $e);
+		debug_err($pageName, $e);
 		//to do: handle sql error
 		//...
 		exit;
