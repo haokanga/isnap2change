@@ -3,29 +3,26 @@
     require_once("../mysql-lib.php");
     require_once("../debug.php");
     require_once("/researcher-validation.php");
-    $pageName = "mcq";
-    $columnName = array('QuizID','Week','TopicName','Points','Questionnaires','Questions');
+    $pageName = "saq";
+    $columnName = array('QuizID','Week','TopicName','Points','Questions');
     
     try{
         $conn = db_connect();
-        //edit/delete quiz
         if($_SERVER["REQUEST_METHOD"] == "POST"){
             if(isset($_POST['update'])){                          
                 $update = $_POST['update'];
                 if($update == 1){
                     try{
                         $week = $_POST['week'];
-                        $quizType = 'MCQ';
+                        $quizType = 'SAQ';
                         $topicName = $_POST['topicname'];
-                        $points = $_POST['points'];
-                        $questionnaires = $_POST['questionnaires'];
                         $conn->beginTransaction();              
                         
                         //insert and get topicID
                         $topicResult = getTopicByName($conn, $topicName);  
                         $topicID = $topicResult->TopicID;                        
                         $quizID = createQuiz($conn, $topicID, $quizType, $week);                        
-                        createMCQSection($conn, $quizID, $points, $questionnaires);
+                        createSAQSection($conn, $quizID);
                         createEmptyLearningMaterial($conn, $quizID);
                         
                         $conn->commit();                    
@@ -45,7 +42,7 @@
     }
             
     try {    
-        $quizResult = getMCQQuizzes($conn); 
+        $quizResult = getSAQQuizzes($conn); 
         $topicResult = getTopics($conn); 
     } catch(Exception $e) {
         debug_err($pageName, $e);
@@ -70,7 +67,7 @@
         <div id="page-wrapper">
             <div class="row">
                 <div class="col-lg-12">
-                    <h1 class="page-header">Multiple Choice Quiz Overview</h1>
+                    <h1 class="page-header">Short Answer Quiz Overview</h1>
                 </div>
                 <!-- /.col-lg-12 -->
             </div>
@@ -79,7 +76,7 @@
                 <div class="col-lg-12">
                     <div class="panel panel-default">
                         <div class="panel-heading">
-                            Multiple Choice Quiz Information Table <span class="glyphicon glyphicon-plus pull-right" data-toggle="modal" data-target="#dialog"></span>
+                            Short Answer Quiz Information Table <span class="glyphicon glyphicon-plus pull-right" data-toggle="modal" data-target="#dialog"></span>
                         </div>
                         <!-- /.panel-heading -->
                         <div class="panel-body">
@@ -96,20 +93,12 @@
                                     <?php for($i=0; $i<count($quizResult); $i++) {?>
                                         <tr class="<?php if($i % 2 == 0){echo "odd";} else {echo "even";} ?>">
                                             <?php for($j=0; $j<count($columnName); $j++){ ?>
-                                                <td <?php if ($j==0){ echo 'style="display:none"';} ?>>                                                
-                                                    <?php 
-                                                        // Questionnaires: if 1, true; else if 0, false
-                                                        if($j==count($columnName)-2){
-                                                            echo $quizResult[$i]->$columnName[$j] ? 'True' : 'False';
-                                                        } 
-                                                        else {
-                                                            echo $quizResult[$i]->$columnName[$j];  
-                                                        }                                                        
-                                                    ?> 
+                                                <td <?php if ($j==0){ echo 'style="display:none"';} ?>>
+                                                    <?php if(strlen($quizResult[$i]->$columnName[$j]) > 0) echo $quizResult[$i]->$columnName[$j]; else echo 0; ?> 
                                                     <?php if($j==count($columnName)-1){?>
                                                         <span class="glyphicon glyphicon-remove pull-right" aria-hidden="true"></span>
                                                         <span class="pull-right" aria-hidden="true">&nbsp;</span>
-                                                        <a href="mcq-editor.php?quizid=<?php echo $quizResult[$i]->QuizID ?>">
+                                                        <a href="saq-editor.php?quizid=<?php echo $quizResult[$i]->QuizID ?>">
                                                         <span class="glyphicon glyphicon-edit pull-right" aria-hidden="true"></span></a>
                                                     <?php } ?>
                                                 </td>
@@ -121,7 +110,7 @@
                             </div>
                             <!-- /.table-responsive -->
                             <div class="well row">
-                                <h4>Multiple Choice Quiz Overview Notification</h4>
+                                <h4>Short Answer Quiz Overview Notification</h4>
                                 <div class="alert alert-info">
                                     <p>View quizzes by filtering or searching. You can create/update/delete any quiz.</p>
                                 </div>
@@ -169,11 +158,6 @@
                   <?php } ?>
                 </select>
                 <br>
-                <label for="Points">Points</label>
-                <input type="text" class="form-control dialoginput" id="Points" name="points"  placeholder="Input Points" required></input>
-                <br>
-                <label for="Questionnaires">Questionnaires</label>
-                <input type="checkbox" class="form-control" id="Questionnaires" name="questionnaires" value="1"></input>
             </form>
             </div>
             <div class="modal-footer">            
@@ -189,7 +173,7 @@
     <script>
     //DO NOT put them in $(document).ready() since the table has multi pages    
     $('.glyphicon-plus').on('click', function (){
-        $('#dialogTitle').text("Add MCQ");
+        $('#dialogTitle').text("Add SAQ");
         $('#update').val(1);
         for(i=0;i<$('.dialoginput').length;i++){                
             $('.dialoginput').eq(i).val('');
@@ -208,10 +192,6 @@
         $('#submission').validate({
           rules: {
             week: {
-              required: true,
-              digits: true
-            },
-            points: {
               required: true,
               digits: true
             }
