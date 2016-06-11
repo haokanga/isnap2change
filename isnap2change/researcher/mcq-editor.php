@@ -76,7 +76,7 @@
 
 <head>
     <!-- Header Library -->
-    <?php include('/header-lib.php'); ?>
+    <?php require_once('/header-lib.php'); ?>
 </head>
 
 <body>
@@ -136,7 +136,7 @@
                     </div>
                     <!-- /.panel -->
                                                        
-                    <?php include('/learning-material-editor-iframe.php'); ?>
+                    <?php require_once('/learning-material-editor-iframe.php'); ?>
                     
                     <!-- Options -->
                     <div class="panel panel-default">
@@ -231,7 +231,7 @@
       </div>    
       
     <!-- SB Admin Library -->  
-    <?php include('/sb-admin-lib.php'); ?>   
+    <?php require_once('/sb-admin-lib.php'); ?>   
     <!-- Page-Level Scripts -->
     <script>
     //DO NOT put them in $(document).ready() since the table has multi pages

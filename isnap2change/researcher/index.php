@@ -13,7 +13,7 @@
 
 <head>
     <!-- Header Library -->
-    <?php include('/header-lib.php'); ?>
+    <?php require_once('/header-lib.php'); ?>
 </head>
 
 <body>
@@ -192,7 +192,7 @@
       <input type=hidden name="keyword" id="keyword" value="<?php if(isset($_GET['schoolname'])){ echo $_GET['schoolname']; } ?>"></input>
       
     <!-- SB Admin Library -->  
-    <?php include('/sb-admin-lib.php'); ?>
+    <?php require_once('/sb-admin-lib.php'); ?>
     
     <!--jQuery Validate plugin-->
     <script src="http://ajax.aspnetcdn.com/ajax/jquery.validate/1.15.0/jquery.validate.min.js"></script>

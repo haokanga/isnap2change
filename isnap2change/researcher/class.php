@@ -62,7 +62,7 @@
 
 <head>
     <!-- Header Library -->
-    <?php include('/header-lib.php'); ?>
+    <?php require_once('/header-lib.php'); ?>
 </head>
 
 <body>
@@ -195,7 +195,7 @@
       ?>">
       </input>
     <!-- SB Admin Library -->  
-    <?php include('/sb-admin-lib.php'); ?>
+    <?php require_once('/sb-admin-lib.php'); ?>
     <!-- Page-Level Scripts -->
     <script>
     function randomString(length) {

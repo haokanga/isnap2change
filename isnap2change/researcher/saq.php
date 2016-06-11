@@ -58,7 +58,7 @@
 
 <head>    
     <!-- Header Library -->
-    <?php include('/header-lib.php'); ?>
+    <?php require_once('/header-lib.php'); ?>
 </head>
 
 <body>
@@ -184,7 +184,7 @@
         </div>
       </div>
     <!-- SB Admin Library -->  
-    <?php include('/sb-admin-lib.php'); ?>
+    <?php require_once('/sb-admin-lib.php'); ?>
     <!-- Page-Level Scripts -->
     <script>
     //DO NOT put them in $(document).ready() since the table has multi pages    
