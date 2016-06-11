@@ -64,8 +64,8 @@
 <body>
 
     <div id="wrapper">
-    
-        <?php require_once('/navigation.php'); ?>
+
+        <?php require_once('/navigation.php'); ?> 
 
         <div id="page-wrapper">
             <div class="row">
@@ -219,7 +219,7 @@
         });   
         $('#submission').submit();
     });
-   
+    
     $(document).ready(function() {
         var table = $('#datatables').DataTable({
                 responsive: true,

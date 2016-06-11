@@ -32,9 +32,10 @@
                         $conn->rollback();
                     } 
                 }
-                else if($metadataupdate == 1){  
+                else if($metadataupdate == -1){  
                     $quizID = $_POST['quizid'];
                     deleteQuiz($conn, $quizID);
+                    header('Location: mcq.php');
                 }            
             }
             if(isset($_POST['update'])){                          
@@ -82,7 +83,7 @@
 
     <div id="wrapper">
 
-        <div w3-include-html="navigation.html"></div> 
+        <?php require_once('/navigation.php'); ?> 
 
         <div id="page-wrapper">
             <div class="row">
@@ -134,25 +135,8 @@
                         <!-- /.panel-body -->
                     </div>
                     <!-- /.panel -->
-                    
-                    
-                    <!--Learning Material-->
-                    <div class="panel panel-default">
-                        <div class="panel-heading">
-                            Learning Material Editor
-                        </div>
-                        <!-- /.panel-heading -->
-                        <div class="panel-body">
-                            <div class="heading" style="color: black; max-height:10vh; text-align:center; border-bottom: 1px solid #eee;">
-                                <h1 style='padding: 0px;'> 
-								<i>	<?php echo $materialRes->TopicName; ?> </i>                          
-                                </h1> 
-                            </div>
-                            <iframe id="cp_embed_YydQoj" src="learning-material-editor.php?quizid=<?php echo $quizID; ?>" scrolling="no" frameborder="0" allowtransparency="true" allowfullscreen="true" name="Learning Material Editor" title="Learning Material Editor" style="width: 100%; height:100%;" ></iframe>                          
-                        </div>                            
-                        <!-- /.panel-body -->
-                    </div>
-                    <!-- /.panel -->
+                                                       
+                    <?php include('/learning-material-editor-iframe.php'); ?>
                     
                     <!-- Options -->
                     <div class="panel panel-default">
@@ -259,6 +243,12 @@
             $('.dialoginput').eq(i).val('');
         }   
     });
+    $('div > .glyphicon-remove').on('click', function (){
+        if (confirm('[WARNING] Are you sure to remove this quiz? If you remove one quiz. All the questions and submission of this quiz will also get deleted (not recoverable). It includes learning material, questions and options, their submissions and your grading/feedback, not only the quiz itself.')) {
+            $('#metadataupdate').val(-1);
+            $('#metadatasubmission').submit();
+        }                            
+    });
     $('td > .glyphicon-remove').on('click', function (){
         $('#update').val(-1);
         for(i=0;i<$('.dialoginput').length;i++){                
@@ -269,10 +259,8 @@
     $('#btnSave').on('click', function (){
         $('#submission').validate();   
         $('#submission').submit();
-    });
-    
-    //include html
-    w3IncludeHTML();   
+    }); 
+   
     $(document).ready(function() {
         var table = $('#datatables').DataTable({
             responsive: true,

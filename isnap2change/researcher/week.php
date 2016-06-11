@@ -39,7 +39,7 @@
 
     <div id="wrapper">
 
-        <div w3-include-html="navigation.html"></div> 
+        <?php require_once('/navigation.php'); ?> 
 
         <div id="page-wrapper">
             <div class="row">
@@ -164,8 +164,6 @@
         $('#submission').validate();
         $('#submission').submit();
     });
-    //include html
-    w3IncludeHTML();
     </script>
 </body>
 

@@ -69,7 +69,7 @@
 
     <div id="wrapper">
 
-        <div w3-include-html="navigation.html"></div> 
+        <?php require_once('/navigation.php'); ?> 
 
         <div id="page-wrapper">
             <div class="row">
@@ -248,8 +248,7 @@
         $('.dialoginput').eq(0).prop('disabled',false);
         $('#submission').submit();
     });
-    //include html
-    w3IncludeHTML();   
+   
     $(document).ready(function() {
         var table = $('#datatables').DataTable({
                 responsive: true,

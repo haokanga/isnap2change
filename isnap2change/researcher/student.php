@@ -48,7 +48,7 @@
 
     <div id="wrapper">
 
-        <div w3-include-html="navigation.html"></div> 
+        <?php require_once('/navigation.php'); ?> 
 
         <div id="page-wrapper">
             <div class="row">
@@ -214,8 +214,7 @@
             $('#submission').submit();
         }
     });
-    //include html
-    w3IncludeHTML();   
+    
     $(document).ready(function() {
         var table = $('#datatables').DataTable({
                 responsive: true,

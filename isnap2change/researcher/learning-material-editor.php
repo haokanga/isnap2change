@@ -54,6 +54,7 @@
   image_advtab: true,
   browser_spellcheck : true,
   templates: [
+    //infograph list
     { title: 'Infograph Demo', url: '../infograph/demo.html' }
   ],
   content_css: [
