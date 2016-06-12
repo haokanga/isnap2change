@@ -104,12 +104,12 @@
         return $conn->lastInsertId();
     }
     
-    function updateClass($conn, $classID, $schoolID, $className){
+    function updateClass($conn, $classID, $schoolID, $className, $unlockedProgress){
          $updateSql = "UPDATE Class 
-            SET ClassName = ?, SchoolID = ?
+            SET ClassName = ?, SchoolID = ?, UnlockedProgress = ?
             WHERE ClassID = ?";			
         $updateSql = $conn->prepare($updateSql);                            
-        $updateSql->execute(array($className, $schoolID, $classID));
+        $updateSql->execute(array($className, $schoolID, $unlockedProgress, $classID));
     }
     
     function deleteClass($conn, $classID){
@@ -163,15 +163,8 @@
         $studentNumQuery->execute();
         $studentNumResult = $studentNumQuery->fetchAll(PDO::FETCH_OBJ);
         return $studentNumResult;
-    }
-    
-    function updateUnlockedProgress($conn, $classID, $unlockedProgress){
-        $updateSql = "UPDATE Class 
-            SET UnlockedProgress = ?
-            WHERE ClassID = ?";			
-        $updateSql = $conn->prepare($updateSql);                            
-        $updateSql->execute(array($unlockedProgress, $classID));
-    }
+    }    
+
     /* Class */
     
     /* Token */    

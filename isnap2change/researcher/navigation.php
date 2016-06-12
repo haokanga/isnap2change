@@ -1,7 +1,7 @@
 <?php
 
-$userAdminPageList=array('School','Class','Student', 'Locks');
-$userAdminIconList=array('mortar-board','users','child','lock');
+$userAdminPageList=array('School','Class','Student');
+$userAdminIconList=array('mortar-board','users','child');
 $contentAdminPageList=array('Week','Quiz','Fact','MCQ','SAQ','Matching','Poster');
 $contentAdminIconList=array('calendar','book','comment','check','pencil','th-list','check','check','check');
 

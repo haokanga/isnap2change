@@ -16,9 +16,8 @@
                     $schoolName = $_POST['schoolname'];
                     $teacherToken = $_POST['teachertoken'];
                     $studentToken = $_POST['studenttoken'];
-                    
-                    $schoolResult = getSchoolByName($conn, $schoolName);                                      
-                    $classID = createClass($conn, $schoolResult->SchoolID, $className);                     
+                    $schoolID = getSchoolByName($conn, $schoolName)->SchoolID;
+                    $classID = createClass($conn, $schoolID, $className);
                     updateToken($conn, $classID, $teacherToken, "TEACHER");
                     updateToken($conn, $classID, $studentToken, "STUDENT");                    
                 }else if($update == 0){
@@ -27,9 +26,10 @@
                     $schoolName = $_POST['schoolname'];
                     $teacherToken = $_POST['teachertoken'];
                     $studentToken = $_POST['studenttoken'];
-                    
-                    $schoolResult = getSchoolByName($conn, $schoolName);
-                    updateClass($conn, $classID, $schoolResult->SchoolID, $className);
+                    $unlockedProgress = $_POST['unlockedprogress'];
+
+                    $schoolID = getSchoolByName($conn, $schoolName)->SchoolID;
+                    updateClass($conn, $classID, $schoolID, $className, $unlockedProgress);
                     updateToken($conn, $classID, $teacherToken, "TEACHER");
                     updateToken($conn, $classID, $studentToken, "STUDENT");
                 }else if($update == -1){
@@ -164,15 +164,13 @@
                 <br><label for="StudentToken">StudentToken</label><span class="glyphicon glyphicon-random pull-right"></span>
                 <input type="text" class="form-control dialoginput" id="StudentToken" name="studenttoken" required>
                 <br>
-            </form>            
-            <label for="EnrolledStudents">EnrolledStudents</label>
-            <input type="text" class="form-control dialoginput" id="EnrolledStudents" name="enrolledstudents">
-            <br>
-            <form id="progress-submission" method="post" action="<?php if(isset($_GET['schoolid'])) echo $_SERVER['PHP_SELF'].'?schoolid='.$_GET['schoolid']; else echo $_SERVER['PHP_SELF']; ?>">
+                <label for="EnrolledStudents">EnrolledStudents</label>
+                <input type="text" class="form-control dialoginput" id="EnrolledStudents" name="enrolledstudents">
+                <br>
                 <label for="UnlockedProgress">UnlockedProgress</label>
-                <input type="range" class="dialoginput" min="0" max="<?php echo min($classResult[$i]->UnlockedProgress, $weekResult->WeekNum) ?>" id="UnlockedProgress" name="unlockedprogress" onchange="updateTextInput(this.value);">                                                       
-                <input type="text" class="dialoginput" id="textInput" value="" disabled>
-            </form> 
+                <input type="text" class="dialoginput pull-right" id="textInput" value="" disabled>
+                <input type="range" class="dialoginput" min="0" max="<?php echo min($classResult[$i]->UnlockedProgress, $weekResult->WeekNum) ?>" id="UnlockedProgress" name="unlockedprogress" onchange="updateTextInput(this.value);">
+            </form>
             </div>
             <div class="modal-footer">            
               <button type="button" id="btnSave" class="btn btn-default">Save</button>
