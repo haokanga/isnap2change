@@ -4,7 +4,7 @@
     require_once("../debug.php");
     require_once("researcher-validation.php");
     $pageName = "matching";
-    $columnName = array('QuizID','Week','TopicName','Description','MultipleChoice','Points');
+    $columnName = array('QuizID','Week','TopicName','Description','Points');
     
     try{
         $conn = db_connect();
@@ -88,31 +88,31 @@
                                         <tr>
                                         <?php for($i=0; $i<count($columnName); $i++){ ?>
                                             <th <?php if ($i==0){ echo 'style="display:none"';} ?>><?php echo $columnName[$i]; ?></th>
-                                        <?php }?>
+                                            <?php if($i==count($columnName)-2){ ?>
+                                            <th>MultipleChoice</th>
+                                        <?php }
+                                        }?>
                                         </tr>
                                     </thead>
                                     <tbody>
                                     <?php for($i=0; $i<count($quizResult); $i++) {?>
                                         <tr class="<?php if($i % 2 == 0){echo "odd";} else {echo "even";} ?>">
                                             <?php for($j=0; $j<count($columnName); $j++){ ?>
-                                                <td <?php if ($j==0){ echo 'style="display:none"';} ?>>                            
-                                                    <?php 
-                                                        // MultipleChoice: if 1, true; else if 0, false
-                                                        if($j==count($columnName)-2){
-                                                            echo $quizResult[$i]->$columnName[$j] ? 'True' : 'False';
-                                                        } 
-                                                        else {
-                                                            echo $quizResult[$i]->$columnName[$j];  
-                                                        }                                                        
-                                                    ?> 
-                                                    <?php if($j==count($columnName)-1){?>
+                                                <td <?php if ($j==0){ echo 'style="display:none"';} ?>>
+                                                    <?php
+                                                    echo $quizResult[$i]->$columnName[$j];
+                                                    if($j==count($columnName)-1){?>
                                                         <span class="glyphicon glyphicon-remove pull-right" aria-hidden="true"></span>
                                                         <span class="pull-right" aria-hidden="true">&nbsp;</span>
                                                         <a href="matching-editor.php?quizid=<?php echo $quizResult[$i]->QuizID ?>">
                                                         <span class="glyphicon glyphicon-edit pull-right" aria-hidden="true"></span></a>
                                                     <?php } ?>
                                                 </td>
-                                            <?php }?>
+                                            <?php if($j==count($columnName)-2){ ?>
+                                                <td><?php echo $multipleChoice = getMaxMatchingOptionNum($conn, $quizResult[$i]->QuizID) > 1 ? 'True' : 'False'; ?> </td>
+                                            <?php
+                                                }
+                                            }?>
                                         </tr>
                                     <?php } ?>    
                                     </tbody>
@@ -187,19 +187,20 @@
     <?php require_once('sb-admin-lib.php'); ?>
     <!-- Page-Level Scripts -->
     <script>
-    //DO NOT put them in $(document).ready() since the table has multi pages    
+    //DO NOT put them in $(document).ready() since the table has multi pages
+    var diaglogInputArr = $('.dialoginput');    
     $('.glyphicon-plus').on('click', function (){
         $('#dialogTitle').text("Add Matching");
         $('#update').val(1);
-        for(i=0;i<$('.dialoginput').length;i++){                
-            $('.dialoginput').eq(i).val('');
+        for(i=0;i<diaglogInputArr.length;i++){                
+            diaglogInputArr.eq(i).val('');
         }   
     }); 
     $('.glyphicon-remove').on('click', function (){
         if (confirm('[WARNING] Are you sure to remove this quiz? If you remove one quiz. All the questions and submission of this quiz will also get deleted (not recoverable). It includes learning material, questions and options, their submissions and your grading/feedback, not only the quiz itself.')) {
             $('#update').val(-1);
-            for(i=0;i<$('.dialoginput').length;i++){                
-                $('.dialoginput').eq(i).val($(this).parent().parent().children('td').eq(i).text().trim());
+            for(i=0;i<diaglogInputArr.length;i++){                
+                diaglogInputArr.eq(i).val($(this).parent().parent().children('td').eq(i).text().trim());
             }
             $('#submission').submit();
         }           

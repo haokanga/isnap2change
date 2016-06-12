@@ -298,7 +298,9 @@
     <?php require_once('sb-admin-lib.php'); ?>   
     <!-- Page-Level Scripts -->
     <script>
-    //DO NOT put them in $(document).ready() since the table has multi pages    
+    //DO NOT put them in $(document).ready() since the table has multi pages 
+    var bucketDialogInputArr = $('.bucket-dialoginput');
+    var itemDialogInputArr = $('.item-dialoginput');
     $('#metadata-save').on('click', function (){
         $('#metadataupdate').val(0);
         $('#metadata-submission').validate({
@@ -324,21 +326,21 @@
     $('.bucket-plus').on('click', function (){
         $('#bucket-dialogtitle').text("Add Bucket");
         $('#bucketupdate').val(1);
-        for(i=0;i<$('.bucket-dialoginput').length;i++){                
-            $('.bucket-dialoginput').eq(i).val('');
+        for(i=0;i<bucketDialogInputArr.length;i++){                
+            bucketDialogInputArr.eq(i).val('');
         }   
     });    
     $('.bucket-edit').on('click', function (){
         $('#bucket-dialogtitle').text("Edit Bucket");
         $('#bucketupdate').val(0);
-        for(i=0;i<$('.bucket-dialoginput').length;i++){                
-            $('.bucket-dialoginput').eq(i).val($(this).parent().parent().children('td').eq(i).text().trim());
+        for(i=0;i<bucketDialogInputArr.length;i++){                
+            bucketDialogInputArr.eq(i).val($(this).parent().parent().children('td').eq(i).text().trim());
         }                          
     });
     $('.bucket-remove').on('click', function (){
         $('#bucketupdate').val(-1);
-        for(i=0;i<$('.bucket-dialoginput').length;i++){                
-            $('.bucket-dialoginput').eq(i).val($(this).parent().parent().children('td').eq(i).text().trim());
+        for(i=0;i<bucketDialogInputArr.length;i++){                
+            bucketDialogInputArr.eq(i).val($(this).parent().parent().children('td').eq(i).text().trim());
         }
         $('#bucket-submission').submit();                           
     });
@@ -349,8 +351,8 @@
      $('.item-plus').on('click', function (){
         $('#item-dialogtitle').text("Add Item");
         $('#itemupdate').val(1);
-        for(i=0;i<$('.item-dialoginput').length;i++){                
-            $('.item-dialoginput').eq(i).val('');
+        for(i=0;i<itemDialogInputArr.length;i++){                
+            itemDialogInputArr.eq(i).val('');
         }   
     });    
     $('.item-edit').on('click', function (){
@@ -358,15 +360,15 @@
         $('#itemupdate').val(0);
         var bucketText = $(this).parent().parent().children('td').eq(1).text().trim();
         var index = $('#Bucket option').filter(function () { return $(this).html() == bucketText; }).val();        
-        $('.item-dialoginput').eq(0).val(index);
-        for(i=1;i<$('.item-dialoginput').length;i++){                
-            $('.item-dialoginput').eq(i).val($(this).parent().parent().children('td').eq(i+1).text().trim());
+        itemDialogInputArr.eq(0).val(index);
+        for(i=1;i<itemDialogInputArr.length;i++){                
+            itemDialogInputArr.eq(i).val($(this).parent().parent().children('td').eq(i+1).text().trim());
         }                          
     });
     $('.item-remove').on('click', function (){
         $('#itemupdate').val(-1);
-        for(i=1;i<$('.item-dialoginput').length;i++){                
-            $('.item-dialoginput').eq(i).val($(this).parent().parent().children('td').eq(i+1).text().trim());
+        for(i=1;i<itemDialogInputArr.length;i++){                
+            itemDialogInputArr.eq(i).val($(this).parent().parent().children('td').eq(i+1).text().trim());
         }
         $('#item-submission').submit();                           
     });

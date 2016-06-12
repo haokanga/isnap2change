@@ -153,11 +153,12 @@
                 responsive: true,                
                 "pageLength":25
         });            
-    });    
+    });
+    var diaglogInputArr = $('.dialoginput');    
     $('.glyphicon-remove').on('click', function (){
-        for(i=0;i<$('.dialoginput').length;i++){
+        for(i=0;i<diaglogInputArr.length;i++){
             console.log($(this).parent().parent().children('span'));
-            $('.dialoginput').eq(i).val($(this).parent().parent().children('td').eq(i).children('a').attr("id"));
+            diaglogInputArr.eq(i).val($(this).parent().parent().children('td').eq(i).children('a').attr("id"));
         }                  
     });
     $('#btnConfirm').on('click', function (){

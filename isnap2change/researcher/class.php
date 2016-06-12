@@ -204,41 +204,42 @@
         return Math.round((Math.pow(36, length + 1) - Math.random() * Math.pow(36, length))).toString(36).slice(1);
     }
     //DO NOT put them in $(document).ready() since the table has multi pages
-        
+    
+    var diaglogInputArr = $('.dialoginput');
     $('.glyphicon-edit').on('click', function (){
         $('#dialogTitle').text("Edit Class");
         $('#update').val(0);
-        for(i=0;i<$('.dialoginput').length-2;i++){                
-            $('.dialoginput').eq(i).val($(this).parent().parent().children('td').eq(i).text().trim());
+        for(i=0;i<diaglogInputArr.length-2;i++){                
+            diaglogInputArr.eq(i).val($(this).parent().parent().children('td').eq(i).text().trim());
         }
         var currentWeek = $(this).parent().parent().children('td').eq(6).text().trim().split("/")[0];
-        $('.dialoginput').eq(6).val(currentWeek);
-        $('.dialoginput').eq(7).val(currentWeek);
+        diaglogInputArr.eq(6).val(currentWeek);
+        diaglogInputArr.eq(7).val(currentWeek);
         //disable ClassID, EnrolledStudents, UnlockedProgress
-        $('.dialoginput').eq(0).attr('disabled','disabled');
-        $('.dialoginput').eq(5).attr('disabled','disabled');         
+        diaglogInputArr.eq(0).attr('disabled','disabled');
+        diaglogInputArr.eq(5).attr('disabled','disabled');         
     });
     $('.glyphicon-plus').on('click', function (){
         $('#dialogTitle').text("Add Class");
         $('#update').val(1);
-        for(i=0;i<$('.dialoginput').length;i++){                
-            $('.dialoginput').eq(i).val('');
+        for(i=0;i<diaglogInputArr.length;i++){                
+            diaglogInputArr.eq(i).val('');
         }
         //disable ClassID, EnrolledStudents, UnlockedProgress
-        $('.dialoginput').eq(0).attr('disabled','disabled');
-        $('.dialoginput').eq(5).attr('disabled','disabled');        
+        diaglogInputArr.eq(0).attr('disabled','disabled');
+        diaglogInputArr.eq(5).attr('disabled','disabled');        
     }); 
     $('.glyphicon-remove').on('click', function (){
         if (confirm('[WARNING] Are you sure to remove this class? All the student data in this class will also get deleted (not recoverable). It includes student information, their submissions of every task and your grading/feedback, not only the class itself.')) {
             $('#update').val(-1);
             //fill required input
-            $('.dialoginput').eq(0).prop('disabled',false);
-            for(i=0;i<$('.dialoginput').length-2;i++){                
-                $('.dialoginput').eq(i).val($(this).parent().parent().children('td').eq(i).text().trim());
+            diaglogInputArr.eq(0).prop('disabled',false);
+            for(i=0;i<diaglogInputArr.length-2;i++){                
+                diaglogInputArr.eq(i).val($(this).parent().parent().children('td').eq(i).text().trim());
             }
             var currentWeek = $(this).parent().parent().children('td').eq(6).text().trim().split("/")[0];
-            $('.dialoginput').eq(6).val(currentWeek);
-            $('.dialoginput').eq(7).val(currentWeek);
+            diaglogInputArr.eq(6).val(currentWeek);
+            diaglogInputArr.eq(7).val(currentWeek);
             $('#submission').submit();
         }           
     });
@@ -252,7 +253,7 @@
     $('#btnSave').on('click', function (){
         $('#submission').validate();        
         //enable ClassID and EnrolledStudents
-        $('.dialoginput').eq(0).prop('disabled',false);
+        diaglogInputArr.eq(0).prop('disabled',false);
         $('#submission').submit();
     });
     

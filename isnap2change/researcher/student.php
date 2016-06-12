@@ -183,12 +183,13 @@
         return Math.round((Math.pow(36, length + 1) - Math.random() * Math.pow(36, length))).toString(36).slice(1);
     }
     //DO NOT put them in $(document).ready() since the table has multi pages
+    var diaglogInputArr = $('.dialoginput');
     $('.glyphicon-edit').on('click', function (){
         $('#update').val(0);
         //studentid, username
-        $('.dialoginput').eq(0).val($(this).parent().parent().children('td').eq(0).text());        
-        $('.dialoginput').eq(1).val($(this).parent().text());
-        $('.dialoginput').each(function() {
+        diaglogInputArr.eq(0).val($(this).parent().parent().children('td').eq(0).text());        
+        diaglogInputArr.eq(1).val($(this).parent().text());
+        diaglogInputArr.each(function() {
             $( this ).attr('disabled','disabled');
         });
     });
@@ -196,10 +197,10 @@
         if (confirm('[WARNING] Are you sure to remove this student? All the data of this student will also get deleted (not recoverable). It includes student submissions of every task and your grading/feedback, not only the student itself.')) {
             $('#update').val(-1);
             //studentid, username
-            $('.dialoginput').eq(0).val($(this).parent().parent().children('td').eq(0).text());        
-            $('.dialoginput').eq(1).val($(this).parent().text());            
+            diaglogInputArr.eq(0).val($(this).parent().parent().children('td').eq(0).text());        
+            diaglogInputArr.eq(1).val($(this).parent().text());            
             //enable all the input
-            $('.dialoginput').each(function() {
+            diaglogInputArr.each(function() {
                 $( this ).prop('disabled',false);
             });
             $('#submission').submit();
@@ -208,7 +209,7 @@
     $('#btmResetPwd').on('click', function (){
         $('#submission').validate();        
         //enable all the input
-        $('.dialoginput').each(function() {
+        diaglogInputArr.each(function() {
             $( this ).prop('disabled',false);
         });
         if (confirm('[WARNING] Are you sure to reset this student password to `WelcomeToiSNAP2`? (not recoverable).')) {

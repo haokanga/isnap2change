@@ -163,33 +163,34 @@
         });            
     }); 
     //DO NOT put them in $(document).ready() since the table has multi pages
+    var diaglogInputArr = $('.dialoginput');
     $('.glyphicon-edit').on('click', function (){
         $('#dialogTitle').text("Edit School");
         $('#update').val(0);
-        for(i=0;i<$('.dialoginput').length;i++){                
-            $('.dialoginput').eq(i).val($(this).parent().parent().children('td').eq(i).text().trim());
+        for(i=0;i<diaglogInputArr.length;i++){                
+            diaglogInputArr.eq(i).val($(this).parent().parent().children('td').eq(i).text().trim());
         }
         //disable SchoolID and Classes
-        $('.dialoginput').eq(0).attr('disabled','disabled');
-        $('.dialoginput').eq(2).attr('disabled','disabled');            
+        diaglogInputArr.eq(0).attr('disabled','disabled');
+        diaglogInputArr.eq(2).attr('disabled','disabled');            
     });
     $('.glyphicon-plus').on('click', function (){
         $('#dialogTitle').text("Add School");
         $('#update').val(1);
-        for(i=0;i<$('.dialoginput').length;i++){                
-            $('.dialoginput').eq(i).val('');
+        for(i=0;i<diaglogInputArr.length;i++){                
+            diaglogInputArr.eq(i).val('');
         }
         //disable SchoolID and Classes
-        $('.dialoginput').eq(0).attr('disabled','disabled');
-        $('.dialoginput').eq(2).attr('disabled','disabled');            
+        diaglogInputArr.eq(0).attr('disabled','disabled');
+        diaglogInputArr.eq(2).attr('disabled','disabled');            
     }); 
     $('.glyphicon-remove').on('click', function (){
         if (confirm('[WARNING] Are you sure to remove this school? All the student data in this school will also get deleted (not recoverable). It includes student information, their submissions of every task and your grading/feedback, not only the school itself.')) {
             $('#update').val(-1);
             //fill required input
-            $('.dialoginput').eq(0).prop('disabled',false);
-            for(i=0;i<$('.dialoginput').length;i++){                
-                $('.dialoginput').eq(i).val($(this).parent().parent().children('td').eq(i).text().trim());
+            diaglogInputArr.eq(0).prop('disabled',false);
+            for(i=0;i<diaglogInputArr.length;i++){                
+                diaglogInputArr.eq(i).val($(this).parent().parent().children('td').eq(i).text().trim());
             }
             $('#submission').submit();
         }           
@@ -197,7 +198,7 @@
     $('#btnSave').on('click', function (){
         $('#submission').validate();        
         //enable SchoolID
-        $('.dialoginput').eq(0).prop('disabled',false);
+        diaglogInputArr.eq(0).prop('disabled',false);
         $('#submission').submit();
     });
     

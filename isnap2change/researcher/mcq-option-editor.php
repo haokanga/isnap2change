@@ -218,32 +218,33 @@
     <?php require_once('sb-admin-lib.php'); ?>
     <!-- Page-Level Scripts -->
     <script>
-    //DO NOT put them in $(document).ready() since the table has multi pages 
+    //DO NOT put them in $(document).ready() since the table has multi pages
+    var diaglogInputArr = $('.dialoginput');    
     $('.glyphicon-plus').on('click', function (){
         $('#dialogTitle').text("Add Option");
         $('#update').val(1);
-        for(i=0;i<$('.dialoginput').length-1;i++){                
-            $('.dialoginput').eq(i).val('');
+        for(i=0;i<diaglogInputArr.length-1;i++){                
+            diaglogInputArr.eq(i).val('');
         }   
     });     
     $('td > .glyphicon-edit').on('click', function (){
         $('#dialogTitle').text("Edit Option");
         $('#update').val(0);
-        for(i=0;i<$('.dialoginput').length-1;i++){                
-            $('.dialoginput').eq(i).val($(this).parent().parent().children('td').eq(i).text().trim());
+        for(i=0;i<diaglogInputArr.length-1;i++){                
+            diaglogInputArr.eq(i).val($(this).parent().parent().children('td').eq(i).text().trim());
         }   
     });     
     $('td > .glyphicon-remove').on('click', function (){        
         $('#update').val(-1);
-        for(i=0;i<$('.dialoginput').length-1;i++){                
-            $('.dialoginput').eq(i).val($(this).parent().parent().children('td').eq(i).text().trim());
+        for(i=0;i<diaglogInputArr.length-1;i++){                
+            diaglogInputArr.eq(i).val($(this).parent().parent().children('td').eq(i).text().trim());
         }
         $('#submission').submit();                   
     });
     $('#btnSave').on('click', function (){
         $('#submission').validate();
-        for(i=0;i<$('.dialoginput').length;i++){                
-            console.log($('.dialoginput').eq(i).val());
+        for(i=0;i<diaglogInputArr.length;i++){                
+            console.log(diaglogInputArr.eq(i).val());
         }        
         $('#submission').submit();
     });

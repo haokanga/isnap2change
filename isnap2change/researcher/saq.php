@@ -171,19 +171,20 @@
     <?php require_once('sb-admin-lib.php'); ?>
     <!-- Page-Level Scripts -->
     <script>
-    //DO NOT put them in $(document).ready() since the table has multi pages    
+    //DO NOT put them in $(document).ready() since the table has multi pages
+    var diaglogInputArr = $('.dialoginput');
     $('.glyphicon-plus').on('click', function (){
         $('#dialogTitle').text("Add SAQ");
         $('#update').val(1);
-        for(i=0;i<$('.dialoginput').length;i++){                
-            $('.dialoginput').eq(i).val('');
+        for(i=0;i<diaglogInputArr.length;i++){                
+            diaglogInputArr.eq(i).val('');
         }   
     }); 
     $('.glyphicon-remove').on('click', function (){
         if (confirm('[WARNING] Are you sure to remove this quiz? If you remove one quiz. All the questions and submission of this quiz will also get deleted (not recoverable). It includes learning material, questions and options, their submissions and your grading/feedback, not only the quiz itself.')) {
             $('#update').val(-1);
-            for(i=0;i<$('.dialoginput').length;i++){                
-                $('.dialoginput').eq(i).val($(this).parent().parent().children('td').eq(i).text().trim());
+            for(i=0;i<diaglogInputArr.length;i++){                
+                diaglogInputArr.eq(i).val($(this).parent().parent().children('td').eq(i).text().trim());
             }
             $('#submission').submit();
         }           
