@@ -22,7 +22,8 @@
                         $conn->beginTransaction();              
                         
                         $topicResult = getTopicByName($conn, $topicName);
-                        updateQuiz($conn, $quizID, $topicResult->TopicID, $week);
+                        $topicID = $topicResult->TopicID;
+                        updateQuiz($conn, $quizID, $topicID, $week);
                         updateMCQSection($conn, $quizID, $points, $questionnaires);
                         
                         $conn->commit();                    
@@ -102,7 +103,7 @@
                         </div>
                         <!-- /.panel-heading -->
                         <div class="panel-body">
-                            <form id="metadatasubmission" method="post" action="<?php echo $phpself; ?>">
+                            <form id="metadata-submission" method="post" action="<?php echo $phpself; ?>">
                                 <!--if 0 update; else if -1 delete;-->
                                 <input type=hidden name="metadataupdate" id="metadataupdate" value="1" required></input>
                                 <label for="QuizID" style="display:none">QuizID</label>
@@ -112,7 +113,7 @@
                                 <input type="text" class="form-control" id="Week" name="week" placeholder="Input Week Number" value="<?php echo $quizResult->Week; ?>"></input> 
                                 <br>  
                                 <label for='TopicName'>TopicName</label>
-                                <select class="form-control" id="TopicName" form="metadatasubmission" name="topicname" required>
+                                <select class="form-control" id="TopicName" form="metadata-submission" name="topicname" required>
                                   <?php for($j=0; $j<count($topicResult); $j++) {?>                  
                                     <option value='<?php echo $topicResult[$j]->TopicName ?>' <?php if($topicResult[$j]->TopicName==$quizResult->TopicName) echo 'selected' ?> ><?php echo $topicResult[$j]->TopicName ?></option>
                                   <?php } ?>
@@ -129,7 +130,7 @@
                                 <br>
                             </form>
                             <!--edit metadata-->
-                            <span class="glyphicon glyphicon-remove pull-right" id="metadataremove" aria-hidden="true"></span><span class="pull-right" aria-hidden="true">&nbsp;</span><span class="glyphicon glyphicon-floppy-saved pull-right" id="metadataedit" aria-hidden="true"></span>    
+                            <span class="glyphicon glyphicon-remove pull-right" id="metadata-remove" aria-hidden="true"></span><span class="pull-right" aria-hidden="true">&nbsp;</span><span class="glyphicon glyphicon-floppy-saved pull-right" id="metadata-save" aria-hidden="true"></span>    
                         </div>                            
                         <!-- /.panel-body -->
                     </div>
@@ -165,6 +166,7 @@
                                             <td><?php echo $mcqQuesResult[$i]->$mcqQuesColName[1] ?></td>
                                             <td class ="<?php if ($mcqQuesResult[$i]->Content == $mcqQuesResult[$i]->CorrectChoice && strlen($mcqQuesResult[$i]->Content) > 0 ) {echo 'bg-success';} else {echo 'bg-danger';} ?>">
                                                 <?php echo $mcqQuesResult[$i]->Content; ?>
+                                            </td>
                                             <td><?php echo $mcqQuesResult[$i]->$mcqQuesColName[3] ?></td>
                                             <td>
                                                 <span class="glyphicon glyphicon-remove pull-right " aria-hidden="true"></span>
@@ -245,7 +247,7 @@
     $('div > .glyphicon-remove').on('click', function (){
         if (confirm('[WARNING] Are you sure to remove this quiz? If you remove one quiz. All the questions and submission of this quiz will also get deleted (not recoverable). It includes learning material, questions and options, their submissions and your grading/feedback, not only the quiz itself.')) {
             $('#metadataupdate').val(-1);
-            $('#metadatasubmission').submit();
+            $('#metadata-submission').submit();
         }                            
     });
     $('td > .glyphicon-remove').on('click', function (){
@@ -270,9 +272,9 @@
               { "bSearchable": false, "aTargets": [ 0 ] }
             ]
         })
-        $('#metadataedit').on('click', function (){
+        $('#metadata-save').on('click', function (){
             $('#metadataupdate').val(0);
-            $('#metadatasubmission').validate({
+            $('#metadata-submission').validate({
               rules: {
                 week: {
                   required: true,
@@ -284,7 +286,7 @@
                 }
               }
             });   
-            $('#metadatasubmission').submit();
+            $('#metadata-submission').submit();
         });        
     });    
     </script>    

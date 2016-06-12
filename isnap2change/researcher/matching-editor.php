@@ -5,7 +5,8 @@
     require_once("/researcher-validation.php");
     $pageName = "matching-editor";
     $columnName = array('QuizID','Week','TopicName','Description','MultipleChoice','Points');  
-    $matchingQuesColName = array('MatchingID','Question','Option', 'Explanation','Edit');
+    $matchingQuesColName = array('MatchingID','Question','OptionID','Content');
+    $matchingQuesVisualName = array('MatchingID','Terminology/Bucket','OptionID','Explanation/Item');
     
     try { 	    
         $conn = db_connect();
@@ -17,13 +18,15 @@
                         $quizID = $_POST['quizid'];
                         $week = $_POST['week'];
                         $topicName = $_POST['topicname'];
+                        $description = $_POST['description'];
                         $points = $_POST['points'];
-                        $multiplechoice = $_POST['multiplechoice'];
+                        $multipleChoice = $_POST['multiplechoice'];
                         $conn->beginTransaction();              
                         
                         $topicResult = getTopicByName($conn, $topicName);
-                        updateQuiz($conn, $quizID, $topicResult->TopicID, $week);
-                        updateMatchingSection($conn, $quizID, $points, $multiplechoice);
+                        $topicID = $topicResult->TopicID;
+                        updateQuiz($conn, $quizID, $topicID, $week);
+                        updateMatchingSection($conn, $quizID, $description, $points);
                         
                         $conn->commit();                    
                     } catch(Exception $e) {
@@ -102,7 +105,7 @@
                         </div>
                         <!-- /.panel-heading -->
                         <div class="panel-body">
-                            <form id="metadatasubmission" method="post" action="<?php echo $phpself; ?>">
+                            <form id="metadata-submission" method="post" action="<?php echo $phpself; ?>">
                                 <!--if 0 update; else if -1 delete;-->
                                 <input type=hidden name="metadataupdate" id="metadataupdate" value="1" required></input>
                                 <label for="QuizID" style="display:none">QuizID</label>
@@ -112,24 +115,27 @@
                                 <input type="text" class="form-control" id="Week" name="week" placeholder="Input Week Number" value="<?php echo $quizResult->Week; ?>"></input> 
                                 <br>  
                                 <label for='TopicName'>TopicName</label>
-                                <select class="form-control" id="TopicName" form="metadatasubmission" name="topicname" required>
+                                <select class="form-control" id="TopicName" form="metadata-submission" name="topicname" required>
                                   <?php for($j=0; $j<count($topicResult); $j++) {?>                  
                                     <option value='<?php echo $topicResult[$j]->TopicName ?>' <?php if($topicResult[$j]->TopicName==$quizResult->TopicName) echo 'selected' ?> ><?php echo $topicResult[$j]->TopicName ?></option>
                                   <?php } ?>
                                 </select>
+                                <br>
+                                <label for="Description">Description</label>
+                                <input type="text" class="form-control" id="Description" name="description"  placeholder="Input Description" value="<?php echo $quizResult->Description; ?>" required></input>
                                 <br>
                                 <label for="Points">Points</label>
                                 <input type="text" class="form-control" id="Points" name="points" placeholder="Input Points" value="<?php echo $quizResult->Points; ?>" required></input>
                                 <br>
                                 <label for="MultipleChoice">MultipleChoice</label>
                                 <input type="hidden" class="form-control" id="MultipleChoice" name="multiplechoice" value="0"></input>
-                                <input type="checkbox" class="form-control" id="MultipleChoice" name="multiplechoice" value="1" <?php if($quizResult->MultipleChoice!=0) echo 'checked';?>></input>
+                                <input type="checkbox" class="form-control" id="MultipleChoice" name="multiplechoice" value="1" <?php if($quizResult->MultipleChoice!=0) echo 'checked';?> disabled></input>
                                 <label for="Questions">Questions</label>
                                 <input type="text" class="form-control" id="Questions" name="questions" value="<?php echo $quizResult->Questions; ?>" disabled></input>
                                 <br>
                             </form>
                             <!--edit metadata-->
-                            <span class="glyphicon glyphicon-remove pull-right" id="metadataremove" aria-hidden="true"></span><span class="pull-right" aria-hidden="true">&nbsp;</span><span class="glyphicon glyphicon-floppy-saved pull-right" id="metadataedit" aria-hidden="true"></span>    
+                            <span class="glyphicon glyphicon-remove pull-right" id="metadata-remove" aria-hidden="true"></span><span class="pull-right" aria-hidden="true">&nbsp;</span><span class="glyphicon glyphicon-floppy-saved pull-right" id="metadata-save" aria-hidden="true"></span>    
                         </div>                            
                         <!-- /.panel-body -->
                     </div>
@@ -141,7 +147,6 @@
                     <div class="panel panel-default">
                         <div class="panel-heading">
                             Questions and Options
-                            <span class="glyphicon glyphicon-plus pull-right" data-toggle="modal" data-target="#dialog"></span>
                         </div>
                         <!-- /.panel-heading -->
                         <div class="panel-body">
@@ -149,11 +154,13 @@
                                 <table class="table table-striped table-bordered table-hover" id="datatables">
                                     <thead>
                                         <tr>
-                                        <?php for($i=0; $i<count($matchingQuesColName); $i++) {
-                                            if ($i==0){?>
-                                            <th style="display:none"><?php echo $matchingQuesColName[$i]; ?></th>
+                                        <?php for($i=0; $i<count($matchingQuesVisualName); $i++) {
+                                            if ($i==0||$i==2){?>
+                                            <th style="display:none"><?php echo $matchingQuesVisualName[$i]; ?></th>
                                             <?php } else {?>                                            
-                                            <th><?php echo $matchingQuesColName[$i]; ?></th>
+                                            <th><?php echo $matchingQuesVisualName[$i]; ?>
+                                                <span class="glyphicon glyphicon-plus" data-toggle="modal" data-target="#dialog"></span>
+                                            </th>
                                         <?php }
                                         }?>
                                         </tr>
@@ -162,16 +169,17 @@
                                         <?php for($i=0; $i<count($matchingQuesResult); $i++) {?>
                                         <tr class="<?php if($i % 2 == 0){echo "odd";} else {echo "even";} ?>">
                                             <td style="display:none"><?php echo $matchingQuesResult[$i]->$matchingQuesColName[0]; ?></td>
-                                            <td><?php echo $matchingQuesResult[$i]->$matchingQuesColName[1] ?></td>
-                                            <td class ="<?php if ($matchingQuesResult[$i]->Content == $matchingQuesResult[$i]->CorrectChoice && strlen($matchingQuesResult[$i]->Content) > 0 ) {echo 'bg-success';} else {echo 'bg-danger';} ?>">
-                                                <?php echo $matchingQuesResult[$i]->Content; ?>
-                                            <td><?php echo $matchingQuesResult[$i]->$matchingQuesColName[3] ?></td>
-                                            <td>
-                                                <span class="glyphicon glyphicon-remove pull-right " aria-hidden="true"></span>
+                                            <td><?php echo $matchingQuesResult[$i]->$matchingQuesColName[1] ?>
+                                                <span class="glyphicon glyphicon-remove pull-right bucket-remove" aria-hidden="true"></span>
                                                 <span class="pull-right" aria-hidden="true">&nbsp;</span>
-                                                <a href="matching-option-editor.php?quizid=<?php echo $quizID ?>&matchingid=<?php echo $matchingQuesResult[$i]->$matchingQuesColName[0]; ?>">
-                                                <span class="glyphicon glyphicon-edit pull-right" data-toggle="modal" data-target="#dialog" aria-hidden="true"></span></a>
-                                            </td>            
+                                                <span class="glyphicon glyphicon-edit pull-right bucket-edit" data-toggle="modal" data-target="#bucket-dialog" aria-hidden="true"></span>
+                                            </td>
+                                            <td style="display:none"><?php echo $matchingQuesResult[$i]->$matchingQuesColName[2]; ?></td>
+                                            <td><?php echo $matchingQuesResult[$i]->$matchingQuesColName[3] ?>
+                                                <span class="glyphicon glyphicon-remove pull-right item-remove" aria-hidden="true"></span>
+                                                <span class="pull-right" aria-hidden="true">&nbsp;</span>
+                                                <span class="glyphicon glyphicon-edit pull-right item-edit" data-toggle="modal" data-target="#item-dialog" aria-hidden="true"></span> 
+                                            </td>          
                                         </tr>
                                     <?php } ?>
                                     </tbody>
@@ -200,21 +208,21 @@
     </div>
     <!-- /#wrapper -->
     <!-- Modal -->
-      <div class="modal fade" id="dialog" role="dialog">
+      <div class="modal fade" id="bucket-dialog" role="dialog">
         <div class="modal-dialog">        
           <!-- Modal content-->
           <div class="modal-content">
             <div class="modal-header">
               <button type="button" class="close" data-dismiss="modal">&times;</button>
-              <h4 class="modal-title" id="dialogTitle">Edit Question</h4>
+              <h4 class="modal-title" id="bucket-dialogtitle">Edit Bucket</h4>
             </div>
             <div class="modal-body">
-            <form id="submission" method="post" action="<?php echo $phpself; ?>">
+            <form id="bucket-submission" method="post" action="<?php echo $phpself; ?>">
                 <input type=hidden name="update" id="update" value="1" required></input>
                 <label for="MatchingID" style="display:none">MatchingID</label>
-                <input type="text" class="form-control dialoginput" id="MatchingID" name="matchingid" style="display:none"></input>
-                <label for="Question">Question</label>
-                <input type="text" class="form-control dialoginput" id="Question" name="question" value="" required></input>
+                <input type="text" class="form-control bucket-dialoginput" id="MatchingID" name="matchingid" style="display:none"></input>
+                <label for="Question">Terminology/Bucket</label>
+                <input type="text" class="form-control bucket-dialoginput" id="Question" name="question" value="" required></input>
                 <br>
                 <label for="QuizID" style="display:none">QuizID</label>
                 <input type="text" class="form-control" id="QuizID" name="quizid" style="display:none" value="<?php echo $quizID; ?>" required></input>
@@ -222,7 +230,7 @@
             </form>
             </div>
             <div class="modal-footer">            
-              <button type="button" id="btnSave" class="btn btn-default">Save</button>
+              <button type="button" id="bucket-save" class="btn btn-default">Save</button>
               <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
             </div>
           </div>          
@@ -233,59 +241,65 @@
     <?php require_once('/sb-admin-lib.php'); ?>   
     <!-- Page-Level Scripts -->
     <script>
-    //DO NOT put them in $(document).ready() since the table has multi pages
-    
-    $('.glyphicon-plus').on('click', function (){
-        $('#dialogTitle').text("Add Question");
-        $('#update').val(1);
-        for(i=0;i<$('.dialoginput').length;i++){                
-            $('.dialoginput').eq(i).val('');
-        }   
-    });
-    $('div > .glyphicon-remove').on('click', function (){
+    //DO NOT put them in $(document).ready() since the table has multi pages    
+    $('#metadata-save').on('click', function (){
+        $('#metadataupdate').val(0);
+        $('#metadata-submission').validate({
+          rules: {
+            week: {
+              required: true,
+              digits: true
+            },
+            points: {
+              required: true,
+              digits: true
+            }
+          }
+        });   
+        $('#metadata-submission').submit();
+    });  
+    $('metadata-remove').on('click', function (){
         if (confirm('[WARNING] Are you sure to remove this quiz? If you remove one quiz. All the questions and submission of this quiz will also get deleted (not recoverable). It includes learning material, questions and options, their submissions and your grading/feedback, not only the quiz itself.')) {
             $('#metadataupdate').val(-1);
-            $('#metadatasubmission').submit();
+            $('#metadata-submission').submit();
         }                            
     });
-    $('td > .glyphicon-remove').on('click', function (){
-        $('#update').val(-1);
-        for(i=0;i<$('.dialoginput').length;i++){                
-            $('.dialoginput').eq(i).val($(this).parent().parent().children('td').eq(i).text().trim());
-        }
-        $('#submission').submit();                           
+    $('.bucket-plus').on('click', function (){
+        $('#bucket-dialogtitle').text("Add Bucket");
+        $('#update').val(1);
+        for(i=0;i<$('.bucket-dialoginput').length;i++){                
+            $('.bucket-dialoginput').eq(i).val('');
+        }   
     });    
-    $('#btnSave').on('click', function (){
-        $('#submission').validate();   
-        $('#submission').submit();
+    $('.bucket-edit').on('click', function (){
+        $('#update').val(0);
+        for(i=0;i<$('.bucket-dialoginput').length;i++){                
+            $('.bucket-dialoginput').eq(i).val($(this).parent().parent().children('td').eq(i).text().trim());
+        }                          
+    });
+    $('.bucket-remove').on('click', function (){
+        $('#update').val(-1);
+        for(i=0;i<$('.bucket-dialoginput').length;i++){                
+            $('.bucket-dialoginput').eq(i).val($(this).parent().parent().children('td').eq(i).text().trim());
+        }
+        $('#bucket-submission').submit();                           
+    });
+    $('#bucket-save').on('click', function (){
+        $('#bucket-submission').validate();   
+        $('#bucket-submission').submit();
     }); 
+    //item...
    
     $(document).ready(function() {
         var table = $('#datatables').DataTable({
             responsive: true,
-            //rows group for Question and edit box
-            rowsGroup: [1,4],
+            //rows group for Question
+            rowsGroup: [1],
             "pageLength":100,
             "aoColumnDefs": [
               { "bSearchable": false, "aTargets": [ 0 ] }
             ]
-        })
-        $('#metadataedit').on('click', function (){
-            $('#metadataupdate').val(0);
-            $('#metadatasubmission').validate({
-              rules: {
-                week: {
-                  required: true,
-                  digits: true
-                },
-                points: {
-                  required: true,
-                  digits: true
-                }
-              }
-            });   
-            $('#metadatasubmission').submit();
-        });        
+        })      
     });    
     </script>    
 </body>

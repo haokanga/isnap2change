@@ -369,7 +369,7 @@
     
     /* MCQ */    
     function createMCQSection($conn, $quizID, $points, $questionnaires){
-        $updateSql = "INSERT INTO MCQ_Section(QuizID, Points, Questionnaires)
+        $updateSql = "INSERT INTO MCQ_Section(QuizID, Points, MultipleChoice)
                     VALUES (?,?,?)";			
         $updateSql = $conn->prepare($updateSql);                            
         $updateSql->execute(array($quizID, $points, $questionnaires)); 
@@ -377,7 +377,7 @@
     
     function updateMCQSection($conn, $quizID, $points, $questionnaires){
         $updateSql = "UPDATE MCQ_Section
-                    SET Points = ?, Questionnaires = ?
+                    SET Points = ?, MultipleChoice = ?
                     WHERE QuizID = ?";			
         $updateSql = $conn->prepare($updateSql);                            
         $updateSql->execute(array($points, $questionnaires, $quizID));
@@ -560,12 +560,12 @@
         $updateSql->execute(array($quizID, $description, $multipleChoice, $points)); 
     }
     
-    function updateMatchingSection($conn, $quizID, $description, $multipleChoice, $points){
+    function updateMatchingSection($conn, $quizID, $description, $points){
         $updateSql = "UPDATE Matching_Section
-                    SET Description = ?, MultipleChoice = ?, Points = ?
+                    SET Description = ?, Points = ?
                     WHERE QuizID = ?";			
         $updateSql = $conn->prepare($updateSql);                            
-        $updateSql->execute(array($description, $multipleChoice, $points, $quizID));
+        $updateSql->execute(array($description, $points, $quizID));
     }
     
     function createMatchingQuestion($conn, $quizID, $question){

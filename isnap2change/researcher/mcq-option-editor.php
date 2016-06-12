@@ -96,7 +96,7 @@
                         </div>
                         <!-- /.panel-heading -->
                         <div class="panel-body">
-                            <form id="metadatasubmission" method="post" action="<?php echo $phpself; ?>">
+                            <form id="metadata-submission" method="post" action="<?php echo $phpself; ?>">
                                 <!--if 0 update; else if -1 delete;-->
                                 <input type=hidden name="metadataupdate" id="metadataupdate" value="1" required></input>
                                 <label for="MCQID" style="display:none">MCQID</label>
@@ -106,7 +106,7 @@
                                 <input type="text" class="form-control" id="Question" name="question" value="<?php echo $mcqQuesResult->Question; ?>" required></input>
                                 <br>
                                 <label for="CorrectChoice">CorrectChoice</label>
-                                <select class="form-control" id="CorrectChoice" form="metadatasubmission" name="correctchoice">                                
+                                <select class="form-control" id="CorrectChoice" form="metadata-submission" name="correctchoice">                                
                                 <option value='' selected>No Correct Choice Selected</option> 
                                 <?php for($i=0; $i<count($optionResult); $i++) { ?>                              
                                 <option value="<?php echo $optionResult[$i]->Content; ?>" <?php if($mcqQuesResult->CorrectChoice==$optionResult[$i]->Content) {echo 'selected';} ?>><?php echo $optionResult[$i]->Content; ?></option>
@@ -119,7 +119,7 @@
                                 <p><strong>Reminder</strong> : You have not chosen any correct choice for this question!
                             </div>
                             <!--edit metadata-->
-                            <span class="glyphicon glyphicon-remove pull-right" id="metadataremove" aria-hidden="true"></span><span class="pull-right" aria-hidden="true">&nbsp;</span><span class="glyphicon glyphicon-floppy-saved pull-right" id="metadataedit" aria-hidden="true"></span>    
+                            <span class="glyphicon glyphicon-remove pull-right" id="metadata-remove" aria-hidden="true"></span><span class="pull-right" aria-hidden="true">&nbsp;</span><span class="glyphicon glyphicon-floppy-saved pull-right" id="metadata-save" aria-hidden="true"></span>    
                         </div>                            
                         <!-- /.panel-body -->
                     </div>
@@ -257,14 +257,14 @@
                   { "bSearchable": false, "aTargets": [ 0 ] }
                 ]
         })
-        $('#metadataedit').on('click', function (){
+        $('#metadata-save').on('click', function (){
             $('#metadataupdate').val(0);
-            $('#metadatasubmission').validate();   
-            $('#metadatasubmission').submit();
+            $('#metadata-submission').validate();   
+            $('#metadata-submission').submit();
         }); 
-        $('#metadataremove').on('click', function (){
+        $('#metadata-remove').on('click', function (){
             $('#metadataupdate').val(-1);   
-            $('#metadatasubmission').submit();
+            $('#metadata-submission').submit();
         });
         showNoCorrectChoiceReminder();
         $( "#CorrectChoice" ).change(function() {
