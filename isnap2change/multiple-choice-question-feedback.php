@@ -9,8 +9,8 @@
    //     echo "<script language=\"javascript\">  console.log(\"SUBMISSION.\"); </script>";
     }
 	
-	if(isset($_SESSION["studentid"])){
-		$studentid = $_SESSION["studentid"];
+	if(isset($_SESSION["studentID"])){
+		$studentID = $_SESSION["studentID"];
 	} else {
 		
 	}
@@ -69,7 +69,7 @@
 		$updateSql = "INSERT INTO Quiz_Record(QuizID, StudentID, Status, Score)
 						VALUES (?,?,?,?);";			
 		$updateSql = $conn->prepare($updateSql);                            
-		if(! $updateSql -> execute(array($quizid, $studentid, $status, $score_res -> Points))){
+		if(! $updateSql -> execute(array($quizid, $studentID, $status, $score_res -> Points))){
 		//	echo "<script language=\"javascript\">  alert(\"Error occurred to submit your answer. Report this bug to reseachers.\"); </script>";
 		} else{ 
 		//	echo "<script language=\"javascript\">  console.log(\"Quiz Passed\"); </script>";
@@ -92,7 +92,7 @@
 		//UPDATE MCQ_Question_Record
 		for($i=0; $i<count($MCQIDArr); $i++){
 	
-			if(! $updateSql -> execute(array($studentid, $MCQIDArr[$i], $answerArr[$i]))){
+			if(! $updateSql -> execute(array($studentID, $MCQIDArr[$i], $answerArr[$i]))){
 			//	echo "<script language=\"javascript\">  alert(\"Error occurred to submit your answer. Report this bug to reseachers.\"); </script>";
 			}
 			

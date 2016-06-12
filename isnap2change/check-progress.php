@@ -2,8 +2,8 @@
 	session_start();
 	require_once("mysql-lib.php");
 	
-	if(isset($_SESSION["studentid"])){
-		$studentid = $_SESSION["studentid"];
+	if(isset($_SESSION["studentID"])){
+		$studentID = $_SESSION["studentID"];
 	} else {
 		
 	}
@@ -47,7 +47,7 @@ th, td {
 		<?php
 			$week = $i+1;
 			$progressQuery = $conn->prepare($progressSql);
-			$progressQuery->execute(array($studentid, $week));
+			$progressQuery->execute(array($studentID, $week));
 			$rows = $progressQuery->fetchAll(PDO::FETCH_OBJ);  
 		   
 		   for($j=0; $j<count($rows); $j++) { ?>

@@ -2,8 +2,8 @@
     //if true, echo debug output in dev mode, else production mode
 	$DEBUG_MODE = false;
 	session_start();
-    if($DEBUG_MODE && !isset($_SESSION["studentid"])){
-        $_SESSION["studentid"] = 1;
+    if($DEBUG_MODE && !isset($_SESSION["studentID"])){
+        $_SESSION["studentID"] = 1;
     }
 ?>
 

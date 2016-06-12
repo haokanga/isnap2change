@@ -3,8 +3,8 @@
     session_start();
 	require_once('mysql-lib.php');
 	
-	if(isset($_SESSION["studentid"])){
-		$studentid = $_SESSION["studentid"];
+	if(isset($_SESSION["studentID"])){
+		$studentID = $_SESSION["studentID"];
 	} else {
 		
 	}
@@ -64,7 +64,7 @@
 					ORDER BY MCQID";
 								
 	   $mcqQuery = $conn->prepare($mcqSql);
-	   $mcqQuery->execute(array($studentid, $quizid));
+	   $mcqQuery->execute(array($studentID, $quizid));
 	}
 	
 	if($status == "UNANSWERED"){

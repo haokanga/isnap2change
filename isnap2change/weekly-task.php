@@ -3,8 +3,8 @@
 	$DEBUG_MODE = true;
 	session_start();
 	require_once('mysql-lib.php');	
-	if(isset($_SESSION["studentid"])){
-		$studentid = $_SESSION["studentid"];
+	if(isset($_SESSION["studentID"])){
+		$studentID = $_SESSION["studentID"];
 	} else {
 		
 	}
@@ -35,13 +35,13 @@
     //quiz
     $quizSql = "SELECT Quiz.QuizID, QuizType, `Status` FROM Quiz LEFT JOIN (SELECT * FROM Quiz_Record WHERE StudentID = ?) Student_Quiz_Record ON Quiz.QuizID = Student_Quiz_Record.QuizID WHERE Week = ? ORDER BY Quiz.QuizID";    
     $quizQuery = $conn->prepare($quizSql);
-    $quizQuery->execute(array($studentid, $week)); 
+    $quizQuery->execute(array($studentID, $week)); 
     $count = 0;
 	
     while($quizResult = $quizQuery->fetch(PDO::FETCH_ASSOC)){
         $count++;
         if($DEBUG_MODE){
-            echo "<script language=\"javascript\">  console.log(\"[SUCCESS] studentid: $studentid week:$week QuizID:".$quizResult["QuizID"]." QuizType:".$quizResult["QuizType"]."\"); </script>";
+            echo "<script language=\"javascript\">  console.log(\"[SUCCESS] studentid: $studentID week:$week QuizID:".$quizResult["QuizID"]." QuizType:".$quizResult["QuizType"]."\"); </script>";
         }
 		
 		if(isset($quizResult["Status"])){

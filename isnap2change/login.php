@@ -54,7 +54,7 @@
 	       		if($DEBUG_MODE) {
 	    			echo "count($results)".count($results);
 	   			}
-				$_SESSION['studentid'] = $results[$idcolumnname];
+				$_SESSION['studentID'] = $results[$idcolumnname];
 				$_SESSION['username'] = $results['Username'];
 				header('location:welcome.php');
 				exit;			

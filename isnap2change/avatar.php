@@ -2,9 +2,9 @@
     //if true, echo debug output in dev mode, else production mode
 	$DEBUG_MODE = false;
 	session_start();
-	//$studentid = 1;
+	//$studentID = 1;
     if($DEBUG_MODE){
-        $_SESSION["studentid"] = 1;
+        $_SESSION["studentID"] = 1;
     }
 ?>
 
