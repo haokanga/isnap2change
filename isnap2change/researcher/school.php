@@ -5,22 +5,22 @@
     require_once("/researcher-validation.php");
     $pageName = "school";
     
-    //if update/insert/remove school
+    //if insert/update/remove school
     try{        
         $conn = db_connect();
         if($_SERVER["REQUEST_METHOD"] == "POST"){
             if(isset($_POST['update'])){                          
                 $update = $_POST['update'];
-                //update
-                if($update == 0){                    
+                // insert
+                if($update == 1){                                     
+                    $schoolName = $_POST['schoolname']; 
+                    createSchool($conn, $schoolName);                
+                }                
+                // update 
+                else if($update == 0){                    
                     $schoolID = $_POST['schoolid'];
                     $schoolName = $_POST['schoolname'];
                     updateSchool($conn, $schoolID, $schoolName);
-                }
-                // insert
-                else if($update == 1){                                     
-                    $schoolName = $_POST['schoolname']; 
-                    createSchool($conn, $schoolName);                
                 }
                 // remove school (with help of DELETE CASCADE) 
                 else if($update == -1){                                        

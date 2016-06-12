@@ -5,14 +5,23 @@
     require_once("/researcher-validation.php");    
     $pageName = "class";
     
-    //if update/insert/remove class
+    //if insert/update/remove class
     try{
         $conn = db_connect();
         if($_SERVER["REQUEST_METHOD"] == "POST"){
             if(isset($_POST['update'])){                          
                 $update = $_POST['update'];
-                //update
-                if($update == 0){
+                if($update == 1){  
+                    $className = $_POST['classname'];
+                    $schoolName = $_POST['schoolname'];
+                    $teacherToken = $_POST['teachertoken'];
+                    $studentToken = $_POST['studenttoken'];
+                    
+                    $schoolResult = getSchoolByName($conn, $schoolName);                                      
+                    $classID = createClass($conn, $schoolResult->SchoolID, $className);                     
+                    updateToken($conn, $classID, $teacherToken, "TEACHER");
+                    updateToken($conn, $classID, $studentToken, "STUDENT");                    
+                }else if($update == 0){
                     $classID = $_POST['classid'];
                     $className = $_POST['classname'];
                     $schoolName = $_POST['schoolname'];
@@ -23,18 +32,6 @@
                     updateClass($conn, $classID, $schoolResult->SchoolID, $className);
                     updateToken($conn, $classID, $teacherToken, "TEACHER");
                     updateToken($conn, $classID, $studentToken, "STUDENT");
-                }
-                else if($update == 1){  
-                    $className = $_POST['classname'];
-                    $schoolName = $_POST['schoolname'];
-                    $teacherToken = $_POST['teachertoken'];
-                    $studentToken = $_POST['studenttoken'];
-                    
-                    $schoolResult = getSchoolByName($conn, $schoolName);                                      
-                    $classID = createClass($conn, $schoolResult->SchoolID, $className);                     
-                    updateToken($conn, $classID, $teacherToken, "TEACHER");
-                    updateToken($conn, $classID, $studentToken, "STUDENT");
-                    
                 }else if($update == -1){
                     $classID = $_POST['classid'];                    
                     deleteClass($conn, $classID);                    
@@ -166,11 +163,16 @@
                 <input type="text" class="form-control dialoginput" id="TeacherToken" name="teachertoken" required></input>
                 <br><label for="StudentToken">StudentToken</label><span class="glyphicon glyphicon-random pull-right"></span>
                 <input type="text" class="form-control dialoginput" id="StudentToken" name="studenttoken" required></input>
-                <br><label for="EnrolledStudents">EnrolledStudents</label>
-                <input type="text" class="form-control dialoginput" id="EnrolledStudents" name="EnrolledStudents">
-                <br><label for="UnlockedProgress">UnlockedProgress</label>
-                <input type="text" class="form-control dialoginput" id="UnlockedProgress" name="UnlockedProgress">
-            </form>
+                <br>
+            </form>            
+            <label for="EnrolledStudents">EnrolledStudents</label>
+            <input type="text" class="form-control dialoginput" id="EnrolledStudents" name="enrolledstudents">
+            <br>
+            <form id="progress-submission" method="post" action="<?php if(isset($_GET['schoolid'])) echo $_SERVER['PHP_SELF'].'?schoolid='.$_GET['schoolid']; else echo $_SERVER['PHP_SELF']; ?>">
+                <label for="UnlockedProgress">UnlockedProgress</label>
+                <input type="range" class="dialoginput" min="0" max="<?php echo min($classResult[$i]->UnlockedProgress, $weekResult->WeekNum) ?>" id="UnlockedProgress" name="unlockedprogress" onchange="updateTextInput(this.value);">                                                       
+                <input type="text" class="dialoginput" id="textInput" value="" disabled></input>
+            </form> 
             </div>
             <div class="modal-footer">            
               <button type="button" id="btnSave" class="btn btn-default">Save</button>
@@ -202,16 +204,19 @@
         return Math.round((Math.pow(36, length + 1) - Math.random() * Math.pow(36, length))).toString(36).slice(1);
     }
     //DO NOT put them in $(document).ready() since the table has multi pages
+        
     $('.glyphicon-edit').on('click', function (){
         $('#dialogTitle').text("Edit Class");
         $('#update').val(0);
-        for(i=0;i<$('.dialoginput').length;i++){                
+        for(i=0;i<$('.dialoginput').length-2;i++){                
             $('.dialoginput').eq(i).val($(this).parent().parent().children('td').eq(i).text().trim());
         }
+        var currentWeek = $(this).parent().parent().children('td').eq(6).text().trim().split("/")[0];
+        $('.dialoginput').eq(6).val(currentWeek);
+        $('.dialoginput').eq(7).val(currentWeek);
         //disable ClassID, EnrolledStudents, UnlockedProgress
         $('.dialoginput').eq(0).attr('disabled','disabled');
-        $('.dialoginput').eq(5).attr('disabled','disabled');
-        $('.dialoginput').eq(6).attr('disabled','disabled');          
+        $('.dialoginput').eq(5).attr('disabled','disabled');         
     });
     $('.glyphicon-plus').on('click', function (){
         $('#dialogTitle').text("Add Class");
@@ -221,17 +226,19 @@
         }
         //disable ClassID, EnrolledStudents, UnlockedProgress
         $('.dialoginput').eq(0).attr('disabled','disabled');
-        $('.dialoginput').eq(5).attr('disabled','disabled');    
-        $('.dialoginput').eq(6).attr('disabled','disabled');         
+        $('.dialoginput').eq(5).attr('disabled','disabled');        
     }); 
     $('.glyphicon-remove').on('click', function (){
         if (confirm('[WARNING] Are you sure to remove this class? All the student data in this class will also get deleted (not recoverable). It includes student information, their submissions of every task and your grading/feedback, not only the class itself.')) {
             $('#update').val(-1);
             //fill required input
             $('.dialoginput').eq(0).prop('disabled',false);
-            for(i=0;i<$('.dialoginput').length;i++){                
+            for(i=0;i<$('.dialoginput').length-2;i++){                
                 $('.dialoginput').eq(i).val($(this).parent().parent().children('td').eq(i).text().trim());
             }
+            var currentWeek = $(this).parent().parent().children('td').eq(6).text().trim().split("/")[0];
+            $('.dialoginput').eq(6).val(currentWeek);
+            $('.dialoginput').eq(7).val(currentWeek);
             $('#submission').submit();
         }           
     });
@@ -248,7 +255,11 @@
         $('.dialoginput').eq(0).prop('disabled',false);
         $('#submission').submit();
     });
-   
+    
+    function updateTextInput(val) {
+      document.getElementById('textInput').value=val; 
+    }
+    
     $(document).ready(function() {
         var table = $('#datatables').DataTable({
                 responsive: true,

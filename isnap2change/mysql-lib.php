@@ -164,6 +164,14 @@
         $studentNumResult = $studentNumQuery->fetchAll(PDO::FETCH_OBJ);
         return $studentNumResult;
     }
+    
+    function updateUnlockedProgress($conn, $classID, $unlockedProgress){
+        $updateSql = "UPDATE Class 
+            SET UnlockedProgress = ?
+            WHERE ClassID = ?";			
+        $updateSql = $conn->prepare($updateSql);                            
+        $updateSql->execute(array($unlockedProgress, $classID));
+    }
     /* Class */
     
     /* Token */    
