@@ -18,14 +18,13 @@
                         $topicName = $_POST['topicname'];
                         $description = $_POST['description'];
                         $points = $_POST['points'];
-                        $multipleChoice = $_POST['multiplechoice'];
                         $conn->beginTransaction();              
                         
                         //insert and get topicID
                         $topicResult = getTopicByName($conn, $topicName);  
                         $topicID = $topicResult->TopicID;                        
                         $quizID = createQuiz($conn, $topicID, $quizType, $week);                        
-                        createMatchingSection($conn, $quizID, $description, $multipleChoice, $points);
+                        createMatchingSection($conn, $quizID, $description, $points);
                         createEmptyLearningMaterial($conn, $quizID);
                         
                         $conn->commit();                    
@@ -172,9 +171,6 @@
                 <label for="Description">Description</label>
                 <input type="text" class="form-control dialoginput" id="Description" name="description"  placeholder="Input Description" required></input>
                 <br>
-                <label for="MultipleChoice">MultipleChoice</label>
-                <input type="hidden" class="form-control" id="MultipleChoice" name="multiplechoice" value="0"></input>
-                <input type="checkbox" class="form-control" id="MultipleChoice" name="multiplechoice" value="1"></input>
                 <label for="Points">Points</label>
                 <input type="text" class="form-control dialoginput" id="Points" name="points"  placeholder="Input Points" required></input>
                 <br>

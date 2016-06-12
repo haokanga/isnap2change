@@ -369,7 +369,7 @@
     
     /* MCQ */    
     function createMCQSection($conn, $quizID, $points, $questionnaires){
-        $updateSql = "INSERT INTO MCQ_Section(QuizID, Points, MultipleChoice)
+        $updateSql = "INSERT INTO MCQ_Section(QuizID, Points, Questionnaires)
                     VALUES (?,?,?)";			
         $updateSql = $conn->prepare($updateSql);                            
         $updateSql->execute(array($quizID, $points, $questionnaires)); 
@@ -377,7 +377,7 @@
     
     function updateMCQSection($conn, $quizID, $points, $questionnaires){
         $updateSql = "UPDATE MCQ_Section
-                    SET Points = ?, MultipleChoice = ?
+                    SET Points = ?, Questionnaires = ?
                     WHERE QuizID = ?";			
         $updateSql = $conn->prepare($updateSql);                            
         $updateSql->execute(array($points, $questionnaires, $quizID));
@@ -553,11 +553,11 @@
     /* SAQ */
     
     /* Matching */    
-    function createMatchingSection($conn, $quizID, $description, $multipleChoice, $points){
-        $updateSql = "INSERT INTO Matching_Section(QuizID, Description, MultipleChoice, Points)
-                    VALUES (?,?,?,?)";			
+    function createMatchingSection($conn, $quizID, $description, $points){
+        $updateSql = "INSERT INTO Matching_Section(QuizID, Description, Points)
+                    VALUES (?,?,?)";			
         $updateSql = $conn->prepare($updateSql);                            
-        $updateSql->execute(array($quizID, $description, $multipleChoice, $points)); 
+        $updateSql->execute(array($quizID, $description, $points)); 
     }
     
     function updateMatchingSection($conn, $quizID, $description, $points){
@@ -633,7 +633,7 @@
     
     function getMatchingQuiz($conn, $quizID){
         $quizSql = "SELECT *, COUNT(MatchingID) AS Questions
-                   FROM Quiz NATURAL JOIN Topic NATURAL JOIN Matching_Section LEFT JOIN Matching_Question USING (QuizID) WHERE QuizID = ? GROUP BY QuizID";
+                   FROM Quiz NATURAL JOIN Topic NATURAL JOIN Matching_Section LEFT JOIN Matching_Question USING (QuizID) WHERE QuizID = ?";
         $quizQuery = $conn->prepare($quizSql);
         $quizQuery->execute(array($quizID));
         $quizResult = $quizQuery->fetch(PDO::FETCH_OBJ);
@@ -651,20 +651,20 @@
     /* Matching */
     
     /* Matching_Option */
-    function createMatchingOption($conn, $mcqID, $content, $explanation){
-        $updateSql = "INSERT INTO Matching_Option (Content, Explanation, MCQID)
-             VALUES (?,?,?)";
+    function createMatchingOption($conn, $matchingID, $content){
+        $updateSql = "INSERT INTO Matching_Option(Content, MatchingID)
+             VALUES (?,?)";
         $updateSql = $conn->prepare($updateSql);         
-        $updateSql->execute(array($content, $explanation, $mcqID));
+        $updateSql->execute(array($content, $matchingID));
         return $conn->lastInsertId(); 
     }
     
-    function updateMatchingOption($conn, $optionID, $content, $explanation){
+    function updateMatchingOption($conn, $matchingID, $optionID, $content){
         $updateSql = "UPDATE Matching_Option 
-                SET Content = ?, Explanation = ?
+                SET Content = ?, MatchingID = ?
                 WHERE OptionID = ?";			
         $updateSql = $conn->prepare($updateSql);         
-        $updateSql->execute(array($content, $explanation, $optionID)); 
+        $updateSql->execute(array($content, $matchingID, $optionID)); 
     }
     
     function deleteMatchingOption($conn, $optionID){
@@ -674,11 +674,11 @@
     }
     
     function getMaxMatchingOptionNum($conn, $quizID){
-        $optionNumSql = "SELECT MAX(OptionNum) AS MaxOptionNum FROM (SELECT COUNT(*) AS OptionNum FROM MCQ_Question natural JOIN Matching_Option WHERE QuizID = ? GROUP BY MCQID) AS OptionNumTable";								
+        $optionNumSql = "SELECT MAX(OptionNum) AS MaxOptionNum FROM (SELECT COUNT(*) AS OptionNum FROM Matching_Question natural JOIN Matching_Option WHERE QuizID = ? GROUP BY MatchingID) AS OptionNumTable";								
         $optionNumQuery = $conn->prepare($optionNumSql);
         $optionNumQuery->execute(array($quizID));
         $optionNumResult = $optionNumQuery->fetch(PDO::FETCH_OBJ);
-        return $optionNumResult;
+        return $optionNumResult->MaxOptionNum;
     }
     /* Matching_Option */
     
@@ -759,6 +759,15 @@
         $updateSql = $conn->prepare($updateSql);         
         $updateSql->execute(array(calculateStudentScore($conn, $studentID), $studentID));        
     }
+    
+    function refreshAllStudentsScore($conn){
+        $studentResult = getStudents($conn); 
+        for($i=0; $i<count($studentResult); $i++){
+            $studentID = $studentResult[$i]->StudentID;
+            updateStudentScore($conn, $studentID);
+        }
+    }
+    
 	
 	function updateQuizRecord($conn, $quizID, $studentID, $status){
 		$updateQuizRecordSql = "INSERT INTO Quiz_Record(QuizID, StudentID, Status)
@@ -822,6 +831,5 @@
 		
 		return $posterRes;
 	}
-	
-	
+    
 ?>

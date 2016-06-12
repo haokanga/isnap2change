@@ -27,7 +27,8 @@
         debug_err($pageName, $e);
     }
     
-    try{  
+    try{
+        refreshAllStudentsScore($conn);
         $studentResult = getStudents($conn);  
     } catch(Exception $e) {
         debug_err($pageName, $e);

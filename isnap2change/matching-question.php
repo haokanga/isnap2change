@@ -11,27 +11,25 @@
         if ($_SERVER["REQUEST_METHOD"] == "POST") {		
             if(isset($_POST["quizID"]) && isset($_POST["week"])){
                 $quizID = $_POST["quizID"];
-                $week = $_POST["week"];
-                $status = getQuizStatus($conn, $quizID, $studentID);
+                $week = $_POST["week"];                
                 //[unused] get learning-material
                 $materialRes = getLearningMaterial($conn, $quizID);
                 // get matching section
                 $matchingSectionResult = getMatchingSection($conn, $quizID);
                 $score = $matchingSectionResult->Points;
-                // if 1, multipleChoices
-                $multipleChoice=$matchingSectionResult->MultipleChoice;                
+                // if 1, multipleChoice
+                $multipleChoice= getMaxMatchingOptionNum($conn, $quizID) > 1 ? 1 : 0;                
                 // get matching questions
                 $matchingQuestionResult = getMatchingBuckets($conn, $quizID); 
                 // get matching options
-                $matchingOptionResult = getMatchingQuestions($conn, $quizID);
+                $matchingOptionResult = getMatchingQuestions($conn, $quizID);                
                 
-                if($status == "GRADED"){
-                    $quizID = $_POST["quizID"];
+                if(isset($_POST["status"])){
+                    $status = $_POST["status"];                    
                     updateQuizRecord($conn, $quizID, $studentID, "GRADED");
+                } else {
+                    $status = getQuizStatus($conn, $quizID, $studentID);
                 }
-                else if($status == "UNANSWERED"){
-                    debug_log("Jump from weekly tasks/learning materials.");                           
-                } 
             }		
         }
     } catch(Exception $e) {
@@ -57,7 +55,7 @@
     <script type="text/javascript" src="js/jquery-1.12.3.js"></script>
     <!--md5-->
     <script src="js/md5.min.js"></script>
-    <title>1:1 matching</title>
+    <title>Matching Question</title>
     <style>
     .parent { display: -ms-flex; display: -webkit-flex; display: flex; }
     .parent>div { flex:1; }
@@ -148,7 +146,7 @@
         <input type=hidden name="quizID" value=<?php echo $quizID; ?> ></input>
         <input type=hidden name="status" value="GRADED" ></input>
         
-        
+        <!-- 1-1 matching -->
         <?php if($multipleChoice == 0){ ?>
         <div class='examples'>      
             <div class='wrapper'>   
@@ -171,14 +169,17 @@
                         //shuffle options
                         if($status != "GRADED")
                             shuffle($randomOptionArray);
-                        foreach ($randomOptionArray as $value) { ?>
-                        <div class="choice" id="<?php echo encryptMD5($value) ?>" ><?php echo $matchingOptionResult[$value]->Content ?></div>
-                         <?php } ?>
+                        foreach ($randomOptionArray as $value) { 
+                            if( strlen($matchingOptionResult[$value]->Content) > 0) {?>
+                                <div class="choice" id="<?php echo encryptMD5($value) ?>" ><?php echo $matchingOptionResult[$value]->Content ?></div>
+                            <?php } 
+                        }?>
                     </div>       
                 </div>
           </div>
         </div>
-        <?php } else {?>
+        <!-- n-1 matching -->
+        <?php } else { ?>
         <div class="examples">        
             <label><?php echo $matchingSectionResult->Description ?></label> 
           <div class="parent">   
@@ -192,7 +193,7 @@
                     <!--if GRADED, directly show answers-->
                     <?php if($status == "GRADED") { 
                         for($j=0; $j<count($matchingOptionResult); $j++) {
-                            if($matchingOptionResult[$j]->MatchingID == $matchingQuestionResult[$i]->MatchingID) {?>                    
+                            if($matchingOptionResult[$j]->MatchingID == $matchingQuestionResult[$i]->MatchingID && strlen($matchingOptionResult[$j]->Content)>0) {?>
                             <div class="choice" ><?php echo $matchingOptionResult[$j]->Content ?></div>
                         <?php } 
                         }
@@ -207,9 +208,11 @@
                     $randomOptionArray = range(0, count($matchingOptionResult)-1);
                     //shuffle options
                     shuffle($randomOptionArray);
-                    foreach ($randomOptionArray as $value) { ?>
-                    <div class="choice" ><?php echo $matchingOptionResult[$value]->Content ?><input type=hidden value="<?php echo encryptMD5($matchingOptionResult[$value]->MatchingID) ?>"></div>
-                <?php } 
+                    foreach ($randomOptionArray as $value) {  
+                        if( strlen($matchingOptionResult[$value]->Content) > 0) {?>
+                            <div class="choice" ><?php echo $matchingOptionResult[$value]->Content ?><input type=hidden value="<?php echo encryptMD5($matchingOptionResult[$value]->MatchingID) ?>"></div>
+                    <?php } 
+                    }
                 } ?>
            </div>
         </div>       

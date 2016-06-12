@@ -20,7 +20,6 @@
                         $topicName = $_POST['topicname'];
                         $description = $_POST['description'];
                         $points = $_POST['points'];
-                        $multipleChoice = $_POST['multiplechoice'];
                         $conn->beginTransaction();              
                         
                         $topicResult = getTopicByName($conn, $topicName);
@@ -44,7 +43,7 @@
                 $bucketupdate = $_POST['bucketupdate'];
                 if($bucketupdate == 1){
                     $quizID = $_POST['quizid'];
-                    $question = $_POST['question'];
+                    $question = $_POST['question'];                    
                     createMatchingQuestion($conn, $quizID, $question);
                 } else if($bucketupdate == 0){
                     $matchingID = $_POST['matchingid'];
@@ -58,16 +57,17 @@
             if(isset($_POST['itemupdate'])){                          
                 $itemupdate = $_POST['itemupdate'];
                 if($itemupdate == 1){
-                    $quizID = $_POST['quizid'];
+                    $matchingID = $_POST['matchingid'];
                     $content = $_POST['content'];
-                    createMatchingOption($conn, $quizID, $content);
+                    createMatchingOption($conn, $matchingID, $content);
                 } else if($itemupdate == 0){
+                    $optionID = $_POST['optionid'];
                     $matchingID = $_POST['matchingid'];
                     $content = $_POST['content'];
-                    updateMatchingOption($conn, $matchingID, $content);
+                    updateMatchingOption($conn, $matchingID, $optionID, $content);
                 }else if($itemupdate == -1){
-                    $matchingID = $_POST['matchingid'];
-                    deleteMatchingOption($conn, $matchingID); 
+                    $optionID = $_POST['optionid'];
+                    deleteMatchingOption($conn, $optionID); 
                 }            
             }
         }
@@ -109,7 +109,7 @@
         <div id="page-wrapper">
             <div class="row">
                 <div class="col-lg-12">
-                    <h1 class="page-header">Multiple Choice Quiz Editor</h1>
+                    <h1 class="page-header">Matching Quiz Editor</h1>
                 </div>
                 <!-- /.col-lg-12 -->
             </div>
@@ -148,7 +148,7 @@
                                 <br>
                                 <label for="MultipleChoice">MultipleChoice</label>
                                 <input type="hidden" class="form-control" id="MultipleChoice" name="multiplechoice" value="0"></input>
-                                <input type="checkbox" class="form-control" id="MultipleChoice" name="multiplechoice" value="1" <?php if($quizResult->MultipleChoice!=0) echo 'checked';?> disabled></input>
+                                <input type="checkbox" class="form-control" id="MultipleChoice" name="multiplechoice" value="1" <?php if(getMaxMatchingOptionNum($conn, $quizID) > 1) echo 'checked';?> disabled></input>
                                 <label for="Questions">Questions</label>
                                 <input type="text" class="form-control" id="Questions" name="questions" value="<?php echo $quizResult->Questions; ?>" disabled></input>
                                 <br>
@@ -210,9 +210,9 @@
                             </div>
                             <!-- /.table-responsive -->
                             <div class="well row">
-                                <h4>Multiple Choice Quiz Overview Notification</h4>
+                                <h4>Matching Quiz Overview Notification</h4>
                                 <div class="alert alert-info">
-                                    <p>View multiple choice questions in this quiz by filtering or searching. You can create/bucketupdate/delete any question.</p>
+                                    <p>View matching questions in this quiz by filtering or searching. You can create/update/delete any bucket/item.</p>
                                 </div>
                                 <div class="alert alert-danger">
                                     <p><strong>Warning</strong> : If you remove one question. All the <strong>options and student answers</strong> of this question will also get deleted (not recoverable), not only the question itself.</p>
@@ -270,21 +270,19 @@
             </div>
             <div class="modal-body">
             <form id="item-submission" method="post" action="<?php echo $phpself; ?>">
-                <input type=hidden name="itemupdate" id="itemupdate" value="1" required></input>
-                <label for="OptionID" style="display:none">OptionID</label>
-                <input type="text" class="form-control item-dialoginput" id="OptionID" name="matchingid" style="display:none"></input>
-                <label for="Content">Explanation/Item</label>
-                <input type="text" class="form-control item-dialoginput" id="Content" name="content" value="" required></input>
-                <br>
+                <input type=hidden name="itemupdate" id="itemupdate" value="1" required></input>                
                 <label for='Bucket'>Terminology/Bucket</label>
-                <select class="form-control dialoginput" id="Bucket" form="item-submission" name="bucket" required>
+                <select class="form-control item-dialoginput" id="Bucket" form="item-submission" name="matchingid" required>
                     <option value="" disabled selected>Select Bucket</option>
                   <?php for($j=0; $j<count($bucketResult); $j++) {?>                  
-                    <option value='<?php echo $bucketResult[$j]->Question ?>'><?php echo $bucketResult[$j]->Question ?></option>
+                    <option value='<?php echo $bucketResult[$j]->MatchingID ?>'><?php echo $bucketResult[$j]->Question ?></option>
                   <?php } ?>
-                </select>                
-                <label for="MatchingID" style="display:none">MatchingID</label>
-                <input type="text" class="form-control" id="MatchingID" name="matchingid" style="display:none" value=""></input>
+                </select>
+                <br>
+                <label for="OptionID" style="display:none">OptionID</label>
+                <input type="text" class="form-control item-dialoginput" id="OptionID" name="optionid" style="display:none"></input>
+                <label for="Content">Explanation/Item</label>
+                <input type="text" class="form-control item-dialoginput" id="Content" name="content" value="" required></input>
                 <br>
             </form>
             </div>
@@ -317,7 +315,7 @@
         });   
         $('#metadata-submission').submit();
     });  
-    $('metadata-remove').on('click', function (){
+    $('#metadata-remove').on('click', function (){
         if (confirm('[WARNING] Are you sure to remove this quiz? If you remove one quiz. All the questions and submission of this quiz will also get deleted (not recoverable). It includes learning material, questions and options, their submissions and your grading/feedback, not only the quiz itself.')) {
             $('#metadataupdate').val(-1);
             $('#metadata-submission').submit();
@@ -331,6 +329,7 @@
         }   
     });    
     $('.bucket-edit').on('click', function (){
+        $('#bucket-dialogtitle').text("Edit Bucket");
         $('#bucketupdate').val(0);
         for(i=0;i<$('.bucket-dialoginput').length;i++){                
             $('.bucket-dialoginput').eq(i).val($(this).parent().parent().children('td').eq(i).text().trim());
@@ -347,7 +346,34 @@
         $('#bucket-submission').validate();   
         $('#bucket-submission').submit();
     }); 
-    //item...
+     $('.item-plus').on('click', function (){
+        $('#item-dialogtitle').text("Add Item");
+        $('#itemupdate').val(1);
+        for(i=0;i<$('.item-dialoginput').length;i++){                
+            $('.item-dialoginput').eq(i).val('');
+        }   
+    });    
+    $('.item-edit').on('click', function (){
+        $('#item-dialogtitle').text("Edit Item");
+        $('#itemupdate').val(0);
+        var bucketText = $(this).parent().parent().children('td').eq(1).text().trim();
+        var index = $('#Bucket option').filter(function () { return $(this).html() == bucketText; }).val();        
+        $('.item-dialoginput').eq(0).val(index);
+        for(i=1;i<$('.item-dialoginput').length;i++){                
+            $('.item-dialoginput').eq(i).val($(this).parent().parent().children('td').eq(i+1).text().trim());
+        }                          
+    });
+    $('.item-remove').on('click', function (){
+        $('#itemupdate').val(-1);
+        for(i=1;i<$('.item-dialoginput').length;i++){                
+            $('.item-dialoginput').eq(i).val($(this).parent().parent().children('td').eq(i+1).text().trim());
+        }
+        $('#item-submission').submit();                           
+    });
+    $('#item-save').on('click', function (){
+        $('#item-submission').validate();   
+        $('#item-submission').submit();
+    });
    
     $(document).ready(function() {
         var table = $('#datatables').DataTable({

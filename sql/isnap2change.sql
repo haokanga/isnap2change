@@ -233,8 +233,7 @@ CREATE TABLE IF NOT EXISTS `SAQ_Question_Record` (
 
 CREATE TABLE IF NOT EXISTS `Matching_Section` (
     QuizID MEDIUMINT,
-    Description TEXT,    
-    MultipleChoice BOOLEAN DEFAULT 0,
+    Description TEXT,
     Points MEDIUMINT,
     CONSTRAINT Matching_Section_QuizID_PK PRIMARY KEY (QuizID),
     CONSTRAINT Matching_Section_QuizID_FK FOREIGN KEY (QuizID)
@@ -591,7 +590,7 @@ INSERT IGNORE INTO `Matching_Option`(Content, MatchingID) VALUES('Caused by the 
 # [Example] Week 7 MultipleChoice Matching
 INSERT IGNORE INTO Quiz(Week,QuizType,TopicID) VALUES(7,'Matching',2);
 SET @QUIZ_LAST_INSERT_ID = LAST_INSERT_ID();
-INSERT IGNORE INTO Matching_Section(QuizID, Description, Points, MultipleChoice) VALUES(@QUIZ_LAST_INSERT_ID, 'Classify the lists of foods into the 5 main food groups', 20, 1);
+INSERT IGNORE INTO Matching_Section(QuizID, Description, Points) VALUES(@QUIZ_LAST_INSERT_ID, 'Classify the lists of foods into the 5 main food groups', 20);
 INSERT IGNORE INTO Matching_Question(Question, QuizID) VALUES('Protein', @QUIZ_LAST_INSERT_ID);
 SET @MATCHING_QUESTION_LAST_INSERT_ID = LAST_INSERT_ID();
 INSERT IGNORE INTO `Matching_Option`(Content, MatchingID) VALUES('Beef', @MATCHING_QUESTION_LAST_INSERT_ID);

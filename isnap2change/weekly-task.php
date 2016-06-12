@@ -74,8 +74,8 @@
 		}
 		
         echo '<button type=button onclick="startQuiz('.$quizResult["QuizID"].')"> Quiz '.$count.'</button>
-			  <input  type=hidden name="quizid" value='.$quizResult["QuizID"].'></input>
-			  <input  type=hidden name="quiztype" value='.$quizResult["QuizType"].'></input>
+			  <input  type=hidden name="quizID" value='.$quizResult["QuizID"].'></input>
+			  <input  type=hidden name="quizType" value='.$quizResult["QuizType"].'></input>
 			  <input  type=hidden name="week" value='.$week.'></input>
 			  <input type=hidden name="status" value='.$status.'></input>
 			  </form>';
