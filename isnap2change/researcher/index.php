@@ -2,7 +2,7 @@
 	session_start();
     require_once("../mysql-lib.php");
     require_once("../debug.php");
-    require_once("/researcher-validation.php");
+    require_once("researcher-validation.php");
     $conn = db_connect();
     
     db_close($conn); 
@@ -13,14 +13,14 @@
 
 <head>
     <!-- Header Library -->
-    <?php require_once('/header-lib.php'); ?>
+    <?php require_once('header-lib.php'); ?>
 </head>
 
 <body>
 
     <div id="wrapper">
 
-        <?php require_once('/navigation.php'); ?> 
+        <?php require_once('navigation.php'); ?> 
 
         <div id="page-wrapper">
             <div class="row">
@@ -192,7 +192,7 @@
       <input type=hidden name="keyword" id="keyword" value="<?php if(isset($_GET['schoolname'])){ echo $_GET['schoolname']; } ?>"></input>
       
     <!-- SB Admin Library -->  
-    <?php require_once('/sb-admin-lib.php'); ?>
+    <?php require_once('sb-admin-lib.php'); ?>
     
     <!--jQuery Validate plugin-->
     <script src="http://ajax.aspnetcdn.com/ajax/jquery.validate/1.15.0/jquery.validate.min.js"></script>

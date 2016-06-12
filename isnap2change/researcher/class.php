@@ -2,7 +2,7 @@
 	session_start();
     require_once("../mysql-lib.php");
     require_once("../debug.php");
-    require_once("/researcher-validation.php");    
+    require_once("researcher-validation.php");
     $pageName = "class";
     
     //if insert/update/remove class
@@ -59,14 +59,14 @@
 
 <head>
     <!-- Header Library -->
-    <?php require_once('/header-lib.php'); ?>
+    <?php require_once('header-lib.php'); ?>
 </head>
 
 <body>
 
     <div id="wrapper">
 
-        <?php require_once('/navigation.php'); ?> 
+        <?php require_once('navigation.php'); ?> 
 
         <div id="page-wrapper">
             <div class="row">
@@ -197,7 +197,7 @@
       ?>">
       </input>
     <!-- SB Admin Library -->  
-    <?php require_once('/sb-admin-lib.php'); ?>
+    <?php require_once('sb-admin-lib.php'); ?>
     <!-- Page-Level Scripts -->
     <script>
     function randomString(length) {

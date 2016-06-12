@@ -2,7 +2,7 @@
     session_start();
     require_once("../mysql-lib.php");
     require_once("../debug.php");
-    require_once("/researcher-validation.php");
+    require_once("researcher-validation.php");
     $pageName = "saq-editor";
     $columnName = array('QuizID','Week','TopicName','Points','Questions');   
     $saqQuesColName = array('SAQID','Question','Points','Edit');
@@ -78,14 +78,14 @@
 
 <head>
     <!-- Header Library -->
-    <?php require_once('/header-lib.php'); ?>
+    <?php require_once('header-lib.php'); ?>
 </head>
 
 <body>
 
     <div id="wrapper">
 
-        <?php require_once('/navigation.php'); ?> 
+        <?php require_once('navigation.php'); ?> 
 
         <div id="page-wrapper">
             <div class="row">
@@ -135,7 +135,7 @@
                     </div>
                     <!-- /.panel -->
                                                        
-                    <?php require_once('/learning-material-editor-iframe.php'); ?>
+                    <?php require_once('learning-material-editor-iframe.php'); ?>
                     
                     <!-- Questions -->
                     <div class="panel panel-default">
@@ -230,7 +230,7 @@
       </div>    
       
     <!-- SB Admin Library -->  
-    <?php require_once('/sb-admin-lib.php'); ?>   
+    <?php require_once('sb-admin-lib.php'); ?>   
     <!-- Page-Level Scripts -->
     <script>
     //DO NOT put them in $(document).ready() since the table has multi pages    

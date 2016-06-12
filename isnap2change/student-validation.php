@@ -1,5 +1,5 @@
 <?php   
-    require_once('/debug.php');    
+    require_once('debug.php');    
     if(isset($_SESSION['studentID'])){
         $studentID = $_SESSION['studentID'];
         debug_log("This is DEBUG_MODE with SESSION studentID = ".$studentID.".");
