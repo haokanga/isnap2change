@@ -15,10 +15,10 @@
     <script src="../dist/js/sb-admin-2.js"></script>    
     
     <!--jQuery Validate plugin-->
-    <script src="http://ajax.aspnetcdn.com/ajax/jquery.validate/1.15.0/jquery.validate.min.js"></script>
+    <script src="//ajax.aspnetcdn.com/ajax/jquery.validate/1.15.0/jquery.validate.min.js"></script>
 
     <!-- DataTables rowsGroup Plugin -->
     <script src="../bower_components/datatables-plugins/rowsgroup/dataTables.rowsGroup.js "></script>
     
-    <link rel="stylesheet" href="https://code.jquery.com/ui/1.11.4/themes/ui-lightness/jquery-ui.css" />
-    <link rel="stylesheet" href="https://code.jquery.com/qunit/qunit-1.18.0.css" />
+    <link rel="stylesheet" href="//code.jquery.com/ui/1.11.4/themes/ui-lightness/jquery-ui.css" />
+    <link rel="stylesheet" href="//code.jquery.com/qunit/qunit-1.18.0.css" />
