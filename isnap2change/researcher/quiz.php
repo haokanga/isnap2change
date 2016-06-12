@@ -166,11 +166,11 @@
             <div class="modal-body">
             <form id="submission" method="post" action="<?php if(isset($_GET['week'])) echo $_SERVER['PHP_SELF'].'?week='.$_GET['week']; else echo $_SERVER['PHP_SELF']; ?>">
                 <!--if 1, insert; else if -1 delete;-->
-                <input type=hidden name="update" id="update" value="1" required></input>
+                <input type=hidden name="update" id="update" value="1" required>
                 <label for="QuizID" style="display:none">QuizID</label>
-                <input type="text" class="form-control dialoginput" id="QuizID" name="quizid" style="display:none"></input>
+                <input type="text" class="form-control dialoginput" id="QuizID" name="quizid" style="display:none">
                 <label for="Week">Week</label>
-                <input type="text" class="form-control dialoginput" id="Week" name="week"  placeholder="Input Week Number" <?php if(isset($_GET['week'])) {$w=$_GET['week']; echo "value='".$w."'"; } ?> required></input> 
+                <input type="text" class="form-control dialoginput" id="Week" name="week"  placeholder="Input Week Number" <?php if(isset($_GET['week'])) {$w=$_GET['week']; echo "value='".$w."'"; } ?> required> 
                 <br>    
                 <label for='QuizType'>QuizType</label>
                 <select class="form-control dialoginput" id="QuizType" form="submission" name="quiztype" required>
@@ -197,7 +197,7 @@
           </div>          
         </div>
       </div>
-      <input type=hidden name="keyword" id="keyword" value="<?php if(isset($_GET['week'])){ echo $_GET['week']; } ?>"></input>
+      <input type=hidden name="keyword" id="keyword" value="<?php if(isset($_GET['week'])){ echo $_GET['week']; } ?>">
     <!-- SB Admin Library -->  
     <?php require_once('sb-admin-lib.php'); ?>
     <!-- Page-Level Scripts -->

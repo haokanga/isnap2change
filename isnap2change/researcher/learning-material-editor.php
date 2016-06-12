@@ -67,7 +67,7 @@
 <body>
 <form method="post" action="<?php echo $phpself ?>">
     <label for="QuizID" style="display:none">QuizID</label>
-    <input type="text" class="form-control" id="QuizID" name="quizid" style="display:none" value="<?php echo $quizID; ?>" required></input>
+    <input type="text" class="form-control" id="QuizID" name="quizid" style="display:none" value="<?php echo $quizID; ?>" required>
     <textarea name="richcontenttextarea">
         <?php echo $materialRes->Content; ?>
     </textarea>

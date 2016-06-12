@@ -113,7 +113,7 @@
 		<button id="submitBtn" type="button" onclick="submitQuiz()">Submit</button>
 		<form id="goBack" method=post action=weekly-task.php>
 			<button type="button" onclick="goBack()">GO BACK</button> 
-			<input type=hidden name="week" value=<?php echo $week; ?>></input>
+			<input type=hidden name="week" value=<?php echo $week; ?>>
 		</form>
 	</div>
 <script>

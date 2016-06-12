@@ -107,12 +107,12 @@
                         <div class="panel-body">
                             <form id="metadata-submission" method="post" action="<?php echo $phpself; ?>">
                                 <!--if 0 update; else if -1 delete;-->
-                                <input type=hidden name="metadataupdate" id="metadataupdate" value="1" required></input>
+                                <input type=hidden name="metadataupdate" id="metadataupdate" value="1" required>
                                 <label for="QuizID" style="display:none">QuizID</label>
-                                <input type="text" class="form-control" id="QuizID" name="quizid" style="display:none" value="<?php echo $quizResult->QuizID; ?>"></input>
+                                <input type="text" class="form-control" id="QuizID" name="quizid" style="display:none" value="<?php echo $quizResult->QuizID; ?>">
                                 <br>
                                 <label for="Week">Week</label>
-                                <input type="text" class="form-control" id="Week" name="week" placeholder="Input Week Number" value="<?php echo $quizResult->Week; ?>"></input> 
+                                <input type="text" class="form-control" id="Week" name="week" placeholder="Input Week Number" value="<?php echo $quizResult->Week; ?>"> 
                                 <br>  
                                 <label for='TopicName'>TopicName</label>
                                 <select class="form-control" id="TopicName" form="metadata-submission" name="topicname" required>
@@ -122,10 +122,10 @@
                                 </select>
                                 <br>
                                 <label for="Points">Points</label>
-                                <input type="text" class="form-control" id="Points" name="points" placeholder="Input Points" value="<?php echo $quizResult->Points; ?>" disabled></input>
+                                <input type="text" class="form-control" id="Points" name="points" placeholder="Input Points" value="<?php echo $quizResult->Points; ?>" disabled>
                                 <br>
                                 <label for="Questions">Questions</label>
-                                <input type="text" class="form-control" id="Questions" name="questions" value="<?php echo $quizResult->Questions; ?>" disabled></input>
+                                <input type="text" class="form-control" id="Questions" name="questions" value="<?php echo $quizResult->Questions; ?>" disabled>
                                 <br>
                             </form>
                             <!--edit metadata-->
@@ -207,17 +207,17 @@
             </div>
             <div class="modal-body">
             <form id="submission" method="post" action="<?php echo $phpself; ?>">
-                <input type=hidden name="update" id="update" value="1" required></input>
+                <input type=hidden name="update" id="update" value="1" required>
                 <label for="SAQID" style="display:none">SAQID</label>
-                <input type="text" class="form-control dialoginput" id="SAQID" name="saqid" style="display:none"></input>
+                <input type="text" class="form-control dialoginput" id="SAQID" name="saqid" style="display:none">
                 <label for="Question">Question</label>
-                <input type="text" class="form-control dialoginput" id="Question" name="question" placeholder="Input Question" value="" required></input>
+                <input type="text" class="form-control dialoginput" id="Question" name="question" placeholder="Input Question" value="" required>
                 <br>
                 <label for="Points">Points</label>
-                <input type="text" class="form-control dialoginput" id="Points" name="points" placeholder="Input Points" value="" required></input>
+                <input type="text" class="form-control dialoginput" id="Points" name="points" placeholder="Input Points" value="" required>
                 <br>
                 <label for="QuizID" style="display:none">QuizID</label>
-                <input type="text" class="form-control" id="QuizID" name="quizid" style="display:none" value="<?php echo $quizID; ?>" required></input>
+                <input type="text" class="form-control" id="QuizID" name="quizid" style="display:none" value="<?php echo $quizID; ?>" required>
                 <br>
             </form>
             </div>

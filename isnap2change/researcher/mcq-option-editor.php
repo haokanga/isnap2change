@@ -98,12 +98,12 @@
                         <div class="panel-body">
                             <form id="metadata-submission" method="post" action="<?php echo $phpself; ?>">
                                 <!--if 0 update; else if -1 delete;-->
-                                <input type=hidden name="metadataupdate" id="metadataupdate" value="1" required></input>
+                                <input type=hidden name="metadataupdate" id="metadataupdate" value="1" required>
                                 <label for="MCQID" style="display:none">MCQID</label>
-                                <input type="text" class="form-control" id="MCQID" name="mcqid" style="display:none" value="<?php echo $mcqQuesResult->MCQID; ?>" required></input>
+                                <input type="text" class="form-control" id="MCQID" name="mcqid" style="display:none" value="<?php echo $mcqQuesResult->MCQID; ?>" required>
                                 <br>
                                 <label for="Question">Question</label>
-                                <input type="text" class="form-control" id="Question" name="question" value="<?php echo $mcqQuesResult->Question; ?>" required></input>
+                                <input type="text" class="form-control" id="Question" name="question" value="<?php echo $mcqQuesResult->Question; ?>" required>
                                 <br>
                                 <label for="CorrectChoice">CorrectChoice</label>
                                 <select class="form-control" id="CorrectChoice" form="metadata-submission" name="correctchoice">                                
@@ -194,17 +194,17 @@
             <div class="modal-body">
             <form id="submission" method="post" action="<?php echo $phpself; ?>">
                 <!--if 1, insert; else if -1 delete;-->
-                <input type=hidden name="update" id="update" value="1" required></input>
+                <input type=hidden name="update" id="update" value="1" required>
                 <label for="OptionID" style="display:none">OptionID</label>                
-                <input type="text" class="form-control dialoginput" id="OptionID" name="optionid" style="display:none"></input>
+                <input type="text" class="form-control dialoginput" id="OptionID" name="optionid" style="display:none">
                 <label for="Content">Content</label>
-                <input type="text" class="form-control dialoginput" id="Content" name="content"  placeholder="Input Content" required></input> 
+                <input type="text" class="form-control dialoginput" id="Content" name="content"  placeholder="Input Content" required> 
                 <br>  
                 <label for="Explanation">Explanation</label>
-                <input type="text" class="form-control dialoginput" id="Explanation" name="explanation"  placeholder="Input Explanation" required></input> 
+                <input type="text" class="form-control dialoginput" id="Explanation" name="explanation"  placeholder="Input Explanation" required> 
                 <br>
                 <label for="MCQID" style="display:none">MCQID</label>
-                <input type="text" class="form-control dialoginput" id="MCQID" name="mcqid" style="display:none" value="<?php echo $mcqQuesResult->MCQID; ?>" required></input>
+                <input type="text" class="form-control dialoginput" id="MCQID" name="mcqid" style="display:none" value="<?php echo $mcqQuesResult->MCQID; ?>" required>
             </form>
             </div>
             <div class="modal-footer">            

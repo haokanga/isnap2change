@@ -148,7 +148,7 @@
             <div class="modal-body">
             <form id="submission" method="post" action="<?php if(isset($_GET['schoolid'])) echo $_SERVER['PHP_SELF'].'?schoolid='.$_GET['schoolid']; else echo $_SERVER['PHP_SELF']; ?>">
                 <!--if 1, insert; else if 0 update; else if -1 delete;-->
-                <input type=hidden name="update" id="update" value="1" required></input>
+                <input type=hidden name="update" id="update" value="1" required>
                 <label for="ClassID" style="display:none">ClassID</label>
                 <input type="text" class="form-control dialoginput" id="ClassID" name="classid" style="display:none">
                 <br><label for="ClassName">ClassName</label>
@@ -160,9 +160,9 @@
                   <?php } ?>
                 </select>                
                 <br><label for="TeacherToken">TeacherToken</label><span class="glyphicon glyphicon-random pull-right"></span>
-                <input type="text" class="form-control dialoginput" id="TeacherToken" name="teachertoken" required></input>
+                <input type="text" class="form-control dialoginput" id="TeacherToken" name="teachertoken" required>
                 <br><label for="StudentToken">StudentToken</label><span class="glyphicon glyphicon-random pull-right"></span>
-                <input type="text" class="form-control dialoginput" id="StudentToken" name="studenttoken" required></input>
+                <input type="text" class="form-control dialoginput" id="StudentToken" name="studenttoken" required>
                 <br>
             </form>            
             <label for="EnrolledStudents">EnrolledStudents</label>
@@ -171,7 +171,7 @@
             <form id="progress-submission" method="post" action="<?php if(isset($_GET['schoolid'])) echo $_SERVER['PHP_SELF'].'?schoolid='.$_GET['schoolid']; else echo $_SERVER['PHP_SELF']; ?>">
                 <label for="UnlockedProgress">UnlockedProgress</label>
                 <input type="range" class="dialoginput" min="0" max="<?php echo min($classResult[$i]->UnlockedProgress, $weekResult->WeekNum) ?>" id="UnlockedProgress" name="unlockedprogress" onchange="updateTextInput(this.value);">                                                       
-                <input type="text" class="dialoginput" id="textInput" value="" disabled></input>
+                <input type="text" class="dialoginput" id="textInput" value="" disabled>
             </form> 
             </div>
             <div class="modal-footer">            
@@ -195,7 +195,7 @@
       } else 
           echo '';
       ?>">
-      </input>
+      
     <!-- SB Admin Library -->  
     <?php require_once('sb-admin-lib.php'); ?>
     <!-- Page-Level Scripts -->

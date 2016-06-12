@@ -34,17 +34,17 @@ function checkprogress(){
 <div id="a" align="center">
 <form id="weeklytask1" action=weekly-task.php method=post>
 <button type=button onclick="startWeeklyTask1()"> Week 1 </button>
-<input  type=hidden name="week" value="1"></input>
+<input  type=hidden name="week" value="1">
 </form>
 <form id="weeklytask3" action=weekly-task.php method=post>
 <button type=button onclick="startWeeklyTask3()"> Week 3 </button>
-<input  type=hidden name="week" value="3"></input>
+<input  type=hidden name="week" value="3">
 </form>
 </div>
 -->
 <div align="center">
 <form id="weeklytask" action=weekly-task.php method=post>
-    <input  type=hidden id="week" name="week" value="0"></input>
+    <input  type=hidden id="week" name="week" value="0">
 	<button type=button onclick="startWeeklyTask(1)"> Week 1 </button>
 	<button type=button onclick="startWeeklyTask(2)"> Week 2 </button>
 	<button type=button onclick="startWeeklyTask(3)"> Week 3 </button>

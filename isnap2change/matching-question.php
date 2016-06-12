@@ -130,7 +130,7 @@
                 <?php } else { ?>
                 <button id="back-btn" type="button" onclick="submitQuiz();" class="btn btn-success">SUBMIT</button>
                 <?php } ?>                                        
-                <input type=hidden name="week" value=<?php echo $week; ?>></input>
+                <input type=hidden name="week" value=<?php echo $week; ?>>
             </form>	
             
         </div>
@@ -140,11 +140,11 @@
             </div>
         </div>
     </header>
-    <input type=hidden id="multiplechoice" name="multiplechoice" value=<?php echo $multipleChoice; ?> ></input>
+    <input type=hidden id="multiplechoice" name="multiplechoice" value=<?php echo $multipleChoice; ?> >
     <form id="submission" method="post" action="<?php echo $_SERVER['PHP_SELF']; ?>">
-        <input type=hidden name="week" value=<?php echo $week; ?> ></input>        
-        <input type=hidden name="quizID" value=<?php echo $quizID; ?> ></input>
-        <input type=hidden name="status" value="GRADED" ></input>
+        <input type=hidden name="week" value=<?php echo $week; ?> >        
+        <input type=hidden name="quizID" value=<?php echo $quizID; ?> >
+        <input type=hidden name="status" value="GRADED" >
         
         <!-- 1-1 matching -->
         <?php if($multipleChoice == 0){ ?>
@@ -188,7 +188,7 @@
                 <?php for($i=0; $i<count($matchingQuestionResult); $i++) { ?>
                 <!--if GRADED, disable dragging-->
                 <div id="bucket-defaults<?php if($status != "GRADED") echo $i; ?>" class="container bucket">
-                <input type=hidden value= <?php echo $matchingQuestionResult[$i]->MatchingID; ?> ></input>                
+                <input type=hidden value= <?php echo $matchingQuestionResult[$i]->MatchingID; ?> >                
                     <?php echo $matchingQuestionResult[$i]->Question ?>
                     <!--if GRADED, directly show answers-->
                     <?php if($status == "GRADED") { 

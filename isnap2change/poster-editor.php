@@ -55,7 +55,7 @@
     <input id="submitBtn" type="button" onclick="onSubmit()"  value="SUBMIT"/>
 	<form id="goBack" method=post action=weekly-task.php>
 		<button type="button" onclick="goBack()">GO BACK</button> 
-		<input type=hidden name="week" value=<?php echo $week; ?>></input>
+		<input type=hidden name="week" value=<?php echo $week; ?>>
 	</form>
 	<form style="display:none" method=post enctype="multipart/form-data" action="upload-handler.php">
 		<input type=file name=file id=fileinput accept="image/*">

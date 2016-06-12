@@ -136,7 +136,7 @@
 
         <nav class="navbar navbar-default navbar-fixed-top">
         <form method="post" action="<?php echo $_SERVER['PHP_SELF']; ?>">
-        <input  type=hidden name="quizid" value=<?php echo $quizid; ?>></input>
+        <input  type=hidden name="quizid" value=<?php echo $quizid; ?>>
             <div class="container-fluid">
                 <!-- Brand and toggle get grouped for better mobile display -->
                 <div class="navbar-header">

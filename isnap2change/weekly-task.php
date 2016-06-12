@@ -74,10 +74,10 @@
 		}
 		
         echo '<button type=button onclick="startQuiz('.$quizResult["QuizID"].')"> Quiz '.$count.'</button>
-			  <input  type=hidden name="quizID" value='.$quizResult["QuizID"].'></input>
-			  <input  type=hidden name="quizType" value='.$quizResult["QuizType"].'></input>
-			  <input  type=hidden name="week" value='.$week.'></input>
-			  <input type=hidden name="status" value='.$status.'></input>
+			  <input  type=hidden name="quizID" value='.$quizResult["QuizID"].'>
+			  <input  type=hidden name="quizType" value='.$quizResult["QuizType"].'>
+			  <input  type=hidden name="week" value='.$week.'>
+			  <input type=hidden name="status" value='.$status.'>
 			  </form>';
     }
     //game
@@ -87,8 +87,8 @@
     while($gameResult = $gameQuery->fetch(PDO::FETCH_ASSOC)){
         echo '<form id="game" method=post>
         <button type=button onclick=""> '.$gameResult["Description"].'</button>
-        <input  type=hidden name="gameid" value='.$gameResult["GameID"].'></input>
-        <input  type=hidden name="week" value='.$week.'></input>
+        <input  type=hidden name="gameid" value='.$gameResult["GameID"].'>
+        <input  type=hidden name="week" value='.$week.'>
         </form>';
     }
 	db_close($conn);	
@@ -108,9 +108,9 @@ function startQuiz(quizid){
 <div id="a" align="center">
 <form id="quiz" action=learning-material.php method=post>
 <button type=button onclick="startQuiz()"> Quiz </button>
-<input  type=hidden name="quizid" value=<?php echo $quizIDRes->QuizID; ?>></input>
-<input  type=hidden name="quiztype" value=<?php echo $quizIDRes->QuizType; ?>></input>
-<input  type=hidden name="week" value=<?php echo $week; ?>></input>
+<input  type=hidden name="quizid" value=<?php echo $quizIDRes->QuizID; ?>>
+<input  type=hidden name="quiztype" value=<?php echo $quizIDRes->QuizType; ?>>
+<input  type=hidden name="week" value=<?php echo $week; ?>>
 </form>
 </div>
 -->

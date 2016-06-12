@@ -161,7 +161,7 @@
             <div class="modal-body">
             <form id="submission" method="post" action="<?php echo $_SERVER['PHP_SELF']; ?>">
                 <!--if 1, insert; else if 0 update; else if -1 delete;-->
-                <input type=hidden name="update" id="update" value="1"></input>
+                <input type=hidden name="update" id="update" value="1">
                 <label for="ClassID" style="display:none">ClassID</label>
                 <input type="text" class="form-control dialoginput" id="ClassID" name="classid" style="display:none">
                 <br><label for="ClassName">ClassName</label>
@@ -173,9 +173,9 @@
                   <?php } ?>
                 </select>                
                 <br><label for="TeacherToken">TeacherToken</label><span class="glyphicon glyphicon-random pull-right"></span>
-                <input type="text" class="form-control dialoginput" id="TeacherToken" name="teachertoken" required></input>
+                <input type="text" class="form-control dialoginput" id="TeacherToken" name="teachertoken" required>
                 <br><label for="StudentToken">StudentToken</label><span class="glyphicon glyphicon-random pull-right"></span>
-                <input type="text" class="form-control dialoginput" id="StudentToken" name="studenttoken" required></input>
+                <input type="text" class="form-control dialoginput" id="StudentToken" name="studenttoken" required>
                 <br><label for="EnrolledStudents">EnrolledStudents</label>
                 <input type="text" class="form-control dialoginput" id="EnrolledStudents" name="EnrolledStudents">
                 <br><label for="UnlockedProgress">UnlockedProgress</label>
@@ -189,7 +189,7 @@
           </div>          
         </div>
       </div>
-      <input type=hidden name="keyword" id="keyword" value="<?php if(isset($_GET['schoolname'])){ echo $_GET['schoolname']; } ?>"></input>
+      <input type=hidden name="keyword" id="keyword" value="<?php if(isset($_GET['schoolname'])){ echo $_GET['schoolname']; } ?>">
       
     <!-- SB Admin Library -->  
     <?php require_once('sb-admin-lib.php'); ?>

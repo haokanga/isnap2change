@@ -126,12 +126,12 @@
                         <div class="panel-body">
                             <form id="metadata-submission" method="post" action="<?php echo $phpself; ?>">
                                 <!--if 0 bucketupdate; else if -1 delete;-->
-                                <input type=hidden name="metadataupdate" id="metadataupdate" value="1" required></input>
+                                <input type=hidden name="metadataupdate" id="metadataupdate" value="1" required>
                                 <label for="QuizID" style="display:none">QuizID</label>
-                                <input type="text" class="form-control" id="QuizID" name="quizid" style="display:none" value="<?php echo $quizResult->QuizID; ?>"></input>
+                                <input type="text" class="form-control" id="QuizID" name="quizid" style="display:none" value="<?php echo $quizResult->QuizID; ?>">
                                 <br>
                                 <label for="Week">Week</label>
-                                <input type="text" class="form-control" id="Week" name="week" placeholder="Input Week Number" value="<?php echo $quizResult->Week; ?>"></input> 
+                                <input type="text" class="form-control" id="Week" name="week" placeholder="Input Week Number" value="<?php echo $quizResult->Week; ?>"> 
                                 <br>  
                                 <label for='TopicName'>TopicName</label>
                                 <select class="form-control" id="TopicName" form="metadata-submission" name="topicname" required>
@@ -141,16 +141,16 @@
                                 </select>
                                 <br>
                                 <label for="Description">Description</label>
-                                <input type="text" class="form-control" id="Description" name="description"  placeholder="Input Description" value="<?php echo $quizResult->Description; ?>" required></input>
+                                <input type="text" class="form-control" id="Description" name="description"  placeholder="Input Description" value="<?php echo $quizResult->Description; ?>" required>
                                 <br>
                                 <label for="Points">Points</label>
-                                <input type="text" class="form-control" id="Points" name="points" placeholder="Input Points" value="<?php echo $quizResult->Points; ?>" required></input>
+                                <input type="text" class="form-control" id="Points" name="points" placeholder="Input Points" value="<?php echo $quizResult->Points; ?>" required>
                                 <br>
                                 <label for="MultipleChoice">MultipleChoice</label>
-                                <input type="hidden" class="form-control" id="MultipleChoice" name="multiplechoice" value="0"></input>
-                                <input type="checkbox" class="form-control" id="MultipleChoice" name="multiplechoice" value="1" <?php if(getMaxMatchingOptionNum($conn, $quizID) > 1) echo 'checked';?> disabled></input>
+                                <input type="hidden" class="form-control" id="MultipleChoice" name="multiplechoice" value="0">
+                                <input type="checkbox" class="form-control" id="MultipleChoice" name="multiplechoice" value="1" <?php if(getMaxMatchingOptionNum($conn, $quizID) > 1) echo 'checked';?> disabled>
                                 <label for="Questions">Questions</label>
-                                <input type="text" class="form-control" id="Questions" name="questions" value="<?php echo $quizResult->Questions; ?>" disabled></input>
+                                <input type="text" class="form-control" id="Questions" name="questions" value="<?php echo $quizResult->Questions; ?>" disabled>
                                 <br>
                             </form>
                             <!--edit metadata-->
@@ -241,14 +241,14 @@
             </div>
             <div class="modal-body">
             <form id="bucket-submission" method="post" action="<?php echo $phpself; ?>">
-                <input type=hidden name="bucketupdate" id="bucketupdate" value="1" required></input>
+                <input type=hidden name="bucketupdate" id="bucketupdate" value="1" required>
                 <label for="MatchingID" style="display:none">MatchingID</label>
-                <input type="text" class="form-control bucket-dialoginput" id="MatchingID" name="matchingid" style="display:none"></input>
+                <input type="text" class="form-control bucket-dialoginput" id="MatchingID" name="matchingid" style="display:none">
                 <label for="Question">Terminology/Bucket</label>
-                <input type="text" class="form-control bucket-dialoginput" id="Question" name="question" value="" required></input>
+                <input type="text" class="form-control bucket-dialoginput" id="Question" name="question" value="" required>
                 <br>
                 <label for="QuizID" style="display:none">QuizID</label>
-                <input type="text" class="form-control" id="QuizID" name="quizid" style="display:none" value="<?php echo $quizID; ?>" required></input>
+                <input type="text" class="form-control" id="QuizID" name="quizid" style="display:none" value="<?php echo $quizID; ?>" required>
                 <br>
             </form>
             </div>
@@ -270,7 +270,7 @@
             </div>
             <div class="modal-body">
             <form id="item-submission" method="post" action="<?php echo $phpself; ?>">
-                <input type=hidden name="itemupdate" id="itemupdate" value="1" required></input>                
+                <input type=hidden name="itemupdate" id="itemupdate" value="1" required>                
                 <label for='Bucket'>Terminology/Bucket</label>
                 <select class="form-control item-dialoginput" id="Bucket" form="item-submission" name="matchingid" required>
                     <option value="" disabled selected>Select Bucket</option>
@@ -280,9 +280,9 @@
                 </select>
                 <br>
                 <label for="OptionID" style="display:none">OptionID</label>
-                <input type="text" class="form-control item-dialoginput" id="OptionID" name="optionid" style="display:none"></input>
+                <input type="text" class="form-control item-dialoginput" id="OptionID" name="optionid" style="display:none">
                 <label for="Content">Explanation/Item</label>
-                <input type="text" class="form-control item-dialoginput" id="Content" name="content" value="" required></input>
+                <input type="text" class="form-control item-dialoginput" id="Content" name="content" value="" required>
                 <br>
             </form>
             </div>

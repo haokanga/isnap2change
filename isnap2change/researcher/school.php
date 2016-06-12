@@ -129,7 +129,7 @@
             <div class="modal-body">
             <form id="submission" method="post" action="<?php echo $_SERVER['PHP_SELF']; ?>">
                 <!--if 1, insert; else if 0 update; else if -1 delete;-->
-                <input type=hidden name="update" id="update" value="1"></input>
+                <input type=hidden name="update" id="update" value="1">
                 <label for="SchoolID" style="display:none">SchoolID</label>
                 <input type="text" class="form-control dialoginput" id="SchoolID" name="schoolid" style="display:none">
                 <br><label for="SchoolName">SchoolName</label>

@@ -154,11 +154,11 @@
             <div class="modal-body">
             <form id="submission" method="post" action="<?php echo $_SERVER['PHP_SELF']; ?>">
                 <!--if 1, insert; else if -1 delete;-->
-                <input type=hidden name="update" id="update" value="1" required></input>
+                <input type=hidden name="update" id="update" value="1" required>
                 <label for="QuizID" style="display:none">QuizID</label>
-                <input type="text" class="form-control dialoginput" id="QuizID" name="quizid" style="display:none"></input>
+                <input type="text" class="form-control dialoginput" id="QuizID" name="quizid" style="display:none">
                 <label for="Week">Week</label>
-                <input type="text" class="form-control dialoginput" id="Week" name="week"  placeholder="Input Week Number" required></input> 
+                <input type="text" class="form-control dialoginput" id="Week" name="week"  placeholder="Input Week Number" required> 
                 <br>  
                 <label for='TopicName'>TopicName</label>
                 <select class="form-control dialoginput" id="TopicName" form="submission" name="topicname" required>
@@ -169,11 +169,11 @@
                 </select>
                 <br>
                 <label for="Points">Points</label>
-                <input type="text" class="form-control dialoginput" id="Points" name="points"  placeholder="Input Points" required></input>
+                <input type="text" class="form-control dialoginput" id="Points" name="points"  placeholder="Input Points" required>
                 <br>
                 <label for="Questionnaires">Questionnaires</label>
-                <input type="hidden" class="form-control" id="Questionnaires" name="questionnaires" value="0"></input>
-                <input type="checkbox" class="form-control" id="Questionnaires" name="questionnaires" value="1"></input>
+                <input type="hidden" class="form-control" id="Questionnaires" name="questionnaires" value="0">
+                <input type="checkbox" class="form-control" id="Questionnaires" name="questionnaires" value="1">
             </form>
             </div>
             <div class="modal-footer">            

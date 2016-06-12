@@ -139,12 +139,12 @@
             <div class="modal-body">
             <form id="submission" method="post" action="<?php if(isset($_GET['classid'])) echo $_SERVER['PHP_SELF'].'?classid='.$_GET['classid']; else echo $_SERVER['PHP_SELF']; ?>">
                 <!--if 0 update; else if -1 delete;-->
-                <input type=hidden name="update" id="update" value="1"></input>                
+                <input type=hidden name="update" id="update" value="1">                
                 <?php for($i=0; $i<count($columnName); $i++) {
                     if($columnName[$i] == 'StudentID' || $columnName[$i] == 'Username'){?>
                     <label for="<?php echo $columnName[$i]; ?>" <?php if ($i==0){ echo 'style="display:none"';} ?>><?php echo $columnName[$i]; ?></label>
                     <input type="text" class="form-control dialoginput" id="<?php echo $columnName[$i]; ?>" name="<?php echo strtolower($columnName[$i]); ?>"  
-                    <?php if ($i==0){ echo 'style="display:none"';} ?> ></input>
+                    <?php if ($i==0){ echo 'style="display:none"';} ?> >
                 <?php } 
                 }?>
                 <br>
@@ -174,7 +174,7 @@
         }
       } else 
           echo '';
-      ?>"></input>
+      ?>">
     <!-- SB Admin Library -->  
     <?php require_once('sb-admin-lib.php'); ?>
     <!-- Page-Level Scripts -->

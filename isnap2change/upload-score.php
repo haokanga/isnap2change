@@ -55,11 +55,11 @@
 <!--
 <div id="a" align="center">
 <form id="quiz" action="<?php echo $_SERVER['PHP_SELF']; ?>" method=get>
-Score:<input name="score[]" value="15"></input>
-Score:<input name="score[]" value="15"></input>
-Score:<input name="score[]" value="15"></input>
-Score:<input name="score[]" value="15"></input>
-Score:<input name="score[]" value="15"></input>
+Score:<input name="score[]" value="15">
+Score:<input name="score[]" value="15">
+Score:<input name="score[]" value="15">
+Score:<input name="score[]" value="15">
+Score:<input name="score[]" value="15">
 <input type="submit" name='submit' value="Submit" class='submit'/>
 </form>
 -->

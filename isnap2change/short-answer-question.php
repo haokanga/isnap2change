@@ -231,7 +231,7 @@
                     <?php } else if($status == "UNANSWERED" || $status == "UNGRADED"){ ?>
                     <button id="back-btn" type="button" onclick="return submitQuiz();" class="btn btn-success">SUBMIT</button>
                     <?php } ?>                                        
-                    <input type=hidden name="week" value=<?php echo $week; ?>></input>
+                    <input type=hidden name="week" value=<?php echo $week; ?>>
                 </form>	
 				
             </div>
@@ -278,10 +278,10 @@
             </div>
         <!--form submission-->    
         <form id="submission" method="post" action="<?php echo $_SERVER['PHP_SELF']; ?>">
-            <input type=hidden name="goback" value=0 ></input> 
-            <input type=hidden name="week" value=<?php echo $week; ?> ></input>        
-            <input type=hidden name="quizid" value=<?php echo $quizid; ?> ></input>
-            <input type=hidden name="status" value="UNGRADED" ></input>
+            <input type=hidden name="goback" value=0 > 
+            <input type=hidden name="week" value=<?php echo $week; ?> >        
+            <input type=hidden name="quizid" value=<?php echo $quizid; ?> >
+            <input type=hidden name="status" value="UNGRADED" >
             <!--start of saq for-loop-->
             <?php for($i=0; $i<count($saqresult); $i++) {
                 $currentsaqid = $saqresult[$i] -> SAQID;
