@@ -3,7 +3,7 @@
 $userAdminPageList=array('School','Class','Student', 'Locks');
 $userAdminIconList=array('mortar-board','users','child','lock');
 $contentAdminPageList=array('Week','Quiz','Fact','MCQ','SAQ','Matching','Poster');
-$contentAdminIconList=array('calendar','book','comment','check','pencil','check','check','check','check');
+$contentAdminIconList=array('calendar','book','comment','check','pencil','th-list','check','check','check');
 
 $gradingAdminPageList=array('SAQ','Poster');
 

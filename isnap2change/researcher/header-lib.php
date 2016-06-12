@@ -35,4 +35,7 @@
     .glyphicon:hover {
         background-color: rgb(153, 153, 102);
     }
+    .panel-heading{
+        font-weight: bold;
+    }
     </style>

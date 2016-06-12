@@ -476,7 +476,7 @@
     }
     
     function getMaxOptionNum($conn, $quizID){
-        $optionNumSql = "SELECT MAX(OptionNum) AS MaxOptionNum FROM (SELECT COUNT(*) AS OptionNum FROM MCQ_Question natural JOIN `Option` WHERE QuizID = ? GROUP BY MCQID) AS OptionNumbTable";								
+        $optionNumSql = "SELECT MAX(OptionNum) AS MaxOptionNum FROM (SELECT COUNT(*) AS OptionNum FROM MCQ_Question natural JOIN `Option` WHERE QuizID = ? GROUP BY MCQID) AS OptionNumTable";								
         $optionNumQuery = $conn->prepare($optionNumSql);
         $optionNumQuery->execute(array($quizID));
         $optionNumResult = $optionNumQuery->fetch(PDO::FETCH_OBJ);
@@ -610,6 +610,17 @@
         return $matchingQuesResult;
     }
     
+    function getMatchingBuckets($conn, $quizID){
+        $matchingQuesSql = "SELECT *
+                    FROM Matching_Section NATURAL JOIN Matching_Question
+                    WHERE QuizID = ?
+                    ORDER BY MatchingID";                                
+        $matchingQuesQuery = $conn->prepare($matchingQuesSql);
+        $matchingQuesQuery->execute(array($quizID));
+        $matchingQuesResult = $matchingQuesQuery->fetchAll(PDO::FETCH_OBJ); 
+        return $matchingQuesResult;
+    }
+    
     function getMatchingQuiz($conn, $quizID){
         $quizSql = "SELECT *, COUNT(MatchingID) AS Questions
                    FROM Quiz NATURAL JOIN Topic NATURAL JOIN Matching_Section LEFT JOIN Matching_Question USING (QuizID) WHERE QuizID = ? GROUP BY QuizID";
@@ -628,6 +639,38 @@
         return $quizResult;
     }    
     /* Matching */
+    
+    /* Matching_Option */
+    function createMatchingOption($conn, $mcqID, $content, $explanation){
+        $updateSql = "INSERT INTO Matching_Option (Content, Explanation, MCQID)
+             VALUES (?,?,?)";
+        $updateSql = $conn->prepare($updateSql);         
+        $updateSql->execute(array($content, $explanation, $mcqID));
+        return $conn->lastInsertId(); 
+    }
+    
+    function updateMatchingOption($conn, $optionID, $content, $explanation){
+        $updateSql = "UPDATE Matching_Option 
+                SET Content = ?, Explanation = ?
+                WHERE OptionID = ?";			
+        $updateSql = $conn->prepare($updateSql);         
+        $updateSql->execute(array($content, $explanation, $optionID)); 
+    }
+    
+    function deleteMatchingOption($conn, $optionID){
+        $updateSql = "DELETE FROM Matching_Option WHERE OptionID = ?";			
+        $updateSql = $conn->prepare($updateSql);
+        $updateSql->execute(array($optionID));
+    }
+    
+    function getMaxMatchingOptionNum($conn, $quizID){
+        $optionNumSql = "SELECT MAX(OptionNum) AS MaxOptionNum FROM (SELECT COUNT(*) AS OptionNum FROM MCQ_Question natural JOIN Matching_Option WHERE QuizID = ? GROUP BY MCQID) AS OptionNumTable";								
+        $optionNumQuery = $conn->prepare($optionNumSql);
+        $optionNumQuery->execute(array($quizID));
+        $optionNumResult = $optionNumQuery->fetch(PDO::FETCH_OBJ);
+        return $optionNumResult;
+    }
+    /* Matching_Option */
     
     /* Learning_Material */
     function createEmptyLearningMaterial($conn, $quizID){

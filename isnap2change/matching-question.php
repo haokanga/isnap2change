@@ -1,101 +1,88 @@
-<?php
-    //if true, echo debug output in dev mode, else production mode
-	$DEBUG_MODE = true;    
+<?php        
 	session_start();
-    require_once("mysql-lib.php");	
-    require_once("encrypt.php");      
-    $conn = db_connect();
-    
-    //set userid    
-    if(isset($_SESSION['studentid'])){
-        $studentid = $_SESSION['studentid'];
-        if($DEBUG_MODE){
-            echo "<script language=\"javascript\">  console.log(\"This is DEBUG_MODE with SESSION studentID = ".$studentid.".\"); </script>";
-        }
-    }else{
-        if($DEBUG_MODE){
-            echo "<script language=\"javascript\">  console.log(\"This is DEBUG_MODE with hard-code studentID = 1.\"); </script>";
-            $studentid = 1;
-        }
-    }
-    //POST parameters
-    if ($_SERVER["REQUEST_METHOD"] == "POST") {		
-		if(isset($_POST["quizid"]) && isset($_POST["week"]) && isset($_POST["status"])){
-			$quizid = $_POST["quizid"];
-			$week = $_POST["week"];
-			$status = $_POST["status"];
-            //[unused] get learning-material
-            $materialPreSql = "SELECT COUNT(*) 
-                               FROM   Learning_Material
-                               WHERE  QuizID = ?";							
-            $materialPreQuery = $conn->prepare($materialPreSql);
-            $materialPreQuery->execute(array($quizid));			
-            if($materialPreQuery->fetchColumn() == 1){
-                $materialSql = "SELECT Content, TopicName 
-                                FROM   Learning_Material NATURAL JOIN Quiz
-                                                         NATURAL JOIN Topic
-                                WHERE  QuizID = ?";							
-                $materialQuery = $conn->prepare($materialSql);
-                $materialQuery->execute(array($quizid));
-                $materialRes = $materialQuery->fetch(PDO::FETCH_OBJ);		
-            } else {       
-            }
+    require_once("/mysql-lib.php");
+    require_once("/debug.php");
+    require_once("/student-validation.php");
+    require_once("/encrypt.php");
+    $pageName = "matching-question";
 
-            // get matching section
-            $matchingSectionSql = "SELECT Explanation, Points, MultipleChoices
-                       FROM   Matching_Section
-                       WHERE  QuizID = ?";
-            $matchingSectionQuery = $conn->prepare($matchingSectionSql);
-            $matchingSectionQuery->execute(array($quizid));
-            $matchingSectionResult = $matchingSectionQuery->fetch(PDO::FETCH_OBJ);
-            $score=$matchingSectionResult->Points;
-            // if 1, multipleChoices
-            $multipleChoices=$matchingSectionResult->MultipleChoices;
-            
-            // get matching questions
-            $matchingQuestionSql = "SELECT MatchingQuestionID, Question
-                       FROM   Matching_Section NATURAL JOIN Matching_Question
-                       WHERE  QuizID = ?
-                       ORDER BY MatchingQuestionID";
-            $matchingQuestionQuery = $conn->prepare($matchingQuestionSql);
-            $matchingQuestionQuery->execute(array($quizid));
-            $matchingQuestionResult = $matchingQuestionQuery->fetchAll(PDO::FETCH_OBJ);
-            
-            
-            // get matching options
-            $matchingOptionSql = "SELECT MatchingQuestionID, Explanation, Question, Content, Points
-                       FROM   Matching_Section NATURAL JOIN Matching_Question NATURAL JOIN Matching_Option
-                       WHERE  QuizID = ?
-                       ORDER BY MatchingQuestionID";
-            $matchingOptionQuery = $conn->prepare($matchingOptionSql);
-            $matchingOptionQuery->execute(array($quizid));
-            $matchingOptionResult = $matchingOptionQuery->fetchAll(PDO::FETCH_OBJ);
-            
-            //if submission            
-            if($status == "GRADED"){
-                $quizid = $_POST["quizid"];
-                $updateSql = "INSERT INTO Quiz_Record(QuizID, StudentID, `Status`, Score)
-                                             VALUES (?,?,?,?) ON DUPLICATE KEY UPDATE Score = ?";			
-                $updateSql = $conn->prepare($updateSql);                
-                if(! $updateSql -> execute(array($quizid, $studentid, $status, $score, $score))){
-                    echo "<script language=\"javascript\">  alert(\"Error occurred to update your score. Report this bug to reseachers.\"); </script>";
+    try{    
+        $conn = db_connect();
+        if ($_SERVER["REQUEST_METHOD"] == "POST") {		
+            if(isset($_POST["quizID"]) && isset($_POST["week"])){
+                $quizid = $_POST["quizID"];
+                $week = $_POST["week"];
+                $status = getQuizStatus($conn, $quizID, $studentID);
+                //[unused] get learning-material
+                $materialPreSql = "SELECT COUNT(*) 
+                                   FROM   Learning_Material
+                                   WHERE  QuizID = ?";							
+                $materialPreQuery = $conn->prepare($materialPreSql);
+                $materialPreQuery->execute(array($quizid));			
+                if($materialPreQuery->fetchColumn() == 1){
+                    $materialSql = "SELECT Content, TopicName 
+                                    FROM   Learning_Material NATURAL JOIN Quiz
+                                                             NATURAL JOIN Topic
+                                    WHERE  QuizID = ?";							
+                    $materialQuery = $conn->prepare($materialSql);
+                    $materialQuery->execute(array($quizid));
+                    $materialRes = $materialQuery->fetch(PDO::FETCH_OBJ);		
+                } else {       
                 }
-            }
-            //if Jump from weekly tasks/learning materials
-            else if($status == "UNANSWERED"){
-                if($DEBUG_MODE){
-                    echo "<script language=\"javascript\">  console.log(\"Jump from weekly tasks/learning materials.\"); </script>";
-                }        
-            } else {
-                //todo: error handling
-            }       
-        
-        } else {
-			
-		}		
-	} else {		
-	}
-    
+
+                // get matching section
+                $matchingSectionSql = "SELECT Explanation, Points, MultipleChoices
+                           FROM   Matching_Section
+                           WHERE  QuizID = ?";
+                $matchingSectionQuery = $conn->prepare($matchingSectionSql);
+                $matchingSectionQuery->execute(array($quizid));
+                $matchingSectionResult = $matchingSectionQuery->fetch(PDO::FETCH_OBJ);
+                $score=$matchingSectionResult->Points;
+                // if 1, multipleChoices
+                $multipleChoices=$matchingSectionResult->MultipleChoices;
+                
+                // get matching questions
+                $matchingQuestionSql = "SELECT MatchingQuestionID, Question
+                           FROM   Matching_Section NATURAL JOIN Matching_Question
+                           WHERE  QuizID = ?
+                           ORDER BY MatchingQuestionID";
+                $matchingQuestionQuery = $conn->prepare($matchingQuestionSql);
+                $matchingQuestionQuery->execute(array($quizid));
+                $matchingQuestionResult = $matchingQuestionQuery->fetchAll(PDO::FETCH_OBJ);
+                
+                
+                // get matching options
+                $matchingOptionSql = "SELECT MatchingQuestionID, Explanation, Question, Content, Points
+                           FROM   Matching_Section NATURAL JOIN Matching_Question NATURAL JOIN Matching_Option
+                           WHERE  QuizID = ?
+                           ORDER BY MatchingQuestionID";
+                $matchingOptionQuery = $conn->prepare($matchingOptionSql);
+                $matchingOptionQuery->execute(array($quizid));
+                $matchingOptionResult = $matchingOptionQuery->fetchAll(PDO::FETCH_OBJ);
+                
+                //if submission            
+                if($status == "GRADED"){
+                    $quizid = $_POST["quizID"];
+                    $updateSql = "INSERT INTO Quiz_Record(QuizID, StudentID, `Status`, Score)
+                                                 VALUES (?,?,?,?) ON DUPLICATE KEY UPDATE Score = ?";			
+                    $updateSql = $conn->prepare($updateSql);                
+                    if(! $updateSql -> execute(array($quizid, $studentid, $status, $score, $score))){
+                        echo "<script language=\"javascript\">  alert(\"Error occurred to update your score. Report this bug to reseachers.\"); </script>";
+                    }
+                }
+                //if Jump from weekly tasks/learning materials
+                else if($status == "UNANSWERED"){
+                    if($DEBUG_MODE){
+                        echo "<script language=\"javascript\">  console.log(\"Jump from weekly tasks/learning materials.\"); </script>";
+                    }        
+                } else {
+                    //todo: error handling
+                }
+            }		
+        }
+    } catch(Exception $e) {
+        debug_err($pageName, $e);
+    }
     
     db_close($conn); 
     

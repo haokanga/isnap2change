@@ -245,7 +245,7 @@ CREATE TABLE IF NOT EXISTS `Matching_Section` (
 # Set A: terminology/category/bucket
 CREATE TABLE IF NOT EXISTS `Matching_Question` (
     MatchingID MEDIUMINT AUTO_INCREMENT,
-    Question TEXT,
+    Question TEXT NOT NULL,
     QuizID MEDIUMINT,
     CONSTRAINT Matching_Question_MatchingID_PK PRIMARY KEY (MatchingID),
     CONSTRAINT Matching_Question_QuizID_FK FOREIGN KEY (QuizID)
@@ -256,7 +256,7 @@ CREATE TABLE IF NOT EXISTS `Matching_Question` (
 # Set B: explanation/concept/item
 CREATE TABLE IF NOT EXISTS `Matching_Option` (
     OptionID MEDIUMINT AUTO_INCREMENT,
-    Content TEXT,
+    Content TEXT NOT NULL,
     MatchingID MEDIUMINT,
     CONSTRAINT Matching_Option_OptionID_PK PRIMARY KEY (OptionID),
     CONSTRAINT Matching_Option_MatchingID_FK FOREIGN KEY (MatchingID)

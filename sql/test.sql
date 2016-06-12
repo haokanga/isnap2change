@@ -94,3 +94,11 @@ INSERT INTO MCQ_Question(Question, QuizID)
 SELECT * FROM Learning_Material;
 SELECT QuizID, TopicID, Week, QuizType, TopicName, SAQID, SUM(Points) AS Points, COUNT(SAQID) AS Questions
                    FROM Quiz NATURAL JOIN Topic NATURAL JOIN SAQ_Section LEFT JOIN SAQ_Question USING (QuizID) WHERE QuizType = 'SAQ' GROUP BY QuizID;
+                   
+SELECT *
+FROM Matching_Section NATURAL JOIN Matching_Question
+WHERE QuizID = 8
+ORDER BY MatchingID;
+
+SELECT * FROM Quiz;                   
+                   
