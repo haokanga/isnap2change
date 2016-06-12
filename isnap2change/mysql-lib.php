@@ -568,6 +568,16 @@
         $updateSql->execute(array($description, $points, $quizID));
     }
     
+    function getMatchingSection($conn, $quizID){
+        $matchingSectionSql = "SELECT *
+                   FROM   Matching_Section
+                   WHERE  QuizID = ?";
+        $matchingSectionQuery = $conn->prepare($matchingSectionSql);
+        $matchingSectionQuery->execute(array($quizID));
+        $matchingSectionResult = $matchingSectionQuery->fetch(PDO::FETCH_OBJ);
+        return $matchingSectionResult;
+    } 
+    
     function createMatchingQuestion($conn, $quizID, $question){
         $updateSql = "INSERT INTO Matching_Question(Question, QuizID)
                     VALUES (?,?)";			
