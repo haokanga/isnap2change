@@ -1003,7 +1003,7 @@ function getSAQRecords(PDO $conn, $quizID, $studentID)
     return $saqQuesRecordResult;
 }
 
-function updateSAQDraft(PDO $conn, $quizID, $studentID, $pageName, $saqID, $answer)
+function updateSAQDraft(PDO $conn, $quizID, $saqID, $studentID, $answer, $pageName)
 {
     try {
         $conn->beginTransaction();
