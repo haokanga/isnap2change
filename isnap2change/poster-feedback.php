@@ -1,6 +1,7 @@
 <?php
-	
 	require_once("mysql-lib.php");
+	require_once("debug.php");
+	
 	$pageName = "poster-feedback";
 	
 	//check whether a request is GET or POST

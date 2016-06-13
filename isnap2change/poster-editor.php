@@ -2,6 +2,7 @@
 
 	session_start();
 	require_once("mysql-lib.php");
+	require_once("debug.php");
 	
 	$pageName = "poster-editor";
 	
@@ -44,7 +45,8 @@
 		//...
 		exit;
 	}
-		
+	
+	db_close($conn);
 ?>
 
 <html>
