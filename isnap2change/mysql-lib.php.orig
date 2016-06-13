@@ -522,14 +522,13 @@ function getMCQQuestions(PDO $conn, $quizID)
         $updateMCQQuesRecordQuery->execute(array($studentID, $MCQID, $choice, $choice));
     }
 
-    function getMCQQuiz(PDO $conn, $quizID){
-        $quizSql = "SELECT *, COUNT(MCQID) AS Questions
+    $quizSql = "SELECT *, COUNT(MCQID) AS Questions
                    FROM Quiz NATURAL JOIN Topic NATURAL JOIN MCQ_Section LEFT JOIN MCQ_Question USING (QuizID) WHERE QuizID = ? GROUP BY QuizID";
-        $quizQuery = $conn->prepare($quizSql);
-        $quizQuery->execute(array($quizID));
-        $quizResult = $quizQuery->fetch(PDO::FETCH_OBJ);
-        return $quizResult;
-    }
+    $quizQuery = $conn->prepare($quizSql);
+    $quizQuery->execute(array($quizID));
+    $quizResult = $quizQuery->fetch(PDO::FETCH_OBJ);
+    return $quizResult;
+}
 
 function getMCQQuizzes(PDO $conn)
 {
