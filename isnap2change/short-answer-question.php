@@ -1,113 +1,58 @@
 <?php
-    //if true, echo debug output in dev mode, else production mode
-	$DEBUG_MODE = true;
+    session_start();
+    require_once("mysql-lib.php");
+    require_once("debug.php");
+    require_once("student-validation.php");
+    $pageName = "short-answer-question";	
     
-	session_start();
-    require_once("mysql-lib.php");	
-           
-    $conn = db_connect();
-    
-    //set userid    
-    if(isset($_SESSION['studentID'])){
-        $studentID = $_SESSION['studentID'];
-        echo "<script language=\"javascript\">  console.log(\"This is DEBUG_MODE with SESSION studentID = ".$studentID.".\"); </script>";
-    }else{
-        if(DEBUG_MODE){
-            echo "<script language=\"javascript\">  console.log(\"This is DEBUG_MODE with hard-code studentID = 1.\"); </script>";
-            $studentID = 1;
+    try{   
+        $conn = db_connect();
+        //POST parameters
+        if ($_SERVER["REQUEST_METHOD"] == "POST") {		
+            if(isset($_POST["quizID"]) && isset($_POST["week"])){
+                $quizID = $_POST["quizID"];
+                $week = $_POST["week"];
+                $status = getQuizStatus($conn, $quizID, $studentID);
+            } else {
+                
+            }		
+        } else {		
         }
-    }
-    //POST parameters
-    if ($_SERVER["REQUEST_METHOD"] == "POST") {		
-		if(isset($_POST["quizid"]) && isset($_POST["week"]) && isset($_POST["status"])){
-			$quizid = $_POST["quizid"];
-			$week = $_POST["week"];
-			$status = $_POST["status"];
-		} else {
-			
-		}		
-	} else {		
-	}
-    
-    //get learning-material
-    $materialPreSql = "SELECT COUNT(*) 
-					   FROM   Learning_Material
-					   WHERE  QuizID = ?";							
-	$materialPreQuery = $conn->prepare($materialPreSql);
-	$materialPreQuery->execute(array($quizid));			
-	if($materialPreQuery->fetchColumn() == 1){
-		$materialSql = "SELECT Content, TopicName 
-                        FROM   Learning_Material NATURAL JOIN Quiz
-                                                 NATURAL JOIN Topic
-                        WHERE  QuizID = ?";							
-        $materialQuery = $conn->prepare($materialSql);
-        $materialQuery->execute(array($quizid));
-        $materialRes = $materialQuery->fetch(PDO::FETCH_OBJ);		
-	} else {       
-    }    
-    
-    // get $saqresult[$i] -> SAQID;
-    $saqsql = "SELECT SAQID, Question
-               FROM   SAQ_Section NATURAL JOIN SAQ_Question
-               WHERE  QuizID = ?
-               ORDER BY SAQID";
-    $saqquery = $conn->prepare($saqsql);
-    $saqquery->execute(array($quizid));
-    $saqresult = $saqquery->fetchAll(PDO::FETCH_OBJ);
-    
-    //if submitted
-    if($status == "UNGRADED" || $status == "GRADED"){
-        $saq_question_record_sql = "SELECT StudentID, SAQID, Answer, Feedback, Grading
-               FROM   SAQ_Question_Record NATURAL JOIN SAQ_Question
-               WHERE  QuizID = ?
-               ORDER BY SAQID";
-        $saq_question_record_query = $conn->prepare($saq_question_record_sql);
-        $saq_question_record_query->execute(array($quizid));
-        $saq_question_record_result = $saq_question_record_query->fetchAll(PDO::FETCH_OBJ);
-    }
-    
-    // get score for each question    
-    $score = 0;
-    for($i=0; $i<count($saqresult); $i++) {
-        $scoreSql = "SELECT Points FROM SAQ_Question WHERE SAQID = ?";
-        $scoreQuery = $conn->prepare($scoreSql);
-        $scoreQuery->execute(array($saqresult[$i] -> SAQID));
-        $scoreResult = $scoreQuery->fetch(PDO::FETCH_OBJ);
-        $score += $scoreResult->Points;
-        $scoreArray[] = $scoreResult->Points;
-        $score += $scoreResult->Points;
-    }
-    
-    //if submission
-    if(isset($_POST['answer']) && isset($_POST['saqid']) && isset($_POST['quizid'])){
-        $quizid = $_POST["quizid"];
-        $saqid = $_POST["saqid"];    
-        $answer = $_POST["answer"];
-        for($i=0; $i<count($saqid); $i++) {
-            $updateSql = "INSERT INTO SAQ_Question_Record(StudentID, SAQID, Answer)
-                                     VALUES (?,?,?) ON DUPLICATE KEY UPDATE Answer = ?";			
-            $updateSql = $conn->prepare($updateSql);                
-            if(! $updateSql -> execute(array($studentID, $saqid[$i], htmlspecialchars($answer[$i]), htmlspecialchars($answer[$i])))){
-                echo "<script language=\"javascript\">  alert(\"Error occurred to submit your answer. Report this bug to reseachers.\"); </script>";
-            }
+        
+        //get learning-material
+        $materialRes = getLearningMaterial($conn, $quizID);    
+        
+        // get saq questionss;
+        $saqResult = getSAQQuestions($conn, $quizID);
+        
+        //if submitted
+        if($status == "UNGRADED" || $status == "GRADED"){
+            $saqQuesRecordResult = getSAQRecords($conn, $quizID, $studentID);
         }
-        $updateSql = "INSERT INTO Quiz_Record(QuizID, StudentID, `Status`, Score)
-                                     VALUES (?,?,?,?) ON DUPLICATE KEY UPDATE Score = ?";			
-        $updateSql = $conn->prepare($updateSql);                
-        if(! $updateSql -> execute(array($quizid, $studentID, "UNGRADED", $score, $score))){
-            echo "<script language=\"javascript\">  alert(\"Error occurred to update your score. Report this bug to reseachers.\"); </script>";
-        }        
-        $saqresult = null;
+        
+        // get score for each question
+        for($i=0; $i<count($saqResult); $i++) {
+            $saqID = $saqResult[$i] -> SAQID;
+            $scoreResult = getSAQQuestion($conn, $saqID);
+            $scoreArray[] = $scoreResult->Points;
+        }
+        
+        //if submission
+        if(isset($_POST['answer']) && isset($_POST['saqID']) && isset($_POST['quizID'])){
+            $quizID = $_POST["quizID"];
+            $saqID = $_POST["saqID"];    
+            $answer = $_POST["answer"];
+            for($i=0; $i<count($saqID); $i++) {
+                updateSAQQuestionRecord($conn, $saqID[$i], $studentID, $answer[$i]);
+            }            
+            updateQuizRecord($conn, $quizID, $studentID, "UNGRADED");
+        }
+        db_close($conn);       
+        $lastsaqID = -1;
+        $questionIndex = 1;        
+    } catch(Exception $e) {
+        debug_err($pageName, $e);
     }
-    //if Jump from weekly tasks/learning materials
-    else if(!isset($_POST['answer']) && !isset($_POST['saqid']) && isset($_POST["status"])){
-        echo "<script language=\"javascript\">  console.log(\"Jump from weekly tasks/learning materials.\"); </script>";
-    } else {
-        //todo: error handling
-    }
-    db_close($conn);       
-    $lastsaqid = -1;
-    $questionIndex = 1;
 ?>
 <html>
     <head>
@@ -249,7 +194,7 @@
                     <li class="list-group-item" style="color:turquoise;">
                         <button type="button" class="btn btn-default" id="button0" style="color:turquoise;font-weight: bold;" value="0">i</button>
                     </li>
-                    <?php for($i=0; $i<count($saqresult); $i++) {?>
+                    <?php for($i=0; $i<count($saqResult); $i++) {?>
 						<li class="list-group-item">
 							<button type="button" class="btn btn-default" id="button<?php echo $i+1;?>" value="<?php echo $i+1;?>"><?php echo $i+1;?></button>
 						</li>						
@@ -280,22 +225,22 @@
         <form id="submission" method="post" action="<?php echo $_SERVER['PHP_SELF']; ?>">
             <input type=hidden name="goback" value=0 > 
             <input type=hidden name="week" value=<?php echo $week; ?> >        
-            <input type=hidden name="quizid" value=<?php echo $quizid; ?> >
+            <input type=hidden name="quizID" value=<?php echo $quizID; ?> >
             <input type=hidden name="status" value="UNGRADED" >
             <!--start of saq for-loop-->
-            <?php for($i=0; $i<count($saqresult); $i++) {
-                $currentsaqid = $saqresult[$i] -> SAQID;
-                if($currentsaqid != $lastsaqid){?>
+            <?php for($i=0; $i<count($saqResult); $i++) {
+                $currentsaqID = $saqResult[$i] -> SAQID;
+                if($currentsaqID != $lastsaqID){?>
                 <div class="myques <?php if($questionIndex != 1){echo "hidden";} ?> " id="panel<?php echo $questionIndex;?>">
                     <!--heading-->
                     <div class="panel-heading" style="font-size: xx-large; font-weight: 600; color:black; height:35%; min-height: 35%; max-height: 35%; text-align:center;">
                         <div class="ques" >                        
-                            <?php $questionIndex++; echo ($i+1).". ".htmlspecialchars($saqresult[$i] -> Question); ?>
+                            <?php $questionIndex++; echo ($i+1).". ".htmlspecialchars($saqResult[$i] -> Question); ?>
                         </div> 
                     </div>
                     <!--body-->
                     <div class="panel-body" style="width: 85%; margin-left:7.5%;">
-                    <?php  $lastsaqid = $currentsaqid;?>
+                    <?php  $lastsaqID = $currentsaqID;?>
                         <!--if GRADED-->
                         <?php if($status == "GRADED"){ ?>                        
                             <div class="well-large">
@@ -307,32 +252,32 @@
                             <div class="tab-content">
                                 <div id="feedback<?php echo $i+1;?>" class="tab-pane fade in active">
                                     <div class="alert alert-success" role="alert"> 
-                                        <strong> Score : <?php echo $saq_question_record_result[$i]->Grading ?> / <?php echo $scoreArray[$i] ?> </strong>
+                                        <strong> Score : <?php echo $saqQuesRecordResult[$i]->Grading ?> / <?php echo $scoreArray[$i] ?> </strong>
                                         <br>
                                         <br>
                                         <strong>Comments :</strong>
                                         <br>
-                                        <?php echo $saq_question_record_result[$i]->Feedback ?>
+                                        <?php echo $saqQuesRecordResult[$i]->Feedback ?>
                                     </div>
                                 </div>
                                 
                                 <div class="tab-pane fade" id="myanswer<?php echo $i+1;?>">
                                     <div class="alert alert-warning" role="alert">
-                                        <?php if($status == "UNGRADED" || $status == "GRADED"){echo $saq_question_record_result[$i]->Answer;} ?>
+                                        <?php if($status == "UNGRADED" || $status == "GRADED"){echo $saqQuesRecordResult[$i]->Answer;} ?>
                                     </div>
                                 </div>
                             </div>
                         <!--if UNANSWERED/UNGRADED-->    
                         <?php } else { ?>
-                        <input type="hidden" name="saqid[]" value="<?php echo $currentsaqid ?>"/>
-                        <textarea class="form-control" rows="10" name="answer[]" placeholder='Please input your answer here'><?php if($status == "UNGRADED"){echo $saq_question_record_result[$i]->Answer;} ?></textarea>                        
+                        <input type="hidden" name="saqID[]" value="<?php echo $currentsaqID ?>"/>
+                        <textarea class="form-control" rows="10" name="answer[]" placeholder='Please input your answer here'><?php if($status == "UNGRADED"){echo $saqQuesRecordResult[$i]->Answer;} ?></textarea>                        
                         <?php } ?>
                         <br>
                         <br>
                         <!--Navigation Button-->
                         <div class="back2"  style="text-align: center;">                            
                             <a class="btn btn-default last <?php if($i<=0){echo "disabled";} ?>"  role="button" style="padding-top:8px; padding-bottom: 10px;"><span class="glyphicon glyphicon-chevron-left"></span></a>                           
-                            <a class="btn btn-default next <?php if($i>=count($saqresult)-1){echo "disabled";} ?>"  role="button" style="padding-top:8px; padding-bottom: 10px;"><span class="glyphicon glyphicon-chevron-right"></span></a>
+                            <a class="btn btn-default next <?php if($i>=count($saqResult)-1){echo "disabled";} ?>"  role="button" style="padding-top:8px; padding-bottom: 10px;"><span class="glyphicon glyphicon-chevron-right"></span></a>
                         </div>
                     </div>
                 </div>                

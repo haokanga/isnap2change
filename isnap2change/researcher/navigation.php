@@ -3,9 +3,9 @@
 $userAdminPageList=array('School','Class','Student');
 $userAdminIconList=array('mortar-board','users','child');
 $contentAdminPageList=array('Week','Quiz','Fact','MCQ','SAQ','Matching','Poster');
-$contentAdminIconList=array('calendar','book','comment','check','pencil','th-list','check','check','check');
-
-$gradingAdminPageList=array('SAQ','Poster');
+$contentAdminIconList=array('calendar','book','comment','check','pencil','th-list','check');
+$gradingPageList=array('SAQ-Grading','Poster-Grading');
+$gradingIconList=array('check','check');
 
 ?>        
         
@@ -252,6 +252,17 @@ $gradingAdminPageList=array('SAQ','Poster');
                             <a href="<?php echo strtolower($contentAdminPageList[$i]); ?>.php"><i class="fa fa-fw fa-<?php echo $contentAdminIconList[$i]; ?>"></i>&nbsp;<?php echo $contentAdminPageList[$i]; ?> Overview</a>
                         </li>
                     <?php } ?>
+                    </ul>
+                    <!--/.nav-second-level -->
+                </li>
+                <li>
+                    <a href="javascript:;" data-toggle="collapse" data-target="#contenteditor" class="" aria-expanded="true"><i class="fa fa-fw fa-comment"></i> Grading & Feedback <i class="fa fa-fw fa-caret-down"></i></a>
+                    <ul id="contenteditor" class="collapse in nav nav-second-level" aria-expanded="true">
+                        <?php for($i=0; $i<count($gradingPageList); $i++) { ?>
+                            <li>
+                                <a href="<?php echo strtolower($gradingPageList[$i]); ?>.php"><i class="fa fa-fw fa-<?php echo $gradingIconList[$i]; ?>"></i>&nbsp;<?php echo $gradingPageList[$i]; ?></a>
+                            </li>
+                        <?php } ?>
                     </ul>
                     <!--/.nav-second-level -->
                 </li>
