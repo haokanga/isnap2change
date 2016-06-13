@@ -65,7 +65,7 @@ db_close($conn);
                                 <thead>
                                 <tr>
                                     <?php for ($i = 0; $i < count($columnName); $i++) { ?>
-                                        <th <?php if ($i == 0) {
+                                        <th <?php if ($i == 0 || $i == 2) {
                                             echo 'style="display:none"';
                                         } ?>><?php echo $columnName[$i]; ?></th>
                                     <?php } ?>
@@ -83,7 +83,7 @@ db_close($conn);
                                         echo "even";
                                     } ?>">
                                         <?php for ($j = 0; $j < count($columnName); $j++) { ?>
-                                            <td <?php if ($j == 0) {
+                                            <td <?php if ($j == 0 || $j == 2) {
                                                 echo 'style="display:none"';
                                             } ?>>
                                                 <?php if (strlen($submissionResult[$i]->$columnName[$j]) > 0) echo $submissionResult[$i]->$columnName[$j]; else echo 0; ?>
@@ -92,7 +92,7 @@ db_close($conn);
                                         <td>
                                             <?php
                                             $status = getQuizStatus($conn, $quizID, $studentID);
-                                            if($status =='GRADED') echo getStuQuizScore($conn, $quizID, $studentID); else echo '-'; ?>
+                                            if ($status == 'GRADED') echo getStuQuizScore($conn, $quizID, $studentID); else echo '-'; ?>
                                         </td>
                                         <td>
                                             <?php
@@ -131,23 +131,9 @@ db_close($conn);
 </div>
 <!-- /#wrapper -->
 <form id="submission" method="post" action="<?php echo $_SERVER['PHP_SELF']; ?>">
-    <!--if 1, insert; else if -1 delete;-->
-    <input type=hidden name="update" id="update" value="1" required>
-    <label for="QuizID" style="display:none">QuizID</label>
-    <input type="text" class="form-control dialoginput" id="QuizID" name="quizID" style="display:none">
-    <label for="Week">Week</label>
-    <input type="text" class="form-control dialoginput" id="Week" name="week"
-           placeholder="Input Week Number" required>
-    <br>
-    <label for='TopicName'>TopicName</label>
-    <select class="form-control dialoginput" id="TopicName" form="submission" name="topicName" required>
-        <option value="" disabled selected>Select Topic</option>
-        <?php for ($j = 0; $j < count($topicResult); $j++) { ?>
-            <option
-                value='<?php echo $topicResult[$j]->TopicName ?>'><?php echo $topicResult[$j]->TopicName ?></option>
-        <?php } ?>
-    </select>
-    <br>
+    <input type=hidden name="update" id="update" value="-1" required>
+    <input type=hidden name="studentID" id="studentID" value="" required>
+    <input type=hidden id="quizID" name="quizID" value="" required>
 </form>
 
 <!-- SB Admin Library -->
@@ -155,13 +141,11 @@ db_close($conn);
 <!-- Page-Level Scripts -->
 <script>
     //DO NOT put them in $(document).ready() since the table has multi pages
-    var dialogInputArr = $('.dialoginput');
     $('.glyphicon-remove').on('click', function () {
         if (confirm('[WARNING] Are you sure to remove this submission?')) {
             $('#update').val(-1);
-            for (i = 0; i < dialogInputArr.length; i++) {
-                dialogInputArr.eq(i).val($(this).parent().parent().children('td').eq(i).text().trim());
-            }
+            $('#quizID').val($(this).parent().parent().children('td').eq(0).text().trim());
+            $('#studentID').val($(this).parent().parent().children('td').eq(2).text().trim());
             $('#submission').submit();
         }
     });

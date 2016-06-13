@@ -503,33 +503,36 @@ function getMCQQuestions(PDO $conn, $quizID)
     return $mcqQuesResult;
 }
 
-    function getMCQQuestionNum(PDO $conn, $quizID){
-        $quesNumSql = "SELECT Count(*)
+function getMCQQuestionNum(PDO $conn, $quizID)
+{
+    $quesNumSql = "SELECT Count(*)
 				       FROM   MCQ_Question
 				       WHERE  QuizID = ?";
 
-        $quesNumQuery = $conn->prepare($quesNumSql);
-        $quesNumQuery->execute(array($quizID));
-        $quesNumRes = $quesNumQuery->fetchColumn();
+    $quesNumQuery = $conn->prepare($quesNumSql);
+    $quesNumQuery->execute(array($quizID));
+    $quesNumRes = $quesNumQuery->fetchColumn();
 
-        return $quesNumRes;
-    }
+    return $quesNumRes;
+}
 
-    function updateMCQQuestionRecord(PDO $conn, $MCQID, $studentID, $choice){
-        $updateMCQQuesRecordSql = "INSERT INTO MCQ_Question_Record(StudentID, MCQID, Choice)
+function updateMCQQuestionRecord(PDO $conn, $MCQID, $studentID, $choice)
+{
+    $updateMCQQuesRecordSql = "INSERT INTO MCQ_Question_Record(StudentID, MCQID, Choice)
 							       VALUES (?,?,?) ON DUPLICATE KEY UPDATE Choice = ?;";
-        $updateMCQQuesRecordQuery = $conn->prepare($updateMCQQuesRecordSql);
-        $updateMCQQuesRecordQuery->execute(array($studentID, $MCQID, $choice, $choice));
-    }
+    $updateMCQQuesRecordQuery = $conn->prepare($updateMCQQuesRecordSql);
+    $updateMCQQuesRecordQuery->execute(array($studentID, $MCQID, $choice, $choice));
+}
 
-    function getMCQQuiz(PDO $conn, $quizID){
-        $quizSql = "SELECT *, COUNT(MCQID) AS Questions
+function getMCQQuiz(PDO $conn, $quizID)
+{
+    $quizSql = "SELECT *, COUNT(MCQID) AS Questions
                    FROM Quiz NATURAL JOIN Topic NATURAL JOIN MCQ_Section LEFT JOIN MCQ_Question USING (QuizID) WHERE QuizID = ? GROUP BY QuizID";
-        $quizQuery = $conn->prepare($quizSql);
-        $quizQuery->execute(array($quizID));
-        $quizResult = $quizQuery->fetch(PDO::FETCH_OBJ);
-        return $quizResult;
-    }
+    $quizQuery = $conn->prepare($quizSql);
+    $quizQuery->execute(array($quizID));
+    $quizResult = $quizQuery->fetch(PDO::FETCH_OBJ);
+    return $quizResult;
+}
 
 function getMCQQuizzes(PDO $conn)
 {
@@ -539,36 +542,38 @@ function getMCQQuizzes(PDO $conn)
     $quizQuery->execute();
     $quizResult = $quizQuery->fetchAll(PDO::FETCH_OBJ);
     return $quizResult;
-    }
+}
 
-    function getMCQSubmission(PDO $conn, $quizID, $studentID){
-        $mcqSubmissionSql = "SELECT MCQID, Question, Content, CorrectChoice, Choice, Explanation
+function getMCQSubmission(PDO $conn, $quizID, $studentID)
+{
+    $mcqSubmissionSql = "SELECT MCQID, Question, Content, CorrectChoice, Choice, Explanation
 				             FROM   MCQ_Section NATURAL JOIN MCQ_Question
 									            NATURAL JOIN MCQ_Option
 									            NATURAL JOIN MCQ_Question_Record
 				             WHERE StudentID = ? AND QuizID = ?
 				             ORDER BY MCQID";
 
-        $mcqSubmissionQuery = $conn->prepare($mcqSubmissionSql);
-        $mcqSubmissionQuery->execute(array($studentID, $quizID));
+    $mcqSubmissionQuery = $conn->prepare($mcqSubmissionSql);
+    $mcqSubmissionQuery->execute(array($studentID, $quizID));
 
-        $mcqSubmissionRes = $mcqSubmissionQuery->fetchAll(PDO::FETCH_OBJ);
-        return $mcqSubmissionRes;
-    }
+    $mcqSubmissionRes = $mcqSubmissionQuery->fetchAll(PDO::FETCH_OBJ);
+    return $mcqSubmissionRes;
+}
 
-    function getMCQSubmissionCorrectNum(PDO $conn, $MCQIDArr, $answerArr){
-        $score = 0;
+function getMCQSubmissionCorrectNum(PDO $conn, $MCQIDArr, $answerArr)
+{
+    $score = 0;
 
-        $mcqCorrectNumSql = "SELECT COUNT(*) FROM MCQ_Question 
+    $mcqCorrectNumSql = "SELECT COUNT(*) FROM MCQ_Question 
                              WHERE `MCQID` = BINARY ? AND `CorrectChoice` = BINARY ?";
 
-        for($i=0; $i<count($MCQIDArr); $i++){
-            $mcqCorrectNumQuery = $conn->prepare($mcqCorrectNumSql);
-            $mcqCorrectNumQuery->execute(array($MCQIDArr[$i], $answerArr[$i]));
-            $score = $score + $mcqCorrectNumQuery->fetchColumn();
-        }
+    for ($i = 0; $i < count($MCQIDArr); $i++) {
+        $mcqCorrectNumQuery = $conn->prepare($mcqCorrectNumSql);
+        $mcqCorrectNumQuery->execute(array($MCQIDArr[$i], $answerArr[$i]));
+        $score = $score + $mcqCorrectNumQuery->fetchColumn();
+    }
 
-        return $score;
+    return $score;
 }
 
 /* MCQ */
@@ -1038,7 +1043,7 @@ function updateSAQSubmissionGrading(PDO $conn, $quizID, $saqID, $studentID, $fee
         try {
             $conn->beginTransaction();
             for ($i = 0; $i < count($saqID); $i++) {
-               updateSAQQuestionGrading($conn, $saqID[$i], $studentID, $feedback[$i], $grading[$i]);
+                updateSAQQuestionGrading($conn, $saqID[$i], $studentID, $feedback[$i], $grading[$i]);
             }
             updateQuizRecord($conn, $quizID, $studentID, "GRADED");
             $conn->commit();
@@ -1150,6 +1155,7 @@ function getSAQSubmissions(PDO $conn)
     $quizResult = $quizQuery->fetchAll(PDO::FETCH_OBJ);
     return $quizResult;
 }
+
 /* SAQ-Grading */
 
 /* Unit Test */
@@ -1183,6 +1189,7 @@ function generateRandomSAQSubmissions(PDO $conn)
         }
     }
 }
+
 /* Unit Test */
 
 function getMiscQuizType(PDO $conn, $quizID)
