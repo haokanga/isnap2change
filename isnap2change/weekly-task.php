@@ -2,47 +2,50 @@
     //if true, echo debug output in dev mode, else production mode
 	$DEBUG_MODE = true;
 	session_start();
-	require_once('mysql-lib.php');	
-	if(isset($_SESSION["studentID"])){
-		$studentID = $_SESSION["studentID"];
-	} else {
-		
-	}
-    	
-	if ($_SERVER["REQUEST_METHOD"] == "POST") {		
+
+	//check login status
+	require_once('student-validation.php');
+
+	require_once('mysql-lib.php');
+	require_once('debug.php');
+	$pageName = "weekly-task";
+
+	if ($_SERVER["REQUEST_METHOD"] == "POST") {
 		if(isset($_POST["week"])){
 			$week = $_POST["week"];
-		} else {
+		} else{
 			
 		}		
 	} else {
 		
 	}
-	
-	$conn = db_connect();
-    /**
-    $quizIDSql = "SELECT QuizID, QuizType
-                  FROM   Quiz 
-                  WHERE  Week = ?
-                  AND QuizID NOT IN
-                 (SELECT QuizID
-                  FROM   Quiz_Record NATURAL JOIN Quiz
-                  WHERE  StudentID = ? AND	Week = ?)
-                  ORDER BY QuizID
-                  LIMIT 1";
-    */
-    
-    //quiz
-    $quizSql = "SELECT Quiz.QuizID, QuizType, `Status` FROM Quiz LEFT JOIN (SELECT * FROM Quiz_Record WHERE StudentID = ?) Student_Quiz_Record ON Quiz.QuizID = Student_Quiz_Record.QuizID WHERE Week = ? ORDER BY Quiz.QuizID";    
-    $quizQuery = $conn->prepare($quizSql);
-    $quizQuery->execute(array($studentID, $week)); 
+
+	$conn = null;
+
+	try{
+		$conn = db_connect();
+
+		//get all quizzes and status by studentID and week
+		getQuizzesStatusByWeek($conn, $studentID, $week);
+
+
+	} catch(Exception $e){
+		if($conn != null) {
+			db_close($conn);
+		}
+
+		debug_err($pageName, $e);
+		//to do: handle sql error
+		//...
+		exit;
+	}
+
+	db_close($conn);
+
     $count = 0;
 	
     while($quizResult = $quizQuery->fetch(PDO::FETCH_ASSOC)){
         $count++;
-        if($DEBUG_MODE){
-            echo "<script language=\"javascript\">  console.log(\"[SUCCESS] studentid: $studentID week:$week QuizID:".$quizResult["QuizID"]." QuizType:".$quizResult["QuizType"]."\"); </script>";
-        }
 		
 		if(isset($quizResult["Status"])){
 			//if UNGRADED/GRADED
