@@ -143,10 +143,9 @@ CREATE TABLE IF NOT EXISTS `Quiz_Record` (
 )  ENGINE=INNODB;
 
 CREATE TABLE IF NOT EXISTS `Learning_Material` (
-    MaterialID MEDIUMINT AUTO_INCREMENT,
-    Content LONGTEXT,
     QuizID MEDIUMINT,
-    CONSTRAINT Learning_Material_MaterialID_PK PRIMARY KEY (MaterialID),
+    Content LONGTEXT,
+    CONSTRAINT Learning_Material_QuizID_PK PRIMARY KEY (QuizID),
     CONSTRAINT Learning_Material_QuizID_FK FOREIGN KEY (QuizID)
         REFERENCES Quiz (QuizID)
         ON DELETE CASCADE ON UPDATE CASCADE
@@ -165,7 +164,7 @@ CREATE TABLE IF NOT EXISTS `MCQ_Section` (
 CREATE TABLE IF NOT EXISTS `MCQ_Question` (
     MCQID MEDIUMINT AUTO_INCREMENT,
     Question TEXT,
-    CorrectChoice TEXT NOT NULL,
+    CorrectChoice TEXT DEFAULT NULL,
     QuizID MEDIUMINT,
     CONSTRAINT MCQ_Question_MCQID_PK PRIMARY KEY (MCQID),
     CONSTRAINT MCQ_Question_QuizID_FK FOREIGN KEY (QuizID)
@@ -234,9 +233,8 @@ CREATE TABLE IF NOT EXISTS `SAQ_Question_Record` (
 
 CREATE TABLE IF NOT EXISTS `Matching_Section` (
     QuizID MEDIUMINT,
-    Explanation TEXT,
+    Description TEXT,
     Points MEDIUMINT,
-    MultipleChoices BOOLEAN DEFAULT 0,
     CONSTRAINT Matching_Section_QuizID_PK PRIMARY KEY (QuizID),
     CONSTRAINT Matching_Section_QuizID_FK FOREIGN KEY (QuizID)
         REFERENCES Quiz (QuizID)
@@ -245,10 +243,10 @@ CREATE TABLE IF NOT EXISTS `Matching_Section` (
 
 # Set A: terminology/category/bucket
 CREATE TABLE IF NOT EXISTS `Matching_Question` (
-    MatchingQuestionID MEDIUMINT AUTO_INCREMENT,
-    Question TEXT,
+    MatchingID MEDIUMINT AUTO_INCREMENT,
+    Question TEXT NOT NULL,
     QuizID MEDIUMINT,
-    CONSTRAINT Matching_Question_MatchingQuestionID_PK PRIMARY KEY (MatchingQuestionID),
+    CONSTRAINT Matching_Question_MatchingID_PK PRIMARY KEY (MatchingID),
     CONSTRAINT Matching_Question_QuizID_FK FOREIGN KEY (QuizID)
         REFERENCES Matching_Section (QuizID)
         ON DELETE CASCADE ON UPDATE CASCADE
@@ -257,11 +255,11 @@ CREATE TABLE IF NOT EXISTS `Matching_Question` (
 # Set B: explanation/concept/item
 CREATE TABLE IF NOT EXISTS `Matching_Option` (
     OptionID MEDIUMINT AUTO_INCREMENT,
-    Content TEXT,
-    MatchingQuestionID MEDIUMINT,
+    Content TEXT NOT NULL,
+    MatchingID MEDIUMINT,
     CONSTRAINT Matching_Option_OptionID_PK PRIMARY KEY (OptionID),
-    CONSTRAINT Matching_Option_MatchingQuestionID_FK FOREIGN KEY (MatchingQuestionID)
-        REFERENCES Matching_Question (MatchingQuestionID)
+    CONSTRAINT Matching_Option_MatchingID_FK FOREIGN KEY (MatchingID)
+        REFERENCES Matching_Question (MatchingID)
         ON DELETE CASCADE ON UPDATE CASCADE
 )  ENGINE=INNODB;
 
@@ -572,57 +570,57 @@ INSERT IGNORE INTO MCQ_Section(QuizID,Points,Questionnaires) VALUES(@QUIZ_LAST_I
 # [Formal] Matching quesitons
 INSERT IGNORE INTO Quiz(Week,QuizType,TopicID) VALUES(6,'Matching',2);
 SET @QUIZ_LAST_INSERT_ID = LAST_INSERT_ID();
-INSERT IGNORE INTO Matching_Section(QuizID, Explanation, Points) VALUES(@QUIZ_LAST_INSERT_ID, 'Match the diseases to the causes. You may have to do some research on other websites to find out the answers.', 20);
+INSERT IGNORE INTO Matching_Section(QuizID, Description, Points) VALUES(@QUIZ_LAST_INSERT_ID, 'Match the diseases to the causes. You may have to do some research on other websites to find out the answers.', 20);
 INSERT IGNORE INTO Matching_Question(Question, QuizID) VALUES('Kwashiorkor', @QUIZ_LAST_INSERT_ID);
 SET @MATCHING_QUESTION_LAST_INSERT_ID = LAST_INSERT_ID();
-INSERT IGNORE INTO `Matching_Option`(Content, MatchingQuestionID) VALUES('A disease that occurs if your body doesn’t get enough proteins', @MATCHING_QUESTION_LAST_INSERT_ID);
+INSERT IGNORE INTO `Matching_Option`(Content, MatchingID) VALUES('A disease that occurs if your body doesn’t get enough proteins', @MATCHING_QUESTION_LAST_INSERT_ID);
 INSERT IGNORE INTO Matching_Question(Question, QuizID) VALUES('Marasmus', @QUIZ_LAST_INSERT_ID);
 SET @MATCHING_QUESTION_LAST_INSERT_ID = LAST_INSERT_ID();
-INSERT IGNORE INTO `Matching_Option`(Content, MatchingQuestionID) VALUES('Occurs in young children who don’t get enough calories every day', @MATCHING_QUESTION_LAST_INSERT_ID);
+INSERT IGNORE INTO `Matching_Option`(Content, MatchingID) VALUES('Occurs in young children who don’t get enough calories every day', @MATCHING_QUESTION_LAST_INSERT_ID);
 INSERT IGNORE INTO Matching_Question(Question, QuizID) VALUES('Scurvy', @QUIZ_LAST_INSERT_ID);
 SET @MATCHING_QUESTION_LAST_INSERT_ID = LAST_INSERT_ID();
-INSERT IGNORE INTO `Matching_Option`(Content, MatchingQuestionID) VALUES('Caused by a lack of vitamin C', @MATCHING_QUESTION_LAST_INSERT_ID);
+INSERT IGNORE INTO `Matching_Option`(Content, MatchingID) VALUES('Caused by a lack of vitamin C', @MATCHING_QUESTION_LAST_INSERT_ID);
 INSERT IGNORE INTO Matching_Question(Question, QuizID) VALUES('Rickets', @QUIZ_LAST_INSERT_ID);
 SET @MATCHING_QUESTION_LAST_INSERT_ID = LAST_INSERT_ID();
-INSERT IGNORE INTO `Matching_Option`(Content, MatchingQuestionID) VALUES('This condition is brought on by a lack of vitamin D', @MATCHING_QUESTION_LAST_INSERT_ID);
+INSERT IGNORE INTO `Matching_Option`(Content, MatchingID) VALUES('This condition is brought on by a lack of vitamin D', @MATCHING_QUESTION_LAST_INSERT_ID);
 INSERT IGNORE INTO Matching_Question(Question, QuizID) VALUES('Beriberi', @QUIZ_LAST_INSERT_ID);
 SET @MATCHING_QUESTION_LAST_INSERT_ID = LAST_INSERT_ID();
-INSERT IGNORE INTO `Matching_Option`(Content, MatchingQuestionID) VALUES('Caused by the deficiency of vitamin B1 (thiamine) ', @MATCHING_QUESTION_LAST_INSERT_ID);
+INSERT IGNORE INTO `Matching_Option`(Content, MatchingID) VALUES('Caused by the deficiency of vitamin B1 (thiamine) ', @MATCHING_QUESTION_LAST_INSERT_ID);
 
-# [Example] Week 7 MultipleChoices Matching
+# [Example] Week 7 MultipleChoice Matching
 INSERT IGNORE INTO Quiz(Week,QuizType,TopicID) VALUES(7,'Matching',2);
 SET @QUIZ_LAST_INSERT_ID = LAST_INSERT_ID();
-INSERT IGNORE INTO Matching_Section(QuizID, Explanation, Points, MultipleChoices) VALUES(@QUIZ_LAST_INSERT_ID, 'Classify the lists of foods into the 5 main food groups', 20, 1);
+INSERT IGNORE INTO Matching_Section(QuizID, Description, Points) VALUES(@QUIZ_LAST_INSERT_ID, 'Classify the lists of foods into the 5 main food groups', 20);
 INSERT IGNORE INTO Matching_Question(Question, QuizID) VALUES('Protein', @QUIZ_LAST_INSERT_ID);
 SET @MATCHING_QUESTION_LAST_INSERT_ID = LAST_INSERT_ID();
-INSERT IGNORE INTO `Matching_Option`(Content, MatchingQuestionID) VALUES('Beef', @MATCHING_QUESTION_LAST_INSERT_ID);
-INSERT IGNORE INTO `Matching_Option`(Content, MatchingQuestionID) VALUES('Beef', @MATCHING_QUESTION_LAST_INSERT_ID);
-INSERT IGNORE INTO `Matching_Option`(Content, MatchingQuestionID) VALUES('Beef', @MATCHING_QUESTION_LAST_INSERT_ID);
-INSERT IGNORE INTO `Matching_Option`(Content, MatchingQuestionID) VALUES('Beef', @MATCHING_QUESTION_LAST_INSERT_ID);
+INSERT IGNORE INTO `Matching_Option`(Content, MatchingID) VALUES('Beef', @MATCHING_QUESTION_LAST_INSERT_ID);
+INSERT IGNORE INTO `Matching_Option`(Content, MatchingID) VALUES('Beef', @MATCHING_QUESTION_LAST_INSERT_ID);
+INSERT IGNORE INTO `Matching_Option`(Content, MatchingID) VALUES('Beef', @MATCHING_QUESTION_LAST_INSERT_ID);
+INSERT IGNORE INTO `Matching_Option`(Content, MatchingID) VALUES('Beef', @MATCHING_QUESTION_LAST_INSERT_ID);
 INSERT IGNORE INTO Matching_Question(Question, QuizID) VALUES('Fat', @QUIZ_LAST_INSERT_ID);
 SET @MATCHING_QUESTION_LAST_INSERT_ID = LAST_INSERT_ID();
-INSERT IGNORE INTO `Matching_Option`(Content, MatchingQuestionID) VALUES('Chips', @MATCHING_QUESTION_LAST_INSERT_ID);
-INSERT IGNORE INTO `Matching_Option`(Content, MatchingQuestionID) VALUES('Chips', @MATCHING_QUESTION_LAST_INSERT_ID);
-INSERT IGNORE INTO `Matching_Option`(Content, MatchingQuestionID) VALUES('Chips', @MATCHING_QUESTION_LAST_INSERT_ID);
-#INSERT IGNORE INTO `Matching_Option`(Content, MatchingQuestionID) VALUES('Chips', @MATCHING_QUESTION_LAST_INSERT_ID);
+INSERT IGNORE INTO `Matching_Option`(Content, MatchingID) VALUES('Chips', @MATCHING_QUESTION_LAST_INSERT_ID);
+INSERT IGNORE INTO `Matching_Option`(Content, MatchingID) VALUES('Chips', @MATCHING_QUESTION_LAST_INSERT_ID);
+INSERT IGNORE INTO `Matching_Option`(Content, MatchingID) VALUES('Chips', @MATCHING_QUESTION_LAST_INSERT_ID);
+#INSERT IGNORE INTO `Matching_Option`(Content, MatchingID) VALUES('Chips', @MATCHING_QUESTION_LAST_INSERT_ID);
 INSERT IGNORE INTO Matching_Question(Question, QuizID) VALUES('Vitamin', @QUIZ_LAST_INSERT_ID);
 SET @MATCHING_QUESTION_LAST_INSERT_ID = LAST_INSERT_ID();
-INSERT IGNORE INTO `Matching_Option`(Content, MatchingQuestionID) VALUES('Orange', @MATCHING_QUESTION_LAST_INSERT_ID);
-INSERT IGNORE INTO `Matching_Option`(Content, MatchingQuestionID) VALUES('Orange', @MATCHING_QUESTION_LAST_INSERT_ID);
-#INSERT IGNORE INTO `Matching_Option`(Content, MatchingQuestionID) VALUES('Orange', @MATCHING_QUESTION_LAST_INSERT_ID);
-#INSERT IGNORE INTO `Matching_Option`(Content, MatchingQuestionID) VALUES('Orange', @MATCHING_QUESTION_LAST_INSERT_ID);
+INSERT IGNORE INTO `Matching_Option`(Content, MatchingID) VALUES('Orange', @MATCHING_QUESTION_LAST_INSERT_ID);
+INSERT IGNORE INTO `Matching_Option`(Content, MatchingID) VALUES('Orange', @MATCHING_QUESTION_LAST_INSERT_ID);
+#INSERT IGNORE INTO `Matching_Option`(Content, MatchingID) VALUES('Orange', @MATCHING_QUESTION_LAST_INSERT_ID);
+#INSERT IGNORE INTO `Matching_Option`(Content, MatchingID) VALUES('Orange', @MATCHING_QUESTION_LAST_INSERT_ID);
 INSERT IGNORE INTO Matching_Question(Question, QuizID) VALUES('Minerals', @QUIZ_LAST_INSERT_ID);
 SET @MATCHING_QUESTION_LAST_INSERT_ID = LAST_INSERT_ID();
-INSERT IGNORE INTO `Matching_Option`(Content, MatchingQuestionID) VALUES('Fish', @MATCHING_QUESTION_LAST_INSERT_ID);
-INSERT IGNORE INTO `Matching_Option`(Content, MatchingQuestionID) VALUES('Fish', @MATCHING_QUESTION_LAST_INSERT_ID);
-#INSERT IGNORE INTO `Matching_Option`(Content, MatchingQuestionID) VALUES('Fish', @MATCHING_QUESTION_LAST_INSERT_ID);
-#INSERT IGNORE INTO `Matching_Option`(Content, MatchingQuestionID) VALUES('Fish', @MATCHING_QUESTION_LAST_INSERT_ID);
+INSERT IGNORE INTO `Matching_Option`(Content, MatchingID) VALUES('Fish', @MATCHING_QUESTION_LAST_INSERT_ID);
+INSERT IGNORE INTO `Matching_Option`(Content, MatchingID) VALUES('Fish', @MATCHING_QUESTION_LAST_INSERT_ID);
+#INSERT IGNORE INTO `Matching_Option`(Content, MatchingID) VALUES('Fish', @MATCHING_QUESTION_LAST_INSERT_ID);
+#INSERT IGNORE INTO `Matching_Option`(Content, MatchingID) VALUES('Fish', @MATCHING_QUESTION_LAST_INSERT_ID);
 INSERT IGNORE INTO Matching_Question(Question, QuizID) VALUES('Carbohydrate', @QUIZ_LAST_INSERT_ID);
 SET @MATCHING_QUESTION_LAST_INSERT_ID = LAST_INSERT_ID();
-INSERT IGNORE INTO `Matching_Option`(Content, MatchingQuestionID) VALUES('Rice', @MATCHING_QUESTION_LAST_INSERT_ID);
-#INSERT IGNORE INTO `Matching_Option`(Content, MatchingQuestionID) VALUES('Rice', @MATCHING_QUESTION_LAST_INSERT_ID);
-#INSERT IGNORE INTO `Matching_Option`(Content, MatchingQuestionID) VALUES('Rice', @MATCHING_QUESTION_LAST_INSERT_ID);
-#INSERT IGNORE INTO `Matching_Option`(Content, MatchingQuestionID) VALUES('Rice', @MATCHING_QUESTION_LAST_INSERT_ID);
+INSERT IGNORE INTO `Matching_Option`(Content, MatchingID) VALUES('Rice', @MATCHING_QUESTION_LAST_INSERT_ID);
+#INSERT IGNORE INTO `Matching_Option`(Content, MatchingID) VALUES('Rice', @MATCHING_QUESTION_LAST_INSERT_ID);
+#INSERT IGNORE INTO `Matching_Option`(Content, MatchingID) VALUES('Rice', @MATCHING_QUESTION_LAST_INSERT_ID);
+#INSERT IGNORE INTO `Matching_Option`(Content, MatchingID) VALUES('Rice', @MATCHING_QUESTION_LAST_INSERT_ID);
 
 
 
@@ -731,9 +729,6 @@ INSERT IGNORE INTO `Option`(Content, Explanation, MCQID) VALUES('2', "Wrong", @M
 INSERT IGNORE INTO `Option`(Content, Explanation, MCQID) VALUES('3', "Wrong", @MCQ_QUESTION_LAST_INSERT_ID);
 INSERT IGNORE INTO `Option`(Content, Explanation, MCQID) VALUES('4', "Wrong", @MCQ_QUESTION_LAST_INSERT_ID);
 INSERT IGNORE INTO `Option`(Content, Explanation, MCQID) VALUES('5', "Correct", @MCQ_QUESTION_LAST_INSERT_ID);
-
-INSERT IGNORE INTO Learning_Material(Content,QuizID) VALUES('
-<p>Learning materials for this quiz has not been added.</p>',9);
 
 # [Example] insert a poster task into Poster_Section
 INSERT INTO `isnap2changedb`.`poster_section` (`QuizID`, `Points`) VALUES ('9', '20');

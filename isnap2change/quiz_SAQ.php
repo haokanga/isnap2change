@@ -267,14 +267,14 @@
                 <input type=hidden id="hiddenMCQIDArray" value="<?php echo substr($MCQIDArray, 0, strlen($MCQIDArray)-1); ?>">
 
                 <form id="hiddenReturnQuiz" action="learning-material.php" method=post>
-                    <!--	<input  type=hidden name="quizid" value=<?php echo $quizid; ?>></input>
-                            <input  type=hidden name="quiztype" value=<?php echo $quiztype; ?>></input>
-                            <input  type=hidden name="week" value=<?php echo $week; ?>></input>
-                            <input  type=hidden name="status" value=<?php echo $status; ?>></input>  -->
+                    <!--	<input  type=hidden name="quizid" value=<?php echo $quizid; ?>>
+                            <input  type=hidden name="quiztype" value=<?php echo $quiztype; ?>>
+                            <input  type=hidden name="week" value=<?php echo $week; ?>>
+                            <input  type=hidden name="status" value=<?php echo $status; ?>>  -->
                 </form>
 
                 <form id="hiddenReturnTask" action="weekly-task.php" method=post>
-                    <!--	<input  type=hidden name="week" value=<?php echo $week; ?>></input>  -->
+                    <!--	<input  type=hidden name="week" value=<?php echo $week; ?>>  -->
                 </form>
             </div>
         </div>

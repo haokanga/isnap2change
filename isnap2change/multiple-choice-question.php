@@ -3,8 +3,8 @@
     session_start();
 	require_once('mysql-lib.php');
 	
-	if(isset($_SESSION["studentid"])){
-		$studentid = $_SESSION["studentid"];
+	if(isset($_SESSION["studentID"])){
+		$studentID = $_SESSION["studentID"];
 	} else {
 		
 	}
@@ -64,7 +64,7 @@
 					ORDER BY MCQID";
 								
 	   $mcqQuery = $conn->prepare($mcqSql);
-	   $mcqQuery->execute(array($studentid, $quizid));
+	   $mcqQuery->execute(array($studentID, $quizid));
 	}
 	
 	if($status == "UNANSWERED"){
@@ -335,14 +335,14 @@
 						if($status == "GRADED"){ ?>
 						<form id="goBack" method=post action=weekly-task.php>
 							 <button type="button" onclick="return goBack()" class="btn btn-success">GO BACK</button> 
-							 <input type=hidden name="week" value=<?php echo $week; ?>></input>
+							 <input type=hidden name="week" value=<?php echo $week; ?>>
 						</form>
 				<?php	}
 					
 						if($status == "UNANSWERED"){ ?>
 						<form id="goBack" method=post action=weekly-task.php>
 							<button id="back-btn" type="button" onclick="return submitQuiz();" class="btn btn-success">SUBMIT</button> 
-							<input type=hidden name="week" value=<?php echo $week; ?>></input>
+							<input type=hidden name="week" value=<?php echo $week; ?>>
 						</form>
 				<?php	} ?>
 					
@@ -503,14 +503,14 @@
 			<input type=hidden id="hiddenMCQIDArray" value="<?php echo substr($MCQIDArray, 0, strlen($MCQIDArray)-1); ?>">
 			
 			<form id="hiddenReturnQuiz" action="learning-material.php" method=post>
-					<input  type=hidden name="quizid" value=<?php echo $quizid; ?>></input>
-					<input  type=hidden name="quiztype" value=<?php echo $quiztype; ?>></input>
-					<input  type=hidden name="week" value=<?php echo $week; ?>></input>
-					<input  type=hidden name="status" value=<?php echo $status; ?>></input>
+					<input  type=hidden name="quizid" value=<?php echo $quizid; ?>>
+					<input  type=hidden name="quiztype" value=<?php echo $quiztype; ?>>
+					<input  type=hidden name="week" value=<?php echo $week; ?>>
+					<input  type=hidden name="status" value=<?php echo $status; ?>>
 			</form>
 			
 			<form id="hiddenReturnTask" action="weekly-task.php" method=post>
-					<input  type=hidden name="week" value=<?php echo $week; ?>></input>
+					<input  type=hidden name="week" value=<?php echo $week; ?>>
 			</form>
 		</div>
         </div>

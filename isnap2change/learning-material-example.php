@@ -2,8 +2,8 @@
     //if true, echo debug output in dev mode, else production mode
 	$DEBUG_MODE = false;
 	session_start();
-    if($DEBUG_MODE && !isset($_SESSION["studentid"])){
-        $_SESSION["studentid"] = 1;
+    if($DEBUG_MODE && !isset($_SESSION["studentID"])){
+        $_SESSION["studentID"] = 1;
     }
 ?>
 
@@ -33,11 +33,11 @@ function checkprogress(){
 <div id="a" align="center">
 <form id="weeklytask1" action=weekly-task.php method=post>
 <button type=button onclick="startWeeklyTask1()"> Week 1 </button>
-<input  type=hidden name="week" value="1"></input>
+<input  type=hidden name="week" value="1">
 </form>
 <form id="weeklytask3" action=weekly-task.php method=post>
 <button type=button onclick="startWeeklyTask3()"> Week 3 </button>
-<input  type=hidden name="week" value="3"></input>
+<input  type=hidden name="week" value="3">
 </form>
 </div>
 -->

@@ -1,8 +1,7 @@
 <?php
 	session_start();
 	require_once('mysql-lib.php');
-	require_once('debug.php');
-	
+	require_once('debug.php');	
 	$pageName = "learning-material";
 	
 	//check login status
@@ -12,9 +11,9 @@
 	
 	//check whether a request is GET or POST 
 	if ($_SERVER["REQUEST_METHOD"] == "POST") {
-		if(isset($_POST["quizID"]) && isset($_POST["quizType"]) && isset($_POST["week"])){
-			$quizID = $_POST["quizID"];
-			$quizType = $_POST["quizType"];
+		if(isset($_POST["quizid"]) && isset($_POST["quiztype"]) && isset($_POST["week"])){
+			$quizID = $_POST["quizid"];
+			$quizType = $_POST["quiztype"];
 			$week = $_POST["week"];
 		} else {
 			
@@ -29,7 +28,7 @@
 		$conn = db_connect();
 		
 		//get learning material
-		getLearningMaterial($conn, $quizID);
+		$materialRes = getLearningMaterial($conn, $quizID);
 		
 	} catch(Exception $e){
 		if($conn != null) {
@@ -111,10 +110,9 @@
                         <br>
 						<form id="formQuizBegin" method=post>
                             <button type="button" onclick="beginQuiz()" class="btn btn-default btn-lg btn-block" style="background-color:darkseagreen;">BEGIN QUIZ </button>
-							<input  type=hidden name="quizID" value=<?php echo $quizID; ?>></input>
-                            <input  type=hidden name="quizType" value=<?php echo $quizType; ?>></input>
-							<input  type=hidden name="week" value=<?php echo $week; ?>></input>
-                            <input  type=hidden name="status" value=<?php echo $status; ?>></input>
+							<input  type=hidden name="quizID" value=<?php echo $quizID; ?>>
+                            <input  type=hidden name="quizType" value=<?php echo $quizType; ?>>
+							<input  type=hidden name="week" value=<?php echo $week; ?>>
                            <!--
 						   implement logic 
 						   -->

@@ -3,8 +3,8 @@
 	$DEBUG_MODE = true;
 	session_start();
 	require_once('mysql-lib.php');	
-	if(isset($_SESSION["studentid"])){
-		$studentid = $_SESSION["studentid"];
+	if(isset($_SESSION["studentID"])){
+		$studentID = $_SESSION["studentID"];
 	} else {
 		
 	}
@@ -35,13 +35,13 @@
     //quiz
     $quizSql = "SELECT Quiz.QuizID, QuizType, `Status` FROM Quiz LEFT JOIN (SELECT * FROM Quiz_Record WHERE StudentID = ?) Student_Quiz_Record ON Quiz.QuizID = Student_Quiz_Record.QuizID WHERE Week = ? ORDER BY Quiz.QuizID";    
     $quizQuery = $conn->prepare($quizSql);
-    $quizQuery->execute(array($studentid, $week)); 
+    $quizQuery->execute(array($studentID, $week)); 
     $count = 0;
 	
     while($quizResult = $quizQuery->fetch(PDO::FETCH_ASSOC)){
         $count++;
         if($DEBUG_MODE){
-            echo "<script language=\"javascript\">  console.log(\"[SUCCESS] studentid: $studentid week:$week QuizID:".$quizResult["QuizID"]." QuizType:".$quizResult["QuizType"]."\"); </script>";
+            echo "<script language=\"javascript\">  console.log(\"[SUCCESS] studentid: $studentID week:$week QuizID:".$quizResult["QuizID"]." QuizType:".$quizResult["QuizType"]."\"); </script>";
         }
 		
 		if(isset($quizResult["Status"])){
@@ -74,10 +74,10 @@
 		}
 		
         echo '<button type=button onclick="startQuiz('.$quizResult["QuizID"].')"> Quiz '.$count.'</button>
-			  <input  type=hidden name="quizid" value='.$quizResult["QuizID"].'></input>
-			  <input  type=hidden name="quiztype" value='.$quizResult["QuizType"].'></input>
-			  <input  type=hidden name="week" value='.$week.'></input>
-			  <input type=hidden name="status" value='.$status.'></input>
+			  <input  type=hidden name="quizID" value='.$quizResult["QuizID"].'>
+			  <input  type=hidden name="quizType" value='.$quizResult["QuizType"].'>
+			  <input  type=hidden name="week" value='.$week.'>
+			  <input type=hidden name="status" value='.$status.'>
 			  </form>';
     }
     //game
@@ -87,8 +87,8 @@
     while($gameResult = $gameQuery->fetch(PDO::FETCH_ASSOC)){
         echo '<form id="game" method=post>
         <button type=button onclick=""> '.$gameResult["Description"].'</button>
-        <input  type=hidden name="gameid" value='.$gameResult["GameID"].'></input>
-        <input  type=hidden name="week" value='.$week.'></input>
+        <input  type=hidden name="gameid" value='.$gameResult["GameID"].'>
+        <input  type=hidden name="week" value='.$week.'>
         </form>';
     }
 	db_close($conn);	
@@ -108,9 +108,9 @@ function startQuiz(quizid){
 <div id="a" align="center">
 <form id="quiz" action=learning-material.php method=post>
 <button type=button onclick="startQuiz()"> Quiz </button>
-<input  type=hidden name="quizid" value=<?php echo $quizIDRes->QuizID; ?>></input>
-<input  type=hidden name="quiztype" value=<?php echo $quizIDRes->QuizType; ?>></input>
-<input  type=hidden name="week" value=<?php echo $week; ?>></input>
+<input  type=hidden name="quizid" value=<?php echo $quizIDRes->QuizID; ?>>
+<input  type=hidden name="quiztype" value=<?php echo $quizIDRes->QuizType; ?>>
+<input  type=hidden name="week" value=<?php echo $week; ?>>
 </form>
 </div>
 -->

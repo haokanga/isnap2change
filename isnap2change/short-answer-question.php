@@ -8,13 +8,13 @@
     $conn = db_connect();
     
     //set userid    
-    if(isset($_SESSION['studentid'])){
-        $studentid = $_SESSION['studentid'];
-        echo "<script language=\"javascript\">  console.log(\"This is DEBUG_MODE with SESSION studentID = ".$studentid.".\"); </script>";
+    if(isset($_SESSION['studentID'])){
+        $studentID = $_SESSION['studentID'];
+        echo "<script language=\"javascript\">  console.log(\"This is DEBUG_MODE with SESSION studentID = ".$studentID.".\"); </script>";
     }else{
         if(DEBUG_MODE){
             echo "<script language=\"javascript\">  console.log(\"This is DEBUG_MODE with hard-code studentID = 1.\"); </script>";
-            $studentid = 1;
+            $studentID = 1;
         }
     }
     //POST parameters
@@ -87,14 +87,14 @@
             $updateSql = "INSERT INTO SAQ_Question_Record(StudentID, SAQID, Answer)
                                      VALUES (?,?,?) ON DUPLICATE KEY UPDATE Answer = ?";			
             $updateSql = $conn->prepare($updateSql);                
-            if(! $updateSql -> execute(array($studentid, $saqid[$i], htmlspecialchars($answer[$i]), htmlspecialchars($answer[$i])))){
+            if(! $updateSql -> execute(array($studentID, $saqid[$i], htmlspecialchars($answer[$i]), htmlspecialchars($answer[$i])))){
                 echo "<script language=\"javascript\">  alert(\"Error occurred to submit your answer. Report this bug to reseachers.\"); </script>";
             }
         }
         $updateSql = "INSERT INTO Quiz_Record(QuizID, StudentID, `Status`, Score)
                                      VALUES (?,?,?,?) ON DUPLICATE KEY UPDATE Score = ?";			
         $updateSql = $conn->prepare($updateSql);                
-        if(! $updateSql -> execute(array($quizid, $studentid, "UNGRADED", $score, $score))){
+        if(! $updateSql -> execute(array($quizid, $studentID, "UNGRADED", $score, $score))){
             echo "<script language=\"javascript\">  alert(\"Error occurred to update your score. Report this bug to reseachers.\"); </script>";
         }        
         $saqresult = null;
@@ -231,7 +231,7 @@
                     <?php } else if($status == "UNANSWERED" || $status == "UNGRADED"){ ?>
                     <button id="back-btn" type="button" onclick="return submitQuiz();" class="btn btn-success">SUBMIT</button>
                     <?php } ?>                                        
-                    <input type=hidden name="week" value=<?php echo $week; ?>></input>
+                    <input type=hidden name="week" value=<?php echo $week; ?>>
                 </form>	
 				
             </div>
@@ -278,10 +278,10 @@
             </div>
         <!--form submission-->    
         <form id="submission" method="post" action="<?php echo $_SERVER['PHP_SELF']; ?>">
-            <input type=hidden name="goback" value=0 ></input> 
-            <input type=hidden name="week" value=<?php echo $week; ?> ></input>        
-            <input type=hidden name="quizid" value=<?php echo $quizid; ?> ></input>
-            <input type=hidden name="status" value="UNGRADED" ></input>
+            <input type=hidden name="goback" value=0 > 
+            <input type=hidden name="week" value=<?php echo $week; ?> >        
+            <input type=hidden name="quizid" value=<?php echo $quizid; ?> >
+            <input type=hidden name="status" value="UNGRADED" >
             <!--start of saq for-loop-->
             <?php for($i=0; $i<count($saqresult); $i++) {
                 $currentsaqid = $saqresult[$i] -> SAQID;

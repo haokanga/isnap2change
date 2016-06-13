@@ -2,8 +2,8 @@
     /**
     session_set_cookie_params(5);
 	session_start();        
-    if(isset($_SESSION['studentid'])){
-        $studentID = $_SESSION['studentid'];
+    if(isset($_SESSION['studentID'])){
+        $studentID = $_SESSION['studentID'];
         echo "<script language=\"javascript\">  console.log(\"This is DEBUG_MODE with SESSION studentID = ".$studentID.".\"); </script>";
     }else{
         echo "<script language=\"javascript\">  console.log(\"SESSION EXPIRED!\"); </script>";
@@ -20,7 +20,7 @@
             echo "<script language=\"javascript\">  console.log(\"SESSION EXPIRED AS EXPECTED!\"); </script>";
             header("location: login.php");
         } else {
-            $studentID = $_SESSION['studentid'];
+            $studentID = $_SESSION['studentID'];
             echo "<script language=\"javascript\">  console.log(\"This is DEBUG_MODE with SESSION studentID = ".$studentID.".\"); </script>";
             $_SESSION['timestamp']=time();
         }       

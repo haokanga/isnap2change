@@ -3,9 +3,9 @@
     require_once("../mysql-lib.php");
     require_once("../debug.php");
     require_once("researcher-validation.php");
-    $pageName = "mcq-editor";
-    $columnName = array('QuizID','Week','TopicName','Points','Questionnaires','Questions');   
-    $mcqQuesColName = array('MCQID','Question','Option', 'Explanation','Edit');
+    $pageName = "saq-editor";
+    $columnName = array('QuizID','Week','TopicName','Points','Questions');   
+    $saqQuesColName = array('SAQID','Question','Points','Edit');
     
     try { 	    
         $conn = db_connect();
@@ -17,14 +17,11 @@
                         $quizID = $_POST['quizid'];
                         $week = $_POST['week'];
                         $topicName = $_POST['topicname'];
-                        $points = $_POST['points'];
-                        $questionnaires = $_POST['questionnaires'];
                         $conn->beginTransaction();              
                         
                         $topicResult = getTopicByName($conn, $topicName);
                         $topicID = $topicResult->TopicID;
                         updateQuiz($conn, $quizID, $topicID, $week);
-                        updateMCQSection($conn, $quizID, $points, $questionnaires);
                         
                         $conn->commit();                    
                     } catch(Exception $e) {
@@ -35,19 +32,24 @@
                 else if($metadataupdate == -1){  
                     $quizID = $_POST['quizid'];
                     deleteQuiz($conn, $quizID);
-                    header('Location: mcq.php');
+                    header('Location: saq.php');
                 }            
             }
             if(isset($_POST['update'])){                          
                 $update = $_POST['update'];
                 if($update == 1){
                     $quizID = $_POST['quizid'];
+                    $points = $_POST['points'];
                     $question = $_POST['question'];
-                    $mcqID = createMCQQuestion($conn, $quizID, $question);
-                    header('Location: mcq-option-editor.php?quizid='.$quizID.'&mcqid='.$mcqID);
+                    createSAQQuestion($conn, $quizID, $points, $question);
+                } else if($update == 0){
+                    $saqID = $_POST['saqid'];
+                    $points = $_POST['points'];
+                    $question = $_POST['question'];
+                    updateSAQQuestion($conn, $saqID, $points, $question);
                 } else if($update == -1){
-                    $mcqID = $_POST['mcqid'];
-                    deleteMCQQuestion($conn, $mcqID); 
+                    $saqID = $_POST['saqid'];
+                    deleteSAQQuestion($conn, $saqID);
                 }            
             }
         }
@@ -58,10 +60,10 @@
     try{
         if(isset($_GET['quizid'])){
             $quizID = $_GET['quizid'];
-            $quizResult = getMCQQuiz($conn, $quizID);
+            $quizResult = getSAQQuiz($conn, $quizID);
             $topicResult = getTopics($conn);
             $materialRes = getLearningMaterial($conn, $quizID);
-            $mcqQuesResult = getMCQQuestions($conn, $quizID);
+            $saqQuesResult = getSAQQuestions($conn, $quizID);
             $phpself = $pageName.'.php?quizid='.$quizID;
         }
     } catch(Exception $e) {
@@ -88,7 +90,7 @@
         <div id="page-wrapper">
             <div class="row">
                 <div class="col-lg-12">
-                    <h1 class="page-header">Multiple Choice Quiz Editor</h1>
+                    <h1 class="page-header">Short Answer Quiz Editor</h1>
                 </div>
                 <!-- /.col-lg-12 -->
             </div>
@@ -120,11 +122,8 @@
                                 </select>
                                 <br>
                                 <label for="Points">Points</label>
-                                <input type="text" class="form-control" id="Points" name="points" placeholder="Input Points" value="<?php echo $quizResult->Points; ?>" required>
+                                <input type="text" class="form-control" id="Points" name="points" placeholder="Input Points" value="<?php echo $quizResult->Points; ?>" disabled>
                                 <br>
-                                <label for="Questionnaires">Questionnaires</label>
-                                <input type="hidden" class="form-control" id="Questionnaires" name="questionnaires" value="0">
-                                <input type="checkbox" class="form-control" id="Questionnaires" name="questionnaires" value="1" <?php if($quizResult->Questionnaires!=0) echo 'checked';?>>
                                 <label for="Questions">Questions</label>
                                 <input type="text" class="form-control" id="Questions" name="questions" value="<?php echo $quizResult->Questions; ?>" disabled>
                                 <br>
@@ -138,10 +137,10 @@
                                                        
                     <?php require_once('learning-material-editor-iframe.php'); ?>
                     
-                    <!-- Options -->
+                    <!-- Questions -->
                     <div class="panel panel-default">
                         <div class="panel-heading">
-                            Questions and Options
+                            Questions and Points
                             <span class="glyphicon glyphicon-plus pull-right" data-toggle="modal" data-target="#dialog"></span>
                         </div>
                         <!-- /.panel-heading -->
@@ -150,29 +149,25 @@
                                 <table class="table table-striped table-bordered table-hover" id="datatables">
                                     <thead>
                                         <tr>
-                                        <?php for($i=0; $i<count($mcqQuesColName); $i++) {
+                                        <?php for($i=0; $i<count($saqQuesColName); $i++) {
                                             if ($i==0){?>
-                                            <th style="display:none"><?php echo $mcqQuesColName[$i]; ?></th>
+                                            <th style="display:none"><?php echo $saqQuesColName[$i]; ?></th>
                                             <?php } else {?>                                            
-                                            <th><?php echo $mcqQuesColName[$i]; ?></th>
+                                            <th><?php echo $saqQuesColName[$i]; ?></th>
                                         <?php }
                                         }?>
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        <?php for($i=0; $i<count($mcqQuesResult); $i++) {?>
+                                        <?php for($i=0; $i<count($saqQuesResult); $i++) {?>
                                         <tr class="<?php if($i % 2 == 0){echo "odd";} else {echo "even";} ?>">
-                                            <td style="display:none"><?php echo $mcqQuesResult[$i]->$mcqQuesColName[0]; ?></td>
-                                            <td><?php echo $mcqQuesResult[$i]->$mcqQuesColName[1] ?></td>
-                                            <td class ="<?php if ($mcqQuesResult[$i]->Content == $mcqQuesResult[$i]->CorrectChoice && strlen($mcqQuesResult[$i]->Content) > 0 ) {echo 'bg-success';} else {echo 'bg-danger';} ?>">
-                                                <?php echo $mcqQuesResult[$i]->Content; ?>
-                                            </td>
-                                            <td><?php echo $mcqQuesResult[$i]->$mcqQuesColName[3] ?></td>
+                                            <td style="display:none"><?php echo $saqQuesResult[$i]->$saqQuesColName[0]; ?></td>
+                                            <td><?php echo $saqQuesResult[$i]->$saqQuesColName[1] ?></td>
+                                            <td><?php echo $saqQuesResult[$i]->$saqQuesColName[2] ?></td>
                                             <td>
                                                 <span class="glyphicon glyphicon-remove pull-right " aria-hidden="true"></span>
                                                 <span class="pull-right" aria-hidden="true">&nbsp;</span>
-                                                <a href="mcq-option-editor.php?quizid=<?php echo $quizID ?>&mcqid=<?php echo $mcqQuesResult[$i]->$mcqQuesColName[0]; ?>">
-                                                <span class="glyphicon glyphicon-edit pull-right" data-toggle="modal" data-target="#dialog" aria-hidden="true"></span></a>
+                                                <span class="glyphicon glyphicon-edit pull-right" data-toggle="modal" data-target="#dialog" aria-hidden="true"></span>
                                             </td>            
                                         </tr>
                                     <?php } ?>
@@ -181,12 +176,12 @@
                             </div>
                             <!-- /.table-responsive -->
                             <div class="well row">
-                                <h4>Multiple Choice Quiz Overview Notification</h4>
+                                <h4>Short Answer Quiz Overview Notification</h4>
                                 <div class="alert alert-info">
-                                    <p>View multiple choice questions in this quiz by filtering or searching. You can create/update/delete any question.</p>
+                                    <p>View short answer questions in this quiz by filtering or searching. You can create/update/delete any question.</p>
                                 </div>
                                 <div class="alert alert-danger">
-                                    <p><strong>Warning</strong> : If you remove one question. All the <strong>options and student answers</strong> of this question will also get deleted (not recoverable), not only the question itself.</p>
+                                    <p><strong>Warning</strong> : If you remove one question. All the <strong>student answers</strong> of this question will also get deleted (not recoverable), not only the question itself.</p>
                                 </div>
                             </div>
                         </div>
@@ -213,10 +208,13 @@
             <div class="modal-body">
             <form id="submission" method="post" action="<?php echo $phpself; ?>">
                 <input type=hidden name="update" id="update" value="1" required>
-                <label for="MCQID" style="display:none">MCQID</label>
-                <input type="text" class="form-control dialoginput" id="MCQID" name="mcqid" style="display:none">
+                <label for="SAQID" style="display:none">SAQID</label>
+                <input type="text" class="form-control dialoginput" id="SAQID" name="saqid" style="display:none">
                 <label for="Question">Question</label>
-                <input type="text" class="form-control dialoginput" id="Question" name="question" value="" required>
+                <input type="text" class="form-control dialoginput" id="Question" name="question" placeholder="Input Question" value="" required>
+                <br>
+                <label for="Points">Points</label>
+                <input type="text" class="form-control dialoginput" id="Points" name="points" placeholder="Input Points" value="" required>
                 <br>
                 <label for="QuizID" style="display:none">QuizID</label>
                 <input type="text" class="form-control" id="QuizID" name="quizid" style="display:none" value="<?php echo $quizID; ?>" required>
@@ -236,7 +234,7 @@
     <!-- Page-Level Scripts -->
     <script>
     //DO NOT put them in $(document).ready() since the table has multi pages
-    var diaglogInputArr = $('.dialoginput');
+    var diaglogInputArr = $('.dialoginput');    
     $('.glyphicon-plus').on('click', function (){
         $('#dialogTitle').text("Add Question");
         $('#update').val(1);
@@ -245,11 +243,17 @@
         }   
     });
     $('div > .glyphicon-remove').on('click', function (){
-        if (confirm('[WARNING] Are you sure to remove this quiz? If you remove one quiz. All the questions and submission of this quiz will also get deleted (not recoverable). It includes learning material, questions and options, their submissions and your grading/feedback, not only the quiz itself.')) {
+        if (confirm('[WARNING] Are you sure to remove this quiz? If you remove one quiz. All the questions and submission of this quiz will also get deleted (not recoverable). It includes learning material, questions, their submissions and your grading/feedback, not only the quiz itself.')) {
             $('#metadataupdate').val(-1);
             $('#metadata-submission').submit();
         }                            
     });
+    $('td > .glyphicon-edit').on('click', function (){
+        $('#update').val(0);
+        for(i=0;i<diaglogInputArr.length;i++){                
+            diaglogInputArr.eq(i).val($(this).parent().parent().children('td').eq(i).text().trim());
+        }                          
+    }); 
     $('td > .glyphicon-remove').on('click', function (){
         $('#update').val(-1);
         for(i=0;i<diaglogInputArr.length;i++){                
@@ -258,15 +262,20 @@
         $('#submission').submit();                           
     });    
     $('#btnSave').on('click', function (){
-        $('#submission').validate();   
+        $('#submission').validate({
+              rules: {
+                points: {
+                  required: true,
+                  digits: true
+                }
+              }
+            });   
         $('#submission').submit();
     }); 
    
     $(document).ready(function() {
         var table = $('#datatables').DataTable({
             responsive: true,
-            //rows group for Question and edit box
-            rowsGroup: [1,4],
             "pageLength":100,
             "aoColumnDefs": [
               { "bSearchable": false, "aTargets": [ 0 ] }
@@ -277,10 +286,6 @@
             $('#metadata-submission').validate({
               rules: {
                 week: {
-                  required: true,
-                  digits: true
-                },
-                points: {
                   required: true,
                   digits: true
                 }

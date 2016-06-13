@@ -2,7 +2,7 @@
 	session_start();
     require_once("../mysql-lib.php");
     require_once("../debug.php");
-    require_once("/researcher-validation.php");
+    require_once("researcher-validation.php");
     $conn = db_connect();
     
     db_close($conn); 
@@ -12,55 +12,15 @@
 <html lang="en">
 
 <head>
-
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="description" content="">
-    <meta name="author" content="">
-
-    <title>iSNAP2Change Admin</title>
-
-    <!-- Bootstrap Core CSS -->
-    <link href="../bower_components/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
-
-    <!-- MetisMenu CSS -->
-    <link href="../bower_components/metisMenu/dist/metisMenu.min.css" rel="stylesheet">
-
-    <!-- DataTables CSS -->
-    <link href="../bower_components/datatables-plugins/integration/bootstrap/3/dataTables.bootstrap.css" rel="stylesheet">
-
-    <!-- DataTables Responsive CSS -->
-    <!-- <link href="../bower_components/datatables-responsive/css/dataTables.responsive.css" rel="stylesheet"> -->
-
-    <!-- Custom CSS -->
-    <link href="../dist/css/sb-admin-2.css" rel="stylesheet">
-
-    <!-- Custom Fonts -->
-    <link href="../bower_components/font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css">
-
-    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
-    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
-    <!--[if lt IE 9]>
-        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
-        <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
-    <![endif]-->
-
-    <!--w3data.js to include html-->
-    <script src="../js/w3data.js"></script>
-    
-    <style>
-    .glyphicon:hover {
-        background-color: rgb(153, 153, 102);
-    }
-    </style>
+    <!-- Header Library -->
+    <?php require_once('header-lib.php'); ?>
 </head>
 
 <body>
 
     <div id="wrapper">
 
-        <div w3-include-html="navigation.html"></div> 
+        <?php require_once('navigation.php'); ?> 
 
         <div id="page-wrapper">
             <div class="row">
@@ -201,7 +161,7 @@
             <div class="modal-body">
             <form id="submission" method="post" action="<?php echo $_SERVER['PHP_SELF']; ?>">
                 <!--if 1, insert; else if 0 update; else if -1 delete;-->
-                <input type=hidden name="update" id="update" value="1"></input>
+                <input type=hidden name="update" id="update" value="1">
                 <label for="ClassID" style="display:none">ClassID</label>
                 <input type="text" class="form-control dialoginput" id="ClassID" name="classid" style="display:none">
                 <br><label for="ClassName">ClassName</label>
@@ -213,9 +173,9 @@
                   <?php } ?>
                 </select>                
                 <br><label for="TeacherToken">TeacherToken</label><span class="glyphicon glyphicon-random pull-right"></span>
-                <input type="text" class="form-control dialoginput" id="TeacherToken" name="teachertoken" required></input>
+                <input type="text" class="form-control dialoginput" id="TeacherToken" name="teachertoken" required>
                 <br><label for="StudentToken">StudentToken</label><span class="glyphicon glyphicon-random pull-right"></span>
-                <input type="text" class="form-control dialoginput" id="StudentToken" name="studenttoken" required></input>
+                <input type="text" class="form-control dialoginput" id="StudentToken" name="studenttoken" required>
                 <br><label for="EnrolledStudents">EnrolledStudents</label>
                 <input type="text" class="form-control dialoginput" id="EnrolledStudents" name="EnrolledStudents">
                 <br><label for="UnlockedProgress">UnlockedProgress</label>
@@ -229,22 +189,10 @@
           </div>          
         </div>
       </div>
-      <input type=hidden name="keyword" id="keyword" value="<?php if(isset($_GET['schoolname'])){ echo $_GET['schoolname']; } ?>"></input>
-    <!-- jQuery -->
-    <script src="../bower_components/jquery/dist/jquery.min.js"></script>
-
-    <!-- Bootstrap Core JavaScript -->
-    <script src="../bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
-
-    <!-- Metis Menu Plugin JavaScript -->
-    <script src="../bower_components/metisMenu/dist/metisMenu.min.js"></script>
-
-    <!-- DataTables JavaScript -->
-    <script src="../bower_components/datatables/media/js/jquery.dataTables.min.js"></script>
-    <script src="../bower_components/datatables-plugins/integration/bootstrap/3/dataTables.bootstrap.min.js"></script>
-
-    <!-- Custom Theme JavaScript -->
-    <script src="../dist/js/sb-admin-2.js"></script>    
+      <input type=hidden name="keyword" id="keyword" value="<?php if(isset($_GET['schoolname'])){ echo $_GET['schoolname']; } ?>">
+      
+    <!-- SB Admin Library -->  
+    <?php require_once('sb-admin-lib.php'); ?>
     
     <!--jQuery Validate plugin-->
     <script src="http://ajax.aspnetcdn.com/ajax/jquery.validate/1.15.0/jquery.validate.min.js"></script>
@@ -255,35 +203,36 @@
         return Math.round((Math.pow(36, length + 1) - Math.random() * Math.pow(36, length))).toString(36).slice(1);
     }
     //DO NOT put them in $(document).ready() since the table has multi pages
+    var diaglogInputArr = $('.dialoginput');
     $('.glyphicon-edit').on('click', function (){
         $('#dialogTitle').text("Edit Class");
         $('#update').val(0);
-        for(i=0;i<$('.dialoginput').length;i++){                
-            $('.dialoginput').eq(i).val($(this).parent().parent().children('td').eq(i).text().trim());
+        for(i=0;i<diaglogInputArr.length;i++){                
+            diaglogInputArr.eq(i).val($(this).parent().parent().children('td').eq(i).text().trim());
         }
         //disable ClassID, EnrolledStudents, UnlockedProgress
-        $('.dialoginput').eq(0).attr('disabled','disabled');
-        $('.dialoginput').eq(5).attr('disabled','disabled');
-        $('.dialoginput').eq(6).attr('disabled','disabled');          
+        diaglogInputArr.eq(0).attr('disabled','disabled');
+        diaglogInputArr.eq(5).attr('disabled','disabled');
+        diaglogInputArr.eq(6).attr('disabled','disabled');          
     });
     $('.glyphicon-plus').on('click', function (){
         $('#dialogTitle').text("Add Class");
         $('#update').val(1);
-        for(i=0;i<$('.dialoginput').length;i++){                
-            $('.dialoginput').eq(i).val('');
+        for(i=0;i<diaglogInputArr.length;i++){                
+            diaglogInputArr.eq(i).val('');
         }
         //disable ClassID, EnrolledStudents, UnlockedProgress
-        $('.dialoginput').eq(0).attr('disabled','disabled');
-        $('.dialoginput').eq(5).attr('disabled','disabled');    
-        $('.dialoginput').eq(6).attr('disabled','disabled');         
+        diaglogInputArr.eq(0).attr('disabled','disabled');
+        diaglogInputArr.eq(5).attr('disabled','disabled');    
+        diaglogInputArr.eq(6).attr('disabled','disabled');         
     }); 
     $('.glyphicon-remove').on('click', function (){
         if (confirm('[WARNING] Are you sure to remove this class? All the student data in this class will also get deleted (not recoverable). It includes student information, their submissions of every task and your grading/feedback, not only the class itself.')) {
             $('#update').val(-1);
             //fill required input
-            $('.dialoginput').eq(0).prop('disabled',false);
-            for(i=0;i<$('.dialoginput').length;i++){                
-                $('.dialoginput').eq(i).val($(this).parent().parent().children('td').eq(i).text().trim());
+            diaglogInputArr.eq(0).prop('disabled',false);
+            for(i=0;i<diaglogInputArr.length;i++){                
+                diaglogInputArr.eq(i).val($(this).parent().parent().children('td').eq(i).text().trim());
             }
             $('#submission').submit();
         }           
@@ -298,11 +247,10 @@
     $('#btnSave').on('click', function (){
         $('#submission').validate();        
         //enable ClassID and EnrolledStudents
-        $('.dialoginput').eq(0).prop('disabled',false);
+        diaglogInputArr.eq(0).prop('disabled',false);
         $('#submission').submit();
     });
-    //include html
-    w3IncludeHTML();   
+   
     $(document).ready(function() {
         var table = $('#datatables').DataTable({
                 responsive: true,

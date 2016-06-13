@@ -3,12 +3,12 @@
 	session_start();
     require_once("mysql-lib.php");	
     //set userid    
-    if(isset($_SESSION['studentid'])){
-        $studentid = $_SESSION['studentid'];
-        echo "<script language=\"javascript\">  console.log(\"This is DEBUG_MODE with SESSION studentID = ".$studentid.".\"); </script>";
+    if(isset($_SESSION['studentID'])){
+        $studentID = $_SESSION['studentID'];
+        echo "<script language=\"javascript\">  console.log(\"This is DEBUG_MODE with SESSION studentID = ".$studentID.".\"); </script>";
     }else{
         echo "<script language=\"javascript\">  console.log(\"This is DEBUG_MODE with hard-code studentID = 1.\"); </script>";
-        $studentid = 1;
+        $studentID = 1;
     }
     //if submission
     if(isset($_POST['answer']) && isset($_POST['saqid']) && isset($_POST['quizid'])){
@@ -21,7 +21,7 @@
             $updateSql = "INSERT INTO SAQ_Question_Record(StudentID, SAQID, Answer)
                                      VALUES (?,?,?) ON DUPLICATE KEY UPDATE Answer = ?";			
             $updateSql = $conn->prepare($updateSql);                
-            if(! $updateSql -> execute(array($studentid, $saqid[$i], htmlspecialchars($answer[$i]), htmlspecialchars($answer[$i])))){
+            if(! $updateSql -> execute(array($studentID, $saqid[$i], htmlspecialchars($answer[$i]), htmlspecialchars($answer[$i])))){
                 echo "<script language=\"javascript\">  alert(\"Error occurred to submit your answer. Report this bug to reseachers.\"); </script>";
             }
             $scoreSql = "SELECT Points FROM SAQ_Question WHERE SAQID = ?";
@@ -33,7 +33,7 @@
         $updateSql = "INSERT INTO Quiz_Record(QuizID, StudentID, `Status`, Score)
                                      VALUES (?,?,?,?) ON DUPLICATE KEY UPDATE Score = ?";			
         $updateSql = $conn->prepare($updateSql);                
-        if(! $updateSql -> execute(array($quizid, $studentid, "UNGRADED", $score, $score))){
+        if(! $updateSql -> execute(array($quizid, $studentID, "UNGRADED", $score, $score))){
             echo "<script language=\"javascript\">  alert(\"Error occurred to update your score. Report this bug to reseachers.\"); </script>";
         }
         db_close($conn);
@@ -136,7 +136,7 @@
 
         <nav class="navbar navbar-default navbar-fixed-top">
         <form method="post" action="<?php echo $_SERVER['PHP_SELF']; ?>">
-        <input  type=hidden name="quizid" value=<?php echo $quizid; ?>></input>
+        <input  type=hidden name="quizid" value=<?php echo $quizid; ?>>
             <div class="container-fluid">
                 <!-- Brand and toggle get grouped for better mobile display -->
                 <div class="navbar-header">

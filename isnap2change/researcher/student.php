@@ -2,7 +2,7 @@
 	session_start();
     require_once("../mysql-lib.php");
     require_once("../debug.php");
-    require_once("/researcher-validation.php");
+    require_once("researcher-validation.php");
     $pageName = "student"; 
     $columnName = array('StudentID','ClassName','Username','FirstName','LastName','Email','Gender','DOB','Score','SubmissionDate');
     
@@ -27,7 +27,8 @@
         debug_err($pageName, $e);
     }
     
-    try{  
+    try{
+        refreshAllStudentsScore($conn);
         $studentResult = getStudents($conn);  
     } catch(Exception $e) {
         debug_err($pageName, $e);
@@ -39,56 +40,16 @@
 <!DOCTYPE html>
 <html lang="en">
 
-<head>
-
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="description" content="">
-    <meta name="author" content="">
-
-    <title>iSNAP2Change Admin</title>
-
-    <!-- Bootstrap Core CSS -->
-    <link href="../bower_components/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
-
-    <!-- MetisMenu CSS -->
-    <link href="../bower_components/metisMenu/dist/metisMenu.min.css" rel="stylesheet">
-
-    <!-- DataTables CSS -->
-    <link href="../bower_components/datatables-plugins/integration/bootstrap/3/dataTables.bootstrap.css" rel="stylesheet">
-
-    <!-- DataTables Responsive CSS -->
-    <!-- <link href="../bower_components/datatables-responsive/css/dataTables.responsive.css" rel="stylesheet"> -->
-
-    <!-- Custom CSS -->
-    <link href="../dist/css/sb-admin-2.css" rel="stylesheet">
-
-    <!-- Custom Fonts -->
-    <link href="../bower_components/font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css">
-
-    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
-    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
-    <!--[if lt IE 9]>
-        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
-        <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
-    <![endif]-->
-
-    <!--w3data.js to include html-->
-    <script src="../js/w3data.js"></script>
-    
-    <style>
-    .glyphicon:hover {
-        background-color: rgb(153, 153, 102);
-    }
-    </style>
+<head> 
+    <!-- Header Library -->   
+    <?php require_once('header-lib.php'); ?>
 </head>
 
 <body>
 
     <div id="wrapper">
 
-        <div w3-include-html="navigation.html"></div> 
+        <?php require_once('navigation.php'); ?> 
 
         <div id="page-wrapper">
             <div class="row">
@@ -178,12 +139,12 @@
             <div class="modal-body">
             <form id="submission" method="post" action="<?php if(isset($_GET['classid'])) echo $_SERVER['PHP_SELF'].'?classid='.$_GET['classid']; else echo $_SERVER['PHP_SELF']; ?>">
                 <!--if 0 update; else if -1 delete;-->
-                <input type=hidden name="update" id="update" value="1"></input>                
+                <input type=hidden name="update" id="update" value="1">                
                 <?php for($i=0; $i<count($columnName); $i++) {
                     if($columnName[$i] == 'StudentID' || $columnName[$i] == 'Username'){?>
                     <label for="<?php echo $columnName[$i]; ?>" <?php if ($i==0){ echo 'style="display:none"';} ?>><?php echo $columnName[$i]; ?></label>
                     <input type="text" class="form-control dialoginput" id="<?php echo $columnName[$i]; ?>" name="<?php echo strtolower($columnName[$i]); ?>"  
-                    <?php if ($i==0){ echo 'style="display:none"';} ?> ></input>
+                    <?php if ($i==0){ echo 'style="display:none"';} ?> >
                 <?php } 
                 }?>
                 <br>
@@ -213,38 +174,22 @@
         }
       } else 
           echo '';
-      ?>"></input>
-    <!-- jQuery -->
-    <script src="../bower_components/jquery/dist/jquery.min.js"></script>
-
-    <!-- Bootstrap Core JavaScript -->
-    <script src="../bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
-
-    <!-- Metis Menu Plugin JavaScript -->
-    <script src="../bower_components/metisMenu/dist/metisMenu.min.js"></script>
-
-    <!-- DataTables JavaScript -->
-    <script src="../bower_components/datatables/media/js/jquery.dataTables.min.js"></script>
-    <script src="../bower_components/datatables-plugins/integration/bootstrap/3/dataTables.bootstrap.min.js"></script>
-
-    <!-- Custom Theme JavaScript -->
-    <script src="../dist/js/sb-admin-2.js"></script>    
-    
-    <!--jQuery Validate plugin-->
-    <script src="http://ajax.aspnetcdn.com/ajax/jquery.validate/1.15.0/jquery.validate.min.js"></script>
-
+      ?>">
+    <!-- SB Admin Library -->  
+    <?php require_once('sb-admin-lib.php'); ?>
     <!-- Page-Level Scripts -->
     <script>
     function randomString(length) {
         return Math.round((Math.pow(36, length + 1) - Math.random() * Math.pow(36, length))).toString(36).slice(1);
     }
     //DO NOT put them in $(document).ready() since the table has multi pages
+    var diaglogInputArr = $('.dialoginput');
     $('.glyphicon-edit').on('click', function (){
         $('#update').val(0);
         //studentid, username
-        $('.dialoginput').eq(0).val($(this).parent().parent().children('td').eq(0).text());        
-        $('.dialoginput').eq(1).val($(this).parent().text());
-        $('.dialoginput').each(function() {
+        diaglogInputArr.eq(0).val($(this).parent().parent().children('td').eq(0).text());        
+        diaglogInputArr.eq(1).val($(this).parent().text());
+        diaglogInputArr.each(function() {
             $( this ).attr('disabled','disabled');
         });
     });
@@ -252,10 +197,10 @@
         if (confirm('[WARNING] Are you sure to remove this student? All the data of this student will also get deleted (not recoverable). It includes student submissions of every task and your grading/feedback, not only the student itself.')) {
             $('#update').val(-1);
             //studentid, username
-            $('.dialoginput').eq(0).val($(this).parent().parent().children('td').eq(0).text());        
-            $('.dialoginput').eq(1).val($(this).parent().text());            
+            diaglogInputArr.eq(0).val($(this).parent().parent().children('td').eq(0).text());        
+            diaglogInputArr.eq(1).val($(this).parent().text());            
             //enable all the input
-            $('.dialoginput').each(function() {
+            diaglogInputArr.each(function() {
                 $( this ).prop('disabled',false);
             });
             $('#submission').submit();
@@ -264,15 +209,14 @@
     $('#btmResetPwd').on('click', function (){
         $('#submission').validate();        
         //enable all the input
-        $('.dialoginput').each(function() {
+        diaglogInputArr.each(function() {
             $( this ).prop('disabled',false);
         });
         if (confirm('[WARNING] Are you sure to reset this student password to `WelcomeToiSNAP2`? (not recoverable).')) {
             $('#submission').submit();
         }
     });
-    //include html
-    w3IncludeHTML();   
+    
     $(document).ready(function() {
         var table = $('#datatables').DataTable({
                 responsive: true,

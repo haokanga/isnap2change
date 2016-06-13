@@ -1,15 +1,15 @@
 <?php
 	
-	$studentid = $_POST["studentid"];
+	$studentID = $_POST["studentid"];
 	$tmpid = rand();
-	$target_path = "./tmp_poster_img/".$studentid."_".$tmpid."_tmp";
+	$target_path = "./tmp_poster_img/".$studentID."_".$tmpid."_tmp";
 	
 	while(file_exists($target_path)) {
 		$tmpid = rand();
-		$target_path = "./tmp_poster_img/".$studentid."_".$tmpid."_tmp";
+		$target_path = "./tmp_poster_img/".$studentID."_".$tmpid."_tmp";
 	}
 	
-	$fileid = $studentid."_".$tmpid."_tmp";
+	$fileid = $studentID."_".$tmpid."_tmp";
 		
 	$result = array();
 	
