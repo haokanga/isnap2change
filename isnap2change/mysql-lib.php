@@ -417,7 +417,7 @@
     function getMCQQuestions(PDO $conn, $quizID){
         $mcqQuesSql = "SELECT *
                     FROM MCQ_Section NATURAL JOIN MCQ_Question
-                    LEFT JOIN `Option` USING (MCQID)
+                    LEFT JOIN MCQ_Option USING (MCQID)
                     WHERE QuizID = ?
                     ORDER BY MCQID";                                
         $mcqQuesQuery = $conn->prepare($mcqQuesSql);
@@ -447,7 +447,7 @@
     
     /* Option */
     function createOption(PDO $conn, $mcqID, $content, $explanation){
-        $updateSql = "INSERT INTO `Option`(Content, Explanation, MCQID)
+        $updateSql = "INSERT INTO MCQ_Option(Content, Explanation, MCQID)
              VALUES (?,?,?)";
         $updateSql = $conn->prepare($updateSql);         
         $updateSql->execute(array($content, $explanation, $mcqID));
@@ -455,7 +455,7 @@
     }
     
     function updateOption(PDO $conn, $optionID, $content, $explanation){
-        $updateSql = "UPDATE `Option` 
+        $updateSql = "UPDATE MCQ_Option 
                 SET Content = ?, Explanation = ?
                 WHERE OptionID = ?";			
         $updateSql = $conn->prepare($updateSql);         
@@ -463,13 +463,13 @@
     }
     
     function deleteOption(PDO $conn, $optionID){
-        $updateSql = "DELETE FROM `Option` WHERE OptionID = ?";			
+        $updateSql = "DELETE FROM MCQ_Option WHERE OptionID = ?";			
         $updateSql = $conn->prepare($updateSql);
         $updateSql->execute(array($optionID));
     }
     function getOptions(PDO $conn, $mcqID){
         $optionSql = "SELECT *
-                   FROM MCQ_Question NATURAL JOIN `Option` WHERE MCQID = ?";
+                   FROM MCQ_Question NATURAL JOIN MCQ_Option WHERE MCQID = ?";
         $optionQuery = $conn->prepare($optionSql);
         $optionQuery->execute(array($mcqID));
         $optionResult = $optionQuery->fetchAll(PDO::FETCH_OBJ); 
@@ -477,7 +477,7 @@
     }
     
     function getMaxOptionNum(PDO $conn, $quizID){
-        $optionNumSql = "SELECT MAX(OptionNum) AS MaxOptionNum FROM (SELECT COUNT(*) AS OptionNum FROM MCQ_Question natural JOIN `Option` WHERE QuizID = ? GROUP BY MCQID) AS OptionNumTable";								
+        $optionNumSql = "SELECT MAX(OptionNum) AS MaxOptionNum FROM (SELECT COUNT(*) AS OptionNum FROM MCQ_Question natural JOIN MCQ_Option WHERE QuizID = ? GROUP BY MCQID) AS OptionNumTable";								
         $optionNumQuery = $conn->prepare($optionNumSql);
         $optionNumQuery->execute(array($quizID));
         $optionNumResult = $optionNumQuery->fetch(PDO::FETCH_OBJ);

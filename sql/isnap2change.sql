@@ -19,7 +19,7 @@ DROP TABLE IF EXISTS `Quiz`;
 DROP TABLE IF EXISTS `Quiz_Record`;
 DROP TABLE IF EXISTS `MCQ_Section`;
 DROP TABLE IF EXISTS `MCQ_Question`;
-DROP TABLE IF EXISTS `Option`;
+DROP TABLE IF EXISTS `MCQ_Option`;
 DROP TABLE IF EXISTS `MCQ_Question_Record`;
 DROP TABLE IF EXISTS `SAQ_Section`;
 DROP TABLE IF EXISTS `SAQ_Question`;
@@ -172,13 +172,13 @@ CREATE TABLE IF NOT EXISTS `MCQ_Question` (
         ON DELETE CASCADE ON UPDATE CASCADE
 )  ENGINE=INNODB;
 
-CREATE TABLE IF NOT EXISTS `Option` (
+CREATE TABLE IF NOT EXISTS `MCQ_Option` (
     OptionID MEDIUMINT AUTO_INCREMENT,
     Content TEXT,    
     Explanation TEXT,
     MCQID MEDIUMINT,
-    CONSTRAINT Option_OptionID_PK PRIMARY KEY (OptionID),
-    CONSTRAINT Option_MCQID_FK FOREIGN KEY (MCQID)
+    CONSTRAINT MCQ_Option_OptionID_PK PRIMARY KEY (OptionID),
+    CONSTRAINT MCQ_Option_MCQID_FK FOREIGN KEY (MCQID)
         REFERENCES MCQ_Question (MCQID)
         ON DELETE CASCADE ON UPDATE CASCADE
 )  ENGINE=INNODB;
@@ -427,58 +427,58 @@ SET @QUIZ_LAST_INSERT_ID = LAST_INSERT_ID();
 INSERT IGNORE INTO MCQ_Section(QuizID,Points,Questionnaires) VALUES(@QUIZ_LAST_INSERT_ID,30,0);
 INSERT IGNORE INTO MCQ_Question(Question, CorrectChoice, QuizID) VALUES('Which of these breakfast foods will provide you with the most energy?', 'Whole grain cereal or oatmeal', @QUIZ_LAST_INSERT_ID);
 SET @MCQ_QUESTION_LAST_INSERT_ID = LAST_INSERT_ID();
-INSERT IGNORE INTO `Option`(Content, Explanation, MCQID) VALUES('Candy bar', 'Candy bars will give you an instant burst of energy but will not last!', @MCQ_QUESTION_LAST_INSERT_ID);
-INSERT IGNORE INTO `Option`(Content, Explanation, MCQID) VALUES('Whole grain cereal or oatmeal', 'Whole grains take your body longer to digest, giving you energy all morning!', @MCQ_QUESTION_LAST_INSERT_ID);
-INSERT IGNORE INTO `Option`(Content, Explanation, MCQID) VALUES('Potato chips', 'Whole grains take your body longer to digest, giving you energy all morning!', @MCQ_QUESTION_LAST_INSERT_ID);
+INSERT IGNORE INTO `MCQ_Option`(Content, Explanation, MCQID) VALUES('Candy bar', 'Candy bars will give you an instant burst of energy but will not last!', @MCQ_QUESTION_LAST_INSERT_ID);
+INSERT IGNORE INTO `MCQ_Option`(Content, Explanation, MCQID) VALUES('Whole grain cereal or oatmeal', 'Whole grains take your body longer to digest, giving you energy all morning!', @MCQ_QUESTION_LAST_INSERT_ID);
+INSERT IGNORE INTO `MCQ_Option`(Content, Explanation, MCQID) VALUES('Potato chips', 'Whole grains take your body longer to digest, giving you energy all morning!', @MCQ_QUESTION_LAST_INSERT_ID);
 
 
 INSERT IGNORE INTO MCQ_Question(Question, CorrectChoice, QuizID) VALUES('Which type of food should take up the most space on your plate?', 'Fruits and veggies', @QUIZ_LAST_INSERT_ID);
 SET @MCQ_QUESTION_LAST_INSERT_ID = LAST_INSERT_ID();
-INSERT IGNORE INTO `Option`(Content, Explanation, MCQID) VALUES('Fruits and veggies', 'Get munching on carrots, apples, and other tasty fresh foods! The veggies and fruits should take up at least half of your plate.', @MCQ_QUESTION_LAST_INSERT_ID);
-INSERT IGNORE INTO `Option`(Content, Explanation, MCQID) VALUES('Meats', 'Get munching on carrots, apples, and other tasty fresh foods! The veggies and fruits should take up at least half of your plate.', @MCQ_QUESTION_LAST_INSERT_ID);
-INSERT IGNORE INTO `Option`(Content, Explanation, MCQID) VALUES('Grains', 'Get munching on carrots, apples, and other tasty fresh foods! The veggies and fruits should take up at least half of your plate.', @MCQ_QUESTION_LAST_INSERT_ID);
+INSERT IGNORE INTO `MCQ_Option`(Content, Explanation, MCQID) VALUES('Fruits and veggies', 'Get munching on carrots, apples, and other tasty fresh foods! The veggies and fruits should take up at least half of your plate.', @MCQ_QUESTION_LAST_INSERT_ID);
+INSERT IGNORE INTO `MCQ_Option`(Content, Explanation, MCQID) VALUES('Meats', 'Get munching on carrots, apples, and other tasty fresh foods! The veggies and fruits should take up at least half of your plate.', @MCQ_QUESTION_LAST_INSERT_ID);
+INSERT IGNORE INTO `MCQ_Option`(Content, Explanation, MCQID) VALUES('Grains', 'Get munching on carrots, apples, and other tasty fresh foods! The veggies and fruits should take up at least half of your plate.', @MCQ_QUESTION_LAST_INSERT_ID);
 
 INSERT IGNORE INTO MCQ_Question(Question, CorrectChoice, QuizID) VALUES('What should I do if I hate broccoli?', 'Give peas a chance!', @QUIZ_LAST_INSERT_ID);
 SET @MCQ_QUESTION_LAST_INSERT_ID = LAST_INSERT_ID();
-INSERT IGNORE INTO `Option`(Content, Explanation, MCQID) VALUES('Feed it to your dog.', 'Not everyone likes broccoli. But there are so many different kinds of vegetables, you are bound to find one you like!', @MCQ_QUESTION_LAST_INSERT_ID);
-INSERT IGNORE INTO `Option`(Content, Explanation, MCQID) VALUES('Give up on eating vegetables.', 'Not everyone likes broccoli. But there are so many different kinds of vegetables, you are bound to find one you like!', @MCQ_QUESTION_LAST_INSERT_ID);
-INSERT IGNORE INTO `Option`(Content, Explanation, MCQID) VALUES('Give peas a chance!', 'Not everyone likes broccoli. But there are so many different kinds of vegetables, you are bound to find one you like!', @MCQ_QUESTION_LAST_INSERT_ID);
+INSERT IGNORE INTO `MCQ_Option`(Content, Explanation, MCQID) VALUES('Feed it to your dog.', 'Not everyone likes broccoli. But there are so many different kinds of vegetables, you are bound to find one you like!', @MCQ_QUESTION_LAST_INSERT_ID);
+INSERT IGNORE INTO `MCQ_Option`(Content, Explanation, MCQID) VALUES('Give up on eating vegetables.', 'Not everyone likes broccoli. But there are so many different kinds of vegetables, you are bound to find one you like!', @MCQ_QUESTION_LAST_INSERT_ID);
+INSERT IGNORE INTO `MCQ_Option`(Content, Explanation, MCQID) VALUES('Give peas a chance!', 'Not everyone likes broccoli. But there are so many different kinds of vegetables, you are bound to find one you like!', @MCQ_QUESTION_LAST_INSERT_ID);
 
 INSERT IGNORE INTO MCQ_Question(Question, CorrectChoice, QuizID) VALUES('If I want to stay healthy, can I still eat French fries?', 'Sure, just not every day.', @QUIZ_LAST_INSERT_ID);
 SET @MCQ_QUESTION_LAST_INSERT_ID = LAST_INSERT_ID();
-INSERT IGNORE INTO `Option`(Content, Explanation, MCQID) VALUES('No fast food, ever.', 'Eating healthy doesn\'t mean cutting out ALL fried foods. Foods like French fries are ok if you eat a small amount once or twice a month.', @MCQ_QUESTION_LAST_INSERT_ID);
-INSERT IGNORE INTO `Option`(Content, Explanation, MCQID) VALUES('No, but American fries are ok.', 'Eating healthy doesn\'t mean cutting out ALL fried foods. Foods like French fries are ok if you eat a small amount once or twice a month.', @MCQ_QUESTION_LAST_INSERT_ID);
-INSERT IGNORE INTO `Option`(Content, Explanation, MCQID) VALUES('Sure, just not every day.', 'Eating healthy doesn\'t mean cutting out ALL fried foods. Foods like French fries are ok if you eat a small amount once or twice a month.', @MCQ_QUESTION_LAST_INSERT_ID);
+INSERT IGNORE INTO `MCQ_Option`(Content, Explanation, MCQID) VALUES('No fast food, ever.', 'Eating healthy doesn\'t mean cutting out ALL fried foods. Foods like French fries are ok if you eat a small amount once or twice a month.', @MCQ_QUESTION_LAST_INSERT_ID);
+INSERT IGNORE INTO `MCQ_Option`(Content, Explanation, MCQID) VALUES('No, but American fries are ok.', 'Eating healthy doesn\'t mean cutting out ALL fried foods. Foods like French fries are ok if you eat a small amount once or twice a month.', @MCQ_QUESTION_LAST_INSERT_ID);
+INSERT IGNORE INTO `MCQ_Option`(Content, Explanation, MCQID) VALUES('Sure, just not every day.', 'Eating healthy doesn\'t mean cutting out ALL fried foods. Foods like French fries are ok if you eat a small amount once or twice a month.', @MCQ_QUESTION_LAST_INSERT_ID);
 
 INSERT IGNORE INTO MCQ_Question(Question, CorrectChoice, QuizID) VALUES('What\'s a nutritious afterschool snack?', 'An apple, cheese, and whole grain crackers.', @QUIZ_LAST_INSERT_ID);
 SET @MCQ_QUESTION_LAST_INSERT_ID = LAST_INSERT_ID();
-INSERT IGNORE INTO `Option`(Content, Explanation, MCQID) VALUES('Potato chips and soda.', 'Eating healthy snacks is important. Snacks give you energy and help you feel full so you don\'t overeat at dinner.', @MCQ_QUESTION_LAST_INSERT_ID);
-INSERT IGNORE INTO `Option`(Content, Explanation, MCQID) VALUES('An apple, cheese, and whole grain crackers.', 'Eating healthy snacks is important. Snacks give you energy and help you feel full so you don\'t overeat at dinner.', @MCQ_QUESTION_LAST_INSERT_ID);
-INSERT IGNORE INTO `Option`(Content, Explanation, MCQID) VALUES('A doughnut or a brownie.', 'Eating healthy snacks is important. Snacks give you energy and help you feel full so you don\'t overeat at dinner.', @MCQ_QUESTION_LAST_INSERT_ID);
+INSERT IGNORE INTO `MCQ_Option`(Content, Explanation, MCQID) VALUES('Potato chips and soda.', 'Eating healthy snacks is important. Snacks give you energy and help you feel full so you don\'t overeat at dinner.', @MCQ_QUESTION_LAST_INSERT_ID);
+INSERT IGNORE INTO `MCQ_Option`(Content, Explanation, MCQID) VALUES('An apple, cheese, and whole grain crackers.', 'Eating healthy snacks is important. Snacks give you energy and help you feel full so you don\'t overeat at dinner.', @MCQ_QUESTION_LAST_INSERT_ID);
+INSERT IGNORE INTO `MCQ_Option`(Content, Explanation, MCQID) VALUES('A doughnut or a brownie.', 'Eating healthy snacks is important. Snacks give you energy and help you feel full so you don\'t overeat at dinner.', @MCQ_QUESTION_LAST_INSERT_ID);
 
 INSERT IGNORE INTO MCQ_Question(Question, CorrectChoice, QuizID) VALUES('How much veggies and fruit should you eat daily?', '1 to 2 cups of veggies and 1 to 2 pieces of fruit every day.', @QUIZ_LAST_INSERT_ID);
 SET @MCQ_QUESTION_LAST_INSERT_ID = LAST_INSERT_ID();
-INSERT IGNORE INTO `Option`(Content, Explanation, MCQID) VALUES('1 to 2 cups of veggies and 1 to 2 pieces of fruit every day.', 'Fortunately, there are so many types of fruits and vegetables that you\'ll never get bored!', @MCQ_QUESTION_LAST_INSERT_ID);
-INSERT IGNORE INTO `Option`(Content, Explanation, MCQID) VALUES('Eat veggies or fruit once a month.', 'Fortunately, there are so many types of fruits and vegetables that you\'ll never get bored!', @MCQ_QUESTION_LAST_INSERT_ID);
-INSERT IGNORE INTO `Option`(Content, Explanation, MCQID) VALUES('At least 100 cups a day.', 'Fortunately, there are so many types of fruits and vegetables that you\'ll never get bored!', @MCQ_QUESTION_LAST_INSERT_ID);
+INSERT IGNORE INTO `MCQ_Option`(Content, Explanation, MCQID) VALUES('1 to 2 cups of veggies and 1 to 2 pieces of fruit every day.', 'Fortunately, there are so many types of fruits and vegetables that you\'ll never get bored!', @MCQ_QUESTION_LAST_INSERT_ID);
+INSERT IGNORE INTO `MCQ_Option`(Content, Explanation, MCQID) VALUES('Eat veggies or fruit once a month.', 'Fortunately, there are so many types of fruits and vegetables that you\'ll never get bored!', @MCQ_QUESTION_LAST_INSERT_ID);
+INSERT IGNORE INTO `MCQ_Option`(Content, Explanation, MCQID) VALUES('At least 100 cups a day.', 'Fortunately, there are so many types of fruits and vegetables that you\'ll never get bored!', @MCQ_QUESTION_LAST_INSERT_ID);
 
 INSERT IGNORE INTO MCQ_Question(Question, CorrectChoice, QuizID) VALUES('Which of these foods is the best source of calcium?', 'Yogurt', @QUIZ_LAST_INSERT_ID);
 SET @MCQ_QUESTION_LAST_INSERT_ID = LAST_INSERT_ID();
-INSERT IGNORE INTO `Option`(Content, Explanation, MCQID) VALUES('Bread', 'Calcium is important for building bones. You can get your daily dose from a variety of foods, including yogurt, milk, and almonds.', @MCQ_QUESTION_LAST_INSERT_ID);
-INSERT IGNORE INTO `Option`(Content, Explanation, MCQID) VALUES('Yogurt', 'Calcium is important for building bones. You can get your daily dose from a variety of foods, including yogurt, milk, and almonds.', @MCQ_QUESTION_LAST_INSERT_ID);
-INSERT IGNORE INTO `Option`(Content, Explanation, MCQID) VALUES('Apples', 'Calcium is important for building bones. You can get your daily dose from a variety of foods, including yogurt, milk, and almonds.', @MCQ_QUESTION_LAST_INSERT_ID);
+INSERT IGNORE INTO `MCQ_Option`(Content, Explanation, MCQID) VALUES('Bread', 'Calcium is important for building bones. You can get your daily dose from a variety of foods, including yogurt, milk, and almonds.', @MCQ_QUESTION_LAST_INSERT_ID);
+INSERT IGNORE INTO `MCQ_Option`(Content, Explanation, MCQID) VALUES('Yogurt', 'Calcium is important for building bones. You can get your daily dose from a variety of foods, including yogurt, milk, and almonds.', @MCQ_QUESTION_LAST_INSERT_ID);
+INSERT IGNORE INTO `MCQ_Option`(Content, Explanation, MCQID) VALUES('Apples', 'Calcium is important for building bones. You can get your daily dose from a variety of foods, including yogurt, milk, and almonds.', @MCQ_QUESTION_LAST_INSERT_ID);
 
 INSERT IGNORE INTO MCQ_Question(Question, CorrectChoice, QuizID) VALUES('Which of these foods has lots of fiber?', 'Beans and apples', @QUIZ_LAST_INSERT_ID);
 SET @MCQ_QUESTION_LAST_INSERT_ID = LAST_INSERT_ID();
-INSERT IGNORE INTO `Option`(Content, Explanation, MCQID) VALUES('White rice', 'Eating foods that have fiber helps with digestion and keeps you from getting hungry too soon.', @MCQ_QUESTION_LAST_INSERT_ID);
-INSERT IGNORE INTO `Option`(Content, Explanation, MCQID) VALUES('Pasta', 'Eating foods that have fiber helps with digestion and keeps you from getting hungry too soon.', @MCQ_QUESTION_LAST_INSERT_ID);
-INSERT IGNORE INTO `Option`(Content, Explanation, MCQID) VALUES('Beans and apples', 'Eating foods that have fiber helps with digestion and keeps you from getting hungry too soon.', @MCQ_QUESTION_LAST_INSERT_ID);
+INSERT IGNORE INTO `MCQ_Option`(Content, Explanation, MCQID) VALUES('White rice', 'Eating foods that have fiber helps with digestion and keeps you from getting hungry too soon.', @MCQ_QUESTION_LAST_INSERT_ID);
+INSERT IGNORE INTO `MCQ_Option`(Content, Explanation, MCQID) VALUES('Pasta', 'Eating foods that have fiber helps with digestion and keeps you from getting hungry too soon.', @MCQ_QUESTION_LAST_INSERT_ID);
+INSERT IGNORE INTO `MCQ_Option`(Content, Explanation, MCQID) VALUES('Beans and apples', 'Eating foods that have fiber helps with digestion and keeps you from getting hungry too soon.', @MCQ_QUESTION_LAST_INSERT_ID);
 
 INSERT IGNORE INTO MCQ_Question(Question, CorrectChoice, QuizID) VALUES('What should you drink the most of each day?', 'Water', @QUIZ_LAST_INSERT_ID);
 SET @MCQ_QUESTION_LAST_INSERT_ID = LAST_INSERT_ID();
-INSERT IGNORE INTO `Option`(Content, Explanation, MCQID) VALUES('Milk', 'You should drink 6-8 cups of water a day. Cheers!', @MCQ_QUESTION_LAST_INSERT_ID);
-INSERT IGNORE INTO `Option`(Content, Explanation, MCQID) VALUES('Water', 'You should drink 6-8 cups of water a day. Cheers!', @MCQ_QUESTION_LAST_INSERT_ID);
-INSERT IGNORE INTO `Option`(Content, Explanation, MCQID) VALUES('Orange Juice', 'You should drink 6-8 cups of water a day. Cheers!', @MCQ_QUESTION_LAST_INSERT_ID);
+INSERT IGNORE INTO `MCQ_Option`(Content, Explanation, MCQID) VALUES('Milk', 'You should drink 6-8 cups of water a day. Cheers!', @MCQ_QUESTION_LAST_INSERT_ID);
+INSERT IGNORE INTO `MCQ_Option`(Content, Explanation, MCQID) VALUES('Water', 'You should drink 6-8 cups of water a day. Cheers!', @MCQ_QUESTION_LAST_INSERT_ID);
+INSERT IGNORE INTO `MCQ_Option`(Content, Explanation, MCQID) VALUES('Orange Juice', 'You should drink 6-8 cups of water a day. Cheers!', @MCQ_QUESTION_LAST_INSERT_ID);
 
 
 
@@ -487,38 +487,38 @@ SET @QUIZ_LAST_INSERT_ID = LAST_INSERT_ID();
 INSERT IGNORE INTO MCQ_Section(QuizID,Points,Questionnaires) VALUES(@QUIZ_LAST_INSERT_ID,20,0);
 INSERT IGNORE INTO MCQ_Question(Question, CorrectChoice, QuizID) VALUES('Alcohol has an immediate effect on the:', 'Brain', @QUIZ_LAST_INSERT_ID);
 SET @MCQ_QUESTION_LAST_INSERT_ID = LAST_INSERT_ID();
-INSERT IGNORE INTO `Option`(Content, Explanation, MCQID) VALUES('Knees', "Wrong", @MCQ_QUESTION_LAST_INSERT_ID);
-INSERT IGNORE INTO `Option`(Content, Explanation, MCQID) VALUES('Fingers', "Wrong", @MCQ_QUESTION_LAST_INSERT_ID);
-INSERT IGNORE INTO `Option`(Content, Explanation, MCQID) VALUES('Chest', "Wrong", @MCQ_QUESTION_LAST_INSERT_ID);
-INSERT IGNORE INTO `Option`(Content, Explanation, MCQID) VALUES('Brain', "Correct", @MCQ_QUESTION_LAST_INSERT_ID);
+INSERT IGNORE INTO `MCQ_Option`(Content, Explanation, MCQID) VALUES('Knees', "Wrong", @MCQ_QUESTION_LAST_INSERT_ID);
+INSERT IGNORE INTO `MCQ_Option`(Content, Explanation, MCQID) VALUES('Fingers', "Wrong", @MCQ_QUESTION_LAST_INSERT_ID);
+INSERT IGNORE INTO `MCQ_Option`(Content, Explanation, MCQID) VALUES('Chest', "Wrong", @MCQ_QUESTION_LAST_INSERT_ID);
+INSERT IGNORE INTO `MCQ_Option`(Content, Explanation, MCQID) VALUES('Brain', "Correct", @MCQ_QUESTION_LAST_INSERT_ID);
 
 INSERT IGNORE INTO MCQ_Question(Question, CorrectChoice, QuizID) VALUES('Alcohol increases the risk of:', 'All of the above.', @QUIZ_LAST_INSERT_ID);
 SET @MCQ_QUESTION_LAST_INSERT_ID = LAST_INSERT_ID();
-INSERT IGNORE INTO `Option`(Content, Explanation, MCQID) VALUES('A person being involved in anti-social behaviour.', "Wrong", @MCQ_QUESTION_LAST_INSERT_ID);
-INSERT IGNORE INTO `Option`(Content, Explanation, MCQID) VALUES('Injury due to falls, burns, car crashes.', "Wrong", @MCQ_QUESTION_LAST_INSERT_ID);
-INSERT IGNORE INTO `Option`(Content, Explanation, MCQID) VALUES('Violence and fighting.', "Wrong", @MCQ_QUESTION_LAST_INSERT_ID);
-INSERT IGNORE INTO `Option`(Content, Explanation, MCQID) VALUES('All of the above.', "Correct", @MCQ_QUESTION_LAST_INSERT_ID);
+INSERT IGNORE INTO `MCQ_Option`(Content, Explanation, MCQID) VALUES('A person being involved in anti-social behaviour.', "Wrong", @MCQ_QUESTION_LAST_INSERT_ID);
+INSERT IGNORE INTO `MCQ_Option`(Content, Explanation, MCQID) VALUES('Injury due to falls, burns, car crashes.', "Wrong", @MCQ_QUESTION_LAST_INSERT_ID);
+INSERT IGNORE INTO `MCQ_Option`(Content, Explanation, MCQID) VALUES('Violence and fighting.', "Wrong", @MCQ_QUESTION_LAST_INSERT_ID);
+INSERT IGNORE INTO `MCQ_Option`(Content, Explanation, MCQID) VALUES('All of the above.', "Correct", @MCQ_QUESTION_LAST_INSERT_ID);
 
 INSERT IGNORE INTO MCQ_Question(Question, CorrectChoice, QuizID) VALUES('When a person continues to drink:', 'Their blood alcohol content (BAC) increases.', @QUIZ_LAST_INSERT_ID);
 SET @MCQ_QUESTION_LAST_INSERT_ID = LAST_INSERT_ID();
-INSERT IGNORE INTO `Option`(Content, Explanation, MCQID) VALUES('Their  blood alcohol content (BAC) decreases.', "Wrong", @MCQ_QUESTION_LAST_INSERT_ID);
-INSERT IGNORE INTO `Option`(Content, Explanation, MCQID) VALUES('Their blood alcohol content (BAC) increases.', "Correct", @MCQ_QUESTION_LAST_INSERT_ID);
-INSERT IGNORE INTO `Option`(Content, Explanation, MCQID) VALUES('Their blood alcohol content (BAC) remains the same', "Wrong", @MCQ_QUESTION_LAST_INSERT_ID);
-INSERT IGNORE INTO `Option`(Content, Explanation, MCQID) VALUES('Their blood alcohol content (BAC) reduces to zero', "Wrong", @MCQ_QUESTION_LAST_INSERT_ID);
+INSERT IGNORE INTO `MCQ_Option`(Content, Explanation, MCQID) VALUES('Their  blood alcohol content (BAC) decreases.', "Wrong", @MCQ_QUESTION_LAST_INSERT_ID);
+INSERT IGNORE INTO `MCQ_Option`(Content, Explanation, MCQID) VALUES('Their blood alcohol content (BAC) increases.', "Correct", @MCQ_QUESTION_LAST_INSERT_ID);
+INSERT IGNORE INTO `MCQ_Option`(Content, Explanation, MCQID) VALUES('Their blood alcohol content (BAC) remains the same', "Wrong", @MCQ_QUESTION_LAST_INSERT_ID);
+INSERT IGNORE INTO `MCQ_Option`(Content, Explanation, MCQID) VALUES('Their blood alcohol content (BAC) reduces to zero', "Wrong", @MCQ_QUESTION_LAST_INSERT_ID);
 
 INSERT IGNORE INTO MCQ_Question(Question, CorrectChoice, QuizID) VALUES('Alcohol is a:', 'Drug that targets the brain.', @QUIZ_LAST_INSERT_ID);
 SET @MCQ_QUESTION_LAST_INSERT_ID = LAST_INSERT_ID();
-INSERT IGNORE INTO `Option`(Content, Explanation, MCQID) VALUES('Drug that has no effects on you.', "Wrong", @MCQ_QUESTION_LAST_INSERT_ID);
-INSERT IGNORE INTO `Option`(Content, Explanation, MCQID) VALUES('Drug that targets the brain.', "Correct", @MCQ_QUESTION_LAST_INSERT_ID);
-INSERT IGNORE INTO `Option`(Content, Explanation, MCQID) VALUES('Drug that you do not need to worry about.', "Wrong", @MCQ_QUESTION_LAST_INSERT_ID);
-INSERT IGNORE INTO `Option`(Content, Explanation, MCQID) VALUES('Drug that does not affect your behaviour.', "Wrong", @MCQ_QUESTION_LAST_INSERT_ID);
+INSERT IGNORE INTO `MCQ_Option`(Content, Explanation, MCQID) VALUES('Drug that has no effects on you.', "Wrong", @MCQ_QUESTION_LAST_INSERT_ID);
+INSERT IGNORE INTO `MCQ_Option`(Content, Explanation, MCQID) VALUES('Drug that targets the brain.', "Correct", @MCQ_QUESTION_LAST_INSERT_ID);
+INSERT IGNORE INTO `MCQ_Option`(Content, Explanation, MCQID) VALUES('Drug that you do not need to worry about.', "Wrong", @MCQ_QUESTION_LAST_INSERT_ID);
+INSERT IGNORE INTO `MCQ_Option`(Content, Explanation, MCQID) VALUES('Drug that does not affect your behaviour.', "Wrong", @MCQ_QUESTION_LAST_INSERT_ID);
 
 INSERT IGNORE INTO MCQ_Question(Question, CorrectChoice, QuizID) VALUES('Alcohol is broken down by:', 'Liver', @QUIZ_LAST_INSERT_ID);
 SET @MCQ_QUESTION_LAST_INSERT_ID = LAST_INSERT_ID();
-INSERT IGNORE INTO `Option`(Content, Explanation, MCQID) VALUES('Blood', "Wrong", @MCQ_QUESTION_LAST_INSERT_ID);
-INSERT IGNORE INTO `Option`(Content, Explanation, MCQID) VALUES('Heart', "Wrong", @MCQ_QUESTION_LAST_INSERT_ID);
-INSERT IGNORE INTO `Option`(Content, Explanation, MCQID) VALUES('Liver', "Correct", @MCQ_QUESTION_LAST_INSERT_ID);
-INSERT IGNORE INTO `Option`(Content, Explanation, MCQID) VALUES('Kidney', "Wrong", @MCQ_QUESTION_LAST_INSERT_ID);
+INSERT IGNORE INTO `MCQ_Option`(Content, Explanation, MCQID) VALUES('Blood', "Wrong", @MCQ_QUESTION_LAST_INSERT_ID);
+INSERT IGNORE INTO `MCQ_Option`(Content, Explanation, MCQID) VALUES('Heart', "Wrong", @MCQ_QUESTION_LAST_INSERT_ID);
+INSERT IGNORE INTO `MCQ_Option`(Content, Explanation, MCQID) VALUES('Liver', "Correct", @MCQ_QUESTION_LAST_INSERT_ID);
+INSERT IGNORE INTO `MCQ_Option`(Content, Explanation, MCQID) VALUES('Kidney', "Wrong", @MCQ_QUESTION_LAST_INSERT_ID);
 
 
 # [Example] Student Progress
@@ -702,33 +702,33 @@ SET @MCQ_QUESTION_LAST_INSERT_ID = LAST_INSERT_ID();
 
 INSERT IGNORE INTO MCQ_Question(Question, CorrectChoice, QuizID) VALUES('1 option:', '1', @QUIZ_LAST_INSERT_ID);
 SET @MCQ_QUESTION_LAST_INSERT_ID = LAST_INSERT_ID();
-INSERT IGNORE INTO `Option`(Content, Explanation, MCQID) VALUES('1', "Correct", @MCQ_QUESTION_LAST_INSERT_ID);
+INSERT IGNORE INTO `MCQ_Option`(Content, Explanation, MCQID) VALUES('1', "Correct", @MCQ_QUESTION_LAST_INSERT_ID);
 
 INSERT IGNORE INTO MCQ_Question(Question, CorrectChoice, QuizID) VALUES('2 option', '2', @QUIZ_LAST_INSERT_ID);
 SET @MCQ_QUESTION_LAST_INSERT_ID = LAST_INSERT_ID();
-INSERT IGNORE INTO `Option`(Content, Explanation, MCQID) VALUES('1', "Wrong", @MCQ_QUESTION_LAST_INSERT_ID);
-INSERT IGNORE INTO `Option`(Content, Explanation, MCQID) VALUES('2', "Correct", @MCQ_QUESTION_LAST_INSERT_ID);
+INSERT IGNORE INTO `MCQ_Option`(Content, Explanation, MCQID) VALUES('1', "Wrong", @MCQ_QUESTION_LAST_INSERT_ID);
+INSERT IGNORE INTO `MCQ_Option`(Content, Explanation, MCQID) VALUES('2', "Correct", @MCQ_QUESTION_LAST_INSERT_ID);
 
 INSERT IGNORE INTO MCQ_Question(Question, CorrectChoice, QuizID) VALUES('3 option', '3',@QUIZ_LAST_INSERT_ID);
 SET @MCQ_QUESTION_LAST_INSERT_ID = LAST_INSERT_ID();
-INSERT IGNORE INTO `Option`(Content, Explanation, MCQID) VALUES('1', "Wrong", @MCQ_QUESTION_LAST_INSERT_ID);
-INSERT IGNORE INTO `Option`(Content, Explanation, MCQID) VALUES('3', "Correct", @MCQ_QUESTION_LAST_INSERT_ID);
-INSERT IGNORE INTO `Option`(Content, Explanation, MCQID) VALUES('2', "Wrong", @MCQ_QUESTION_LAST_INSERT_ID);
+INSERT IGNORE INTO `MCQ_Option`(Content, Explanation, MCQID) VALUES('1', "Wrong", @MCQ_QUESTION_LAST_INSERT_ID);
+INSERT IGNORE INTO `MCQ_Option`(Content, Explanation, MCQID) VALUES('3', "Correct", @MCQ_QUESTION_LAST_INSERT_ID);
+INSERT IGNORE INTO `MCQ_Option`(Content, Explanation, MCQID) VALUES('2', "Wrong", @MCQ_QUESTION_LAST_INSERT_ID);
 
 INSERT IGNORE INTO MCQ_Question(Question, CorrectChoice, QuizID) VALUES('4 option', '4', @QUIZ_LAST_INSERT_ID);
 SET @MCQ_QUESTION_LAST_INSERT_ID = LAST_INSERT_ID();
-INSERT IGNORE INTO `Option`(Content, Explanation, MCQID) VALUES('1', "Wrong", @MCQ_QUESTION_LAST_INSERT_ID);
-INSERT IGNORE INTO `Option`(Content, Explanation, MCQID) VALUES('2', "Wrong", @MCQ_QUESTION_LAST_INSERT_ID);
-INSERT IGNORE INTO `Option`(Content, Explanation, MCQID) VALUES('3', "Wrong", @MCQ_QUESTION_LAST_INSERT_ID);
-INSERT IGNORE INTO `Option`(Content, Explanation, MCQID) VALUES('4', "Correct", @MCQ_QUESTION_LAST_INSERT_ID);
+INSERT IGNORE INTO `MCQ_Option`(Content, Explanation, MCQID) VALUES('1', "Wrong", @MCQ_QUESTION_LAST_INSERT_ID);
+INSERT IGNORE INTO `MCQ_Option`(Content, Explanation, MCQID) VALUES('2', "Wrong", @MCQ_QUESTION_LAST_INSERT_ID);
+INSERT IGNORE INTO `MCQ_Option`(Content, Explanation, MCQID) VALUES('3', "Wrong", @MCQ_QUESTION_LAST_INSERT_ID);
+INSERT IGNORE INTO `MCQ_Option`(Content, Explanation, MCQID) VALUES('4', "Correct", @MCQ_QUESTION_LAST_INSERT_ID);
 
 INSERT IGNORE INTO MCQ_Question(Question, CorrectChoice, QuizID) VALUES('5 option', '5', @QUIZ_LAST_INSERT_ID);
 SET @MCQ_QUESTION_LAST_INSERT_ID = LAST_INSERT_ID();
-INSERT IGNORE INTO `Option`(Content, Explanation, MCQID) VALUES('1', "Wrong", @MCQ_QUESTION_LAST_INSERT_ID);
-INSERT IGNORE INTO `Option`(Content, Explanation, MCQID) VALUES('2', "Wrong", @MCQ_QUESTION_LAST_INSERT_ID);
-INSERT IGNORE INTO `Option`(Content, Explanation, MCQID) VALUES('3', "Wrong", @MCQ_QUESTION_LAST_INSERT_ID);
-INSERT IGNORE INTO `Option`(Content, Explanation, MCQID) VALUES('4', "Wrong", @MCQ_QUESTION_LAST_INSERT_ID);
-INSERT IGNORE INTO `Option`(Content, Explanation, MCQID) VALUES('5', "Correct", @MCQ_QUESTION_LAST_INSERT_ID);
+INSERT IGNORE INTO `MCQ_Option`(Content, Explanation, MCQID) VALUES('1', "Wrong", @MCQ_QUESTION_LAST_INSERT_ID);
+INSERT IGNORE INTO `MCQ_Option`(Content, Explanation, MCQID) VALUES('2', "Wrong", @MCQ_QUESTION_LAST_INSERT_ID);
+INSERT IGNORE INTO `MCQ_Option`(Content, Explanation, MCQID) VALUES('3', "Wrong", @MCQ_QUESTION_LAST_INSERT_ID);
+INSERT IGNORE INTO `MCQ_Option`(Content, Explanation, MCQID) VALUES('4', "Wrong", @MCQ_QUESTION_LAST_INSERT_ID);
+INSERT IGNORE INTO `MCQ_Option`(Content, Explanation, MCQID) VALUES('5', "Correct", @MCQ_QUESTION_LAST_INSERT_ID);
 
 # [Example] insert a poster task into Poster_Section
 INSERT INTO `isnap2changedb`.`poster_section` (`QuizID`, `Points`) VALUES ('9', '20');
@@ -748,8 +748,8 @@ INSERT INTO `isnap2changedb`.`learning_material` (`Content`, `QuizID`) VALUES ('
 START TRANSACTION;
 INSERT IGNORE INTO MCQ_Question(Question, CorrectChoice, QuizID) VALUES('this is a test question for insert new question', 'A', 1);
 SET @MCQ_QUESTION_LAST_INSERT_ID = LAST_INSERT_ID();
-INSERT IGNORE INTO `Option`(Content, Explanation, MCQID) VALUES('answeroftest1', @MCQ_QUESTION_LAST_INSERT_ID);
-INSERT IGNORE INTO `Option`(Content, Explanation, MCQID) VALUES('answeroftest2', @MCQ_QUESTION_LAST_INSERT_ID);
+INSERT IGNORE INTO `MCQ_Option`(Content, Explanation, MCQID) VALUES('answeroftest1', @MCQ_QUESTION_LAST_INSERT_ID);
+INSERT IGNORE INTO `MCQ_Option`(Content, Explanation, MCQID) VALUES('answeroftest2', @MCQ_QUESTION_LAST_INSERT_ID);
 COMMIT;
 #SELECT LAST_INSERT_ID();
 
