@@ -30,7 +30,7 @@ try {
                     $conn->commit();
                 } catch (Exception $e) {
                     debug_err($pageName, $e);
-                    $conn->rollback();
+                    $conn->rollBack();
                 }
             } else if ($metadataUpdate == -1) {
                 $quizID = $_POST['quizID'];
@@ -82,7 +82,7 @@ try {
         $materialRes = getLearningMaterial($conn, $quizID);
         $matchingQuesResult = getMatchingQuestions($conn, $quizID);
         $bucketResult = getMatchingBuckets($conn, $quizID);
-        $phpself = $pageName . '.php?quizID=' . $quizID;
+        $phpSelf = $pageName . '.php?quizID=' . $quizID;
     }
 } catch (Exception $e) {
     debug_err($pageName, $e);
@@ -123,7 +123,7 @@ db_close($conn);
                     </div>
                     <!-- /.panel-heading -->
                     <div class="panel-body">
-                        <form id="metadata-submission" method="post" action="<?php echo $phpself; ?>">
+                        <form id="metadata-submission" method="post" action="<?php echo $phpSelf; ?>">
                             <!--if 0 bucketUpdate; else if -1 delete;-->
                             <input type=hidden name="metadataUpdate" id="metadataUpdate" value="1" required>
                             <label for="QuizID" style="display:none">QuizID</label>
@@ -271,7 +271,7 @@ db_close($conn);
                 <h4 class="modal-title" id="bucket-dialogtitle">Edit Bucket</h4>
             </div>
             <div class="modal-body">
-                <form id="bucket-submission" method="post" action="<?php echo $phpself; ?>">
+                <form id="bucket-submission" method="post" action="<?php echo $phpSelf; ?>">
                     <input type=hidden name="bucketUpdate" id="bucketUpdate" value="1" required>
                     <label for="MatchingID" style="display:none">MatchingID</label>
                     <input type="text" class="form-control bucket-dialoginput" id="MatchingID" name="matchingID"
@@ -303,7 +303,7 @@ db_close($conn);
                 <h4 class="modal-title" id="item-dialogtitle">Edit Item</h4>
             </div>
             <div class="modal-body">
-                <form id="item-submission" method="post" action="<?php echo $phpself; ?>">
+                <form id="item-submission" method="post" action="<?php echo $phpSelf; ?>">
                     <input type=hidden name="itemUpdate" id="itemUpdate" value="1" required>
                     <label for='Bucket'>Terminology/Bucket</label>
                     <select class="form-control item-dialoginput" id="Bucket" form="item-submission" name="matchingID"

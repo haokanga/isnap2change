@@ -29,7 +29,7 @@ try {
                     $conn->commit();
                 } catch (Exception $e) {
                     debug_err($pageName, $e);
-                    $conn->rollback();
+                    $conn->rollBack();
                 }
             } else if ($metadataUpdate == -1) {
                 $quizID = $_POST['quizID'];
@@ -61,7 +61,7 @@ try {
         $topicResult = getTopics($conn);
         $materialRes = getLearningMaterial($conn, $quizID);
         $mcqQuesResult = getMCQQuestions($conn, $quizID);
-        $phpself = $pageName . '.php?quizID=' . $quizID;
+        $phpSelf = $pageName . '.php?quizID=' . $quizID;
     }
 } catch (Exception $e) {
     debug_err($pageName, $e);
@@ -102,7 +102,7 @@ db_close($conn);
                     </div>
                     <!-- /.panel-heading -->
                     <div class="panel-body">
-                        <form id="metadata-submission" method="post" action="<?php echo $phpself; ?>">
+                        <form id="metadata-submission" method="post" action="<?php echo $phpSelf; ?>">
                             <!--if 0 update; else if -1 delete;-->
                             <input type=hidden name="metadataUpdate" id="metadataUpdate" value="1" required>
                             <label for="QuizID" style="display:none">QuizID</label>
@@ -236,7 +236,7 @@ db_close($conn);
                 <h4 class="modal-title" id="dialogTitle">Edit Question</h4>
             </div>
             <div class="modal-body">
-                <form id="submission" method="post" action="<?php echo $phpself; ?>">
+                <form id="submission" method="post" action="<?php echo $phpSelf; ?>">
                     <input type=hidden name="update" id="update" value="1" required>
                     <label for="MCQID" style="display:none">MCQID</label>
                     <input type="text" class="form-control dialoginput" id="MCQID" name="mcqID" style="display:none">

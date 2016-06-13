@@ -50,7 +50,7 @@
 			$conn->commit();
 		} catch(Exception $e) {
 			if($conn != null) {
-				$conn->rollback();
+				$conn->rollBack();
 				db_close($conn);
 			}
 			

@@ -23,7 +23,7 @@ try {
     if (isset($_GET['quizID'])) {
         $quizID = $_GET['quizID'];
         $materialRes = getLearningMaterial($conn, $quizID);
-        $phpself = $pageName . '.php?quizID=' . $quizID;
+        $phpSelf = $pageName . '.php?quizID=' . $quizID;
     }
 } catch (Exception $e) {
     debug_err($pageName, $e);
@@ -65,7 +65,7 @@ db_close($conn);
     </script>
 </head>
 <body>
-<form method="post" action="<?php echo $phpself ?>">
+<form method="post" action="<?php echo $phpSelf ?>">
     <label for="QuizID" style="display:none">QuizID</label>
     <input type="text" class="form-control" id="QuizID" name="quizID" style="display:none"
            value="<?php echo $quizID; ?>" required>

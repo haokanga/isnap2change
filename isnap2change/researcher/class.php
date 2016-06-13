@@ -198,7 +198,7 @@ db_close($conn);
                     <label for="UnlockedProgress">UnlockedProgress</label>
                     <input type="text" class="dialoginput pull-right" id="textInput" value="" disabled>
                     <input type="range" class="dialoginput" min="0"
-                           max="<?php echo min($classResult[$i]->UnlockedProgress, $weekResult->WeekNum) ?>"
+                           max="<?php echo $weekResult->WeekNum ?>"
                            id="UnlockedProgress" name="unlockedProgress" onchange="updateTextInput(this.value);">
                 </form>
             </div>
@@ -230,6 +230,10 @@ if (isset($_GET['schoolID'])) {
 <script>
     function randomString(length) {
         return Math.round((Math.pow(36, length + 1) - Math.random() * Math.pow(36, length))).toString(36).slice(1);
+    }
+    
+    function updateTextInput(val) {
+        document.getElementById('textInput').value = val;
     }
     //DO NOT put them in $(document).ready() since the table has multi pages
 
@@ -284,10 +288,6 @@ if (isset($_GET['schoolID'])) {
         dialogInputArr.eq(0).prop('disabled', false);
         $('#submission').submit();
     });
-
-    function updateTextInput(val) {
-        document.getElementById('textInput').value = val;
-    }
 
     $(document).ready(function () {
         var table = $('#datatables').DataTable({

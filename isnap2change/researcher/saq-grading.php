@@ -3,7 +3,7 @@ session_start();
 require_once("../mysql-lib.php");
 require_once("../debug.php");
 require_once("researcher-validation.php");
-$pageName = "saq";
+$pageName = "saq-grading";
 $columnName = array('QuizID', 'Week', 'StudentID', 'TopicName', 'ClassName', 'Username');
 
 try {
@@ -14,7 +14,7 @@ try {
             if ($update == -1) {
                 $quizID = $_POST['quizID'];
                 $studentID = $_POST['studentID'];
-                deleteSAQSubmission($conn, $quizID, $studentID);
+                deleteSAQSubmission($conn, $quizID, $studentID, $pageName);
             }
         }
     }
@@ -75,9 +75,7 @@ db_close($conn);
                                 <tbody>
                                 <?php for ($i = 0; $i < count($submissionResult); $i++) {
                                     $quizID = $submissionResult[$i]->QuizID;
-                                    $studentID = $submissionResult[$i]->StudentID;
-
-                                    ?>
+                                    $studentID = $submissionResult[$i]->StudentID; ?>
                                     <tr class="<?php if ($i % 2 == 0) {
                                         echo "odd";
                                     } else {
@@ -95,7 +93,7 @@ db_close($conn);
                                             <span class="glyphicon glyphicon-remove pull-right"
                                                   aria-hidden="true"></span>
                                             <span class="pull-right" aria-hidden="true">&nbsp;</span>
-                                            <a href="saq-grading-editor.php?quizID=<?php echo $quizID ?>&studentID=<?php echo $studentID ?>">
+                                            <a href="saq-grader.php?quizID=<?php echo $quizID ?>&studentID=<?php echo $studentID ?>">
                                                 <span class="glyphicon glyphicon-edit pull-right"
                                                       aria-hidden="true"></span></a>
                                         </td>

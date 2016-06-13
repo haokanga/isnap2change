@@ -22,7 +22,7 @@
         //get learning-material
         $materialRes = getLearningMaterial($conn, $quizID);    
         
-        // get saq questionss;
+        // get saq questions;
         $saqResult = getSAQQuestions($conn, $quizID);
         
         //if submitted
@@ -42,10 +42,7 @@
             $quizID = $_POST["quizID"];
             $saqID = $_POST["saqID"];    
             $answer = $_POST["answer"];
-            for($i=0; $i<count($saqID); $i++) {
-                updateSAQQuestionRecord($conn, $saqID[$i], $studentID, $answer[$i]);
-            }            
-            updateQuizRecord($conn, $quizID, $studentID, "UNGRADED");
+            updateSAQSubmission($conn, $quizID, $saqID, $studentID, $answer, $pageName);            
         }
         db_close($conn);       
         $lastsaqID = -1;
