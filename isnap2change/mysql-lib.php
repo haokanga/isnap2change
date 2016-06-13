@@ -454,6 +454,25 @@
         return $mcqQuesResult;
     }
 
+    function getMCQQuestionNum(PDO $conn, $quizID){
+        $quesNumSql = "SELECT Count(*)
+				       FROM   MCQ_Question
+				       WHERE  QuizID = ?";
+
+        $quesNumQuery = $conn->prepare($quesNumSql);
+        $quesNumQuery->execute(array($quizID));
+        $quesNumRes = $quesNumQuery->fetchColumn();
+
+        return $quesNumRes;
+    }
+
+    function updateMCQQuestionRecord(PDO $conn, $MCQID, $studentID, $choice){
+        $updateMCQQuesRecordSql = "INSERT INTO MCQ_Question_Record(StudentID, MCQID, Choice)
+							       VALUES (?,?,?) ON DUPLICATE KEY UPDATE Choice = ?;";
+        $updateMCQQuesRecordQuery = $conn->prepare($updateMCQQuesRecordSql);
+        $updateMCQQuesRecordQuery->execute(array($studentID, $MCQID, $choice, $choice));
+    }
+
     function getMCQQuiz(PDO $conn, $quizID){
         $quizSql = "SELECT *, COUNT(MCQID) AS Questions
                    FROM Quiz NATURAL JOIN Topic NATURAL JOIN MCQ_Section LEFT JOIN MCQ_Question USING (QuizID) WHERE QuizID = ? GROUP BY QuizID";
@@ -470,6 +489,36 @@
         $quizQuery->execute();
         $quizResult = $quizQuery->fetchAll(PDO::FETCH_OBJ);
         return $quizResult;
+    }
+
+    function getMCQSubmission(PDO $conn, $quizID, $studentID){
+        $mcqSubmissionSql = "SELECT MCQID, Question, Content, CorrectChoice, Choice, Explanation
+				             FROM   MCQ_Section NATURAL JOIN MCQ_Question
+									            NATURAL JOIN MCQ_Option
+									            NATURAL JOIN MCQ_Question_Record
+				             WHERE StudentID = ? AND QuizID = ?
+				             ORDER BY MCQID";
+
+        $mcqSubmissionQuery = $conn->prepare($mcqSubmissionSql);
+        $mcqSubmissionQuery->execute(array($studentID, $quizID));
+
+        $mcqSubmissionRes = $mcqSubmissionQuery->fetchAll(PDO::FETCH_OBJ);
+        return $mcqSubmissionRes;
+    }
+
+    function getMCQSubmissionCorrectNum(PDO $conn, $MCQIDArr, $answerArr){
+        $score = 0;
+
+        $mcqCorrectNumSql = "SELECT COUNT(*) FROM MCQ_Question 
+                             WHERE `MCQID` = BINARY ? AND `CorrectChoice` = BINARY ?";
+
+        for($i=0; $i<count($MCQIDArr); $i++){
+            $mcqCorrectNumQuery = $conn->prepare($mcqCorrectNumSql);
+            $mcqCorrectNumQuery->execute(array($MCQIDArr[$i], $answerArr[$i]));
+            $score = $score + $mcqCorrectNumQuery->fetchColumn();
+        }
+
+        return $score;
     }
     /* MCQ */
 
