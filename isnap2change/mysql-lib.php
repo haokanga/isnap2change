@@ -797,10 +797,12 @@
 		}
 	}
 
-    function getQuizzesStatusByWeek($conn, $studentID, $week){
+    function getQuizzesStatusByWeek(PDO $conn, $studentID, $week){
         $quizzesStatusSql = "SELECT Quiz.QuizID, QuizType, `Status` FROM Quiz LEFT JOIN (SELECT * FROM Quiz_Record WHERE StudentID = ?) Student_Quiz_Record ON Quiz.QuizID = Student_Quiz_Record.QuizID WHERE Week = ? ORDER BY Quiz.QuizID";
         $quizzesStatusQuery = $conn->prepare($quizzesStatusSql);
         $quizzesStatusQuery->execute(array($studentID, $week));
+        $quizzesStatusRes = $quizzesStatusQuery->fetchAll(PDO::FETCH_OBJ);
+        return $quizzesStatusRes;
     }
 	
 	function updatePosterSavedDoc(PDO $conn, $quizID, $studentID, $zwibblerDoc){

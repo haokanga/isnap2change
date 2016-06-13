@@ -26,7 +26,7 @@
 		$conn = db_connect();
 
 		//get all quizzes and status by studentID and week
-		getQuizzesStatusByWeek($conn, $studentID, $week);
+		$quizzesStatusRes = getQuizzesStatusByWeek($conn, $studentID, $week);
 
 
 	} catch(Exception $e){
