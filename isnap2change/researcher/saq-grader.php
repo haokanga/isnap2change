@@ -21,7 +21,7 @@ try {
                 $feedback = $_POST['feedback'];
                 $grading = $_POST['grading'];
                 updateSAQSubmissionGrading($conn, $quizID, $saqID, $studentID, $feedback, $grading, $pageName);
-                //header('Location: saq-grading.php');
+                header('Location: saq-grading.php');
             }
         }
     }

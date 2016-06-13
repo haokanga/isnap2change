@@ -993,6 +993,7 @@ function updateSAQSubmissionGrading(PDO $conn, $quizID, $saqID, $studentID, $fee
                updateSAQQuestionGrading($conn, $saqID[$i], $studentID, $feedback[$i], $grading[$i]);
             }
             updateQuizRecord($conn, $quizID, $studentID, "GRADED");
+            $conn->commit();
         } catch (Exception $e) {
             debug_err($pageName, $e);
             $conn->rollBack();
@@ -1040,6 +1041,7 @@ function updateSAQDraft(PDO $conn, $quizID, $saqID, $studentID, $answer, $pageNa
                 updateSAQQuestionRecord($conn, $saqID[$i], $studentID, $answer[$i]);
             }
             updateQuizRecord($conn, $quizID, $studentID, "UNSUBMITTED");
+            $conn->commit();
         } catch (Exception $e) {
             debug_err($pageName, $e);
             $conn->rollBack();
@@ -1057,6 +1059,7 @@ function updateSAQSubmission(PDO $conn, $quizID, $saqID, $studentID, $answer, $p
             updateSAQQuestionRecord($conn, $saqID[$i], $studentID, $answer[$i]);
         }
         updateQuizRecord($conn, $quizID, $studentID, "UNGRADED");
+        $conn->commit();
     } catch (Exception $e) {
         debug_err($pageName, $e);
         $conn->rollBack();
@@ -1074,6 +1077,7 @@ function deleteSAQSubmission(PDO $conn, $quizID, $studentID, $pageName)
             $saqID = $saqResult[$saqIndex]->SAQID;
             deleteSAQQuestionRecord($conn, $saqID, $studentID);
         }
+        $conn->commit();
     } catch (Exception $e) {
         debug_err($pageName, $e);
         $conn->rollBack();
