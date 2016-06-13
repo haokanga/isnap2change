@@ -165,12 +165,12 @@ db_close($conn);
                     <!--if 1, insert; else if 0 update; else if -1 delete;-->
                     <input type=hidden name="update" id="update" value="1">
                     <label for="ClassID" style="display:none">ClassID</label>
-                    <input type="text" class="form-control dialoginput" id="ClassID" name="classid"
+                    <input type="text" class="form-control dialoginput" id="ClassID" name="classID"
                            style="display:none">
                     <br><label for="ClassName">ClassName</label>
-                    <input type="text" class="form-control dialoginput" id="ClassName" name="classname" required>
+                    <input type="text" class="form-control dialoginput" id="ClassName" name="className" required>
                     <br><label for="SchoolName">SchoolName</label>
-                    <select class="form-control dialoginput" id="SchoolName" form="submission" name="schoolname"
+                    <select class="form-control dialoginput" id="SchoolName" form="submission" name="schoolName"
                             required>
                         <?php for ($i = 0; $i < count($schoolResult); $i++) { ?>
                             <option
@@ -179,10 +179,10 @@ db_close($conn);
                     </select>
                     <br><label for="TeacherToken">TeacherToken</label><span
                         class="glyphicon glyphicon-random pull-right"></span>
-                    <input type="text" class="form-control dialoginput" id="TeacherToken" name="teachertoken" required>
+                    <input type="text" class="form-control dialoginput" id="TeacherToken" name="teacherToken" required>
                     <br><label for="StudentToken">StudentToken</label><span
                         class="glyphicon glyphicon-random pull-right"></span>
-                    <input type="text" class="form-control dialoginput" id="StudentToken" name="studenttoken" required>
+                    <input type="text" class="form-control dialoginput" id="StudentToken" name="studentToken" required>
                     <br><label for="EnrolledStudents">EnrolledStudents</label>
                     <input type="text" class="form-control dialoginput" id="EnrolledStudents" name="EnrolledStudents">
                     <br><label for="UnlockedProgress">UnlockedProgress</label>
@@ -196,8 +196,8 @@ db_close($conn);
         </div>
     </div>
 </div>
-<input type=hidden name="keyword" id="keyword" value="<?php if (isset($_GET['schoolname'])) {
-    echo $_GET['schoolname'];
+<input type=hidden name="keyword" id="keyword" value="<?php if (isset($_GET['schoolName'])) {
+    echo $_GET['schoolName'];
 } ?>">
 
 <!-- SB Admin Library -->

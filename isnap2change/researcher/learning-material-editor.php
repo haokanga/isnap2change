@@ -8,10 +8,10 @@ $pageName = "learning-material-editor";
 try {
     $conn = db_connect();
     if ($_SERVER["REQUEST_METHOD"] == "POST") {
-        if (isset($_POST['richcontenttextarea'])) {
+        if (isset($_POST['richContentTextArea'])) {
             $conn = db_connect();
-            $content = $_POST['richcontenttextarea'];
-            $quizID = $_POST['quizid'];
+            $content = $_POST['richContentTextArea'];
+            $quizID = $_POST['quizID'];
             updateLearningMaterial($conn, $quizID, $content);
         }
     }
@@ -20,10 +20,10 @@ try {
 }
 
 try {
-    if (isset($_GET['quizid'])) {
-        $quizID = $_GET['quizid'];
+    if (isset($_GET['quizID'])) {
+        $quizID = $_GET['quizID'];
         $materialRes = getLearningMaterial($conn, $quizID);
-        $phpself = $pageName . '.php?quizid=' . $quizID;
+        $phpself = $pageName . '.php?quizID=' . $quizID;
     }
 } catch (Exception $e) {
     debug_err($pageName, $e);
@@ -67,9 +67,9 @@ db_close($conn);
 <body>
 <form method="post" action="<?php echo $phpself ?>">
     <label for="QuizID" style="display:none">QuizID</label>
-    <input type="text" class="form-control" id="QuizID" name="quizid" style="display:none"
+    <input type="text" class="form-control" id="QuizID" name="quizID" style="display:none"
            value="<?php echo $quizID; ?>" required>
-    <textarea name="richcontenttextarea">
+    <textarea name="richContentTextArea">
         <?php echo $materialRes->Content; ?>
     </textarea>
     <input type="submit" name='submitbutton' value="Save" class='submit'/> <span

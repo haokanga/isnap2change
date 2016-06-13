@@ -20,8 +20,8 @@ try {
             if ($update == 1) {
                 try {
                     $week = $_POST['week'];
-                    $quizType = $_POST['quiztype'];
-                    $topicName = $_POST['topicname'];
+                    $quizType = $_POST['quizType'];
+                    $topicName = $_POST['topicName'];
 
                     $conn->beginTransaction();
 
@@ -45,7 +45,7 @@ try {
                     $conn->rollback();
                 }
             } else if ($update == -1) {
-                $quizID = $_POST['quizid'];
+                $quizID = $_POST['quizID'];
                 deleteQuiz($conn, $quizID);
             }
         }
@@ -189,7 +189,7 @@ db_close($conn);
                     <!--if 1, insert; else if -1 delete;-->
                     <input type=hidden name="update" id="update" value="1" required>
                     <label for="QuizID" style="display:none">QuizID</label>
-                    <input type="text" class="form-control dialoginput" id="QuizID" name="quizid" style="display:none">
+                    <input type="text" class="form-control dialoginput" id="QuizID" name="quizID" style="display:none">
                     <label for="Week">Week</label>
                     <input type="text" class="form-control dialoginput" id="Week" name="week"
                            placeholder="Input Week Number" <?php if (isset($_GET['week'])) {
@@ -198,7 +198,7 @@ db_close($conn);
                     } ?> required>
                     <br>
                     <label for='QuizType'>QuizType</label>
-                    <select class="form-control dialoginput" id="QuizType" form="submission" name="quiztype" required>
+                    <select class="form-control dialoginput" id="QuizType" form="submission" name="quizType" required>
                         <option value="" disabled selected>Select Quiz Type</option>
                         <?php for ($i = 0; $i < count($quizTypeArray); $i++) { ?>
                             <option value="<?php echo $quizTypeArray[$i] ?>"><?php echo $quizTypeArray[$i] ?></option>
@@ -206,7 +206,7 @@ db_close($conn);
                     </select>
                     <br>
                     <label for='TopicName'>TopicName</label>
-                    <select class="form-control dialoginput" id="TopicName" form="submission" name="topicname" required>
+                    <select class="form-control dialoginput" id="TopicName" form="submission" name="topicName" required>
                         <option value="" disabled selected>Select Topic</option>
                         <?php for ($j = 0; $j < count($topicResult); $j++) { ?>
                             <option

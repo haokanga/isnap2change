@@ -12,28 +12,28 @@ try {
         if (isset($_POST['update'])) {
             $update = $_POST['update'];
             if ($update == 1) {
-                $className = $_POST['classname'];
-                $schoolName = $_POST['schoolname'];
-                $teacherToken = $_POST['teachertoken'];
-                $studentToken = $_POST['studenttoken'];
+                $className = $_POST['className'];
+                $schoolName = $_POST['schoolName'];
+                $teacherToken = $_POST['teacherToken'];
+                $studentToken = $_POST['studentToken'];
                 $schoolID = getSchoolByName($conn, $schoolName)->SchoolID;
                 $classID = createClass($conn, $schoolID, $className);
                 updateToken($conn, $classID, $teacherToken, "TEACHER");
                 updateToken($conn, $classID, $studentToken, "STUDENT");
             } else if ($update == 0) {
-                $classID = $_POST['classid'];
-                $className = $_POST['classname'];
-                $schoolName = $_POST['schoolname'];
-                $teacherToken = $_POST['teachertoken'];
-                $studentToken = $_POST['studenttoken'];
-                $unlockedProgress = $_POST['unlockedprogress'];
+                $classID = $_POST['classID'];
+                $className = $_POST['className'];
+                $schoolName = $_POST['schoolName'];
+                $teacherToken = $_POST['teacherToken'];
+                $studentToken = $_POST['studentToken'];
+                $unlockedProgress = $_POST['unlockedProgress'];
 
                 $schoolID = getSchoolByName($conn, $schoolName)->SchoolID;
                 updateClass($conn, $classID, $schoolID, $className, $unlockedProgress);
                 updateToken($conn, $classID, $teacherToken, "TEACHER");
                 updateToken($conn, $classID, $studentToken, "STUDENT");
             } else if ($update == -1) {
-                $classID = $_POST['classid'];
+                $classID = $_POST['classID'];
                 deleteClass($conn, $classID);
             }
         }
@@ -107,7 +107,7 @@ db_close($conn);
                                     } ?>">
                                         <td style="display:none"><?php echo $classResult[$i]->ClassID ?></td>
                                         <td>
-                                            <a href="student.php?classid=<?php echo $classResult[$i]->ClassID ?>"><?php echo $classResult[$i]->ClassName ?></a>
+                                            <a href="student.php?classID=<?php echo $classResult[$i]->ClassID ?>"><?php echo $classResult[$i]->ClassName ?></a>
                                         </td>
                                         <td><?php echo $classResult[$i]->SchoolName ?></td>
                                         <td><?php for ($j = 0; $j < count($tokenResult); $j++) {
@@ -169,16 +169,16 @@ db_close($conn);
             </div>
             <div class="modal-body">
                 <form id="submission" method="post"
-                      action="<?php if (isset($_GET['schoolid'])) echo $_SERVER['PHP_SELF'] . '?schoolid=' . $_GET['schoolid']; else echo $_SERVER['PHP_SELF']; ?>">
+                      action="<?php if (isset($_GET['schoolID'])) echo $_SERVER['PHP_SELF'] . '?schoolID=' . $_GET['schoolID']; else echo $_SERVER['PHP_SELF']; ?>">
                     <!--if 1, insert; else if 0 update; else if -1 delete;-->
                     <input type=hidden name="update" id="update" value="1" required>
                     <label for="ClassID" style="display:none">ClassID</label>
-                    <input type="text" class="form-control dialoginput" id="ClassID" name="classid"
+                    <input type="text" class="form-control dialoginput" id="ClassID" name="classID"
                            style="display:none">
                     <br><label for="ClassName">ClassName</label>
-                    <input type="text" class="form-control dialoginput" id="ClassName" name="classname" required>
+                    <input type="text" class="form-control dialoginput" id="ClassName" name="className" required>
                     <br><label for="SchoolName">SchoolName</label>
-                    <select class="form-control dialoginput" id="SchoolName" form="submission" name="schoolname"
+                    <select class="form-control dialoginput" id="SchoolName" form="submission" name="schoolName"
                             required>
                         <?php for ($i = 0; $i < count($schoolResult); $i++) { ?>
                             <option
@@ -187,10 +187,10 @@ db_close($conn);
                     </select>
                     <br><label for="TeacherToken">TeacherToken</label><span
                         class="glyphicon glyphicon-random pull-right"></span>
-                    <input type="text" class="form-control dialoginput" id="TeacherToken" name="teachertoken" required>
+                    <input type="text" class="form-control dialoginput" id="TeacherToken" name="teacherToken" required>
                     <br><label for="StudentToken">StudentToken</label><span
                         class="glyphicon glyphicon-random pull-right"></span>
-                    <input type="text" class="form-control dialoginput" id="StudentToken" name="studenttoken" required>
+                    <input type="text" class="form-control dialoginput" id="StudentToken" name="studentToken" required>
                     <br>
                     <label for="EnrolledStudents">EnrolledStudents</label>
                     <input type="text" class="form-control dialoginput" id="EnrolledStudents" name="enrolledstudents">
@@ -199,7 +199,7 @@ db_close($conn);
                     <input type="text" class="dialoginput pull-right" id="textInput" value="" disabled>
                     <input type="range" class="dialoginput" min="0"
                            max="<?php echo min($classResult[$i]->UnlockedProgress, $weekResult->WeekNum) ?>"
-                           id="UnlockedProgress" name="unlockedprogress" onchange="updateTextInput(this.value);">
+                           id="UnlockedProgress" name="unlockedProgress" onchange="updateTextInput(this.value);">
                 </form>
             </div>
             <div class="modal-footer">
@@ -211,9 +211,9 @@ db_close($conn);
 </div>
 <input type=hidden name="keyword" id="keyword" value="
       <?php
-if (isset($_GET['schoolid'])) {
+if (isset($_GET['schoolID'])) {
     try {
-        $schoolID = $_GET['schoolid'];
+        $schoolID = $_GET['schoolID'];
         $schoolResult = getSchool($conn, $schoolID);
         echo $schoolResult->SchoolName;
     } catch (Exception $e) {

@@ -13,11 +13,11 @@ try {
             $update = $_POST['update'];
             //reset student password
             if ($update == 0) {
-                $studentID = $_POST['studentid'];
+                $studentID = $_POST['studentID'];
                 resetPassword($conn, $studentID);
             } //delete student (with help of DELETE CASCADE)            
             else if ($update == -1) {
-                $studentID = $_POST['studentid'];
+                $studentID = $_POST['studentID'];
                 deleteStudent($conn, $studentID);
             }
         }
@@ -146,7 +146,7 @@ db_close($conn);
             </div>
             <div class="modal-body">
                 <form id="submission" method="post"
-                      action="<?php if (isset($_GET['classid'])) echo $_SERVER['PHP_SELF'] . '?classid=' . $_GET['classid']; else echo $_SERVER['PHP_SELF']; ?>">
+                      action="<?php if (isset($_GET['classID'])) echo $_SERVER['PHP_SELF'] . '?classID=' . $_GET['classID']; else echo $_SERVER['PHP_SELF']; ?>">
                     <!--if 0 update; else if -1 delete;-->
                     <input type=hidden name="update" id="update" value="1">
                     <?php for ($i = 0; $i < count($columnName); $i++) {
@@ -156,7 +156,7 @@ db_close($conn);
                                 echo 'style="display:none"';
                             } ?>><?php echo $columnName[$i]; ?></label>
                             <input type="text" class="form-control dialoginput" id="<?php echo $columnName[$i]; ?>"
-                                   name="<?php echo strtolower($columnName[$i]); ?>"
+                                   name="<?php echo lcfirst($columnName[$i]); ?>"
                                 <?php if ($i == 0) {
                                     echo 'style="display:none"';
                                 } ?> >
@@ -177,10 +177,10 @@ db_close($conn);
 </div>
 <input type=hidden name="keyword" id="keyword" value="
       <?php
-if (isset($_GET['classid'])) {
+if (isset($_GET['classID'])) {
     // get ClassName
     try {
-        $classID = $_GET['classid'];
+        $classID = $_GET['classID'];
         $classResult = getClass($conn, $classID);
         echo $classResult->ClassName;
     } catch (Exception $e) {
@@ -201,7 +201,7 @@ if (isset($_GET['classid'])) {
     var dialogInputArr = $('.dialoginput');
     $('.glyphicon-edit').on('click', function () {
         $('#update').val(0);
-        //studentid, username
+        //studentID, username
         dialogInputArr.eq(0).val($(this).parent().parent().children('td').eq(0).text());
         dialogInputArr.eq(1).val($(this).parent().text());
         dialogInputArr.each(function () {
@@ -211,7 +211,7 @@ if (isset($_GET['classid'])) {
     $('.glyphicon-remove').on('click', function () {
         if (confirm('[WARNING] Are you sure to remove this student? All the data of this student will also get deleted (not recoverable). It includes student submissions of every task and your grading/feedback, not only the student itself.')) {
             $('#update').val(-1);
-            //studentid, username
+            //studentID, username
             dialogInputArr.eq(0).val($(this).parent().parent().children('td').eq(0).text());
             dialogInputArr.eq(1).val($(this).parent().text());
             //enable all the input

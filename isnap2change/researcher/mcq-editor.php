@@ -10,13 +10,13 @@ $mcqQuesColName = array('MCQID', 'Question', 'Option', 'Explanation', 'Edit');
 try {
     $conn = db_connect();
     if ($_SERVER["REQUEST_METHOD"] == "POST") {
-        if (isset($_POST['metadataupdate'])) {
-            $metadataupdate = $_POST['metadataupdate'];
-            if ($metadataupdate == 0) {
+        if (isset($_POST['metadataUpdate'])) {
+            $metadataUpdate = $_POST['metadataUpdate'];
+            if ($metadataUpdate == 0) {
                 try {
-                    $quizID = $_POST['quizid'];
+                    $quizID = $_POST['quizID'];
                     $week = $_POST['week'];
-                    $topicName = $_POST['topicname'];
+                    $topicName = $_POST['topicName'];
                     $points = $_POST['points'];
                     $questionnaires = $_POST['questionnaires'];
                     $conn->beginTransaction();
@@ -31,8 +31,8 @@ try {
                     debug_err($pageName, $e);
                     $conn->rollback();
                 }
-            } else if ($metadataupdate == -1) {
-                $quizID = $_POST['quizid'];
+            } else if ($metadataUpdate == -1) {
+                $quizID = $_POST['quizID'];
                 deleteQuiz($conn, $quizID);
                 header('Location: mcq.php');
             }
@@ -40,12 +40,12 @@ try {
         if (isset($_POST['update'])) {
             $update = $_POST['update'];
             if ($update == 1) {
-                $quizID = $_POST['quizid'];
+                $quizID = $_POST['quizID'];
                 $question = $_POST['question'];
                 $mcqID = createMCQQuestion($conn, $quizID, $question);
-                header('Location: mcq-option-editor.php?quizid=' . $quizID . '&mcqid=' . $mcqID);
+                header('Location: mcq-option-editor.php?quizID=' . $quizID . '&mcqID=' . $mcqID);
             } else if ($update == -1) {
-                $mcqID = $_POST['mcqid'];
+                $mcqID = $_POST['mcqID'];
                 deleteMCQQuestion($conn, $mcqID);
             }
         }
@@ -55,13 +55,13 @@ try {
 }
 
 try {
-    if (isset($_GET['quizid'])) {
-        $quizID = $_GET['quizid'];
+    if (isset($_GET['quizID'])) {
+        $quizID = $_GET['quizID'];
         $quizResult = getMCQQuiz($conn, $quizID);
         $topicResult = getTopics($conn);
         $materialRes = getLearningMaterial($conn, $quizID);
         $mcqQuesResult = getMCQQuestions($conn, $quizID);
-        $phpself = $pageName . '.php?quizid=' . $quizID;
+        $phpself = $pageName . '.php?quizID=' . $quizID;
     }
 } catch (Exception $e) {
     debug_err($pageName, $e);
@@ -104,9 +104,9 @@ db_close($conn);
                     <div class="panel-body">
                         <form id="metadata-submission" method="post" action="<?php echo $phpself; ?>">
                             <!--if 0 update; else if -1 delete;-->
-                            <input type=hidden name="metadataupdate" id="metadataupdate" value="1" required>
+                            <input type=hidden name="metadataUpdate" id="metadataUpdate" value="1" required>
                             <label for="QuizID" style="display:none">QuizID</label>
-                            <input type="text" class="form-control" id="QuizID" name="quizid" style="display:none"
+                            <input type="text" class="form-control" id="QuizID" name="quizID" style="display:none"
                                    value="<?php echo $quizResult->QuizID; ?>">
                             <br>
                             <label for="Week">Week</label>
@@ -114,7 +114,7 @@ db_close($conn);
                                    placeholder="Input Week Number" value="<?php echo $quizResult->Week; ?>">
                             <br>
                             <label for='TopicName'>TopicName</label>
-                            <select class="form-control" id="TopicName" form="metadata-submission" name="topicname"
+                            <select class="form-control" id="TopicName" form="metadata-submission" name="topicName"
                                     required>
                                 <?php for ($j = 0; $j < count($topicResult); $j++) { ?>
                                     <option
@@ -192,7 +192,7 @@ db_close($conn);
                                             <span class="glyphicon glyphicon-remove pull-right "
                                                   aria-hidden="true"></span>
                                             <span class="pull-right" aria-hidden="true">&nbsp;</span>
-                                            <a href="mcq-option-editor.php?quizid=<?php echo $quizID ?>&mcqid=<?php echo $mcqQuesResult[$i]->$mcqQuesColName[0]; ?>">
+                                            <a href="mcq-option-editor.php?quizID=<?php echo $quizID ?>&mcqID=<?php echo $mcqQuesResult[$i]->$mcqQuesColName[0]; ?>">
                                                 <span class="glyphicon glyphicon-edit pull-right" data-toggle="modal"
                                                       data-target="#dialog" aria-hidden="true"></span></a>
                                         </td>
@@ -239,12 +239,12 @@ db_close($conn);
                 <form id="submission" method="post" action="<?php echo $phpself; ?>">
                     <input type=hidden name="update" id="update" value="1" required>
                     <label for="MCQID" style="display:none">MCQID</label>
-                    <input type="text" class="form-control dialoginput" id="MCQID" name="mcqid" style="display:none">
+                    <input type="text" class="form-control dialoginput" id="MCQID" name="mcqID" style="display:none">
                     <label for="Question">Question</label>
                     <input type="text" class="form-control dialoginput" id="Question" name="question" value="" required>
                     <br>
                     <label for="QuizID" style="display:none">QuizID</label>
-                    <input type="text" class="form-control" id="QuizID" name="quizid" style="display:none"
+                    <input type="text" class="form-control" id="QuizID" name="quizID" style="display:none"
                            value="<?php echo $quizID; ?>" required>
                     <br>
                 </form>
@@ -272,7 +272,7 @@ db_close($conn);
     });
     $('div > .glyphicon-remove').on('click', function () {
         if (confirm('[WARNING] Are you sure to remove this quiz? If you remove one quiz. All the questions and submission of this quiz will also get deleted (not recoverable). It includes learning material, questions and options, their submissions and your grading/feedback, not only the quiz itself.')) {
-            $('#metadataupdate').val(-1);
+            $('#metadataUpdate').val(-1);
             $('#metadata-submission').submit();
         }
     });
@@ -299,7 +299,7 @@ db_close($conn);
             ]
         })
         $('#metadata-save').on('click', function () {
-            $('#metadataupdate').val(0);
+            $('#metadataUpdate').val(0);
             $('#metadata-submission').validate({
                 rules: {
                     week: {

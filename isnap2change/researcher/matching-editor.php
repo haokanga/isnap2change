@@ -11,13 +11,13 @@ $matchingQuesVisualName = array('MatchingID', 'Terminology/Bucket', 'OptionID', 
 try {
     $conn = db_connect();
     if ($_SERVER["REQUEST_METHOD"] == "POST") {
-        if (isset($_POST['metadataupdate'])) {
-            $metadataupdate = $_POST['metadataupdate'];
-            if ($metadataupdate == 0) {
+        if (isset($_POST['metadataUpdate'])) {
+            $metadataUpdate = $_POST['metadataUpdate'];
+            if ($metadataUpdate == 0) {
                 try {
-                    $quizID = $_POST['quizid'];
+                    $quizID = $_POST['quizID'];
                     $week = $_POST['week'];
-                    $topicName = $_POST['topicname'];
+                    $topicName = $_POST['topicName'];
                     $description = $_POST['description'];
                     $points = $_POST['points'];
                     $conn->beginTransaction();
@@ -32,40 +32,40 @@ try {
                     debug_err($pageName, $e);
                     $conn->rollback();
                 }
-            } else if ($metadataupdate == -1) {
-                $quizID = $_POST['quizid'];
+            } else if ($metadataUpdate == -1) {
+                $quizID = $_POST['quizID'];
                 deleteQuiz($conn, $quizID);
                 header('Location: matching.php');
             }
         }
-        if (isset($_POST['bucketupdate'])) {
-            $bucketupdate = $_POST['bucketupdate'];
-            if ($bucketupdate == 1) {
-                $quizID = $_POST['quizid'];
+        if (isset($_POST['bucketUpdate'])) {
+            $bucketUpdate = $_POST['bucketUpdate'];
+            if ($bucketUpdate == 1) {
+                $quizID = $_POST['quizID'];
                 $question = $_POST['question'];
                 createMatchingQuestion($conn, $quizID, $question);
-            } else if ($bucketupdate == 0) {
-                $matchingID = $_POST['matchingid'];
+            } else if ($bucketUpdate == 0) {
+                $matchingID = $_POST['matchingID'];
                 $question = $_POST['question'];
                 updateMatchingQuestion($conn, $matchingID, $question);
-            } else if ($bucketupdate == -1) {
-                $matchingID = $_POST['matchingid'];
+            } else if ($bucketUpdate == -1) {
+                $matchingID = $_POST['matchingID'];
                 deleteMatchingQuestion($conn, $matchingID);
             }
         }
-        if (isset($_POST['itemupdate'])) {
-            $itemupdate = $_POST['itemupdate'];
-            if ($itemupdate == 1) {
-                $matchingID = $_POST['matchingid'];
+        if (isset($_POST['itemUpdate'])) {
+            $itemUpdate = $_POST['itemUpdate'];
+            if ($itemUpdate == 1) {
+                $matchingID = $_POST['matchingID'];
                 $content = $_POST['content'];
                 createMatchingOption($conn, $matchingID, $content);
-            } else if ($itemupdate == 0) {
-                $optionID = $_POST['optionid'];
-                $matchingID = $_POST['matchingid'];
+            } else if ($itemUpdate == 0) {
+                $optionID = $_POST['optionID'];
+                $matchingID = $_POST['matchingID'];
                 $content = $_POST['content'];
                 updateMatchingOption($conn, $matchingID, $optionID, $content);
-            } else if ($itemupdate == -1) {
-                $optionID = $_POST['optionid'];
+            } else if ($itemUpdate == -1) {
+                $optionID = $_POST['optionID'];
                 deleteMatchingOption($conn, $optionID);
             }
         }
@@ -75,14 +75,14 @@ try {
 }
 
 try {
-    if (isset($_GET['quizid'])) {
-        $quizID = $_GET['quizid'];
+    if (isset($_GET['quizID'])) {
+        $quizID = $_GET['quizID'];
         $quizResult = getMatchingQuiz($conn, $quizID);
         $topicResult = getTopics($conn);
         $materialRes = getLearningMaterial($conn, $quizID);
         $matchingQuesResult = getMatchingQuestions($conn, $quizID);
         $bucketResult = getMatchingBuckets($conn, $quizID);
-        $phpself = $pageName . '.php?quizid=' . $quizID;
+        $phpself = $pageName . '.php?quizID=' . $quizID;
     }
 } catch (Exception $e) {
     debug_err($pageName, $e);
@@ -124,10 +124,10 @@ db_close($conn);
                     <!-- /.panel-heading -->
                     <div class="panel-body">
                         <form id="metadata-submission" method="post" action="<?php echo $phpself; ?>">
-                            <!--if 0 bucketupdate; else if -1 delete;-->
-                            <input type=hidden name="metadataupdate" id="metadataupdate" value="1" required>
+                            <!--if 0 bucketUpdate; else if -1 delete;-->
+                            <input type=hidden name="metadataUpdate" id="metadataUpdate" value="1" required>
                             <label for="QuizID" style="display:none">QuizID</label>
-                            <input type="text" class="form-control" id="QuizID" name="quizid" style="display:none"
+                            <input type="text" class="form-control" id="QuizID" name="quizID" style="display:none"
                                    value="<?php echo $quizResult->QuizID; ?>">
                             <br>
                             <label for="Week">Week</label>
@@ -135,7 +135,7 @@ db_close($conn);
                                    placeholder="Input Week Number" value="<?php echo $quizResult->Week; ?>">
                             <br>
                             <label for='TopicName'>TopicName</label>
-                            <select class="form-control" id="TopicName" form="metadata-submission" name="topicname"
+                            <select class="form-control" id="TopicName" form="metadata-submission" name="topicName"
                                     required>
                                 <?php for ($j = 0; $j < count($topicResult); $j++) { ?>
                                     <option
@@ -272,16 +272,16 @@ db_close($conn);
             </div>
             <div class="modal-body">
                 <form id="bucket-submission" method="post" action="<?php echo $phpself; ?>">
-                    <input type=hidden name="bucketupdate" id="bucketupdate" value="1" required>
+                    <input type=hidden name="bucketUpdate" id="bucketUpdate" value="1" required>
                     <label for="MatchingID" style="display:none">MatchingID</label>
-                    <input type="text" class="form-control bucket-dialoginput" id="MatchingID" name="matchingid"
+                    <input type="text" class="form-control bucket-dialoginput" id="MatchingID" name="matchingID"
                            style="display:none">
                     <label for="Question">Terminology/Bucket</label>
                     <input type="text" class="form-control bucket-dialoginput" id="Question" name="question" value=""
                            required>
                     <br>
                     <label for="QuizID" style="display:none">QuizID</label>
-                    <input type="text" class="form-control" id="QuizID" name="quizid" style="display:none"
+                    <input type="text" class="form-control" id="QuizID" name="quizID" style="display:none"
                            value="<?php echo $quizID; ?>" required>
                     <br>
                 </form>
@@ -304,9 +304,9 @@ db_close($conn);
             </div>
             <div class="modal-body">
                 <form id="item-submission" method="post" action="<?php echo $phpself; ?>">
-                    <input type=hidden name="itemupdate" id="itemupdate" value="1" required>
+                    <input type=hidden name="itemUpdate" id="itemUpdate" value="1" required>
                     <label for='Bucket'>Terminology/Bucket</label>
-                    <select class="form-control item-dialoginput" id="Bucket" form="item-submission" name="matchingid"
+                    <select class="form-control item-dialoginput" id="Bucket" form="item-submission" name="matchingID"
                             required>
                         <option value="" disabled selected>Select Bucket</option>
                         <?php for ($j = 0; $j < count($bucketResult); $j++) { ?>
@@ -316,7 +316,7 @@ db_close($conn);
                     </select>
                     <br>
                     <label for="OptionID" style="display:none">OptionID</label>
-                    <input type="text" class="form-control item-dialoginput" id="OptionID" name="optionid"
+                    <input type="text" class="form-control item-dialoginput" id="OptionID" name="optionID"
                            style="display:none">
                     <label for="Content">Explanation/Item</label>
                     <input type="text" class="form-control item-dialoginput" id="Content" name="content" value=""
@@ -340,7 +340,7 @@ db_close($conn);
     var bucketDialogInputArr = $('.bucket-dialoginput');
     var itemDialogInputArr = $('.item-dialoginput');
     $('#metadata-save').on('click', function () {
-        $('#metadataupdate').val(0);
+        $('#metadataUpdate').val(0);
         $('#metadata-submission').validate({
             rules: {
                 week: {
@@ -357,26 +357,26 @@ db_close($conn);
     });
     $('#metadata-remove').on('click', function () {
         if (confirm('[WARNING] Are you sure to remove this quiz? If you remove one quiz. All the questions and submission of this quiz will also get deleted (not recoverable). It includes learning material, questions and options, their submissions and your grading/feedback, not only the quiz itself.')) {
-            $('#metadataupdate').val(-1);
+            $('#metadataUpdate').val(-1);
             $('#metadata-submission').submit();
         }
     });
     $('.bucket-plus').on('click', function () {
         $('#bucket-dialogtitle').text("Add Bucket");
-        $('#bucketupdate').val(1);
+        $('#bucketUpdate').val(1);
         for (i = 0; i < bucketDialogInputArr.length; i++) {
             bucketDialogInputArr.eq(i).val('');
         }
     });
     $('.bucket-edit').on('click', function () {
         $('#bucket-dialogtitle').text("Edit Bucket");
-        $('#bucketupdate').val(0);
+        $('#bucketUpdate').val(0);
         for (i = 0; i < bucketDialogInputArr.length; i++) {
             bucketDialogInputArr.eq(i).val($(this).parent().parent().children('td').eq(i).text().trim());
         }
     });
     $('.bucket-remove').on('click', function () {
-        $('#bucketupdate').val(-1);
+        $('#bucketUpdate').val(-1);
         for (i = 0; i < bucketDialogInputArr.length; i++) {
             bucketDialogInputArr.eq(i).val($(this).parent().parent().children('td').eq(i).text().trim());
         }
@@ -388,14 +388,14 @@ db_close($conn);
     });
     $('.item-plus').on('click', function () {
         $('#item-dialogtitle').text("Add Item");
-        $('#itemupdate').val(1);
+        $('#itemUpdate').val(1);
         for (i = 0; i < itemDialogInputArr.length; i++) {
             itemDialogInputArr.eq(i).val('');
         }
     });
     $('.item-edit').on('click', function () {
         $('#item-dialogtitle').text("Edit Item");
-        $('#itemupdate').val(0);
+        $('#itemUpdate').val(0);
         var bucketText = $(this).parent().parent().children('td').eq(1).text().trim();
         var index = $('#Bucket option').filter(function () {
             return $(this).html() == bucketText;
@@ -406,7 +406,7 @@ db_close($conn);
         }
     });
     $('.item-remove').on('click', function () {
-        $('#itemupdate').val(-1);
+        $('#itemUpdate').val(-1);
         for (i = 1; i < itemDialogInputArr.length; i++) {
             itemDialogInputArr.eq(i).val($(this).parent().parent().children('td').eq(i + 1).text().trim());
         }

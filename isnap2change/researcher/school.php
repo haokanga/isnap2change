@@ -13,16 +13,16 @@ try {
             $update = $_POST['update'];
             // insert
             if ($update == 1) {
-                $schoolName = $_POST['schoolname'];
+                $schoolName = $_POST['schoolName'];
                 createSchool($conn, $schoolName);
             } // update 
             else if ($update == 0) {
-                $schoolID = $_POST['schoolid'];
-                $schoolName = $_POST['schoolname'];
+                $schoolID = $_POST['schoolID'];
+                $schoolName = $_POST['schoolName'];
                 updateSchool($conn, $schoolID, $schoolName);
             } // remove school (with help of DELETE CASCADE) 
             else if ($update == -1) {
-                $schoolID = $_POST['schoolid'];
+                $schoolID = $_POST['schoolID'];
                 deleteSchool($conn, $schoolID);
             }
         }
@@ -90,7 +90,7 @@ db_close($conn);
                                     } ?>">
                                         <td style="display:none"><?php echo $schoolResult[$i]->SchoolID ?></td>
                                         <td>
-                                            <a href="class.php?schoolid=<?php echo $schoolResult[$i]->SchoolID ?>"><?php echo $schoolResult[$i]->SchoolName ?></a>
+                                            <a href="class.php?schoolID=<?php echo $schoolResult[$i]->SchoolID ?>"><?php echo $schoolResult[$i]->SchoolName ?></a>
                                         </td>
                                         <td><?php $count = 0;
                                             for ($j = 0; $j < count($classNumResult); $j++) {
@@ -147,10 +147,10 @@ db_close($conn);
                     <!--if 1, insert; else if 0 update; else if -1 delete;-->
                     <input type=hidden name="update" id="update" value="1">
                     <label for="SchoolID" style="display:none">SchoolID</label>
-                    <input type="text" class="form-control dialoginput" id="SchoolID" name="schoolid"
+                    <input type="text" class="form-control dialoginput" id="SchoolID" name="schoolID"
                            style="display:none">
                     <br><label for="SchoolName">SchoolName</label>
-                    <input type="text" class="form-control dialoginput" id="SchoolName" name="schoolname" required>
+                    <input type="text" class="form-control dialoginput" id="SchoolName" name="schoolName" required>
                     <br><label for="Classes">Classes</label>
                     <input type="text" class="form-control dialoginput" id="Classes" name="Classes">
                     <br>

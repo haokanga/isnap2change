@@ -10,13 +10,13 @@ $saqQuesColName = array('SAQID', 'Question', 'Points', 'Edit');
 try {
     $conn = db_connect();
     if ($_SERVER["REQUEST_METHOD"] == "POST") {
-        if (isset($_POST['metadataupdate'])) {
-            $metadataupdate = $_POST['metadataupdate'];
-            if ($metadataupdate == 0) {
+        if (isset($_POST['metadataUpdate'])) {
+            $metadataUpdate = $_POST['metadataUpdate'];
+            if ($metadataUpdate == 0) {
                 try {
-                    $quizID = $_POST['quizid'];
+                    $quizID = $_POST['quizID'];
                     $week = $_POST['week'];
-                    $topicName = $_POST['topicname'];
+                    $topicName = $_POST['topicName'];
                     $conn->beginTransaction();
 
                     $topicResult = getTopicByName($conn, $topicName);
@@ -28,8 +28,8 @@ try {
                     debug_err($pageName, $e);
                     $conn->rollback();
                 }
-            } else if ($metadataupdate == -1) {
-                $quizID = $_POST['quizid'];
+            } else if ($metadataUpdate == -1) {
+                $quizID = $_POST['quizID'];
                 deleteQuiz($conn, $quizID);
                 header('Location: saq.php');
             }
@@ -37,17 +37,17 @@ try {
         if (isset($_POST['update'])) {
             $update = $_POST['update'];
             if ($update == 1) {
-                $quizID = $_POST['quizid'];
+                $quizID = $_POST['quizID'];
                 $points = $_POST['points'];
                 $question = $_POST['question'];
                 createSAQQuestion($conn, $quizID, $points, $question);
             } else if ($update == 0) {
-                $saqID = $_POST['saqid'];
+                $saqID = $_POST['saqID'];
                 $points = $_POST['points'];
                 $question = $_POST['question'];
                 updateSAQQuestion($conn, $saqID, $points, $question);
             } else if ($update == -1) {
-                $saqID = $_POST['saqid'];
+                $saqID = $_POST['saqID'];
                 deleteSAQQuestion($conn, $saqID);
             }
         }
@@ -57,13 +57,13 @@ try {
 }
 
 try {
-    if (isset($_GET['quizid'])) {
-        $quizID = $_GET['quizid'];
+    if (isset($_GET['quizID'])) {
+        $quizID = $_GET['quizID'];
         $quizResult = getSAQQuiz($conn, $quizID);
         $topicResult = getTopics($conn);
         $materialRes = getLearningMaterial($conn, $quizID);
         $saqQuesResult = getSAQQuestions($conn, $quizID);
-        $phpself = $pageName . '.php?quizid=' . $quizID;
+        $phpself = $pageName . '.php?quizID=' . $quizID;
     }
 } catch (Exception $e) {
     debug_err($pageName, $e);
@@ -106,9 +106,9 @@ db_close($conn);
                     <div class="panel-body">
                         <form id="metadata-submission" method="post" action="<?php echo $phpself; ?>">
                             <!--if 0 update; else if -1 delete;-->
-                            <input type=hidden name="metadataupdate" id="metadataupdate" value="1" required>
+                            <input type=hidden name="metadataUpdate" id="metadataUpdate" value="1" required>
                             <label for="QuizID" style="display:none">QuizID</label>
-                            <input type="text" class="form-control" id="QuizID" name="quizid" style="display:none"
+                            <input type="text" class="form-control" id="QuizID" name="quizID" style="display:none"
                                    value="<?php echo $quizResult->QuizID; ?>">
                             <br>
                             <label for="Week">Week</label>
@@ -116,7 +116,7 @@ db_close($conn);
                                    placeholder="Input Week Number" value="<?php echo $quizResult->Week; ?>">
                             <br>
                             <label for='TopicName'>TopicName</label>
-                            <select class="form-control" id="TopicName" form="metadata-submission" name="topicname"
+                            <select class="form-control" id="TopicName" form="metadata-submission" name="topicName"
                                     required>
                                 <?php for ($j = 0; $j < count($topicResult); $j++) { ?>
                                     <option
@@ -228,7 +228,7 @@ db_close($conn);
                 <form id="submission" method="post" action="<?php echo $phpself; ?>">
                     <input type=hidden name="update" id="update" value="1" required>
                     <label for="SAQID" style="display:none">SAQID</label>
-                    <input type="text" class="form-control dialoginput" id="SAQID" name="saqid" style="display:none">
+                    <input type="text" class="form-control dialoginput" id="SAQID" name="saqID" style="display:none">
                     <label for="Question">Question</label>
                     <input type="text" class="form-control dialoginput" id="Question" name="question"
                            placeholder="Input Question" value="" required>
@@ -238,7 +238,7 @@ db_close($conn);
                            placeholder="Input Points" value="" required>
                     <br>
                     <label for="QuizID" style="display:none">QuizID</label>
-                    <input type="text" class="form-control" id="QuizID" name="quizid" style="display:none"
+                    <input type="text" class="form-control" id="QuizID" name="quizID" style="display:none"
                            value="<?php echo $quizID; ?>" required>
                     <br>
                 </form>
@@ -266,7 +266,7 @@ db_close($conn);
     });
     $('div > .glyphicon-remove').on('click', function () {
         if (confirm('[WARNING] Are you sure to remove this quiz? If you remove one quiz. All the questions and submission of this quiz will also get deleted (not recoverable). It includes learning material, questions, their submissions and your grading/feedback, not only the quiz itself.')) {
-            $('#metadataupdate').val(-1);
+            $('#metadataUpdate').val(-1);
             $('#metadata-submission').submit();
         }
     });
@@ -304,7 +304,7 @@ db_close($conn);
             ]
         })
         $('#metadata-save').on('click', function () {
-            $('#metadataupdate').val(0);
+            $('#metadataUpdate').val(0);
             $('#metadata-submission').validate({
                 rules: {
                     week: {

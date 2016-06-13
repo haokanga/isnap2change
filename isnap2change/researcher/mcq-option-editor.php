@@ -9,34 +9,34 @@ $columnName = array('OptionID', 'Content', 'Explanation', 'Edit');
 try {
     $conn = db_connect();
     if ($_SERVER["REQUEST_METHOD"] == "POST") {
-        if (isset($_POST['metadataupdate'])) {
-            $metadataupdate = $_POST['metadataupdate'];
-            if ($metadataupdate == 0) {
-                $mcqID = $_POST['mcqid'];
-                $correctChoice = $_POST['correctchoice'];
+        if (isset($_POST['metadataUpdate'])) {
+            $metadataUpdate = $_POST['metadataUpdate'];
+            if ($metadataUpdate == 0) {
+                $mcqID = $_POST['mcqID'];
+                $correctChoice = $_POST['correctChoice'];
                 $question = $_POST['question'];
                 updateMCQQuestion($conn, $mcqID, $correctChoice, $question);
-            } else if ($metadataupdate == -1) {
-                $mcqID = $_POST['mcqid'];
+            } else if ($metadataUpdate == -1) {
+                $mcqID = $_POST['mcqID'];
                 $quizID = getMCQQuestion($conn, $mcqID)->QuizID;
                 deleteMCQQuestion($conn, $mcqID);
-                header('Location: mcq-editor.php?quizid=' . $quizID);
+                header('Location: mcq-editor.php?quizID=' . $quizID);
             }
         }
         if (isset($_POST['update'])) {
             $update = $_POST['update'];
             if ($update == 1) {
-                $mcqID = $_POST['mcqid'];
+                $mcqID = $_POST['mcqID'];
                 $content = $_POST['content'];
                 $explanation = $_POST['explanation'];
                 createOption($conn, $mcqID, $content, $explanation);
             } else if ($update == 0) {
-                $optionID = $_POST['optionid'];
+                $optionID = $_POST['optionID'];
                 $content = $_POST['content'];
                 $explanation = $_POST['explanation'];
                 updateOption($conn, $optionID, $content, $explanation);
             } else if ($update == -1) {
-                $optionID = $_POST['optionid'];
+                $optionID = $_POST['optionID'];
                 deleteOption($conn, $optionID);
             }
         }
@@ -46,12 +46,12 @@ try {
 }
 
 try {
-    if (isset($_GET['quizid']) && isset($_GET['mcqid'])) {
-        $quizID = $_GET['quizid'];
-        $mcqID = $_GET['mcqid'];
+    if (isset($_GET['quizID']) && isset($_GET['mcqID'])) {
+        $quizID = $_GET['quizID'];
+        $mcqID = $_GET['mcqID'];
         $mcqQuesResult = getMCQQuestion($conn, $mcqID);
         $optionResult = getOptions($conn, $mcqID);
-        $phpself = $pageName . '.php?quizid=' . $quizID . '&mcqid=' . $mcqID;
+        $phpself = $pageName . '.php?quizID=' . $quizID . '&mcqID=' . $mcqID;
     }
 } catch (Exception $e) {
     debug_err($pageName, $e);
@@ -79,7 +79,7 @@ db_close($conn);
             <div class="col-lg-12">
                 <h1 class="page-header">Multiple Choice Question Editor
                     <button type="button" class="btn btn-lg btn-info pull-right"
-                            onclick="location.href='<?php echo "mcq-editor.php?quizid=" . $quizID; ?>'">GO BACK
+                            onclick="location.href='<?php echo "mcq-editor.php?quizID=" . $quizID; ?>'">GO BACK
                     </button>
                 </h1>
             </div>
@@ -97,9 +97,9 @@ db_close($conn);
                     <div class="panel-body">
                         <form id="metadata-submission" method="post" action="<?php echo $phpself; ?>">
                             <!--if 0 update; else if -1 delete;-->
-                            <input type=hidden name="metadataupdate" id="metadataupdate" value="1" required>
+                            <input type=hidden name="metadataUpdate" id="metadataUpdate" value="1" required>
                             <label for="MCQID" style="display:none">MCQID</label>
-                            <input type="text" class="form-control" id="MCQID" name="mcqid" style="display:none"
+                            <input type="text" class="form-control" id="MCQID" name="mcqID" style="display:none"
                                    value="<?php echo $mcqQuesResult->MCQID; ?>" required>
                             <br>
                             <label for="Question">Question</label>
@@ -108,7 +108,7 @@ db_close($conn);
                             <br>
                             <label for="CorrectChoice">CorrectChoice</label>
                             <select class="form-control" id="CorrectChoice" form="metadata-submission"
-                                    name="correctchoice">
+                                    name="correctChoice">
                                 <option value='' selected>No Correct Choice Selected</option>
                                 <?php for ($i = 0; $i < count($optionResult); $i++) { ?>
                                     <option
@@ -217,7 +217,7 @@ db_close($conn);
                     <!--if 1, insert; else if -1 delete;-->
                     <input type=hidden name="update" id="update" value="1" required>
                     <label for="OptionID" style="display:none">OptionID</label>
-                    <input type="text" class="form-control dialoginput" id="OptionID" name="optionid"
+                    <input type="text" class="form-control dialoginput" id="OptionID" name="optionID"
                            style="display:none">
                     <label for="Content">Content</label>
                     <input type="text" class="form-control dialoginput" id="Content" name="content"
@@ -228,7 +228,7 @@ db_close($conn);
                            placeholder="Input Explanation" required>
                     <br>
                     <label for="MCQID" style="display:none">MCQID</label>
-                    <input type="text" class="form-control dialoginput" id="MCQID" name="mcqid" style="display:none"
+                    <input type="text" class="form-control dialoginput" id="MCQID" name="mcqID" style="display:none"
                            value="<?php echo $mcqQuesResult->MCQID; ?>" required>
                 </form>
             </div>
@@ -284,12 +284,12 @@ db_close($conn);
             ]
         })
         $('#metadata-save').on('click', function () {
-            $('#metadataupdate').val(0);
+            $('#metadataUpdate').val(0);
             $('#metadata-submission').validate();
             $('#metadata-submission').submit();
         });
         $('#metadata-remove').on('click', function () {
-            $('#metadataupdate').val(-1);
+            $('#metadataUpdate').val(-1);
             $('#metadata-submission').submit();
         });
         showNoCorrectChoiceReminder();
