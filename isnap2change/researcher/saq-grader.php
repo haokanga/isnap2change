@@ -3,8 +3,13 @@ session_start();
 require_once("../mysql-lib.php");
 require_once("../debug.php");
 require_once("researcher-validation.php");
-$pageName = "saq-editor";
+$pageName = "saq-grader";
 $columnName = array('QuizID', 'Week', 'TopicName', 'Points', 'Questions');
+
+if (isset($_GET['quizID']) && isset($_GET['studentID'])) {
+    $quizID = $_GET['quizID'];
+    $studentID = $_GET['studentID'];
+}
 
 try {
     $conn = db_connect();
@@ -13,12 +18,10 @@ try {
             $update = $_POST['update'];
             if ($update == 0) {
                 $saqID = $_POST['saqID'];
-                $points = $_POST['points'];
-                $question = $_POST['question'];
-                updateSAQQuestion($conn, $saqID, $points, $question);
-            } else if ($update == -1) {
-                $saqID = $_POST['saqID'];
-                deleteSAQQuestion($conn, $saqID);
+                $feedback = $_POST['feedback'];
+                $grading = $_POST['grading'];
+                updateSAQSubmissionGrading($conn, $quizID, $saqID, $studentID, $feedback, $grading, $pageName);
+                //header('Location: saq-grading.php');
             }
         }
     }
@@ -27,18 +30,13 @@ try {
 }
 
 try {
-    if (isset($_GET['quizID']) && isset($_GET['studentID'])) {
-        $quizID = $_GET['quizID'];
-        $studentID = $_GET['studentID'];
-        $saqSubmissionResult = getSAQSubmission($conn, $quizID, $studentID);
-        $phpSelf = $pageName . '.php?quizID=' . $quizID . '&studentID=' . $studentID;
-    }
+    $saqSubmissionResult = getSAQSubmission($conn, $quizID, $studentID);
+    $phpSelf = $pageName . '.php?quizID=' . $quizID . '&studentID=' . $studentID;
 } catch (Exception $e) {
     debug_err($pageName, $e);
 }
 
 db_close($conn);
-
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -73,25 +71,27 @@ db_close($conn);
                     <!-- /.panel-heading -->
                     <div class="panel-body">
                         <form id="submission" method="post" action="<?php echo $phpSelf ?>">
+                            <input type=hidden name="update" id="update" value="0" required>
                             <?php for ($i = 0; $i < count($saqSubmissionResult); $i++) {
                                 $saqID = $saqSubmissionResult[$i]->SAQID;
                                 ?>
                                 <div class="well row">
-
+                                    <input type=hidden name="saqID[]" value="<?php echo $saqID ?>" required>
                                     <label for=studentAnswer[]">Student Answer:</label>
                                     <textarea class="form-control" id="studentAnswer[]" rows="8"
                                               disabled><?php echo $saqSubmissionResult[$i]->Answer ?></textarea>
                                     <label for="feedback[]">Feedback</label>
                                     <input type="text" class="form-control dialogInput" id="feedback"
                                            name="feedback[]"
-                                           placeholder="Input Feedback" required>
+                                           placeholder="Input Feedback"
+                                           value="<?php echo $saqSubmissionResult[$i]->Feedback ?>" required>
                                     <br>
                                     <label for="grading[]">Grading</label>
                                     <input type="text" class="dialoginput pull-right" id="textInput<?php echo $saqID ?>"
-                                           value="<?php echo $saqSubmissionResult[$i]->Points ?>" disabled>
+                                           value="<?php if (strlen($saqSubmissionResult[$i]->Grading) > 0) echo $saqSubmissionResult[$i]->Grading; else echo $saqSubmissionResult[$i]->Points ?>" disabled>
                                     <input type="range" class="dialoginput" min="0"
                                            max="<?php echo $saqSubmissionResult[$i]->Points ?>"
-                                           value="<?php echo $saqSubmissionResult[$i]->Points ?>"
+                                           value="<?php if (strlen($saqSubmissionResult[$i]->Grading) > 0) echo $saqSubmissionResult[$i]->Grading; else echo $saqSubmissionResult[$i]->Points ?>"
                                            id="grading" name="grading[]"
                                            onchange="updateTextInput(<?php echo $saqID ?>, this.value);">
                                 </div>
@@ -121,58 +121,10 @@ db_close($conn);
         document.getElementById('textInput' + saqID).value = val;
     }
 
-    //DO NOT put them in $(document).ready() since the table has multi pages
-    var dialogInputArr = $('.dialoginput');
-    $('.glyphicon-plus').on('click', function () {
-        $('#dialogTitle').text("Add Question");
-        $('#update').val(1);
-        for (i = 0; i < dialogInputArr.length; i++) {
-            dialogInputArr.eq(i).val('');
-        }
-    });
-    $('div > .glyphicon-remove').on('click', function () {
-        if (confirm('[WARNING] Are you sure to remove this quiz? If you remove one quiz. All the questions and submission of this quiz will also get deleted (not recoverable). It includes learning material, questions, their submissions and your grading/feedback, not only the quiz itself.')) {
-            $('#metadataUpdate').val(-1);
-            $('#metadata-submission').submit();
-        }
-    });
-    $('td > .glyphicon-edit').on('click', function () {
-        $('#update').val(0);
-        for (i = 0; i < dialogInputArr.length; i++) {
-            dialogInputArr.eq(i).val($(this).parent().parent().children('td').eq(i).text().trim());
-        }
-    });
-    $('td > .glyphicon-remove').on('click', function () {
-        $('#update').val(-1);
-        for (i = 0; i < dialogInputArr.length; i++) {
-            dialogInputArr.eq(i).val($(this).parent().parent().children('td').eq(i).text().trim());
-        }
-        $('#submission').submit();
-    });
-    $('#btnSave').on('click', function () {
-        $('#submission').validate({
-            rules: {
-                points: {
-                    required: true,
-                    digits: true
-                }
-            }
-        });
-        $('#submission').submit();
-    });
-
     $(document).ready(function () {
-        $('#metadata-save').on('click', function () {
-            $('#metadataUpdate').val(0);
-            $('#metadata-submission').validate({
-                rules: {
-                    week: {
-                        required: true,
-                        digits: true
-                    }
-                }
-            });
-            $('#metadata-submission').submit();
+        $('#btnSave').on('click', function () {
+            $('#submission').validate();
+            $('#submission').submit();
         });
     });
 </script>

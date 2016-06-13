@@ -983,6 +983,34 @@ function updateSAQQuestionRecord(PDO $conn, $saqID, $studentID, $answer)
     $updateSql->execute(array($studentID, $saqID, htmlspecialchars($answer), htmlspecialchars($answer)));
 }
 
+
+function updateSAQSubmissionGrading(PDO $conn, $quizID, $saqID, $studentID, $feedback, $grading, $pageName)
+{
+    if (count($saqID) == count($grading) && count($saqID) == count($feedback)) {
+        try {
+            $conn->beginTransaction();
+            for ($i = 0; $i < count($saqID); $i++) {
+               updateSAQQuestionGrading($conn, $saqID[$i], $studentID, $feedback[$i], $grading[$i]);
+            }
+            updateQuizRecord($conn, $quizID, $studentID, "GRADED");
+        } catch (Exception $e) {
+            debug_err($pageName, $e);
+            $conn->rollBack();
+        }
+    } else
+        throw new Exception("The length of feedback array, grading array and saqID array don't match. ");
+}
+
+function updateSAQQuestionGrading(PDO $conn, $saqID, $studentID, $feedback, $grading)
+{
+    $updateSql = "UPDATE SAQ_Question_Record
+                  SET Feedback = ?, Grading = ?
+                  WHERE SAQID = ? AND StudentID = ?";
+    $updateSql = $conn->prepare($updateSql);
+    $updateSql->execute(array($feedback, $grading, $saqID, $studentID));
+}
+
+
 function deleteSAQQuestionRecord(PDO $conn, $saqID, $studentID)
 {
     $updateSql = "DELETE FROM SAQ_Question_Record WHERE SAQID = ? AND StudentID = ?";
@@ -1005,16 +1033,20 @@ function getSAQRecords(PDO $conn, $quizID, $studentID)
 
 function updateSAQDraft(PDO $conn, $quizID, $saqID, $studentID, $answer, $pageName)
 {
-    try {
-        $conn->beginTransaction();
-        for ($i = 0; $i < count($saqID); $i++) {
-            updateSAQQuestionRecord($conn, $saqID[$i], $studentID, $answer[$i]);
+    if (count($saqID) == count($answer)) {
+        try {
+            $conn->beginTransaction();
+            for ($i = 0; $i < count($saqID); $i++) {
+                updateSAQQuestionRecord($conn, $saqID[$i], $studentID, $answer[$i]);
+            }
+            updateQuizRecord($conn, $quizID, $studentID, "UNSUBMITTED");
+        } catch (Exception $e) {
+            debug_err($pageName, $e);
+            $conn->rollBack();
         }
-        updateQuizRecord($conn, $quizID, $studentID, "UNSUBMITTED");
-    } catch (Exception $e) {
-        debug_err($pageName, $e);
-        $conn->rollBack();
-    }
+    } else
+        throw new Exception("The length of answer array and question array don't match. ");
+
 }
 
 function updateSAQSubmission(PDO $conn, $quizID, $saqID, $studentID, $answer, $pageName)
@@ -1066,7 +1098,6 @@ function getSAQSubmissions(PDO $conn)
     $quizResult = $quizQuery->fetchAll(PDO::FETCH_OBJ);
     return $quizResult;
 }
-
 /* SAQ-Grading */
 
 /* Unit Test */
@@ -1100,7 +1131,6 @@ function generateRandomSAQSubmissions(PDO $conn)
         }
     }
 }
-
 /* Unit Test */
 
 function getMiscQuizType(PDO $conn, $quizID)

@@ -104,4 +104,9 @@ SELECT * FROM Quiz;
 SELECT MAX(OptionNum) AS MaxOptionNum FROM (SELECT COUNT(*) AS OptionNum FROM Matching_Question natural JOIN Matching_Option WHERE QuizID = 8 GROUP BY MatchingID) AS OptionNumTable;   
    
 SELECT * FROM Quiz_Record NATURAL JOIN Quiz NATURAL JOIN Student NATURAL JOIN Class NATURAL JOIN Topic WHERE QuizType = 'SAQ' AND (`Status` = 'UNGRADED' OR `Status` = 'GRADED');
+SELECT * FROM Quiz_Record NATURAL JOIN SAQ_Question NATURAL JOIN SAQ_Question_Record WHERE QuizID = 3 AND StudentID = 3;
 
+SELECT * FROM SAQ_Question_Record WHERE SAQID = 1 AND StudentID  =3;
+UPDATE SAQ_Question_Record
+                  SET Feedback = 'QUACK', Grading =  2
+                  WHERE SAQID = 1 AND StudentID = 3;
