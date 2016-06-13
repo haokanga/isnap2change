@@ -101,4 +101,8 @@ WHERE QuizID = 8
 ORDER BY MatchingID;
 
 SELECT * FROM Quiz;                   
-                   
+SELECT MAX(OptionNum) AS MaxOptionNum FROM (SELECT COUNT(*) AS OptionNum FROM Matching_Question natural JOIN Matching_Option WHERE QuizID = 8 GROUP BY MatchingID) AS OptionNumTable;   
+   
+SELECT * FROM Quiz_Record NATURAL JOIN Quiz NATURAL JOIN Student NATURAL JOIN Class NATURAL JOIN Topic WHERE QuizType = 'SAQ';
+
+

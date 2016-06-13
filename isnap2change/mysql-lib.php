@@ -39,13 +39,13 @@
     
     }
 
-    function db_close($connection){
+    function db_close(PDO $connection){
         $connection = null;
     }
     /* db connection*/
          
     /* School */
-    function createSchool($conn, $schoolName){                
+    function createSchool(PDO $conn, $schoolName){                
         $updateSql = "INSERT INTO School(SchoolName)
          VALUES (?)";			
         $updateSql = $conn->prepare($updateSql);                
@@ -53,7 +53,7 @@
         return $conn->lastInsertId();
     }
     
-    function updateSchool($conn, $schoolID, $schoolName){
+    function updateSchool(PDO $conn, $schoolID, $schoolName){
         $updateSql = "UPDATE School 
             SET SchoolName = ?
             WHERE SchoolID = ?";			
@@ -61,13 +61,13 @@
         $updateSql->execute(array($schoolName, $schoolID));
     }
     
-    function deleteSchool($conn, $schoolID){
+    function deleteSchool(PDO $conn, $schoolID){
         $updateSql = "DELETE FROM School WHERE SchoolID = ?";			
         $updateSql = $conn->prepare($updateSql);
         $updateSql->execute(array($schoolID));
     }
     
-    function getSchool($conn, $schoolID){
+    function getSchool(PDO $conn, $schoolID){
         $schoolSql = "SELECT SchoolName
                    FROM School WHERE SchoolID = ?";
         $schoolQuery = $conn->prepare($schoolSql);
@@ -76,7 +76,7 @@
         return $schoolResult;
     }
     
-    function getSchoolByName($conn, $schoolName){
+    function getSchoolByName(PDO $conn, $schoolName){
         $schoolSql = "SELECT SchoolID
                    FROM School WHERE SchoolName = ?";
         $schoolQuery = $conn->prepare($schoolSql);
@@ -85,7 +85,7 @@
         return $schoolResult;
     }
     
-    function getSchools($conn){
+    function getSchools(PDO $conn){
         $schoolSql = "SELECT SchoolID, SchoolName
                    FROM School";
         $schoolQuery = $conn->prepare($schoolSql);
@@ -96,7 +96,7 @@
     /* School */    
     
     /* Class */
-    function createClass($conn, $schoolID, $className){                
+    function createClass(PDO $conn, $schoolID, $className){                
         $updateSql = "INSERT INTO Class(ClassName, SchoolID)
              VALUES (?,?)";			
         $updateSql = $conn->prepare($updateSql);         
@@ -104,7 +104,7 @@
         return $conn->lastInsertId();
     }
     
-    function updateClass($conn, $classID, $schoolID, $className, $unlockedProgress){
+    function updateClass(PDO $conn, $classID, $schoolID, $className, $unlockedProgress){
          $updateSql = "UPDATE Class 
             SET ClassName = ?, SchoolID = ?, UnlockedProgress = ?
             WHERE ClassID = ?";			
@@ -112,13 +112,13 @@
         $updateSql->execute(array($className, $schoolID, $unlockedProgress, $classID));
     }
     
-    function deleteClass($conn, $classID){
+    function deleteClass(PDO $conn, $classID){
         $updateSql = "DELETE FROM Class WHERE ClassID = ?";			
         $updateSql = $conn->prepare($updateSql);
         $updateSql->execute(array($classID));
     }
     
-    function getClass($conn, $classID){
+    function getClass(PDO $conn, $classID){
         $classSql = "SELECT *
                    FROM Class WHERE ClassID = ?";
         $classQuery = $conn->prepare($classSql);
@@ -127,7 +127,7 @@
         return $classResult;
     }
     
-    function getClassByName($conn, $className){
+    function getClassByName(PDO $conn, $className){
         $classSql = "SELECT *
                    FROM Class WHERE ClassName = ?";
         $classQuery = $conn->prepare($classSql);
@@ -136,7 +136,7 @@
         return $classResult;
     }
     
-    function getClassNum($conn){
+    function getClassNum(PDO $conn){
         $classNumSql = "SELECT count(*) as Count, SchoolID
                    FROM School NATURAL JOIN Class
                    GROUP BY SchoolID";
@@ -146,7 +146,7 @@
         return $classNumResult;
     }
     
-    function getClasses($conn){
+    function getClasses(PDO $conn){
         $classSql = "SELECT *
                    FROM Class NATURAL JOIN School";
         $classQuery = $conn->prepare($classSql);
@@ -155,7 +155,7 @@
         return $classResult;
     }    
     
-    function getStudentNum($conn){
+    function getStudentNum(PDO $conn){
         $studentNumSql = "SELECT count(*) as Count, ClassID
                    FROM   Student NATURAL JOIN Class
                    GROUP BY ClassID";
@@ -168,14 +168,14 @@
     /* Class */
     
     /* Token */    
-    function updateToken($conn, $classID, $tokenString, $type){
+    function updateToken(PDO $conn, $classID, $tokenString, $type){
         $updateSql = "INSERT INTO Token(ClassID, `Type`, TokenString)
                                     VALUES (?,?,?) ON DUPLICATE KEY UPDATE TokenString = ?";			
         $updateSql = $conn->prepare($updateSql);                            
         $updateSql->execute(array($classID, $type, $tokenString, $tokenString));
     }
     
-    function getTokens($conn){
+    function getTokens(PDO $conn){
         $tokenSql = "SELECT ClassID, `Type`, TokenString
                    FROM Token NATURAL JOIN Class";
         $tokenQuery = $conn->prepare($tokenSql);
@@ -186,13 +186,13 @@
     /* Token */
     
     /* Student */   
-    function deleteStudent($conn, $studentID){
+    function deleteStudent(PDO $conn, $studentID){
         $updateSql = "DELETE FROM Student WHERE StudentID = ?";			
         $updateSql = $conn->prepare($updateSql);
         $updateSql->execute(array($studentID));
     }
     
-    function getStudents($conn){        
+    function getStudents(PDO $conn){        
         $studentSql = "SELECT * , DATE(SubmissionTime) AS SubmissionDate FROM Student NATURAL JOIN Class
                ORDER BY ClassID";
         $studentQuery = $conn->prepare($studentSql);
@@ -201,7 +201,7 @@
         return $studentResult;
     }
     
-    function resetPassword($conn, $studentID){
+    function resetPassword(PDO $conn, $studentID){
         $updateSql = "UPDATE Student 
             SET Password = ?
             WHERE StudentID = ?";			
@@ -211,7 +211,7 @@
     /* Student */
     
     /* Week */
-    function removeWeek($conn, $week){
+    function removeWeek(PDO $conn, $week){
         $updateSql = "SET SQL_SAFE_UPDATES=0;
             UPDATE Quiz SET Week = NULL WHERE Week = ?;
             SET SQL_SAFE_UPDATES=1";			
@@ -220,7 +220,7 @@
         return $updateSql;
     }
     
-    function getMaxWeek($conn){
+    function getMaxWeek(PDO $conn){
         $weekSql = "select MAX(Week) as WeekNum from Quiz";
         $weekQuery = $conn->prepare($weekSql);
         $weekQuery->execute();
@@ -230,7 +230,7 @@
     /* Week */
        
     /* Quiz */
-    function createQuiz($conn, $topicID, $quizType, $week){
+    function createQuiz(PDO $conn, $topicID, $quizType, $week){
         $updateSql = "INSERT INTO Quiz(Week, QuizType, TopicID)
              VALUES (?,?,?)";			
         $updateSql = $conn->prepare($updateSql);         
@@ -238,7 +238,7 @@
         return $conn->lastInsertId(); 
     }
     
-    function updateQuiz($conn, $quizID, $topicID, $week){
+    function updateQuiz(PDO $conn, $quizID, $topicID, $week){
         $updateSql = "UPDATE Quiz 
                 SET Week = ?, TopicID = ?
                 WHERE QuizID = ?";			
@@ -246,13 +246,13 @@
         $updateSql->execute(array($week, $topicID, $quizID)); 
     }
     
-    function deleteQuiz($conn, $quizID){
+    function deleteQuiz(PDO $conn, $quizID){
         $updateSql = "DELETE FROM Quiz WHERE QuizID = ?";			
         $updateSql = $conn->prepare($updateSql);
         $updateSql->execute(array($quizID));
     }
     
-    function getStuQuizScore($conn, $quizID, $studentID){
+    function getStuQuizScore(PDO $conn, $quizID, $studentID){
         $pointsBySection = array('MCQ', 'Matching', 'Poster', 'Misc');
         $pointsByQuestion = array('SAQ');
         $score = 0;
@@ -286,7 +286,7 @@
         return $score;
     } 
     
-    function getQuizNum($conn){
+    function getQuizNum(PDO $conn){
         $weekSql = "SELECT Week, COUNT(*) AS QuizNum FROM Quiz GROUP BY Week";
         $weekQuery = $conn->prepare($weekSql);
         $weekQuery->execute();
@@ -294,7 +294,7 @@
         return $weekResult;
     }
     
-    function getQuizzes($conn){
+    function getQuizzes(PDO $conn){
         $quizSql = "SELECT QuizID, Week, QuizType, TopicName
                    FROM Quiz NATURAL JOIN Topic";
         $quizQuery = $conn->prepare($quizSql);
@@ -303,7 +303,7 @@
         return $quizResult;
     }
     
-    function getQuizzesByWeek($conn, $week){
+    function getQuizzesByWeek(PDO $conn, $week){
         $quizSql = "SELECT QuizID, Week, QuizType, TopicName
                    FROM Quiz NATURAL JOIN Topic WHERE Week = ?";
         $quizQuery = $conn->prepare($quizSql);
@@ -312,7 +312,7 @@
         return $quizResult;
     }
     
-    function getQuizPoints($conn, $quizID){
+    function getQuizPoints(PDO $conn, $quizID){
         $pointsBySection = array('MCQ', 'Matching', 'Poster', 'Misc');
         $pointsByQuestion = array('SAQ');
         $points = 0;        
@@ -343,7 +343,7 @@
     /* Quiz */
     
     /* Topic */    
-    function getTopic($conn, $topicID){
+    function getTopic(PDO $conn, $topicID){
         $topicSql = "SELECT * FROM Topic WHERE TopicID = ?";
         $topicQuery = $conn->prepare($topicSql);
         $topicQuery->execute(array($topicID));
@@ -351,7 +351,7 @@
         return $topicResult;
     }
 
-    function getTopicByName($conn, $topicName){
+    function getTopicByName(PDO $conn, $topicName){
         $topicSql = "SELECT * FROM Topic WHERE TopicName = ?";
         $topicQuery = $conn->prepare($topicSql);
         $topicQuery->execute(array($topicName));
@@ -359,7 +359,7 @@
         return $topicResult;
     }
     
-    function getTopics($conn){
+    function getTopics(PDO $conn){
         $topicSql = "SELECT * FROM Topic ORDER BY TopicID";
         $topicQuery = $conn->prepare($topicSql);
         $topicQuery->execute(array());
@@ -369,14 +369,14 @@
     /* Topic */
     
     /* MCQ */    
-    function createMCQSection($conn, $quizID, $points, $questionnaires){
+    function createMCQSection(PDO $conn, $quizID, $points, $questionnaires){
         $updateSql = "INSERT INTO MCQ_Section(QuizID, Points, Questionnaires)
                     VALUES (?,?,?)";			
         $updateSql = $conn->prepare($updateSql);                            
         $updateSql->execute(array($quizID, $points, $questionnaires)); 
     }
     
-    function updateMCQSection($conn, $quizID, $points, $questionnaires){
+    function updateMCQSection(PDO $conn, $quizID, $points, $questionnaires){
         $updateSql = "UPDATE MCQ_Section
                     SET Points = ?, Questionnaires = ?
                     WHERE QuizID = ?";			
@@ -384,7 +384,7 @@
         $updateSql->execute(array($points, $questionnaires, $quizID));
     }
     
-    function createMCQQuestion($conn, $quizID, $question){
+    function createMCQQuestion(PDO $conn, $quizID, $question){
         $updateSql = "INSERT INTO MCQ_Question(Question, QuizID)
                     VALUES (?,?)";			
         $updateSql = $conn->prepare($updateSql);                            
@@ -392,7 +392,7 @@
         return $conn->lastInsertId();
     }
     
-    function updateMCQQuestion($conn, $mcqID, $correctChoice, $question){
+    function updateMCQQuestion(PDO $conn, $mcqID, $correctChoice, $question){
         $updateSql = "UPDATE MCQ_Question
                     SET Question = ?, CorrectChoice = ?
                     WHERE MCQID = ?";			
@@ -400,13 +400,13 @@
         $updateSql->execute(array($question, $correctChoice, $mcqID));
     }
     
-    function deleteMCQQuestion($conn, $mcqID){
+    function deleteMCQQuestion(PDO $conn, $mcqID){
         $updateSql = "DELETE FROM MCQ_Question WHERE MCQID = ?";			
         $updateSql = $conn->prepare($updateSql);
         $updateSql->execute(array($mcqID));
     }
     
-    function getMCQQuestion($conn, $mcqID){
+    function getMCQQuestion(PDO $conn, $mcqID){
         $mcqQuesSql = "SELECT * FROM MCQ_Question WHERE MCQID = ?";                                
         $mcqQuesQuery = $conn->prepare($mcqQuesSql);
         $mcqQuesQuery->execute(array($mcqID));
@@ -414,7 +414,7 @@
         return $mcqQuesResult;
     } 
     
-    function getMCQQuestions($conn, $quizID){
+    function getMCQQuestions(PDO $conn, $quizID){
         $mcqQuesSql = "SELECT *
                     FROM MCQ_Section NATURAL JOIN MCQ_Question
                     LEFT JOIN `Option` USING (MCQID)
@@ -426,7 +426,7 @@
         return $mcqQuesResult;
     }
     
-    function getMCQQuiz($conn, $quizID){
+    function getMCQQuiz(PDO $conn, $quizID){
         $quizSql = "SELECT *, COUNT(MCQID) AS Questions
                    FROM Quiz NATURAL JOIN Topic NATURAL JOIN MCQ_Section LEFT JOIN MCQ_Question USING (QuizID) WHERE QuizID = ? GROUP BY QuizID";
         $quizQuery = $conn->prepare($quizSql);
@@ -435,7 +435,7 @@
         return $quizResult;
     }
     
-    function getMCQQuizzes($conn){
+    function getMCQQuizzes(PDO $conn){
         $quizSql = "SELECT *, COUNT(MCQID) AS Questions
                    FROM Quiz NATURAL JOIN Topic NATURAL JOIN MCQ_Section LEFT JOIN MCQ_Question USING (QuizID) WHERE QuizType = 'MCQ' GROUP BY QuizID";
         $quizQuery = $conn->prepare($quizSql);
@@ -446,7 +446,7 @@
     /* MCQ */
     
     /* Option */
-    function createOption($conn, $mcqID, $content, $explanation){
+    function createOption(PDO $conn, $mcqID, $content, $explanation){
         $updateSql = "INSERT INTO `Option`(Content, Explanation, MCQID)
              VALUES (?,?,?)";
         $updateSql = $conn->prepare($updateSql);         
@@ -454,7 +454,7 @@
         return $conn->lastInsertId(); 
     }
     
-    function updateOption($conn, $optionID, $content, $explanation){
+    function updateOption(PDO $conn, $optionID, $content, $explanation){
         $updateSql = "UPDATE `Option` 
                 SET Content = ?, Explanation = ?
                 WHERE OptionID = ?";			
@@ -462,12 +462,12 @@
         $updateSql->execute(array($content, $explanation, $optionID)); 
     }
     
-    function deleteOption($conn, $optionID){
+    function deleteOption(PDO $conn, $optionID){
         $updateSql = "DELETE FROM `Option` WHERE OptionID = ?";			
         $updateSql = $conn->prepare($updateSql);
         $updateSql->execute(array($optionID));
     }
-    function getOptions($conn, $mcqID){
+    function getOptions(PDO $conn, $mcqID){
         $optionSql = "SELECT *
                    FROM MCQ_Question NATURAL JOIN `Option` WHERE MCQID = ?";
         $optionQuery = $conn->prepare($optionSql);
@@ -476,7 +476,7 @@
         return $optionResult;
     }
     
-    function getMaxOptionNum($conn, $quizID){
+    function getMaxOptionNum(PDO $conn, $quizID){
         $optionNumSql = "SELECT MAX(OptionNum) AS MaxOptionNum FROM (SELECT COUNT(*) AS OptionNum FROM MCQ_Question natural JOIN `Option` WHERE QuizID = ? GROUP BY MCQID) AS OptionNumTable";								
         $optionNumQuery = $conn->prepare($optionNumSql);
         $optionNumQuery->execute(array($quizID));
@@ -486,14 +486,14 @@
     /* Option */
     
     /* SAQ */    
-    function createSAQSection($conn, $quizID){
+    function createSAQSection(PDO $conn, $quizID){
         $updateSql = "INSERT INTO SAQ_Section(QuizID)
                     VALUES (?)";			
         $updateSql = $conn->prepare($updateSql);                            
         $updateSql->execute(array($quizID)); 
     }
     
-    function createSAQQuestion($conn, $quizID, $points, $question){
+    function createSAQQuestion(PDO $conn, $quizID, $points, $question){
         $updateSql = "INSERT INTO SAQ_Question(Question, Points, QuizID)
                     VALUES (?,?,?)";			
         $updateSql = $conn->prepare($updateSql);                            
@@ -501,7 +501,7 @@
         return $conn->lastInsertId();
     }
     
-    function updateSAQQuestion($conn, $saqID, $points, $question){
+    function updateSAQQuestion(PDO $conn, $saqID, $points, $question){
         $updateSql = "UPDATE SAQ_Question
                     SET Question = ?, Points = ?
                     WHERE SAQID = ?";			
@@ -509,13 +509,13 @@
         $updateSql->execute(array($question, $points, $saqID));
     }
     
-    function deleteSAQQuestion($conn, $saqID){
+    function deleteSAQQuestion(PDO $conn, $saqID){
         $updateSql = "DELETE FROM SAQ_Question WHERE SAQID = ?";			
         $updateSql = $conn->prepare($updateSql);
         $updateSql->execute(array($saqID));
     }
     
-    function getSAQQuestion($conn, $saqID){
+    function getSAQQuestion(PDO $conn, $saqID){
         $saqQuesSql = "SELECT * FROM SAQ_Question WHERE SAQID = ?";                                
         $saqQuesQuery = $conn->prepare($saqQuesSql);
         $saqQuesQuery->execute(array($saqID));
@@ -523,7 +523,7 @@
         return $saqQuesResult;
     } 
     
-    function getSAQQuestions($conn, $quizID){
+    function getSAQQuestions(PDO $conn, $quizID){
         $saqQuesSql = "SELECT *
                     FROM SAQ_Section NATURAL JOIN SAQ_Question
                     WHERE QuizID = ?
@@ -534,7 +534,7 @@
         return $saqQuesResult;
     }
     
-    function getSAQQuiz($conn, $quizID){
+    function getSAQQuiz(PDO $conn, $quizID){
         $quizSql = "SELECT QuizID, TopicID, Week, QuizType, TopicName, SAQID, SUM(Points) AS Points, COUNT(SAQID) AS Questions
                    FROM Quiz NATURAL JOIN Topic NATURAL JOIN SAQ_Section LEFT JOIN SAQ_Question USING (QuizID) WHERE QuizID = ? GROUP BY QuizID";
         $quizQuery = $conn->prepare($quizSql);
@@ -543,7 +543,7 @@
         return $quizResult;
     }
     
-    function getSAQQuizzes($conn){
+    function getSAQQuizzes(PDO $conn){
         $quizSql = "SELECT QuizID, TopicID, Week, QuizType, TopicName, SAQID, SUM(Points) AS Points, COUNT(SAQID) AS Questions
                    FROM Quiz NATURAL JOIN Topic NATURAL JOIN SAQ_Section LEFT JOIN SAQ_Question USING (QuizID) WHERE QuizType = 'SAQ' GROUP BY QuizID";
         $quizQuery = $conn->prepare($quizSql);
@@ -554,14 +554,14 @@
     /* SAQ */
     
     /* Matching */    
-    function createMatchingSection($conn, $quizID, $description, $points){
+    function createMatchingSection(PDO $conn, $quizID, $description, $points){
         $updateSql = "INSERT INTO Matching_Section(QuizID, Description, Points)
                     VALUES (?,?,?)";			
         $updateSql = $conn->prepare($updateSql);                            
         $updateSql->execute(array($quizID, $description, $points)); 
     }
     
-    function updateMatchingSection($conn, $quizID, $description, $points){
+    function updateMatchingSection(PDO $conn, $quizID, $description, $points){
         $updateSql = "UPDATE Matching_Section
                     SET Description = ?, Points = ?
                     WHERE QuizID = ?";			
@@ -569,7 +569,7 @@
         $updateSql->execute(array($description, $points, $quizID));
     }
     
-    function getMatchingSection($conn, $quizID){
+    function getMatchingSection(PDO $conn, $quizID){
         $matchingSectionSql = "SELECT *
                    FROM   Matching_Section
                    WHERE  QuizID = ?";
@@ -579,7 +579,7 @@
         return $matchingSectionResult;
     } 
     
-    function createMatchingQuestion($conn, $quizID, $question){
+    function createMatchingQuestion(PDO $conn, $quizID, $question){
         $updateSql = "INSERT INTO Matching_Question(Question, QuizID)
                     VALUES (?,?)";			
         $updateSql = $conn->prepare($updateSql);                            
@@ -587,7 +587,7 @@
         return $conn->lastInsertId();
     }
     
-    function updateMatchingQuestion($conn, $matchingID, $question){
+    function updateMatchingQuestion(PDO $conn, $matchingID, $question){
         $updateSql = "UPDATE Matching_Question
                     SET Question = ?
                     WHERE MatchingID = ?";			
@@ -595,13 +595,13 @@
         $updateSql->execute(array($question, $matchingID));
     }
     
-    function deleteMatchingQuestion($conn, $matchingID){
+    function deleteMatchingQuestion(PDO $conn, $matchingID){
         $updateSql = "DELETE FROM Matching_Question WHERE MatchingID = ?";			
         $updateSql = $conn->prepare($updateSql);
         $updateSql->execute(array($matchingID));
     }
     
-    function getMatchingQuestion($conn, $matchingID){
+    function getMatchingQuestion(PDO $conn, $matchingID){
         $matchingQuesSql = "SELECT * FROM Matching_Question WHERE MatchingID = ?";                                
         $matchingQuesQuery = $conn->prepare($matchingQuesSql);
         $matchingQuesQuery->execute(array($matchingID));
@@ -609,7 +609,7 @@
         return $matchingQuesResult;
     } 
     
-    function getMatchingQuestions($conn, $quizID){
+    function getMatchingQuestions(PDO $conn, $quizID){
         $matchingQuesSql = "SELECT *
                     FROM Matching_Section NATURAL JOIN Matching_Question
                     LEFT JOIN Matching_Option USING (MatchingID)
@@ -621,7 +621,7 @@
         return $matchingQuesResult;
     }
     
-    function getMatchingBuckets($conn, $quizID){
+    function getMatchingBuckets(PDO $conn, $quizID){
         $matchingQuesSql = "SELECT *
                     FROM Matching_Section NATURAL JOIN Matching_Question
                     WHERE QuizID = ?
@@ -632,7 +632,7 @@
         return $matchingQuesResult;
     }
     
-    function getMatchingQuiz($conn, $quizID){
+    function getMatchingQuiz(PDO $conn, $quizID){
         $quizSql = "SELECT *, COUNT(MatchingID) AS Questions
                    FROM Quiz NATURAL JOIN Topic NATURAL JOIN Matching_Section LEFT JOIN Matching_Question USING (QuizID) WHERE QuizID = ?";
         $quizQuery = $conn->prepare($quizSql);
@@ -641,7 +641,7 @@
         return $quizResult;
     }
     
-    function getMatchingQuizzes($conn){
+    function getMatchingQuizzes(PDO $conn){
         $quizSql = "SELECT *, COUNT(MatchingID) AS Questions
                    FROM Quiz NATURAL JOIN Topic NATURAL JOIN Matching_Section LEFT JOIN Matching_Question USING (QuizID) WHERE QuizType = 'Matching' GROUP BY QuizID";
         $quizQuery = $conn->prepare($quizSql);
@@ -652,7 +652,7 @@
     /* Matching */
     
     /* Matching_Option */
-    function createMatchingOption($conn, $matchingID, $content){
+    function createMatchingOption(PDO $conn, $matchingID, $content){
         $updateSql = "INSERT INTO Matching_Option(Content, MatchingID)
              VALUES (?,?)";
         $updateSql = $conn->prepare($updateSql);         
@@ -660,7 +660,7 @@
         return $conn->lastInsertId(); 
     }
     
-    function updateMatchingOption($conn, $matchingID, $optionID, $content){
+    function updateMatchingOption(PDO $conn, $matchingID, $optionID, $content){
         $updateSql = "UPDATE Matching_Option 
                 SET Content = ?, MatchingID = ?
                 WHERE OptionID = ?";			
@@ -668,13 +668,13 @@
         $updateSql->execute(array($content, $matchingID, $optionID)); 
     }
     
-    function deleteMatchingOption($conn, $optionID){
+    function deleteMatchingOption(PDO $conn, $optionID){
         $updateSql = "DELETE FROM Matching_Option WHERE OptionID = ?";			
         $updateSql = $conn->prepare($updateSql);
         $updateSql->execute(array($optionID));
     }
     
-    function getMaxMatchingOptionNum($conn, $quizID){
+    function getMaxMatchingOptionNum(PDO $conn, $quizID){
         $optionNumSql = "SELECT MAX(OptionNum) AS MaxOptionNum FROM (SELECT COUNT(*) AS OptionNum FROM Matching_Question natural JOIN Matching_Option WHERE QuizID = ? GROUP BY MatchingID) AS OptionNumTable";								
         $optionNumQuery = $conn->prepare($optionNumSql);
         $optionNumQuery->execute(array($quizID));
@@ -684,14 +684,14 @@
     /* Matching_Option */
     
     /* Learning_Material */
-    function createEmptyLearningMaterial($conn, $quizID){
+    function createEmptyLearningMaterial(PDO $conn, $quizID){
         $content='<p>Learning materials for this quiz has not been added.</p>';
         $updateSql = "INSERT INTO Learning_Material(Content,QuizID) VALUES (?,?)";
         $updateSql = $conn->prepare($updateSql);                            
         $updateSql->execute(array($content, $quizID));
     }
     
-    function updateLearningMaterial($conn, $quizID, $content){
+    function updateLearningMaterial(PDO $conn, $quizID, $content){
         $updateSql = "UPDATE Learning_Material 
             SET Content = ?
             WHERE QuizID = ?";			
@@ -699,7 +699,7 @@
         $updateSql->execute(array($content, $quizID));   
     }
     
-    function getLearningMaterial($conn, $quizID){
+    function getLearningMaterial(PDO $conn, $quizID){
         $materialPreSql = "SELECT COUNT(*) 
                        FROM   Learning_Material
                        WHERE  QuizID = ?";							
@@ -722,7 +722,7 @@
     /* Learning_Material */
     
     
-    function calculateStudentScore($conn, $studentID){
+    function calculateStudentScore(PDO $conn, $studentID){
         $score = 0;
         
         $quizSql = "SELECT * FROM Quiz NATURAL JOIN Quiz_Record WHERE StudentID = ? AND `Status`='GRADED'";
@@ -736,7 +736,7 @@
         return $score;
     } 
     
-    function getStudentScore($conn, $studentID){
+    function getStudentScore(PDO $conn, $studentID){
         $score = 0;
         
         $scoreSql = "SELECT COUNT(*) FROM Student WHERE StudentID = ?";
@@ -753,16 +753,16 @@
         return $score;
     }
     
-    function updateStudentScore($conn, $studentID){        
+    function updateStudentScore(PDO $conn, $studentID){        
         $updateSql = "UPDATE Student 
                 SET Score = ?
                 WHERE StudentID = ?";			
         $updateSql = $conn->prepare($updateSql);         
-        $updateSql->execute(array(calculateStudentScore($conn, $studentID), $studentID));        
+        $updateSql->execute(array(calculateStudentScore($conn, $studentID), $studentID));
     }
     
-    function refreshAllStudentsScore($conn){
-        $studentResult = getStudents($conn); 
+    function refreshAllStudentsScore(PDO $conn){
+        $studentResult = getStudents($conn);
         for($i=0; $i<count($studentResult); $i++){
             $studentID = $studentResult[$i]->StudentID;
             updateStudentScore($conn, $studentID);
@@ -770,14 +770,14 @@
     }
     
 	
-	function updateQuizRecord($conn, $quizID, $studentID, $status){
+	function updateQuizRecord(PDO $conn, $quizID, $studentID, $status){
 		$updateQuizRecordSql = "INSERT INTO Quiz_Record(QuizID, StudentID, Status)
 							    VALUES (?,?,?) ON DUPLICATE KEY UPDATE Status = ?";				
 		$updateQuizRecordQuery = $conn->prepare($updateQuizRecordSql);                            
 		$updateQuizRecordQuery->execute(array($quizID, $studentID, $status, $status));
 	}
 	
-	function getQuizStatus($conn, $quizID, $studentID){
+	function getQuizStatus(PDO $conn, $quizID, $studentID){
 		$statusSql = "SELECT COUNT(*) FROM Quiz_Record
 					  WHERE QuizID = ? AND StudentID = ?";
 		$statusQuery = $conn->prepare($statusSql);
@@ -797,14 +797,14 @@
 		}
 	}
 	
-	function updatePosterSavedDoc($conn, $quizID, $studentID, $zwibblerDoc){
+	function updatePosterSavedDoc(PDO $conn, $quizID, $studentID, $zwibblerDoc){
 		$posterRecordSaveSql = "INSERT INTO Poster_Record(QuizID, StudentID, ZwibblerDoc)
 							    VALUES (?,?,?) ON DUPLICATE KEY UPDATE ZwibblerDoc= ?";
 		$posterRecordSaveQuery = $conn->prepare($posterRecordSaveSql);
 		$posterRecordSaveQuery->execute(array($quizID, $studentID, $zwibblerDoc, $zwibblerDoc));
 	}
 	
-	function updatePosterSubmittedDoc($conn, $quizID, $studentID, $zwibblerDoc, $imageUrl){
+	function updatePosterSubmittedDoc(PDO $conn, $quizID, $studentID, $zwibblerDoc, $imageUrl){
 		$posterRecordSubmittedSql = "INSERT INTO Poster_Record(QuizID, StudentID, ZwibblerDoc, ImageURL)
 									 VALUES (?,?,?,?) ON DUPLICATE KEY UPDATE ZwibblerDoc = ? , ImageURL = ?";
 			
@@ -812,7 +812,7 @@
 		$posterRecordSubmittedQuery -> execute(array($quizID, $studentID, $zwibblerDoc, $imageUrl, $zwibblerDoc, $imageUrl));
 	}
 	
-	function getPosterSavedDoc($conn, $quizID, $studentID){
+	function getPosterSavedDoc(PDO $conn, $quizID, $studentID){
 		$posterSql = "SELECT COUNT(*)
 					  FROM   Poster_Record
 					  WHERE  StudentID=? AND QuizID=?";
@@ -833,4 +833,37 @@
 		return $posterRes;
 	}
     
+    /* SAQ-Grading */
+    function updateSAQQuestionRecord(PDO $conn, $saqID, $studentID, $answer){
+        $updateSql = "INSERT INTO SAQ_Question_Record(StudentID, SAQID, Answer)
+                                         VALUES (?,?,?) ON DUPLICATE KEY UPDATE Answer = ?";			
+        $updateSql = $conn->prepare($updateSql);                
+        $updateSql -> execute(array($studentID, $saqID, htmlspecialchars($answer), htmlspecialchars($answer)));
+    }
+    
+    function getSAQRecords(PDO $conn, $quizID, $studentID){
+        $saqQuesRecordSql = "SELECT StudentID, SAQID, Answer, Feedback, Grading
+                   FROM   SAQ_Question_Record NATURAL JOIN SAQ_Question
+                   WHERE  QuizID = ? AND StudentID = ?
+                   ORDER BY SAQID";
+        $saqQuesRecordQuery = $conn->prepare($saqQuesRecordSql);
+        $saqQuesRecordQuery->execute(array($quizID, $studentID));
+        $saqQuesRecordResult = $saqQuesRecordQuery->fetchAll(PDO::FETCH_OBJ);
+        return $saqQuesRecordResult;   
+    }
+
+    function getSAQSubmissions(PDO $conn){
+        $quizSql = "SELECT * FROM Quiz_Record NATURAL JOIN Quiz NATURAL JOIN Student NATURAL JOIN Class NATURAL JOIN Topic WHERE QuizType = 'SAQ' AND `Status` = 'UNGRADED'";
+        $quizQuery = $conn->prepare($quizSql);
+        $quizQuery->execute();
+        $quizResult = $quizQuery->fetchAll(PDO::FETCH_OBJ); 
+        return $quizResult;
+    }
+    
+    function generateRandomSAQSubmissions(PDO $conn){
+
+    }
+    /* SAQ-Grading */
+
+
 ?>
