@@ -27,36 +27,33 @@
 		//get learning material
 		$materialRes = getLearningMaterial($conn, $quizID);
 
+		//get mcq question number
+		$quesNum = getMCQQuestionNum($conn, $quizID);
+
 		//check quiz status
 		$status = getQuizStatus($conn, $quizID, $studentID);
 
 		//if graded
 		if($status == "GRADED"){
-			$mcqSql = "SELECT MCQID, Question, Content, CorrectChoice, Choice, Explanation
-				   	   FROM   MCQ_Section NATURAL JOIN MCQ_Question
-									  	  NATURAL JOIN MCQ_Option
-									  	  NATURAL JOIN MCQ_Question_Record
-					   WHERE StudentID = ? AND QuizID = ?
-					   ORDER BY MCQID";
-
-			$mcqQuery = $conn->prepare($mcqSql);
-			$mcqQuery->execute(array($studentID, $quizid));
+			$mcqRes = getMCQSubmission($conn, $quizID, $studentID);
 		}
 
 		//if unanswered
 		if($status == "UNANSWERED"){
-			$mcqSql = "SELECT MCQID, Question, Content
-				   FROM   MCQ_Section NATURAL JOIN MCQ_Question
-								  NATURAL JOIN `Option`
-			       WHERE  QuizID = ?
-			       ORDER BY MCQID";
-
-			$mcqQuery = $conn->prepare($mcqSql);
-			$mcqQuery->execute(array($quizid));
+			$mcqRes = getMCQQuestions($conn, $quizID);
 		}
 	} catch(Exception $e){
+		if($conn != null){
+			db_close($conn);
+		}
 
+		debug_err($pageName, $e);
+		//to do: handle sql error
+		//...
+		exit;
 	}
+
+	db_close($conn);
 
 /*
 	$quesNumSql = "SELECT Count(*)
@@ -64,19 +61,15 @@
 				   WHERE  QuizID = ?";
 	
 	$quesNumQuery = $conn->prepare($quesNumSql);
-	$quesNumQuery->execute(array($quizid));
+	$quesNumQuery->execute(array($quizID));
 	
 	$quesNum = $quesNumQuery->fetchColumn();
 */
-			
-	$rows = $mcqQuery->fetchAll(PDO::FETCH_OBJ);
+
 			
 	$lastMCQID = -1;
 	$questionIndex = 1;
 	$MCQIDArray = "";
-	
-	db_close($conn);
-
 ?>
 
 <html>
@@ -119,7 +112,7 @@
 				
 					if (t.total <= 0) {
 						alert("Time is up!");
-						submitQuiz();
+						submitQuiz(<?php echo $quizID; ?>, <?php echo $studentID; ?>);
 					}
 				}
 				
@@ -196,6 +189,11 @@
 			
 			function parseFeedback(response) {
 				var feedback = JSON.parse(response);
+
+				if(feedback.message != "success"){
+					alert(feedback.message + ". Please try again!");
+					return;
+				}
 				
 				var result = feedback.result;
 				var score = feedback.score;
@@ -275,7 +273,7 @@
 				
 			}
 			
-			function submitQuiz()
+			function submitQuiz(quizID, studentID)
 			{
 				clearInterval(timeinterval);
 			//	$(".btn-block").attr("disabled","disabled");
@@ -302,8 +300,7 @@
 				
 				xmlhttp.open("POST", "multiple-choice-question-feedback.php", true);
 				xmlhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-				xmlhttp.send("MCQIDArr="+JSON.stringify(MCQIDArr)+"&answerArr="+JSON.stringify(answerArr)+"&quizid="+<?php echo $quizid;?>);
-
+				xmlhttp.send("MCQIDArr="+JSON.stringify(MCQIDArr)+"&answerArr="+JSON.stringify(answerArr)+"&quizID="+quizID+"&studentID="+studentID);
 			}
 			
 			function goBack()
@@ -332,7 +329,7 @@
 					
 						if($status == "UNANSWERED"){ ?>
 						<form id="goBack" method=post action=weekly-task.php>
-							<button id="back-btn" type="button" onclick="return submitQuiz();" class="btn btn-success">SUBMIT</button> 
+							<button id="back-btn" type="button" onclick="return submitQuiz(<?php echo $quizID; ?>, <?php echo $studentID; ?>);" class="btn btn-success">SUBMIT</button>
 							<input type=hidden name="week" value=<?php echo $week; ?>>
 						</form>
 				<?php	} ?>
@@ -386,9 +383,9 @@
                 </div>
         </div>
 
-		<?php for($i=0; $i<count($rows); $i++) {
+		<?php for($i=0; $i<count($mcqRes); $i++) {
 			
-			$currentMCQID = $rows[$i] -> MCQID;
+			$currentMCQID = $mcqRes[$i]->MCQID;
 							
 			if($currentMCQID != $lastMCQID){ 
 				if($questionIndex == 1){ ?>
@@ -399,7 +396,7 @@
 					<div class="panel panel-default">
                     <div class="panel-heading" style="font-size: xx-large; font-weight: 600; height:35%; text-align: center; justify-content:center; display:flex; align-items:center;">
                         <div class="ques" >
-                            <?php echo $questionIndex.". ".$rows[$i]->Question; $questionIndex++; $MCQIDArray = $MCQIDArray.($rows[$i]->MCQID).',';?>
+                            <?php echo $questionIndex.". ".$mcqRes[$i]->Question; $questionIndex++; $MCQIDArray = $MCQIDArray.($mcqRes[$i]->MCQID).',';?>
                         </div> 
                     </div>
                     <div class="panel-body">
@@ -409,53 +406,53 @@
 								
 						<?php
 								if($status == "GRADED"){
-									if(!isset($rows[$i]->Choice)){ 
-										if($rows[$i]->Content == $rows[$i]->CorrectChoice){
-											echo "<button type=\"button\" class=\"btn btn-default btn-lg btn-block correct\" name=\"".$rows[$i]->MCQID."\" id=\"".$i."\" disabled> 
+									if(!isset($mcqRes[$i]->Choice)){ 
+										if($mcqRes[$i]->Content == $mcqRes[$i]->CorrectChoice){
+											echo "<button type=\"button\" class=\"btn btn-default btn-lg btn-block correct\" name=\"".$mcqRes[$i]->MCQID."\" id=\"".$i."\" disabled> 
 												  <span class=\"glyphicon glyphicon-ok\"></span>";
 										} else { 
-											echo "<button type=\"button\" class=\"btn btn-default btn-lg btn-block\" name=\"".$rows[$i]->MCQID."\" id=\"".$i."\" disabled> 
+											echo "<button type=\"button\" class=\"btn btn-default btn-lg btn-block\" name=\"".$mcqRes[$i]->MCQID."\" id=\"".$i."\" disabled> 
 												  <span class=\"glyphicon glyphicon-remove\"></span>";
 										} 
 									} else { 
-										if($rows[$i]->CorrectChoice == $rows[$i]->Choice){
-											if($rows[$i]->Content == $rows[$i]->CorrectChoice){
+										if($mcqRes[$i]->CorrectChoice == $mcqRes[$i]->Choice){
+											if($mcqRes[$i]->Content == $mcqRes[$i]->CorrectChoice){
 												echo "<script>$(\"#button\"+".($questionIndex-1).").addClass(\"correct\");</script>";
-												echo "<button type=\"button\" class=\"btn btn-default btn-lg btn-block correct\" name=\"".$rows[$i]->MCQID."\" id=\"".$i."\" disabled> 
+												echo "<button type=\"button\" class=\"btn btn-default btn-lg btn-block correct\" name=\"".$mcqRes[$i]->MCQID."\" id=\"".$i."\" disabled> 
 													  <span class=\"glyphicon glyphicon-ok\"></span>";
 											} else {
-												echo "<button type=\"button\" class=\"btn btn-default btn-lg btn-block\" name=\"".$rows[$i]->MCQID."\" id=\"".$i."\" disabled> 
+												echo "<button type=\"button\" class=\"btn btn-default btn-lg btn-block\" name=\"".$mcqRes[$i]->MCQID."\" id=\"".$i."\" disabled> 
 												      <span class=\"glyphicon glyphicon-remove\"></span>";
 											}
 										} else {
-											if($rows[$i]->Content == $rows[$i]->CorrectChoice){ 
-												echo "<button type=\"button\" class=\"btn btn-default btn-lg btn-block correct\" name=\"".$rows[$i]->MCQID."\" id=\"".$i."\" disabled> 
+											if($mcqRes[$i]->Content == $mcqRes[$i]->CorrectChoice){ 
+												echo "<button type=\"button\" class=\"btn btn-default btn-lg btn-block correct\" name=\"".$mcqRes[$i]->MCQID."\" id=\"".$i."\" disabled> 
 													  <span class=\"glyphicon glyphicon-ok\"></span>";
-											} else if($rows[$i]->Content == $rows[$i]->Choice){
+											} else if($mcqRes[$i]->Content == $mcqRes[$i]->Choice){
 												echo "<script>$(\"#button\"+".($questionIndex-1).").addClass(\"wrong\");</script>";
-												echo "<button type=\"button\" class=\"btn btn-default btn-lg btn-block wrong\" name=\"".$rows[$i]->MCQID."\" id=\"".$i."\" disabled> 
+												echo "<button type=\"button\" class=\"btn btn-default btn-lg btn-block wrong\" name=\"".$mcqRes[$i]->MCQID."\" id=\"".$i."\" disabled> 
 												      <span class=\"glyphicon glyphicon-remove\"></span>";
 											} else {
-												echo "<button type=\"button\" class=\"btn btn-default btn-lg btn-block\" name=\"".$rows[$i]->MCQID."\" id=\"".$i."\" disabled> 
+												echo "<button type=\"button\" class=\"btn btn-default btn-lg btn-block\" name=\"".$mcqRes[$i]->MCQID."\" id=\"".$i."\" disabled> 
 												      <span class=\"glyphicon glyphicon-remove\"></span>";
 											}
 										}
 									}  ?>
 									
-									<label><?php echo $rows[$i]->Content;?></label><br><?php echo $rows[$i]->Explanation; ?></button>
+									<label><?php echo $mcqRes[$i]->Content;?></label><br><?php echo $mcqRes[$i]->Explanation; ?></button>
 									
 						<?php	}
 						
 								if($status == "UNANSWERED"){  ?>
-										<button type="button" id="<?php echo $i?>" class="btn btn-default btn-lg btn-block" name="<?php echo $rows[$i]->MCQID;?>" value="<?php echo $rows[$i]->Content;?>">
+										<button type="button" id="<?php echo $i?>" class="btn btn-default btn-lg btn-block" name="<?php echo $mcqRes[$i]->MCQID;?>" value="<?php echo $mcqRes[$i]->Content;?>">
 										<span class="glyphicon glyphicon-remove hidden"></span> 
 										<span class="glyphicon glyphicon-ok hidden"></span> 
-										<input type="radio" name="R_<?php echo $rows[$i]->MCQID;?>" class="" id="radio_<?php echo $i?>"/><label><?php echo $rows[$i]->Content;?></label></button>
+										<input type="radio" name="R_<?php echo $mcqRes[$i]->MCQID;?>" class="" id="radio_<?php echo $i?>"/><label><?php echo $mcqRes[$i]->Content;?></label></button>
 						<?php	} ?>
 								
 			
 		<?php
-			  if(($i+1)==sizeof($rows)){ ?>
+			  if(($i+1)==sizeof($mcqRes)){ ?>
 							</div>
 							<br>
 							<div class="nav-options" style="text-align: center;">
@@ -465,7 +462,7 @@
 					</div>
 				</div>
 		<?php } else {
-				$nextMCQID = $rows[$i+1]->MCQID;
+				$nextMCQID = $mcqRes[$i+1]->MCQID;
 				
 				if($nextMCQID != $currentMCQID){ ?>
 							</div>
@@ -494,10 +491,8 @@
 			<input type=hidden id="hiddenMCQIDArray" value="<?php echo substr($MCQIDArray, 0, strlen($MCQIDArray)-1); ?>">
 			
 			<form id="hiddenReturnQuiz" action="learning-material.php" method=post>
-					<input  type=hidden name="quizid" value=<?php echo $quizid; ?>>
-					<input  type=hidden name="quiztype" value=<?php echo $quiztype; ?>>
+					<input  type=hidden name="quizID" value=<?php echo $quizID; ?>>
 					<input  type=hidden name="week" value=<?php echo $week; ?>>
-					<input  type=hidden name="status" value=<?php echo $status; ?>>
 			</form>
 			
 			<form id="hiddenReturnTask" action="weekly-task.php" method=post>
