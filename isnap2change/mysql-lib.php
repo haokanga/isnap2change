@@ -294,6 +294,32 @@
         return $weekResult;
     }
 
+    function getQuizType(PDO $conn, $quizID){
+        $quizTypeSql = "SELECT COUNT(*)
+                        FROM Quiz
+                        WHERE QuizID = ?";
+        $quizTypeQuery = $conn->prepare($quizTypeSql);
+        $quizTypeQuery->execute(array($quizID));
+        if($quizTypeQuery->fetchColumn() != 1){
+            throw new Exception("Failed to get quiz type");
+        }
+
+        $quizTypeSql = "SELECT QuizType 
+                        FROM   Quiz
+                        WHERE  QuizID = ?";
+
+        $quizTypeQuery = $conn->prepare($quizTypeSql);
+        $quizTypeQuery->execute(array($quizID));
+        $quizTypeQueryRes = $quizTypeQuery->fetch(PDO::FETCH_OBJ);
+
+        if($quizTypeQueryRes->QuizType == "Misc"){
+            return getMiscQuizType($conn, $quizID);
+        } else{
+            return $quizTypeQueryRes->QuizType;
+        }
+
+    }
+
     function getQuizzes(PDO $conn){
         $quizSql = "SELECT QuizID, Week, QuizType, TopicName
                    FROM Quiz NATURAL JOIN Topic";
@@ -938,6 +964,26 @@
         }
     }
     /* Unit Test */
+
+    function getMiscQuizType(PDO $conn, $quizID){
+        $miscQuizTypeSql = "SELECT COUNT(*) 
+                            FROM   Misc_Section
+                            WHERE  QuizID = ?";
+        $miscQuizTypeQuery = $conn->prepare($miscQuizTypeSql);
+        $miscQuizTypeQuery->execute(array($quizID));
+        if($miscQuizTypeQuery->fetchColumn() != 1){
+            throw new Exception("Failed to get misc quiz type");
+        }
+
+        $miscQuizTypeSql = "SELECT QuizSubType 
+                            FROM   Misc_Section
+                            WHERE  QuizID = ?";
+
+        $miscQuizTypeQuery = $conn->prepare($miscQuizTypeSql);
+        $miscQuizTypeQuery->execute(array($quizID));
+        $miscQuizTypeQueryRes = $miscQuizTypeQuery->fetch(PDO::FETCH_OBJ);
+        return $miscQuizTypeQueryRes->QuizSubType;
+    }
 
 
 ?>

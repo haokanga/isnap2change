@@ -1,17 +1,14 @@
 <?php
 
 	session_start();
+
+	//check login status
+	require_once('student-validation.php');
+
 	require_once("mysql-lib.php");
 	require_once("debug.php");
 	
 	$pageName = "poster-editor";
-	
-	//check student login status
-	if(! isset($_SESSION["studentID"])){
-		
-	}
-	
-	$studentID = $_SESSION["studentID"];
 	
 	//check whether a request is GET or POST 
 	if($_SERVER["REQUEST_METHOD"] == "POST"){
@@ -53,8 +50,8 @@
 <body>
 	<div id=progress></div>
     <div id="zwibbler" style="margin-left:auto;margin-right:auto;width:800px;height:800px;"></div>
-    <input id="saveBtn"type="button" onclick="onSave()" value="SAVE"/>
-    <input id="submitBtn" type="button" onclick="onSubmit()"  value="SUBMIT"/>
+    <input id="saveBtn"type="button" onclick="onSave(<?php echo $quizID; ?>, <?php echo $studentID; ?>)" value="SAVE"/>
+    <input id="submitBtn" type="button" onclick="onSubmit(<?php echo $quizID; ?>, <?php echo $studentID; ?>)"  value="SUBMIT"/>
 	<form id="goBack" method=post action=weekly-task.php>
 		<button type="button" onclick="goBack()">GO BACK</button> 
 		<input type=hidden name="week" value=<?php echo $week; ?>>
@@ -124,7 +121,7 @@
 			$("#submitBtn").attr("disabled","disabled");
 		}
 		
-        function onSave(){		
+        function onSave(quizID, studentID){
             var zwibblerDoc = zwibbler.save("zwibbler3");
 			
 			var xmlhttp = new XMLHttpRequest();
@@ -136,10 +133,10 @@
 			
 			xmlhttp.open("POST", "poster-feedback.php", true);
 			xmlhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-			xmlhttp.send("quizID="+<?php echo $quizID; ?>+"&studentID="+<?php echo $studentID; ?>+"&action=SAVE"+"&zwibblerDoc="+zwibblerDoc.substr(10));
+			xmlhttp.send("quizID="+quizID+"&studentID="+studentID+"&action=SAVE"+"&zwibblerDoc="+zwibblerDoc.substr(10));
         }
 
-        function onSubmit() {		
+        function onSubmit(quizID, studentID) {
             var zwibblerDoc = zwibbler.save("zwibbler3");
 			var dataUrl = zwibbler.save("png");
 			
@@ -152,7 +149,7 @@
 			
 			xmlhttp.open("POST", "poster-feedback.php", true);
 			xmlhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-			xmlhttp.send("quizID="+<?php echo $quizID; ?>+"&studentID="+<?php echo $studentID; ?>+"&action=SUBMIT"+"&zwibblerDoc="+zwibblerDoc.substr(10)+"&dataUrl="+dataUrl);
+			xmlhttp.send("quizID="+quizID+"&studentID="+studentID+"&action=SUBMIT"+"&zwibblerDoc="+zwibblerDoc.substr(10)+"&dataUrl="+dataUrl);
         }
 		
 		function goBack() {
@@ -166,15 +163,20 @@
         });
 		
 		function uploadDone(status, result) {
-            if (status === "ok") {	
-				var url = "http://localhost/isnap2change/isnap2change/tmp_poster_img/" + result.fileid;
-					
-				zwibbler.beginTransaction();
-				var nodeId = zwibbler.createNode("ImageNode", {
-					url: url
-				});
-				zwibbler.translateNode(nodeId, 100, 100);
-				zwibbler.commitTransaction();	
+            if (status === "ok") {
+				if(result.message == "success"){
+					var url = "http://localhost/isnap2change/isnap2change/tmp_poster_img/" + result.fileid;
+
+					zwibbler.beginTransaction();
+					var nodeId = zwibbler.createNode("ImageNode", {
+						url: url
+					});
+					zwibbler.translateNode(nodeId, 100, 100);
+					zwibbler.commitTransaction();
+				} else{
+					alert(result.message);
+				}
+
             }
         }
 		

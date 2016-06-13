@@ -1,51 +1,64 @@
 <?php
 
     session_start();
+	//check login status
+	require_once('student-validation.php');
+
 	require_once('mysql-lib.php');
-	
-	if(isset($_SESSION["studentID"])){
-		$studentID = $_SESSION["studentID"];
-	} else {
-		
-	}
+	require_once('debug.php');
+	$pageName = "multiple-choice-question";
 	
 	if ($_SERVER["REQUEST_METHOD"] == "POST") {
-		
-		if(isset($_POST["quizid"]) && isset($_POST["quiztype"]) && isset($_POST["week"]) && isset($_POST["status"])){
-			$quizid = $_POST["quizid"];
-			$quiztype = $_POST["quiztype"];
+		if(isset($_POST["quizID"]) && isset($_POST["week"])){
+			$quizID = $_POST["quizID"];
 			$week = $_POST["week"];
-			$status = $_POST["status"];
 		} else {
 			
 		}
-		
 	} else {
 		
 	}
-	
-	$conn = db_connect();
-	
-	$materialPreSql = "SELECT COUNT(*) 
-					   FROM   Learning_Material
-					   WHERE  QuizID = ?";
-							
-	$materialPreQuery = $conn->prepare($materialPreSql);
-	$materialPreQuery->execute(array($quizid));
-			
-	if($materialPreQuery->fetchColumn() != 1){
-				
+
+	$conn = null;
+
+	try{
+		$conn = db_connect();
+
+		//get learning material
+		$materialRes = getLearningMaterial($conn, $quizID);
+
+		//check quiz status
+		$status = getQuizStatus($conn, $quizID, $studentID);
+
+		//if graded
+		if($status == "GRADED"){
+			$mcqSql = "SELECT MCQID, Question, Content, CorrectChoice, Choice, Explanation
+				   	   FROM   MCQ_Section NATURAL JOIN MCQ_Question
+									  	  NATURAL JOIN MCQ_Option
+									  	  NATURAL JOIN MCQ_Question_Record
+					   WHERE StudentID = ? AND QuizID = ?
+					   ORDER BY MCQID";
+
+			$mcqQuery = $conn->prepare($mcqSql);
+			$mcqQuery->execute(array($studentID, $quizid));
+		}
+
+		//if unanswered
+		if($status == "UNANSWERED"){
+			$mcqSql = "SELECT MCQID, Question, Content
+				   FROM   MCQ_Section NATURAL JOIN MCQ_Question
+								  NATURAL JOIN `Option`
+			       WHERE  QuizID = ?
+			       ORDER BY MCQID";
+
+			$mcqQuery = $conn->prepare($mcqSql);
+			$mcqQuery->execute(array($quizid));
+		}
+	} catch(Exception $e){
+
 	}
-			
-	$materialSql = "SELECT Content, TopicName 
-					FROM   Learning_Material NATURAL JOIN Quiz
-									         NATURAL JOIN Topic
-					WHERE  QuizID = ?";
-							
-	$materialQuery = $conn->prepare($materialSql);
-	$materialQuery->execute(array($quizid));
-	$materialRes = $materialQuery->fetch(PDO::FETCH_OBJ);
-	
+
+/*
 	$quesNumSql = "SELECT Count(*)
 				   FROM   MCQ_Question
 				   WHERE  QuizID = ?";
@@ -54,29 +67,7 @@
 	$quesNumQuery->execute(array($quizid));
 	
 	$quesNum = $quesNumQuery->fetchColumn();
-	
-	if($status == "GRADED"){
-		$mcqSql = "SELECT MCQID, Question, Content, CorrectChoice, Choice, Explanation
-				   FROM   MCQ_Section NATURAL JOIN MCQ_Question
-									  NATURAL JOIN `Option`
-									  NATURAL JOIN MCQ_Question_Record
-					WHERE StudentID = ? AND QuizID = ?
-					ORDER BY MCQID";
-								
-	   $mcqQuery = $conn->prepare($mcqSql);
-	   $mcqQuery->execute(array($studentID, $quizid));
-	}
-	
-	if($status == "UNANSWERED"){
-		$mcqSql = "SELECT MCQID, Question, Content
-				   FROM   MCQ_Section NATURAL JOIN MCQ_Question
-								  NATURAL JOIN `Option`
-			       WHERE  QuizID = ?
-			       ORDER BY MCQID";
-								
-		$mcqQuery = $conn->prepare($mcqSql);
-		$mcqQuery->execute(array($quizid));
-	}
+*/
 			
 	$rows = $mcqQuery->fetchAll(PDO::FETCH_OBJ);
 			

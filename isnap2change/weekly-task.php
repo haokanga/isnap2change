@@ -40,50 +40,66 @@
 		exit;
 	}
 
-	db_close($conn);
+	for($i=0; $i<count($quizzesStatusRes); $i++){
+		if(isset($quizzesStatusRes[$i]->Status)){
+			//if UNSUBMITTED/UNGRADED/GRADED
+			$status = $quizzesStatusRes[$i]->Status;
 
-    $count = 0;
-	
-    while($quizResult = $quizQuery->fetch(PDO::FETCH_ASSOC)){
-        $count++;
-		
-		if(isset($quizResult["Status"])){
-			//if UNGRADED/GRADED
-			$status = $quizResult["Status"];
-			
 			//list of question type
-			switch($quizResult["QuizType"]) {
+			switch($quizzesStatusRes[$i]->QuizType){
 				case "MCQ":
-					echo '<form id="quiz'.$quizResult["QuizID"].'" action=multiple-choice-question.php method=post>';
+					echo '<form id="quiz'.$quizzesStatusRes[$i]->QuizID.'" action=multiple-choice-question.php method=post>';
 					break;
 				case "SAQ":
-					echo '<form id="quiz'.$quizResult["QuizID"].'" action=short-answer-question.php method=post>';
+					echo '<form id="quiz'.$quizzesStatusRes[$i]->QuizID.'" action=short-answer-question.php method=post>';
 					break;
 				case "Matching":
-					echo '<form id="quiz'.$quizResult["QuizID"].'" action=matching-question.php method=post>';
+					echo '<form id="quiz'.$quizzesStatusRes[$i]->QuizID.'" action=matching-question.php method=post>';
 					break;
 				case "Poster":
-					echo '<form id="quiz'.$quizResult["QuizID"].'" action=poster-editor.php method=post>';
+					echo '<form id="quiz'.$quizzesStatusRes[$i]->QuizID.'" action=poster-editor.php method=post>';
+					break;
+				case "Misc":
+					try {
+						$miscQuizType = getMiscQuizType($conn, $quizzesStatusRes[$i]->QuizID);
+					} catch (Exception $e){
+						if($conn != null) {
+							db_close($conn);
+						}
+
+						debug_err($pageName, $e);
+						//to do: handle sql error
+						//...
+						exit;
+					}
+
+					switch($miscQuizType){
+						case "Calculator":
+							echo '<form id="quiz'.$quizzesStatusRes[$i]->QuizID.'" action=cost-calculator.php method=post>';
+							break;
+						default:
+							break;
+					}
 					break;
 				default:
 					break;
 			}
-			
+
 		} else {
 			//if UNANSWERED
 			$status = "UNANSWERED";
-				
-			echo '<form id="quiz'.$quizResult["QuizID"].'" action=learning-material.php method=post>';
+
+			echo '<form id="quiz'.$quizzesStatusRes[$i]->QuizID.'" action=learning-material.php method=post>';
 		}
-		
-        echo '<button type=button onclick="startQuiz('.$quizResult["QuizID"].')"> Quiz '.$count.'</button>
-			  <input  type=hidden name="quizID" value='.$quizResult["QuizID"].'>
-			  <input  type=hidden name="quizType" value='.$quizResult["QuizType"].'>
+
+		echo '<button type=button onclick="startQuiz('.$quizzesStatusRes[$i]->QuizID.')"> Quiz '.($i+1).'</button>
+			  <input  type=hidden name="quizID" value='.$quizzesStatusRes[$i]->QuizID.'>
 			  <input  type=hidden name="week" value='.$week.'>
-			  <input type=hidden name="status" value='.$status.'>
 			  </form>';
-    }
-    //game
+	}
+
+	db_close($conn);
+    /**  game query move somewhere else
     $gameSql = "SELECT * FROM Game";    
     $gameQuery = $conn->prepare($gameSql);
     $gameQuery->execute(); 
@@ -94,8 +110,7 @@
         <input  type=hidden name="week" value='.$week.'>
         </form>';
     }
-	db_close($conn);	
-	
+	*/
 ?>
 
 <html>
