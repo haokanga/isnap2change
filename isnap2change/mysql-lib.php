@@ -331,6 +331,8 @@
                 $pointsSql = "SELECT Points AS SumPoints FROM Quiz NATURAL JOIN ".$quizType."_Section WHERE QuizID = ?";
             } else if(in_array($quizType, $pointsByQuestion)){
                 $pointsSql = "SELECT SUM(Points) AS SumPoints FROM Quiz NATURAL JOIN SAQ_Section NATURAL JOIN SAQ_Question WHERE QuizID = ?";
+            } else {
+                throw new Exception("Unexpected Quiz Type. QuizID: ".$quizID);
             }
             $pointsQuery = $conn->prepare($pointsSql);
             $pointsQuery->execute(array($quizID));
@@ -788,16 +790,14 @@
 						  WHERE QuizID = ? AND StudentID = ?";
 			$statusQuery = $conn->prepare($statusSql);
 			$statusQuery->execute(array($quizID, $studentID));
-			
-			return $statusQuery->Status; 
-		} else if($statusQuery->fetchColumn() == 0){
+            $statusResult = $statusQuery->fetch(PDO::FETCH_OBJ);
+			return $statusResult->Status;
+		} else {
 			return "UNANSWERED";
-		} else{
-			
 		}
 	}
 
-    function getQuizzesStatusByWeek($conn, $studentID, $week){
+    function getQuizzesStatusByWeek(PDO $conn, $studentID, $week){
         $quizzesStatusSql = "SELECT Quiz.QuizID, QuizType, `Status` FROM Quiz LEFT JOIN (SELECT * FROM Quiz_Record WHERE StudentID = ?) Student_Quiz_Record ON Quiz.QuizID = Student_Quiz_Record.QuizID WHERE Week = ? ORDER BY Quiz.QuizID";
         $quizzesStatusQuery = $conn->prepare($quizzesStatusSql);
         $quizzesStatusQuery->execute(array($studentID, $week));
