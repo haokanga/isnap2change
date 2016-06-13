@@ -987,7 +987,6 @@ function getQuizzesStatusByWeek(PDO $conn, $studentID, $week)
     return $quizzesStatusRes;
 }
 
-//updatePosterDraft
 function updatePosterDraft(PDO $conn, $quizID, $studentID, $zwibblerDoc)
 {
     $posterRecordSaveSql = "INSERT INTO Poster_Record(QuizID, StudentID, ZwibblerDoc)
