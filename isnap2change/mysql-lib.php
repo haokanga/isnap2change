@@ -838,14 +838,14 @@
     }
 
     //updatePosterDraft
-	function updatePosterSavedDoc(PDO $conn, $quizID, $studentID, $zwibblerDoc){
+	function updatePosterDraft(PDO $conn, $quizID, $studentID, $zwibblerDoc){
 		$posterRecordSaveSql = "INSERT INTO Poster_Record(QuizID, StudentID, ZwibblerDoc)
 							    VALUES (?,?,?) ON DUPLICATE KEY UPDATE ZwibblerDoc= ?";
 		$posterRecordSaveQuery = $conn->prepare($posterRecordSaveSql);
 		$posterRecordSaveQuery->execute(array($quizID, $studentID, $zwibblerDoc, $zwibblerDoc));
 	}
-    //updatePosterSubmission
-	function updatePosterSubmittedDoc(PDO $conn, $quizID, $studentID, $zwibblerDoc, $imageUrl){
+
+	function updatePosterSubmission(PDO $conn, $quizID, $studentID, $zwibblerDoc, $imageUrl){
 		$posterRecordSubmittedSql = "INSERT INTO Poster_Record(QuizID, StudentID, ZwibblerDoc, ImageURL)
 									 VALUES (?,?,?,?) ON DUPLICATE KEY UPDATE ZwibblerDoc = ? , ImageURL = ?";
 
@@ -853,7 +853,7 @@
 		$posterRecordSubmittedQuery -> execute(array($quizID, $studentID, $zwibblerDoc, $imageUrl, $zwibblerDoc, $imageUrl));
 	}
 
-	function getPosterSavedDoc(PDO $conn, $quizID, $studentID){
+	function getPosterDraft(PDO $conn, $quizID, $studentID){
 		$posterSql = "SELECT COUNT(*)
 					  FROM   Poster_Record
 					  WHERE  StudentID=? AND QuizID=?";

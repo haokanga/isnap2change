@@ -30,7 +30,7 @@
 		$status = getQuizStatus($conn, $quizID, $studentID);
 		//if quiz is answered, saved poster will be read from database.
 		if($status != "UNANSWERED"){
-			$posterRes = getPosterSavedDoc($conn, $quizID, $studentID);	
+			$posterRes = getPosterDraft($conn, $quizID, $studentID);	
 		}	
 	}catch(Exception $e){
 		if($conn != null){

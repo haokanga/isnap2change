@@ -59,7 +59,7 @@
 		
 		//if save, update poster document in the Poster_Record
 		if($action == "SAVE"){
-			updatePosterSavedDoc($conn, $quizID, $studentID, $zwibblerDoc);
+			updatePosterDraft($conn, $quizID, $studentID, $zwibblerDoc);
 		}
 		
 		//if submit, update poster document and image url in the Poster_Record
@@ -75,7 +75,7 @@
 		
 			base64_to_img($dataUrl, $imageUrl);
 			
-			updatePosterSubmittedDoc($conn, $quizID, $studentID, $zwibblerDoc, $imageUrl);
+			updatePosterSubmission($conn, $quizID, $studentID, $zwibblerDoc, $imageUrl);
 		}
 		
 		$conn->commit();
