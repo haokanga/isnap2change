@@ -1,6 +1,7 @@
 <?php
 	
-	$studentID = $_POST["studentid"];
+	$studentID = $_POST["studentID"];
+
 	$tmpid = rand();
 	$target_path = "./tmp_poster_img/".$studentID."_".$tmpid."_tmp";
 	
@@ -16,9 +17,9 @@
 	if(move_uploaded_file($_FILES['file']['tmp_name'], $target_path)) {
 		$result['fileid'] = $fileid; 
 		//echo "success";  
-		//$result['status'] = "success";
+		$result['message'] = "success";
 	}  else{  
-	
+		$result['message'] = "Fail to upload image";
 	}  	
 	
 	echo json_encode($result);

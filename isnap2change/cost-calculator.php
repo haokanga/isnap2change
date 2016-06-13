@@ -1,7 +1,26 @@
 <?php
-	$studentID = 1;
-	$quizID = 5;
-	$week = 6;
+	session_start();
+
+	//check login status
+	require_once('student-validation.php');
+
+	require_once("mysql-lib.php");
+	require_once("debug.php");
+
+	$pageName = "cost-calculaor";
+
+	//check whether a request is GET or POST
+	if($_SERVER["REQUEST_METHOD"] == "POST"){
+		if(isset($_POST["quizID"]) && isset($_POST["week"])){
+			$quizID = $_POST["quizID"];
+			$week = $_POST["week"];
+		} else{
+
+		}
+	} else{
+
+	}
+
 ?>
 <html>
 <head>
@@ -47,7 +66,7 @@
 		
 	}
 
-	function submitQuiz() {		
+	function submitQuiz(quizID, studentID) {
 		var answerArr = new Array(3);	
 		
 		$("input:text[name='studentAns']").each(function(i) {
@@ -64,7 +83,7 @@
 				
 			xmlhttp.open("POST", "cost-calculator-feedback.php", true);
 			xmlhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-			xmlhttp.send("studentID="+<?php echo $studentID;?>+"&quizID="+<?php echo $quizID;?>+"&answerArr="+JSON.stringify(answerArr));
+			xmlhttp.send("studentID="+studentID+"&quizID="+quizID+"&answerArr="+JSON.stringify(answerArr));
 	}
 	
 </script>
@@ -110,7 +129,7 @@
 		<h4>What would the cost be of smoking 40 cigarettes a day for 20 years if a packet of 20 cigarettes costs $25?</h4>
 		<input type="text" name="studentAns">
 		<br><br>
-		<button id="submitBtn" type="button" onclick="submitQuiz()">Submit</button>
+		<button id="submitBtn" type="button" onclick="submitQuiz(<?php echo $quizID?>, <?php echo $studentID?>)">Submit</button>
 		<form id="goBack" method=post action=weekly-task.php>
 			<button type="button" onclick="goBack()">GO BACK</button> 
 			<input type=hidden name="week" value=<?php echo $week; ?>>

@@ -10,9 +10,8 @@
 
 	//check whether a request is GET or POST 
 	if ($_SERVER["REQUEST_METHOD"] == "POST") {
-		if(isset($_POST["quizID"]) && isset($_POST["quizType"]) && isset($_POST["week"])){
+		if(isset($_POST["quizID"]) && isset($_POST["week"])){
 			$quizID = $_POST["quizID"];
-			$quizType = $_POST["quizType"];
 			$week = $_POST["week"];
 		} else {
 			
@@ -28,6 +27,9 @@
 		
 		//get learning material
 		$materialRes = getLearningMaterial($conn, $quizID);
+
+		//get quiz type
+		$quizType = getQuizType($conn, $quizID);
 		
 	} catch(Exception $e){
 		if($conn != null) {
@@ -111,7 +113,6 @@
 						<form id="formQuizBegin" method=post>
                             <button type="button" onclick="beginQuiz()" class="btn btn-default btn-lg btn-block" style="background-color:darkseagreen;">BEGIN QUIZ </button>
 							<input  type=hidden name="quizID" value=<?php echo $quizID; ?>>
-                            <input  type=hidden name="quizType" value=<?php echo $quizType; ?>>
 							<input  type=hidden name="week" value=<?php echo $week; ?>>
                            <!--
 						   implement logic 
