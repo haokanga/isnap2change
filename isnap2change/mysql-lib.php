@@ -779,6 +779,12 @@
 		$updateQuizRecordQuery->execute(array($quizID, $studentID, $status, $status));
 	}
 
+    function deleteQuizRecord(PDO $conn, $quizID, $studentID){
+        $updateSql = "DELETE FROM Quiz_Record WHERE QuizID = ? AND StudentID = ?";
+        $updateSql = $conn->prepare($updateSql);
+        $updateSql->execute(array($quizID, $studentID));
+    }
+
 	function getQuizStatus(PDO $conn, $quizID, $studentID){
 		$statusSql = "SELECT COUNT(*) FROM Quiz_Record
 					  WHERE QuizID = ? AND StudentID = ?";
@@ -805,13 +811,14 @@
         return $quizzesStatusRes;
     }
 
+    //updatePosterDraft
 	function updatePosterSavedDoc(PDO $conn, $quizID, $studentID, $zwibblerDoc){
 		$posterRecordSaveSql = "INSERT INTO Poster_Record(QuizID, StudentID, ZwibblerDoc)
 							    VALUES (?,?,?) ON DUPLICATE KEY UPDATE ZwibblerDoc= ?";
 		$posterRecordSaveQuery = $conn->prepare($posterRecordSaveSql);
 		$posterRecordSaveQuery->execute(array($quizID, $studentID, $zwibblerDoc, $zwibblerDoc));
 	}
-
+    //updatePosterSubmission
 	function updatePosterSubmittedDoc(PDO $conn, $quizID, $studentID, $zwibblerDoc, $imageUrl){
 		$posterRecordSubmittedSql = "INSERT INTO Poster_Record(QuizID, StudentID, ZwibblerDoc, ImageURL)
 									 VALUES (?,?,?,?) ON DUPLICATE KEY UPDATE ZwibblerDoc = ? , ImageURL = ?";
@@ -849,6 +856,13 @@
         $updateSql -> execute(array($studentID, $saqID, htmlspecialchars($answer), htmlspecialchars($answer)));
     }
 
+    function deleteSAQQuestionRecord(PDO $conn, $saqID, $studentID){
+        $updateSql = "DELETE FROM SAQ_Question_Record WHERE SAQID = ? AND StudentID = ?";
+        $updateSql = $conn->prepare($updateSql);
+        $updateSql -> execute(array($saqID, $studentID));
+    }
+
+
     function getSAQRecords(PDO $conn, $quizID, $studentID){
         $saqQuesRecordSql = "SELECT StudentID, SAQID, Answer, Feedback, Grading
                    FROM   SAQ_Question_Record NATURAL JOIN SAQ_Question
@@ -858,6 +872,31 @@
         $saqQuesRecordQuery->execute(array($quizID, $studentID));
         $saqQuesRecordResult = $saqQuesRecordQuery->fetchAll(PDO::FETCH_OBJ);
         return $saqQuesRecordResult;
+    }
+
+    function deleteSAQSubmission(PDO $conn, $quizID, $studentID, $pageName){
+        try {
+            $conn->beginTransaction();
+
+            deleteQuizRecord($conn, $quizID, $studentID);
+            $saqResult = getSAQQuestions($conn, $quizID);
+            for($saqIndex=0; $saqIndex<count($saqResult); $saqIndex++) {
+                $saqID = $saqResult[$saqIndex]->SAQID;
+                deleteSAQQuestionRecord($conn, $saqID, $studentID);
+            }
+        } catch (Exception $e) {
+            debug_err($pageName, $e);
+            $conn->rollBack();
+        }
+
+    }
+
+    function getSAQSubmission(PDO $conn, $quizID, $studentID){
+        $quizSql = "SELECT * FROM Quiz_Record NATURAL JOIN SAQ_Question NATURAL JOIN SAQ_Question_Record WHERE QuizID = ? AND StudentID = ?";
+        $quizQuery = $conn->prepare($quizSql);
+        $quizQuery->execute(array($quizID, $studentID));
+        $quizResult = $quizQuery->fetchAll(PDO::FETCH_OBJ);
+        return $quizResult;
     }
 
     function getSAQSubmissions(PDO $conn){
@@ -891,7 +930,7 @@
                 if($studentID>=3){
                     for($saqIndex=0; $saqIndex<count($saqResult); $saqIndex++) {
                         $saqID = $saqResult[$saqIndex]->SAQID;
-                        updateSAQQuestionRecord($conn, $saqID, $studentID, generateRandomString(50));
+                        updateSAQQuestionRecord($conn, $saqID, $studentID, generateRandomString(300));
                     }
                     updateQuizRecord($conn, $quizID, $studentID, "UNGRADED");
                 }

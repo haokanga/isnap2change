@@ -30,7 +30,7 @@ try {
                     $conn->commit();
                 } catch (Exception $e) {
                     debug_err($pageName, $e);
-                    $conn->rollback();
+                    $conn->rollBack();
                 }
             } else if ($update == -1) {
                 $quizID = $_POST['quizID'];

@@ -42,6 +42,8 @@
             $quizID = $_POST["quizID"];
             $saqID = $_POST["saqID"];    
             $answer = $_POST["answer"];
+            //updateSAQSubmission();
+            //updateSAQDraft();
             for($i=0; $i<count($saqID); $i++) {
                 updateSAQQuestionRecord($conn, $saqID[$i], $studentID, $answer[$i]);
             }            
