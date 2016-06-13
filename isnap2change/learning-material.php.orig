@@ -1,18 +1,19 @@
 <?php
 	session_start();
-
-	//check login status
-	require_once('student-validation.php');
-
 	require_once('mysql-lib.php');
 	require_once('debug.php');	
 	$pageName = "learning-material";
-
+	
+	//check login status
+	if(!isset($_SESSION["studentID"])){
+		
+	}
+	
 	//check whether a request is GET or POST 
 	if ($_SERVER["REQUEST_METHOD"] == "POST") {
-		if(isset($_POST["quizID"]) && isset($_POST["quizType"]) && isset($_POST["week"])){
-			$quizID = $_POST["quizID"];
-			$quizType = $_POST["quizType"];
+		if(isset($_POST["quizid"]) && isset($_POST["quiztype"]) && isset($_POST["week"])){
+			$quizID = $_POST["quizid"];
+			$quizType = $_POST["quiztype"];
 			$week = $_POST["week"];
 		} else {
 			
@@ -35,8 +36,13 @@
 		}
 			
 		debug_err($pageName, $e);
+<<<<<<< HEAD
 		//to do: handle sql error
 		//...
+=======
+		$feedback["message"] = $e->getMessage();
+		echo json_encode($feedback);
+>>>>>>> 2f7fb84b515784021d58fb455e1278a1ea423e51
 		exit;
 	}
 	
@@ -74,9 +80,8 @@
 						case "Poster":
 							echo 'document.getElementById("formQuizBegin").setAttribute("action", "poster-editor.php");';
 							break;
-						case "Calculator":
-							echo 'document.getElementById("formQuizBegin").setAttribute("action", "cost-calculator.php");';
-							break;
+						case "":
+						
 						default:
 							break;
 					}
@@ -95,7 +100,7 @@
 			<div class="panel panel-default">
 				<div class="panel-body">
 					<div class="heading" style="color: black; max-height:10vh; text-align:center; border-bottom: 1px solid #eee;">
-                                <h1 style='padding: 0;'>
+                                <h1 style='padding: 0px;'> 
 								<i>	<?php echo $materialRes->TopicName; ?> </i>                          
                                 </h1> 
 					</div>
