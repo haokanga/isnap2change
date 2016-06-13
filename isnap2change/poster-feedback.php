@@ -1,6 +1,7 @@
 <?php
-	
 	require_once("mysql-lib.php");
+	require_once("debug.php");
+	
 	$pageName = "poster-feedback";
 	
 	//check whether a request is GET or POST
@@ -86,7 +87,7 @@
 			db_close($conn);
 		}
 			
-		debug_pdo_err($pageName, $e);
+		debug_err($pageName, $e);
 		$feedback["message"] = $e->getMessage();
 		echo json_encode($feedback);
 		exit;

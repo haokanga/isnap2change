@@ -2,6 +2,7 @@
 
 	session_start();
 	require_once("mysql-lib.php");
+	require_once("debug.php");
 	
 	$pageName = "poster-editor";
 	
@@ -39,12 +40,13 @@
 			db_close($conn);
 		}
 		
-		debug_pdo_err($pageName, $e);
+		debug_err($pageName, $e);
 		//to do: handle sql error
 		//...
 		exit;
 	}
-		
+	
+	db_close($conn);
 ?>
 
 <html>

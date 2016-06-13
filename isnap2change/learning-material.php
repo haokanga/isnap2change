@@ -36,14 +36,13 @@
 			db_close($conn);
 		}
 			
-		debug_pdo_err($pageName, $e);
-		$feedback["message"] = $e->getMessage();
-		echo json_encode($feedback);
+		debug_err($pageName, $e);
+		//to do: handle sql error
+		//...
 		exit;
 	}
 	
 	db_close($conn);
-
 ?>
 
 <html>
@@ -77,6 +76,8 @@
 						case "Poster":
 							echo 'document.getElementById("formQuizBegin").setAttribute("action", "poster-editor.php");';
 							break;
+						case "":
+						
 						default:
 							break;
 					}
