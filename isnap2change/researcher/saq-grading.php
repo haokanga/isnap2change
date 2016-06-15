@@ -65,10 +65,11 @@ db_close($conn);
                                 <thead>
                                 <tr>
                                     <?php for ($i = 0; $i < count($columnName); $i++) { ?>
-                                        <th <?php if ($i == 0) {
+                                        <th <?php if ($i == 0 || $i == 2) {
                                             echo 'style="display:none"';
                                         } ?>><?php echo $columnName[$i]; ?></th>
                                     <?php } ?>
+                                    <th>Score</th>
                                     <th>Status</th>
                                 </tr>
                                 </thead>
@@ -82,14 +83,20 @@ db_close($conn);
                                         echo "even";
                                     } ?>">
                                         <?php for ($j = 0; $j < count($columnName); $j++) { ?>
-                                            <td <?php if ($j == 0) {
+                                            <td <?php if ($j == 0 || $j == 2) {
                                                 echo 'style="display:none"';
                                             } ?>>
                                                 <?php if (strlen($submissionResult[$i]->$columnName[$j]) > 0) echo $submissionResult[$i]->$columnName[$j]; else echo 0; ?>
                                             </td>
                                         <?php } ?>
                                         <td>
-                                            <?php echo getQuizStatus($conn, $quizID, $studentID) ?>
+                                            <?php
+                                            $status = getQuizStatus($conn, $quizID, $studentID);
+                                            if ($status == 'GRADED') echo getStuQuizScore($conn, $quizID, $studentID); else echo '-'; ?>
+                                        </td>
+                                        <td>
+                                            <?php
+                                            echo $status ?>
                                             <span class="glyphicon glyphicon-remove pull-right"
                                                   aria-hidden="true"></span>
                                             <span class="pull-right" aria-hidden="true">&nbsp;</span>
@@ -123,62 +130,29 @@ db_close($conn);
 
 </div>
 <!-- /#wrapper -->
-<!-- Modal -->
-<div class="modal fade" id="dialog" role="dialog">
-    <div class="modal-dialog">
-        <!-- Modal content-->
-        <div class="modal-content">
-            <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal">&times;</button>
-                <h4 class="modal-title" id="dialogTitle">Edit Quiz</h4>
-            </div>
-            <div class="modal-body">
-                <form id="submission" method="post" action="<?php echo $_SERVER['PHP_SELF']; ?>">
-                    <!--if 1, insert; else if -1 delete;-->
-                    <input type=hidden name="update" id="update" value="1" required>
-                    <label for="QuizID" style="display:none">QuizID</label>
-                    <input type="text" class="form-control dialoginput" id="QuizID" name="quizID" style="display:none">
-                    <label for="Week">Week</label>
-                    <input type="text" class="form-control dialoginput" id="Week" name="week"
-                           placeholder="Input Week Number" required>
-                    <br>
-                    <label for='TopicName'>TopicName</label>
-                    <select class="form-control dialoginput" id="TopicName" form="submission" name="topicName" required>
-                        <option value="" disabled selected>Select Topic</option>
-                        <?php for ($j = 0; $j < count($topicResult); $j++) { ?>
-                            <option
-                                value='<?php echo $topicResult[$j]->TopicName ?>'><?php echo $topicResult[$j]->TopicName ?></option>
-                        <?php } ?>
-                    </select>
-                    <br>
-                </form>
-            </div>
-            <div class="modal-footer">
-                <button type="button" id="btnSave" class="btn btn-default">Save</button>
-                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-            </div>
-        </div>
-    </div>
-</div>
+<form id="submission" method="post" action="<?php echo $_SERVER['PHP_SELF']; ?>">
+    <input type=hidden name="update" id="update" value="-1" required>
+    <input type=hidden name="studentID" id="studentID" value="" required>
+    <input type=hidden id="quizID" name="quizID" value="" required>
+</form>
+
 <!-- SB Admin Library -->
 <?php require_once('sb-admin-lib.php'); ?>
 <!-- Page-Level Scripts -->
 <script>
     //DO NOT put them in $(document).ready() since the table has multi pages
-    var dialogInputArr = $('.dialoginput');
     $('.glyphicon-remove').on('click', function () {
         if (confirm('[WARNING] Are you sure to remove this submission?')) {
             $('#update').val(-1);
-            for (i = 0; i < dialogInputArr.length; i++) {
-                dialogInputArr.eq(i).val($(this).parent().parent().children('td').eq(i).text().trim());
-            }
+            $('#quizID').val($(this).parent().parent().children('td').eq(0).text().trim());
+            $('#studentID').val($(this).parent().parent().children('td').eq(2).text().trim());
             $('#submission').submit();
         }
     });
     $(document).ready(function () {
         var table = $('#datatables').DataTable({
             responsive: true,
-            "order": [[6, "desc"], [1, "asc"], [2, "asc"]],
+            "order": [[7, "desc"], [1, "asc"], [2, "asc"]],
             "pageLength": 100,
             "aoColumnDefs": [
                 {"bSearchable": false, "aTargets": [0]}
