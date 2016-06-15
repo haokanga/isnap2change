@@ -1,5 +1,4 @@
 <?php
-	session_start();
     require_once("mysql-lib.php");
 	require_once('debug.php');
 	$pageName = "multiple-choice-question-feedback";
@@ -35,13 +34,10 @@
 		$feedback['quesNum'] = count($MCQIDArr);
 		$feedback['detail'] = array();
 
-		//SQL UPDATE STATEMENT
+		//if pass, update database.
 		if ($score >= $threshold) {
 
 			$feedback['result'] = "pass";
-
-			//update quiz record
-			updateQuizRecord($conn, $quizID, $studentID, "GRADED");
 
 			for($i=0; $i<count($MCQIDArr); $i++){
 				//update MCQ_Question_Record
@@ -61,6 +57,9 @@
 					array_push($feedback['detail'][$i]['explanation'], $row->Explanation);
 				}
 			}
+
+			//update quiz record
+			updateQuizRecord($conn, $quizID, $studentID, "GRADED");
 
 			//update student score
 			updateStudentScore($conn, $studentID);

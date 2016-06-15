@@ -50,8 +50,8 @@
 <body>
 	<div id=progress></div>
     <div id="zwibbler" style="margin-left:auto;margin-right:auto;width:800px;height:800px;"></div>
-    <input id="saveBtn"type="button" onclick="onSave(<?php echo $quizID; ?>, <?php echo $studentID; ?>)" value="SAVE"/>
-    <input id="submitBtn" type="button" onclick="onSubmit(<?php echo $quizID; ?>, <?php echo $studentID; ?>)"  value="SUBMIT"/>
+    <input id="saveBtn"type="button" onclick="submitQuiz(<?php echo $quizID; ?>, <?php echo $studentID; ?>, 'SAVE')" value="SAVE"/>
+    <input id="submitBtn" type="button" onclick="submitQuiz(<?php echo $quizID; ?>, <?php echo $studentID; ?>, 'SUBMIT')"  value="SUBMIT"/>
 	<form id="goBack" method=post action=weekly-task.php>
 		<button type="button" onclick="goBack()">GO BACK</button> 
 		<input type=hidden name="week" value=<?php echo $week; ?>>
@@ -97,66 +97,58 @@
 					$("#saveBtn").attr("disabled","disabled");
 					$("#submitBtn").attr("disabled","disabled");
 		<?php	} ?>
-		
-		function parseSaveFeedback(saveResponse){
-			var feedback = JSON.parse(saveResponse);
-			
-			if(feedback.message != "success"){
-				alert("Fail to save. Please try again!");
-			} 
-			
-			alert("Saved Successfully!");
-		}
-		
-		function parseSubmitFeedback(submitResponse){
-			var feedback = JSON.parse(submitResponse);
-			
-			if(feedback.message != "success"){
-				alert("Fail to submit. Please try again!");
-			}
-			
-			alert("Submitted Successfully!");
-			zwibbler.setConfig("readOnly", true);
-			$("#saveBtn").attr("disabled","disabled");
-			$("#submitBtn").attr("disabled","disabled");
-		}
-		
-        function onSave(quizID, studentID){
-            var zwibblerDoc = zwibbler.save("zwibbler3");
-			
-			var xmlhttp = new XMLHttpRequest();
-			xmlhttp.onreadystatechange = function(){
-				if (xmlhttp.readyState == 4 && xmlhttp.status == 200){
-					parseSaveFeedback(xmlhttp.responseText);
-				} 
-			};
-			
-			xmlhttp.open("POST", "poster-feedback.php", true);
-			xmlhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-			xmlhttp.send("quizID="+quizID+"&studentID="+studentID+"&action=SAVE"+"&zwibblerDoc="+zwibblerDoc.substr(10));
-        }
 
-        function onSubmit(quizID, studentID) {
+		function parseFeedback(response){
+			var feedback = JSON.parse(response);
+			
+			if(feedback.message != "success"){
+				alert(feedback.message + ". Please try again!");
+				return;
+			}
+
+			if(feedback.action == "SAVE"){
+				alert("Saved Successfully!");
+			}
+
+			if(feedback.action == "SUBMIT") {
+				alert("Submitted Successfully!");
+				zwibbler.setConfig("readOnly", true);
+				$("#saveBtn").attr("disabled", "disabled");
+				$("#submitBtn").attr("disabled", "disabled");
+			}
+		}
+
+        function submitQuiz(quizID, studentID, action){
             var zwibblerDoc = zwibbler.save("zwibbler3");
-			var dataUrl = zwibbler.save("png");
+
+			var postData;
+
+			if(action == "SAVE"){
+				postData = "quizID="+quizID+"&studentID="+studentID+"&action="+action+"&zwibblerDoc="+zwibblerDoc.substr(10);
+			}
+
+			if(action == "SUBMIT"){
+				var dataUrl = zwibbler.save("png");
+				postData = "quizID="+quizID+"&studentID="+studentID+"&action="+action+"&zwibblerDoc="+zwibblerDoc.substr(10)+"&dataUrl="+dataUrl;
+			}
 			
 			var xmlhttp = new XMLHttpRequest();
 			xmlhttp.onreadystatechange = function() {
 				if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
-					parseSubmitFeedback(xmlhttp.responseText);
+					parseFeedback(xmlhttp.responseText);
 				} 
 			};
-			
+
 			xmlhttp.open("POST", "poster-feedback.php", true);
 			xmlhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-			xmlhttp.send("quizID="+quizID+"&studentID="+studentID+"&action=SUBMIT"+"&zwibblerDoc="+zwibblerDoc.substr(10)+"&dataUrl="+dataUrl);
+			xmlhttp.send(postData);
         }
 		
-		function goBack() {
+		function goBack(){
 			document.getElementById("goBack").submit();
 		}
 		
-		$("#fileinput").on("change", function(e) {
+		$("#fileinput").on("change", function(e){
             var form = this.parentNode;
             upload(form);
 			form.reset();

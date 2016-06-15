@@ -85,49 +85,6 @@
     </head>
     <body>
         <script>
-		
-			var timeinterval;
-		
-			function getTimeRemaining(endtime){
-				var t = Date.parse(endtime) - Date.parse(new Date());
-				var seconds = Math.floor( (t/1000) % 60 );
-				var minutes = Math.floor( (t/1000/60) % 60 );
-				
-				return {
-					'total': t,
-					'minutes': minutes,
-					'seconds': seconds
-				 };
-			}
-			
-			function initializeClock(endtime){
-				var clock = document.getElementById("clock");
-				
-				var timerSpan = clock.querySelector('.timer');
-				
-				function updateClock() {
-					var t = getTimeRemaining(endtime);
-
-					timerSpan.innerHTML = ('0' + t.minutes).slice(-2) + ":" + ('0' + t.seconds).slice(-2);
-				
-					if (t.total <= 0) {
-						alert("Time is up!");
-						submitQuiz(<?php echo $quizID; ?>, <?php echo $studentID; ?>);
-					}
-				}
-				
-				updateClock();
-				timeinterval = setInterval(updateClock, 1000);
-				
-			}
-			
-			<?php if($status == "UNANSWERED"){ ?>
-						window.onload = function () {
-						var deadline = new Date(Date.parse(new Date()) + 90 * 1000);
-						initializeClock(deadline);
-					};
-			<?php } ?>
-
             $(document).ready(function ()
             {
 				$("#button1").addClass("highlight");
@@ -184,10 +141,10 @@
 					$("#hiddenIndex").val(index);
 
                 });
-
             });
 			
-			function parseFeedback(response) {
+			function parseFeedback(response)
+			{
 				var feedback = JSON.parse(response);
 
 				if(feedback.message != "success"){
@@ -269,13 +226,10 @@
 						document.getElementById("hiddenReturnTask").submit();
 					}
 				}
-				
-				
 			}
 			
 			function submitQuiz(quizID, studentID)
 			{
-				clearInterval(timeinterval);
 			//	$(".btn-block").attr("disabled","disabled");
 				$("input[type='radio']").remove();
 				
