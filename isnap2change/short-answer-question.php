@@ -1,55 +1,59 @@
 <?php
     session_start();
+    require_once("student-validation.php");
+
     require_once("mysql-lib.php");
     require_once("debug.php");
-    require_once("student-validation.php");
-    $pageName = "short-answer-question";	
-    
+    $pageName = "short-answer-question";
+
+    //POST parameters
+    if ($_SERVER["REQUEST_METHOD"] == "POST") {
+        if(isset($_POST["quizID"]) && isset($_POST["week"])){
+            $quizID = $_POST["quizID"];
+            $week = $_POST["week"];
+        } else {
+
+        }
+    } else {
+
+    }
+
+    $conn = null;
+
     try{   
         $conn = db_connect();
-        //POST parameters
-        if ($_SERVER["REQUEST_METHOD"] == "POST") {		
-            if(isset($_POST["quizID"]) && isset($_POST["week"])){
-                $quizID = $_POST["quizID"];
-                $week = $_POST["week"];
-                $status = getQuizStatus($conn, $quizID, $studentID);
-            } else {
-                
-            }		
-        } else {		
-        }
-        
+        //check quiz status
+        $status = getQuizStatus($conn, $quizID, $studentID);
+
         //get learning-material
         $materialRes = getLearningMaterial($conn, $quizID);    
         
         // get saq questions;
         $saqResult = getSAQQuestions($conn, $quizID);
         
-        //if submitted
-        if($status == "UNGRADED" || $status == "GRADED"){
+        //if answered
+        if($status != "UNANSWERED"){
             $saqQuesRecordResult = getSAQRecords($conn, $quizID, $studentID);
+
+            if($status == "GRADED"){
+                // get score for each question
+                for($i=0; $i<count($saqResult); $i++) {
+                    $saqID = $saqResult[$i] -> SAQID;
+                    $scoreResult = getSAQQuestion($conn, $saqID);
+                    $scoreArray[] = $scoreResult->Points;
+                }
+            }
         }
-        
-        // get score for each question
-        for($i=0; $i<count($saqResult); $i++) {
-            $saqID = $saqResult[$i] -> SAQID;
-            $scoreResult = getSAQQuestion($conn, $saqID);
-            $scoreArray[] = $scoreResult->Points;
-        }
-        
-        //if submission
-        if(isset($_POST['answer']) && isset($_POST['saqID']) && isset($_POST['quizID'])){
-            $quizID = $_POST["quizID"];
-            $saqID = $_POST["saqID"];    
-            $answer = $_POST["answer"];
-            updateSAQSubmission($conn, $quizID, $saqID, $studentID, $answer, $pageName);            
-        }
+
         db_close($conn);       
-        $lastsaqID = -1;
-        $questionIndex = 1;        
+
     } catch(Exception $e) {
         debug_err($pageName, $e);
     }
+
+    db_close($conn);
+    $lastsaqID = -1;
+    $questionIndex = 1;
 ?>
 <html>
     <head>
@@ -64,42 +68,6 @@
     </head>
     <body>
         <script>
-            <!--Timer-->
-            var timeinterval;
-		
-			function getTimeRemaining(endtime){
-				var t = Date.parse(endtime) - Date.parse(new Date());
-				var seconds = Math.floor( (t/1000) % 60 );
-				var minutes = Math.floor( (t/1000/60) % 60 );				
-				return {
-					'total': t,
-					'minutes': minutes,
-					'seconds': seconds
-				 };
-			}
-			
-			function initializeClock(endtime){
-				var clock = document.getElementById("clock");				
-				var timerSpan = clock.querySelector('.timer');				
-				function updateClock() {
-					var t = getTimeRemaining(endtime);
-					timerSpan.innerHTML = ('0' + t.minutes).slice(-2) + ":" + ('0' + t.seconds).slice(-2);				
-					if (t.total <= 0) {
-						alert("Time is up!");
-						submitQuiz();
-					}
-				}				
-				updateClock();
-				timeinterval = setInterval(updateClock, 1000);				
-			}
-            
-            <?php if(($status == "UNANSWERED" || $status == "UNGRADED") && !isset($_POST["goback"])){ ?>
-						window.onload = function () {
-						var deadline = new Date(Date.parse(new Date()) + 90 * 1000);
-						initializeClock(deadline);
-					};
-			<?php } ?>
-            
             $(document).ready(function (){
                 $("#button0").addClass("highlight");
                 $('#panel0').css({
@@ -145,18 +113,60 @@
                     $("#hiddenIndex").val(index);
 
                 });
-
             });
-            
-            function goBack()
-			{
-				document.getElementById("goBack").submit();
+
+            function parseFeedback(response){
+                var feedback = JSON.parse(response);
+
+                if(feedback.message != "success"){
+                    alert(feedback.message + ". Please try again!");
+                    return;
+                }
+
+                if(feedback.action == "SAVE"){
+                    alert("Saved Successfully!");
+                }
+
+                if(feedback.action == "SUBMIT"){
+                    alert("Submitted Successfully!");
+                    $("#saveBtn").attr("disabled","disabled");
+                    $("#submitBtn").attr("disabled","disabled");
+                }
+            }
+
+            function submitQuiz(quizID, studentID, action){
+                //collect SAQID
+                var SAQIDArr = [];
+
+                $("input:hidden[name='SAQIDArr']").each(function() {
+                    SAQIDArr.push($(this).val());
+                });
+
+                //collect student answer
+                var answerArr = [];
+
+                $("textarea[name='answerArr']").each(function() {
+                    answerArr.push($(this).val());
+                });
+
+                //send request
+                var xmlhttp = new XMLHttpRequest();
+
+                xmlhttp.onreadystatechange = function() {
+                    if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
+                        parseFeedback(xmlhttp.responseText);
+                    }
+                };
+
+                xmlhttp.open("POST", "short-answer-question-feedback.php", true);
+                xmlhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+                xmlhttp.send("SAQIDArr="+JSON.stringify(SAQIDArr)+"&answerArr="+JSON.stringify(answerArr)+"&quizID="+quizID+"&studentID="+studentID+"&action="+action);
 			}
-            
-            function submitQuiz()
-			{                
-                document.getElementById("submission").submit();
-			}
+
+            function goBack(){
+                document.getElementById("goBack").submit();
+            }
+
         </script>
         <header class="navbar navbar-static-top bs-docs-nav">
 
@@ -167,15 +177,12 @@
             </div>
             <!--Sumbit/Go Back Button-->
             <div class="nav navbar-nav navbar-btn navbar-right" style="margin-right:22px;">
-                <form id="goBack" method=post action=weekly-task.php>
-                    <?php if($status == "GRADED" || isset($_POST["goback"])){ ?>
+                    <button id="saveBtn" type="button" <?php if($status == "GRADED" || $status == "UNGRADED") echo 'disabled="disabled"';?> onclick="submitQuiz(<?php echo $quizID; ?>, <?php echo $studentID; ?>, 'SAVE');" class="btn btn-success">SAVE</button>
+                    <button id="submitBtn" type="button" <?php if($status == "GRADED" || $status == "UNGRADED") echo 'disabled="disabled"';?> onclick="submitQuiz(<?php echo $quizID; ?>, <?php echo $studentID; ?>, 'SUBMIT');" class="btn btn-success">SUBMIT</button>
                     <button id="back-btn" type="button" onclick="goBack()" class="btn btn-success">GO BACK</button>
-                    <?php } else if($status == "UNANSWERED" || $status == "UNGRADED"){ ?>
-                    <button id="back-btn" type="button" onclick="return submitQuiz();" class="btn btn-success">SUBMIT</button>
-                    <?php } ?>                                        
+                <form id="goBack" method=post action=weekly-task.php>
                     <input type=hidden name="week" value=<?php echo $week; ?>>
-                </form>	
-				
+                </form>
             </div>
             <div class="nav navbar-nav navbar-btn navbar-right" style="margin-right: 15px; font-size: x-large;">
                 <div id="clock">
@@ -219,7 +226,7 @@
                 </div>
             </div>
         <!--form submission-->    
-        <form id="submission" method="post" action="<?php echo $_SERVER['PHP_SELF']; ?>">
+        <form id="submission" method="post">
             <input type=hidden name="goback" value=0 > 
             <input type=hidden name="week" value=<?php echo $week; ?> >        
             <input type=hidden name="quizID" value=<?php echo $quizID; ?> >
@@ -260,14 +267,14 @@
                                 
                                 <div class="tab-pane fade" id="myanswer<?php echo $i+1;?>">
                                     <div class="alert alert-warning" role="alert">
-                                        <?php if($status == "UNGRADED" || $status == "GRADED"){echo $saqQuesRecordResult[$i]->Answer;} ?>
+                                        <?php echo $saqQuesRecordResult[$i]->Answer; ?>
                                     </div>
                                 </div>
                             </div>
                         <!--if UNANSWERED/UNGRADED-->    
                         <?php } else { ?>
-                        <input type="hidden" name="saqID[]" value="<?php echo $currentsaqID ?>"/>
-                        <textarea class="form-control" rows="10" name="answer[]" placeholder='Please input your answer here'><?php if($status == "UNGRADED"){echo $saqQuesRecordResult[$i]->Answer;} ?></textarea>                        
+                        <input type="hidden" name="SAQIDArr" value="<?php echo $currentsaqID ?>"/>
+                        <textarea class="form-control" rows="10" name="answerArr" placeholder='Please input your answer here'><?php if($status == "UNGRADED" || $status == "UNSUBMITTED"){echo $saqQuesRecordResult[$i]->Answer;} ?></textarea>
                         <?php } ?>
                         <br>
                         <br>

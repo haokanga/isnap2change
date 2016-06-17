@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<!--
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+-->
+<html>
+    <head>
+        <title>Sign Up</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="stylesheet" type="text/css" href="css/signup.css" />
+        <script src="js/jquery-1.12.3.js"></script>
+        <!-- Latest compiled and minified CSS -->
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js" integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS" crossorigin="anonymous"></script>
+    </head>
+    <body>
+        <div class="col-xs-offset-3 col-xs-6" style="height: 100%; text-align: center; align-items: center; color: white; margin-top: 3%;">
+            <span style="color:yellow;">TOKEN_NAME_001</span>
+            <br>
+            School: Golden Grove Primary
+            <br>
+            Class: HB5
+            <br>
+            Type: Student
+            <br> 
+
+            <div class="input-group" style="margin-top:2%;  text-align: center; align-items: center; width: 100%;">
+                <span style="display: table-cell; vertical-align: middle; padding: 6px; color: yellow; text-align:right; width:25%;">Name</span>
+                <input type="text" style="width: 70%; text-align: center; border-radius: 10px; border: none; color:yellow; background-color: black; opacity: 0.7;" class="form-control" aria-describedby="sizing-addon1">
+            </div>
+            <div class="input-group" style="margin-top:2%;  align-items: center; width: 100%;">
+                <span style="display: table-cell; vertical-align: middle; padding: 6px; color: yellow; text-align:right; width: 25%;">Email</span>
+                <input type="email" style="width: 70%; text-align: center; border-radius: 10px; border: none; color:yellow; background-color: black; opacity: 0.7;" class="form-control" aria-describedby="sizing-addon1">
+            </div>
+            <div class="input-group" style="margin-top:2%; text-align: center; align-items: center; width: 100%;">
+                <span style="display: table-cell; vertical-align: middle; padding: 6px; color: yellow; width: 25%; text-align:right;">Username</span>
+                <input type="text" style="width: 70%; text-align: center; border-radius: 10px; border: none; color:yellow; background-color: black; opacity: 0.7;" class="form-control" aria-describedby="sizing-addon1">
+            </div>
+            <div class="input-group" style="margin-top:2%; text-align: center; align-items: center; width: 100%;">
+                <span style="display: table-cell; vertical-align: middle; padding: 6px; color: yellow; width: 25%; text-align:right;">Password</span>
+                <input type="text" style="width: 70%; text-align: center; border-radius: 10px; border: none; color:yellow; background-color: black; opacity: 0.7;" class="form-control" aria-describedby="sizing-addon1">
+            </div>
+            <div class="input-group" style="margin-top:2%; text-align: center; align-items: center; width: 100%;">
+                <span style="display: table-cell; vertical-align: middle; padding: 6px; color: yellow; width: 25%; text-align:right;">Date Of Birth</span>
+               <select class="form-control" style="opacity: 0.7; font-size: 0.7em; margin: 0.8%; width: 22%; background-color: black; color:white; border-radius: 10px; border: none; text-align: center;">
+                    <option value="" selected disabled>DD</option>
+                    <option>12</option>
+                    <option>13</option>
+                </select>
+                <select class="form-control" style="opacity: 0.7; font-size: 0.7em; margin: 0.8%; width: 22%; background-color: black; color:white; border-radius: 10px; border: none; text-align: center;">
+                    <option value="" selected disabled>MM</option>
+                    <option>1</option>
+                    <option>2</option>
+                </select>
+                 <select class="form-control" style="opacity: 0.7; font-size: 0.7em; margin: 0.8%; width: 22%; background-color: black; color:white; border-radius: 10px; border: none; text-align: center;">
+                    <option value="" selected disabled>YYYY</option>
+                    <option>2001</option>
+                    <option>2002</option>
+                </select>
+            </div>
+            <div class="input-group" style="margin-top:2%; text-align: center; align-items: center; width: 100%;">
+                <span style="display: table-cell; vertical-align: middle; padding: 6px; color: yellow; width: 25%; text-align:right;">Gender</span>
+
+                <label class="radio-inline" style="background-color: black; border-radius: 8px; opacity: 0.7; width: 33%; margin-left: -28%;">
+                    <input type="radio" name="inlineRadioOptions" id="inlineRadio1" value="option1"> Male
+                </label>
+                <label class="radio-inline" style="background-color: black; border-radius: 8px; opacity: 0.7; width: 33%;">
+                    <input type="radio" name="inlineRadioOptions" id="inlineRadio2" value="option2"> Female
+                </label>    
+
+            </div>
+            <div class="input-group" style="margin-top:2%; text-align: center; align-items: center; width: 100%;">
+                <span style="display: table-cell; vertical-align: middle; padding: 6px; color: yellow; width: 25%; text-align:right;">Do you identify as</span>
+                <select class="form-control" style="opacity: 0.7; width: 69%; background-color: black; color:white; border-radius: 10px; border: none; text-align: center;">
+                    <option>Aboriginal</option>
+                    <option>Resident</option>
+                </select>    
+            </div>
+            <div class="input-group"  style="margin-top:2%; text-align: center; align-items: center; width: 100%;">           
+                <button type="button" class="btn btn-primary btn-default" style="width: 52%; margin-left: 2%; border-radius: 10px; border: none; color:yellow; background-color: black; opacity: 0.7;">Terms & Conditions  <input type="radio" style="color: yellow;" aria-label="..."></button> 
+            </div>
+            <div class="submitinfo" style="text-align: center;">
+                <button type="button" onclick="location.href = '/HomePage/SignUp.html';" class="btn btn-primary btn-lg btn-block" style="margin-left: 35%; width:30%; margin-top:4%; border-radius: 10px; white-space: normal; border: yellow solid 2px; border-color: yellow !important; color:yellow; background-color: black; opacity: 0.7;">Register</button>
+            </div>
+        </div>
+
+    </body>
+</html>

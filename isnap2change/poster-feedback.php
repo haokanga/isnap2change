@@ -45,18 +45,7 @@
 		$conn = db_connect();
 		
 		$conn->beginTransaction();
-		
-		//update Quiz_Record	
-		if($action == "SAVE"){
-			$status = "UNSUBMITTED";
-		}
-		
-		if($action == "SUBMIT"){
-			$status = "UNGRADED";
-		}
-		
-		updateQuizRecord($conn, $quizID, $studentID, $status);
-		
+
 		//if save, update poster document in the Poster_Record
 		if($action == "SAVE"){
 			updatePosterDraft($conn, $quizID, $studentID, $zwibblerDoc);
@@ -77,6 +66,17 @@
 			
 			updatePosterSubmission($conn, $quizID, $studentID, $zwibblerDoc, $imageUrl);
 		}
+
+		//update Quiz_Record
+		if($action == "SAVE"){
+			$status = "UNSUBMITTED";
+		}
+
+		if($action == "SUBMIT"){
+			$status = "UNGRADED";
+		}
+
+		updateQuizRecord($conn, $quizID, $studentID, $status);
 		
 		$conn->commit();
 		
@@ -94,6 +94,7 @@
 	}
   	
 	db_close($conn);
+	$feedback["action"] = $action;
 	$feedback["message"] = "success";
 	echo json_encode($feedback);	
 		

@@ -576,7 +576,7 @@ function getMCQSubmissionCorrectNum(PDO $conn, $MCQIDArr, $answerArr)
     }
 
     return $score;
-}
+    }
 
 /* MCQ */
 
@@ -1095,12 +1095,13 @@ function getSAQRecords(PDO $conn, $quizID, $studentID)
     return $saqQuesRecordResult;
 }
 
+/*
 function updateSAQDraft(PDO $conn, $quizID, $saqID, $studentID, $answer, $pageName)
 {
     if (count($saqID) == count($answer)) {
         try {
             $conn->beginTransaction();
-            for ($i = 0; $i < count($saqID); $i++) {
+            for ($i = 0; $i < count($saqID); $i++){
                 updateSAQQuestionRecord($conn, $saqID[$i], $studentID, $answer[$i]);
             }
             updateQuizRecord($conn, $quizID, $studentID, "UNSUBMITTED");
@@ -1116,19 +1117,20 @@ function updateSAQDraft(PDO $conn, $quizID, $saqID, $studentID, $answer, $pageNa
 
 function updateSAQSubmission(PDO $conn, $quizID, $saqID, $studentID, $answer, $pageName)
 {
-    try {
-        $conn->beginTransaction();
+    //try {
+    //    $conn->beginTransaction();
         for ($i = 0; $i < count($saqID); $i++) {
             updateSAQQuestionRecord($conn, $saqID[$i], $studentID, $answer[$i]);
         }
-        updateQuizRecord($conn, $quizID, $studentID, "UNGRADED");
-        $conn->commit();
-    } catch (Exception $e) {
-        debug_err($pageName, $e);
-        $conn->rollBack();
-    }
-}
 
+        updateQuizRecord($conn, $quizID, $studentID, "UNGRADED");
+    //    $conn->commit();
+    //} catch (Exception $e) {
+    //    debug_err($pageName, $e);
+    //    $conn->rollBack();
+   // }
+}
+*/
 function deleteSAQSubmission(PDO $conn, $quizID, $studentID, $pageName)
 {
     try {
