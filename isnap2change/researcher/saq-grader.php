@@ -81,7 +81,7 @@ db_close($conn);
                                     <textarea class="form-control" id="studentAnswer[]" rows="8"
                                               disabled><?php echo $saqSubmissionResult[$i]->Answer ?></textarea>
                                     <label for="feedback[]">Feedback</label>
-                                    <input type="text" class="form-control dialogInput" id="feedback"
+                                    <input type="text" class="form-control dialogInput" id="feedback<?php echo $saqID ?>"
                                            name="feedback[]"
                                            placeholder="Input Feedback"
                                            value="<?php echo $saqSubmissionResult[$i]->Feedback ?>" required>
