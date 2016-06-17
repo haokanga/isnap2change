@@ -239,7 +239,7 @@
                     <!--heading-->
                     <div class="panel-heading" style="font-size: xx-large; font-weight: 600; color:black; height:35%; min-height: 35%; max-height: 35%; text-align:center;">
                         <div class="ques" >                        
-                            <?php $questionIndex++; echo ($i+1).". ".htmlspecialchars($saqResult[$i] -> Question); ?>
+                            <?php $questionIndex++; echo ($i+1).". ".$saqResult[$i] -> Question; ?>
                         </div> 
                     </div>
                     <!--body-->
