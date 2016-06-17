@@ -1,8 +1,5 @@
 <?php
-/**
- * TODO:
- * edit quiz (jump to different editor)
- */
+
 session_start();
 require_once("../mysql-lib.php");
 require_once("../debug.php");
@@ -98,7 +95,7 @@ db_close($conn);
     <div id="page-wrapper">
         <div class="row">
             <div class="col-lg-12">
-                <h1 class="page-header">Quiz Overview
+                <h1 class="page-header">Misc Quiz Overview
                     <?php if (isset($_GET['week'])) { ?>
                         <div class="alert alert-info alert-dismissable" style="display: inline-block;">
                             <button type="button" class="close" data-dismiss="alert" aria-hidden="true"
@@ -116,8 +113,9 @@ db_close($conn);
             <div class="col-lg-12">
                 <div class="panel panel-default">
                     <div class="panel-heading">
-                        Quiz Information Table <span class="glyphicon glyphicon-plus pull-right" data-toggle="modal"
-                                                     data-target="#dialog"></span>
+                        Misc Quiz Information Table <span class="glyphicon glyphicon-plus pull-right"
+                                                          data-toggle="modal"
+                                                          data-target="#dialog"></span>
                     </div>
                     <!-- /.panel-heading -->
                     <div class="panel-body">
@@ -140,29 +138,29 @@ db_close($conn);
                                     $quizID = $quizResult[$i]->QuizID;
                                     $quizType = getQuizType($conn, $quizID);
                                     $points = getQuizPoints($conn, $quizID);
-                                    ?>
-                                    <tr class="<?php if ($i % 2 == 0) {
-                                        echo "odd";
-                                    } else {
-                                        echo "even";
-                                    } ?>">
-                                        <td style="display:none"><?php echo $quizID ?></td>
-                                        <td><?php echo $quizResult[$i]->Week ?></td>
-                                        <td><?php echo $quizType ?></td>
-                                        <td><?php echo $quizResult[$i]->TopicName ?></td>
-                                        <td><?php echo $points ?>
-                                            <?php if (in_array($quizType, $editableQuizTypeArr)) { ?>
+                                    if (!in_array($quizType, $editableQuizTypeArr)) {
+                                        ?>
+                                        <tr class="<?php if ($i % 2 == 0) {
+                                            echo "odd";
+                                        } else {
+                                            echo "even";
+                                        } ?>">
+                                            <td style="display:none"><?php echo $quizID ?></td>
+                                            <td><?php echo $quizResult[$i]->Week ?></td>
+                                            <td><?php echo $quizType ?></td>
+                                            <td><?php echo $quizResult[$i]->TopicName ?></td>
+                                            <td><?php echo $points ?>
                                                 <span class="glyphicon glyphicon-remove pull-right"
                                                       aria-hidden="true"></span>
                                                 <span class="pull-right" aria-hidden="true">&nbsp;</span>
-                                                <a href="<?php echo strtolower($quizType); ?>-editor.php?quizID=<?php echo $quizID ?>">
-                                                    <span class="glyphicon glyphicon-edit pull-right"
-                                                          aria-hidden="true"></span>
-                                                </a>
-                                            <?php } ?>
-                                        </td>
-                                    </tr>
-                                <?php } ?>
+                                                <span class="glyphicon glyphicon-edit pull-right"
+                                                      data-toggle="modal"
+                                                      data-target="#dialog" aria-hidden="true"></span>
+
+                                            </td>
+                                        </tr>
+                                    <?php }
+                                } ?>
                                 </tbody>
                             </table>
                         </div>
@@ -170,7 +168,9 @@ db_close($conn);
                         <div class="well row">
                             <h4>Quiz Overview Notification</h4>
                             <div class="alert alert-info">
-                                <p>View quizzes by filtering or searching. You can create/update/delete any editable quiz. For fixed quiz, use <a href="fixed-quiz.php">fixed quiz overview</a> instead. </p>
+                                <p>View quizzes by filtering or searching. You can create/update/delete any editable
+                                    quiz. For fixed quiz, use <a href="fixed-quiz.php">fixed quiz overview</a> instead.
+                                </p>
                             </div>
                             <div class="alert alert-danger">
                                 <p><strong>Warning</strong> : If you remove one quiz. All the <strong>questions and
@@ -250,11 +250,15 @@ db_close($conn);
 <script>
     //DO NOT put them in $(document).ready() since the table has multi pages
     var dialogInputArr = $('.dialoginput');
-    $('.glyphicon-edit').on('click', function () {
-        /*...*/
+    $('td > .glyphicon-edit').on('click', function () {
+        $('#dialogTitle').text("Edit Misc Quiz");
+        $('#update').val(0);
+        for (i = 0; i < dialogInputArr.length; i++) {
+            dialogInputArr.eq(i).val($(this).parent().parent().children('td').eq(i).text().trim());
+        }
     });
     $('.glyphicon-plus').on('click', function () {
-        $('#dialogTitle').text("Add Quiz");
+        $('#dialogTitle').text("Add Misc Quiz");
         $('#update').val(1);
         for (i = 0; i < dialogInputArr.length; i++) {
             if (i != 1) {

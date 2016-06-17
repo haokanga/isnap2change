@@ -400,7 +400,9 @@ function getQuizPoints(PDO $conn, $quizID)
         $pointsQuery = $conn->prepare($pointsSql);
         $pointsQuery->execute(array($quizID));
         $pointsResult = $pointsQuery->fetch(PDO::FETCH_OBJ);
-        $points = $pointsResult->SumPoints;
+        if (strlen($pointsResult->SumPoints) > 0) {
+            $points = $pointsResult->SumPoints;
+        }
     }
 
     return $points;
@@ -985,6 +987,15 @@ function getQuizzesStatusByWeek(PDO $conn, $studentID, $week)
     $quizzesStatusQuery->execute(array($studentID, $week));
     $quizzesStatusRes = $quizzesStatusQuery->fetchAll(PDO::FETCH_OBJ);
     return $quizzesStatusRes;
+}
+
+/* Poster */
+function createPosterSection(PDO $conn, $quizID, $question, $points)
+{
+    $updateSql = "INSERT INTO Poster_Section(QuizID, Question, Points)
+                    VALUES (?,?,?)";
+    $updateSql = $conn->prepare($updateSql);
+    $updateSql->execute(array($quizID, $question, $points));
 }
 
 function updatePosterDraft(PDO $conn, $quizID, $studentID, $zwibblerDoc)
