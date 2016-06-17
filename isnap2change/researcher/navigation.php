@@ -2,8 +2,8 @@
 
 $userAdminPageList = array('School', 'Class', 'Student');
 $userAdminIconList = array('mortar-board', 'users', 'child');
-$contentAdminPageList = array('Week', 'Quiz', 'Fact', 'MCQ', 'SAQ', 'Matching', 'Poster');
-$contentAdminIconList = array('calendar', 'book', 'comment', 'check', 'pencil', 'th-list', 'check');
+$contentAdminPageList = array('Week', 'Quiz', 'Fact', 'MCQ', 'SAQ', 'Matching', 'Poster','Misc');
+$contentAdminIconList = array('calendar', 'book', 'comment', 'check', 'pencil', 'th-list', 'check','check');
 $gradingPageList = array('SAQ-Grading', 'Poster-Grading');
 $gradingIconList = array('check', 'check');
 

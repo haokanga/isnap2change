@@ -10,7 +10,7 @@ require_once("researcher-validation.php");
 $pageName = "quiz";
 $columnName = array('QuizID', 'Week', 'QuizType', 'TopicName', 'Points');
 // list all editable quiz types    
-$quizTypeArray = array('MCQ', 'SAQ', 'Matching', 'Poster');
+$editableQuizTypeArr = array('MCQ', 'SAQ', 'Matching', 'Poster');
 
 try {
     $conn = db_connect();
@@ -29,13 +29,27 @@ try {
                     $topicResult = getTopicByName($conn, $topicName);
                     $topicID = $topicResult->TopicID;
                     $quizID = createQuiz($conn, $topicID, $quizType, $week);
-                    //if MCQ, insert MCQ_Section
-                    if ($quizType == 'MCQ') {
-                        $points = 0;
-                        $questionnaires = 0;
-                        createMCQSection($conn, $quizID, $points, $questionnaires);
-                    } else {
-                        /* TODO */
+
+                    $points = 0;
+                    $questionnaires = 0;
+                    $description = '';
+                    $question = '';
+                    switch ($quizType) {
+                        case "MCQ":
+                            createMCQSection($conn, $quizID, $points, $questionnaires);
+                            break;
+                        case "SAQ":
+                            createSAQSection($conn, $quizID);
+                            break;
+                        case "Matching":
+                            createMatchingSection($conn, $quizID, $description, $points);
+                            break;
+                        case "Poster":
+                            createPosterSection($conn, $quizID, $question, $points);
+                            break;
+                        default:
+                            throw new Exception("Unexpected Quiz Type. QuizID: " . $quizID);
+                            break;
                     }
                     createEmptyLearningMaterial($conn, $quizID);
 
@@ -122,28 +136,31 @@ db_close($conn);
                                 </tr>
                                 </thead>
                                 <tbody>
-                                <?php for ($i = 0; $i < count($quizResult); $i++) { ?>
+                                <?php for ($i = 0; $i < count($quizResult); $i++) {
+                                    $quizID = $quizResult[$i]->QuizID;
+                                    $quizType = getQuizType($conn, $quizID);
+                                    $points = getQuizPoints($conn, $quizID);
+                                    ?>
                                     <tr class="<?php if ($i % 2 == 0) {
                                         echo "odd";
                                     } else {
                                         echo "even";
                                     } ?>">
-                                        <td style="display:none"><?php echo $quizResult[$i]->QuizID ?></td>
+                                        <td style="display:none"><?php echo $quizID ?></td>
                                         <td><?php echo $quizResult[$i]->Week ?></td>
-                                        <td><?php if ($quizResult[$i]->QuizType == 'MCQ') {
-                                                echo 'Multiple Choice';
-                                            } else if ($quizResult[$i]->QuizType == 'SAQ') {
-                                                echo 'Short Answer';
-                                            } else {
-                                                echo $quizResult[$i]->QuizType;
-                                            } ?></a></td>
+                                        <td><?php echo $quizType ?></td>
                                         <td><?php echo $quizResult[$i]->TopicName ?></td>
-                                        <td><?php echo getQuizPoints($conn, $quizResult[$i]->QuizID); ?><span
-                                                class="glyphicon glyphicon-remove pull-right" aria-hidden="true"></span><span
-                                                class="pull-right" aria-hidden="true">&nbsp;</span><span
-                                                class="glyphicon glyphicon-edit pull-right" aria-hidden="true"></span>
+                                        <td><?php echo $points ?>
+                                            <?php if (in_array($quizType, $editableQuizTypeArr)) { ?>
+                                                <span class="glyphicon glyphicon-remove pull-right"
+                                                      aria-hidden="true"></span>
+                                                <span class="pull-right" aria-hidden="true">&nbsp;</span>
+                                                <a href="<?php echo strtolower($quizType); ?>-editor.php?quizID=<?php echo $quizID ?>">
+                                                    <span class="glyphicon glyphicon-edit pull-right"
+                                                          aria-hidden="true"></span>
+                                                </a>
+                                            <?php } ?>
                                         </td>
-                                        <!---->
                                     </tr>
                                 <?php } ?>
                                 </tbody>
@@ -153,7 +170,7 @@ db_close($conn);
                         <div class="well row">
                             <h4>Quiz Overview Notification</h4>
                             <div class="alert alert-info">
-                                <p>View quizzes by filtering or searching. You can create/update/delete any quiz.</p>
+                                <p>View quizzes by filtering or searching. You can create/update/delete any editable quiz. For fixed quiz, use <a href="fixed-quiz.php">fixed quiz overview</a> instead. </p>
                             </div>
                             <div class="alert alert-danger">
                                 <p><strong>Warning</strong> : If you remove one quiz. All the <strong>questions and
@@ -181,7 +198,7 @@ db_close($conn);
         <div class="modal-content">
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal">&times;</button>
-                <h4 class="modal-title" id="dialogTitle">Edit Class</h4>
+                <h4 class="modal-title" id="dialogTitle"></h4>
             </div>
             <div class="modal-body">
                 <form id="submission" method="post"
@@ -200,8 +217,9 @@ db_close($conn);
                     <label for='QuizType'>QuizType</label>
                     <select class="form-control dialoginput" id="QuizType" form="submission" name="quizType" required>
                         <option value="" disabled selected>Select Quiz Type</option>
-                        <?php for ($i = 0; $i < count($quizTypeArray); $i++) { ?>
-                            <option value="<?php echo $quizTypeArray[$i] ?>"><?php echo $quizTypeArray[$i] ?></option>
+                        <?php for ($i = 0; $i < count($editableQuizTypeArr); $i++) { ?>
+                            <option
+                                value="<?php echo $editableQuizTypeArr[$i] ?>"><?php echo $editableQuizTypeArr[$i] ?></option>
                         <?php } ?>
                     </select>
                     <br>
