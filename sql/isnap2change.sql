@@ -15,6 +15,7 @@ DROP TABLE IF EXISTS `Researcher`;
 DROP TABLE IF EXISTS `Fact`;
 DROP TABLE IF EXISTS `Topic`;
 DROP TABLE IF EXISTS `Learning_Material`;
+DROP TABLE IF EXISTS `Student_Week_Record`;
 DROP TABLE IF EXISTS `Quiz`;
 DROP TABLE IF EXISTS `Quiz_Record`;
 DROP TABLE IF EXISTS `MCQ_Section`;
@@ -148,6 +149,16 @@ CREATE TABLE IF NOT EXISTS `Learning_Material` (
     CONSTRAINT Learning_Material_QuizID_PK PRIMARY KEY (QuizID),
     CONSTRAINT Learning_Material_QuizID_FK FOREIGN KEY (QuizID)
         REFERENCES Quiz (QuizID)
+        ON DELETE CASCADE ON UPDATE CASCADE
+)  ENGINE=INNODB;
+
+CREATE TABLE IF NOT EXISTS `Student_Week_Record` (
+    StudentID MEDIUMINT,
+    Week MEDIUMINT,
+    DueTime TIMESTAMP,
+    CONSTRAINT Student_Week_Record_PK PRIMARY KEY (StudentID, Week),
+    CONSTRAINT Student_Week_Record_StudentID_FK FOREIGN KEY (StudentID)
+        REFERENCES Student (StudentID)
         ON DELETE CASCADE ON UPDATE CASCADE
 )  ENGINE=INNODB;
 

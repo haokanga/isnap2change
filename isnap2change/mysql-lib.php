@@ -53,7 +53,7 @@ function createSchool(PDO $conn, $schoolName)
     $updateSql = "INSERT INTO School(SchoolName)
          VALUES (?)";
     $updateSql = $conn->prepare($updateSql);
-    $updateSql->execute(array($schoolName));
+    $updateSql->execute(array(htmlspecialchars($schoolName)));
     return $conn->lastInsertId();
 }
 
@@ -63,7 +63,7 @@ function updateSchool(PDO $conn, $schoolID, $schoolName)
             SET SchoolName = ?
             WHERE SchoolID = ?";
     $updateSql = $conn->prepare($updateSql);
-    $updateSql->execute(array($schoolName, $schoolID));
+    $updateSql->execute(array(htmlspecialchars($schoolName), $schoolID));
 }
 
 function deleteSchool(PDO $conn, $schoolID)
@@ -88,7 +88,7 @@ function getSchoolByName(PDO $conn, $schoolName)
     $schoolSql = "SELECT SchoolID
                    FROM School WHERE SchoolName = ?";
     $schoolQuery = $conn->prepare($schoolSql);
-    $schoolQuery->execute(array($schoolName));
+    $schoolQuery->execute(array(htmlspecialchars($schoolName)));
     $schoolResult = $schoolQuery->fetch(PDO::FETCH_OBJ);
     return $schoolResult;
 }
@@ -111,7 +111,7 @@ function createClass(PDO $conn, $schoolID, $className)
     $updateSql = "INSERT INTO Class(ClassName, SchoolID)
              VALUES (?,?)";
     $updateSql = $conn->prepare($updateSql);
-    $updateSql->execute(array($className, $schoolID));
+    $updateSql->execute(array(htmlspecialchars($className), $schoolID));
     return $conn->lastInsertId();
 }
 
@@ -121,7 +121,7 @@ function updateClass(PDO $conn, $classID, $schoolID, $className, $unlockedProgre
             SET ClassName = ?, SchoolID = ?, UnlockedProgress = ?
             WHERE ClassID = ?";
     $updateSql = $conn->prepare($updateSql);
-    $updateSql->execute(array($className, $schoolID, $unlockedProgress, $classID));
+    $updateSql->execute(array(htmlspecialchars($className), $schoolID, $unlockedProgress, $classID));
 }
 
 function deleteClass(PDO $conn, $classID)
@@ -146,7 +146,7 @@ function getClassByName(PDO $conn, $className)
     $classSql = "SELECT *
                    FROM Class WHERE ClassName = ?";
     $classQuery = $conn->prepare($classSql);
-    $classQuery->execute(array($className));
+    $classQuery->execute(array(htmlspecialchars($className)));
     $classResult = $classQuery->fetch(PDO::FETCH_OBJ);
     return $classResult;
 }
@@ -191,7 +191,7 @@ function updateToken(PDO $conn, $classID, $tokenString, $type)
     $updateSql = "INSERT INTO Token(ClassID, `Type`, TokenString)
                                     VALUES (?,?,?) ON DUPLICATE KEY UPDATE TokenString = ?";
     $updateSql = $conn->prepare($updateSql);
-    $updateSql->execute(array($classID, $type, $tokenString, $tokenString));
+    $updateSql->execute(array($classID, $type, htmlspecialchars($tokenString), htmlspecialchars($tokenString)));
 }
 
 function getTokens(PDO $conn)
@@ -256,6 +256,18 @@ function getMaxWeek(PDO $conn)
 }
 
 /* Week */
+
+/* Student Week Record*/
+function createStuWeekRecord(PDO $conn, $studentID, $week)
+{
+    $updateSql = "INSERT IGNORE INTO Student_Week_Record(StudentID, Week, DueTime)
+             VALUES (?,?,DATE_ADD(NOW(), INTERVAL 1 HOUR))";
+    $updateSql = $conn->prepare($updateSql);
+    $updateSql->execute(array($studentID, $week));
+    return $conn->lastInsertId();
+}
+
+/* Student Week Record*/
 
 /* Quiz */
 function createQuiz(PDO $conn, $topicID, $quizType, $week)
@@ -424,7 +436,7 @@ function getTopicByName(PDO $conn, $topicName)
 {
     $topicSql = "SELECT * FROM Topic WHERE TopicName = ?";
     $topicQuery = $conn->prepare($topicSql);
-    $topicQuery->execute(array($topicName));
+    $topicQuery->execute(array(htmlspecialchars($topicName)));
     $topicResult = $topicQuery->fetch(PDO::FETCH_OBJ);
     return $topicResult;
 }
@@ -463,7 +475,7 @@ function createMCQQuestion(PDO $conn, $quizID, $question)
     $updateSql = "INSERT INTO MCQ_Question(Question, QuizID)
                     VALUES (?,?)";
     $updateSql = $conn->prepare($updateSql);
-    $updateSql->execute(array($question, $quizID));
+    $updateSql->execute(array(htmlspecialchars($question), $quizID));
     return $conn->lastInsertId();
 }
 
@@ -473,7 +485,7 @@ function updateMCQQuestion(PDO $conn, $mcqID, $correctChoice, $question)
                     SET Question = ?, CorrectChoice = ?
                     WHERE MCQID = ?";
     $updateSql = $conn->prepare($updateSql);
-    $updateSql->execute(array($question, $correctChoice, $mcqID));
+    $updateSql->execute(array(htmlspecialchars($question), $correctChoice, $mcqID));
 }
 
 function deleteMCQQuestion(PDO $conn, $mcqID)
@@ -523,7 +535,7 @@ function updateMCQQuestionRecord(PDO $conn, $MCQID, $studentID, $choice)
     $updateMCQQuesRecordSql = "INSERT INTO MCQ_Question_Record(StudentID, MCQID, Choice)
 							       VALUES (?,?,?) ON DUPLICATE KEY UPDATE Choice = ?;";
     $updateMCQQuesRecordQuery = $conn->prepare($updateMCQQuesRecordSql);
-    $updateMCQQuesRecordQuery->execute(array($studentID, $MCQID, $choice, $choice));
+    $updateMCQQuesRecordQuery->execute(array($studentID, $MCQID, htmlspecialchars($choice), htmlspecialchars($choice)));
 }
 
 function getMCQQuiz(PDO $conn, $quizID)
@@ -571,12 +583,12 @@ function getMCQSubmissionCorrectNum(PDO $conn, $MCQIDArr, $answerArr)
 
     for ($i = 0; $i < count($MCQIDArr); $i++) {
         $mcqCorrectNumQuery = $conn->prepare($mcqCorrectNumSql);
-        $mcqCorrectNumQuery->execute(array($MCQIDArr[$i], $answerArr[$i]));
-        $score = $score + $mcqCorrectNumQuery->fetchColumn();
+        $mcqCorrectNumQuery->execute(array($MCQIDArr[$i], htmlspecialchars($answerArr[$i])));
+        $score = $score + (int)$mcqCorrectNumQuery->fetchColumn();
     }
 
     return $score;
-    }
+}
 
 /* MCQ */
 
@@ -586,7 +598,7 @@ function createOption(PDO $conn, $mcqID, $content, $explanation)
     $updateSql = "INSERT INTO MCQ_Option(Content, Explanation, MCQID)
              VALUES (?,?,?)";
     $updateSql = $conn->prepare($updateSql);
-    $updateSql->execute(array($content, $explanation, $mcqID));
+    $updateSql->execute(array($content, htmlspecialchars($explanation), $mcqID));
     return $conn->lastInsertId();
 }
 
@@ -596,7 +608,7 @@ function updateOption(PDO $conn, $optionID, $content, $explanation)
                 SET Content = ?, Explanation = ?
                 WHERE OptionID = ?";
     $updateSql = $conn->prepare($updateSql);
-    $updateSql->execute(array($content, $explanation, $optionID));
+    $updateSql->execute(array($content, htmlspecialchars($explanation), $optionID));
 }
 
 function deleteOption(PDO $conn, $optionID)
@@ -641,7 +653,7 @@ function createSAQQuestion(PDO $conn, $quizID, $points, $question)
     $updateSql = "INSERT INTO SAQ_Question(Question, Points, QuizID)
                     VALUES (?,?,?)";
     $updateSql = $conn->prepare($updateSql);
-    $updateSql->execute(array($question, $points, $quizID));
+    $updateSql->execute(array(htmlspecialchars($question), $points, $quizID));
     return $conn->lastInsertId();
 }
 
@@ -651,7 +663,7 @@ function updateSAQQuestion(PDO $conn, $saqID, $points, $question)
                     SET Question = ?, Points = ?
                     WHERE SAQID = ?";
     $updateSql = $conn->prepare($updateSql);
-    $updateSql->execute(array($question, $points, $saqID));
+    $updateSql->execute(array(htmlspecialchars($question), $points, $saqID));
 }
 
 function deleteSAQQuestion(PDO $conn, $saqID)
@@ -710,7 +722,7 @@ function createMatchingSection(PDO $conn, $quizID, $description, $points)
     $updateSql = "INSERT INTO Matching_Section(QuizID, Description, Points)
                     VALUES (?,?,?)";
     $updateSql = $conn->prepare($updateSql);
-    $updateSql->execute(array($quizID, $description, $points));
+    $updateSql->execute(array($quizID, htmlspecialchars($description), $points));
 }
 
 function updateMatchingSection(PDO $conn, $quizID, $description, $points)
@@ -719,7 +731,7 @@ function updateMatchingSection(PDO $conn, $quizID, $description, $points)
                     SET Description = ?, Points = ?
                     WHERE QuizID = ?";
     $updateSql = $conn->prepare($updateSql);
-    $updateSql->execute(array($description, $points, $quizID));
+    $updateSql->execute(array(htmlspecialchars($description), $points, $quizID));
 }
 
 function getMatchingSection(PDO $conn, $quizID)
@@ -738,7 +750,7 @@ function createMatchingQuestion(PDO $conn, $quizID, $question)
     $updateSql = "INSERT INTO Matching_Question(Question, QuizID)
                     VALUES (?,?)";
     $updateSql = $conn->prepare($updateSql);
-    $updateSql->execute(array($question, $quizID));
+    $updateSql->execute(array(htmlspecialchars($question), $quizID));
     return $conn->lastInsertId();
 }
 
@@ -748,7 +760,7 @@ function updateMatchingQuestion(PDO $conn, $matchingID, $question)
                     SET Question = ?
                     WHERE MatchingID = ?";
     $updateSql = $conn->prepare($updateSql);
-    $updateSql->execute(array($question, $matchingID));
+    $updateSql->execute(array(htmlspecialchars($question), $matchingID));
 }
 
 function deleteMatchingQuestion(PDO $conn, $matchingID)
@@ -820,7 +832,7 @@ function createMatchingOption(PDO $conn, $matchingID, $content)
     $updateSql = "INSERT INTO Matching_Option(Content, MatchingID)
              VALUES (?,?)";
     $updateSql = $conn->prepare($updateSql);
-    $updateSql->execute(array($content, $matchingID));
+    $updateSql->execute(array(htmlspecialchars($content), $matchingID));
     return $conn->lastInsertId();
 }
 
@@ -830,7 +842,7 @@ function updateMatchingOption(PDO $conn, $matchingID, $optionID, $content)
                 SET Content = ?, MatchingID = ?
                 WHERE OptionID = ?";
     $updateSql = $conn->prepare($updateSql);
-    $updateSql->execute(array($content, $matchingID, $optionID));
+    $updateSql->execute(array(htmlspecialchars($content), $matchingID, $optionID));
 }
 
 function deleteMatchingOption(PDO $conn, $optionID)
@@ -866,7 +878,7 @@ function updateLearningMaterial(PDO $conn, $quizID, $content)
             SET Content = ?
             WHERE QuizID = ?";
     $updateSql = $conn->prepare($updateSql);
-    $updateSql->execute(array($content, $quizID));
+    $updateSql->execute(array(htmlspecialchars($content), $quizID));
 }
 
 function getLearningMaterial(PDO $conn, $quizID)
@@ -995,7 +1007,7 @@ function createPosterSection(PDO $conn, $quizID, $question, $points)
     $updateSql = "INSERT INTO Poster_Section(QuizID, Question, Points)
                     VALUES (?,?,?)";
     $updateSql = $conn->prepare($updateSql);
-    $updateSql->execute(array($quizID, $question, $points));
+    $updateSql->execute(array($quizID, htmlspecialchars($question), $points));
 }
 
 function updatePosterDraft(PDO $conn, $quizID, $studentID, $zwibblerDoc)
@@ -1071,7 +1083,7 @@ function updateSAQQuestionGrading(PDO $conn, $saqID, $studentID, $feedback, $gra
                   SET Feedback = ?, Grading = ?
                   WHERE SAQID = ? AND StudentID = ?";
     $updateSql = $conn->prepare($updateSql);
-    $updateSql->execute(array($feedback, $grading, $saqID, $studentID));
+    $updateSql->execute(array(htmlspecialchars($feedback), $grading, $saqID, $studentID));
 }
 
 
@@ -1095,13 +1107,13 @@ function getSAQRecords(PDO $conn, $quizID, $studentID)
     return $saqQuesRecordResult;
 }
 
-/*
+
 function updateSAQDraft(PDO $conn, $quizID, $saqID, $studentID, $answer, $pageName)
 {
     if (count($saqID) == count($answer)) {
         try {
             $conn->beginTransaction();
-            for ($i = 0; $i < count($saqID); $i++){
+            for ($i = 0; $i < count($saqID); $i++) {
                 updateSAQQuestionRecord($conn, $saqID[$i], $studentID, $answer[$i]);
             }
             updateQuizRecord($conn, $quizID, $studentID, "UNSUBMITTED");
@@ -1117,20 +1129,20 @@ function updateSAQDraft(PDO $conn, $quizID, $saqID, $studentID, $answer, $pageNa
 
 function updateSAQSubmission(PDO $conn, $quizID, $saqID, $studentID, $answer, $pageName)
 {
-    //try {
-    //    $conn->beginTransaction();
+    try {
+        $conn->beginTransaction();
         for ($i = 0; $i < count($saqID); $i++) {
             updateSAQQuestionRecord($conn, $saqID[$i], $studentID, $answer[$i]);
         }
 
         updateQuizRecord($conn, $quizID, $studentID, "UNGRADED");
-    //    $conn->commit();
-    //} catch (Exception $e) {
-    //    debug_err($pageName, $e);
-    //    $conn->rollBack();
-   // }
+        $conn->commit();
+    } catch (Exception $e) {
+        debug_err($pageName, $e);
+        $conn->rollBack();
+    }
 }
-*/
+
 function deleteSAQSubmission(PDO $conn, $quizID, $studentID, $pageName)
 {
     try {
