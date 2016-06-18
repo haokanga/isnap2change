@@ -257,6 +257,17 @@ function getMaxWeek(PDO $conn)
 
 /* Week */
 
+/* Student Week Record*/
+function createStuWeekRecord(PDO $conn, $studentID, $week)
+{
+    $updateSql = "INSERT IGNORE INTO Student_Week_Record(StudentID, Week, DueTime)
+             VALUES (?,?,DATE_ADD(NOW(), INTERVAL 1 HOUR))";
+    $updateSql = $conn->prepare($updateSql);
+    $updateSql->execute(array($studentID, $week));
+    return $conn->lastInsertId();
+}
+/* Student Week Record*/
+
 /* Quiz */
 function createQuiz(PDO $conn, $topicID, $quizType, $week)
 {
