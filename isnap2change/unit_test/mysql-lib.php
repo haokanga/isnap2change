@@ -113,6 +113,7 @@ echo '###########################<br>';
 echo 'generateRandomSAQSubmissions(\$conn)<br>';
 generateRandomSAQSubmissions($conn);
 
+/*
 echo '###########################<br>';
 echo 'UNIT TEST<br>';
 echo '###########################<br>';
@@ -122,5 +123,6 @@ for ($i = 1; $i <= 5; $i++) {
         createStuWeekRecord($conn, $i, $j);
     }
 }
+*/
 db_close($conn);
 ?>

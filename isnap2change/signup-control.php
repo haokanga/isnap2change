@@ -21,7 +21,7 @@
 							 WHERE TokenString = BINARY ?";
 								
 				$tokenPreQuery = $conn->prepare($tokenPreSql);
-				$tokenPreQuery->execute(array($token));
+				$tokenPreQuery->execute(array(htmlspecialchars($token)));
 				
 				if($tokenPreQuery->fetchColumn() == 0){
 					echo "No record found!";
