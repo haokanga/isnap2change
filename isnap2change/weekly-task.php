@@ -11,9 +11,9 @@
 	$pageName = "weekly-task";
 
 	if ($_SERVER["REQUEST_METHOD"] == "POST") {
-		if(isset($_POST["week"])){
+		if(isset($_POST["week"])) {
 			$week = $_POST["week"];
-		} else{
+		} else {
 			
 		}		
 	} else {
@@ -29,7 +29,7 @@
 		$quizzesStatusRes = getQuizzesStatusByWeek($conn, $studentID, $week);
 
 
-	} catch(Exception $e){
+	} catch(Exception $e) {
 		if($conn != null) {
 			db_close($conn);
 		}
@@ -115,13 +115,52 @@
 
 <html>
 <head>
-<script>
-function startQuiz(quizid){	
-	document.getElementById("quiz"+quizid).submit();	
-}
-</script>
+	<style>
+		#clockdiv{
+			font-family: sans-serif;
+			color: #fff;
+			display: inline-block;
+			font-weight: 100;
+			text-align: center;
+			font-size: 30px;
+		}
+
+		#clockdiv > div{
+			padding: 10px;
+			border-radius: 3px;
+			background: #00BF96;
+			display: inline-block;
+		}
+
+		#clockdiv div > span{
+			padding: 15px;
+			border-radius: 3px;
+			background: #00816A;
+			display: inline-block;
+		}
+
+		.smalltext{
+			padding-top: 5px;
+			font-size: 16px;
+		}
+	</style>
+	<script src="js/timer.js"></script>
 </head>
 <body>
+<div id="clockdiv">
+	<div>
+		<span class="hours"></span>
+		<div class="smalltext">Hours</div>
+	</div>
+	<div>
+		<span class="minutes"></span>
+		<div class="smalltext">Minutes</div>
+	</div>
+	<div>
+		<span class="seconds"></span>
+		<div class="smalltext">Seconds</div>
+	</div>
+</div>
 <!--
 <div id="a" align="center">
 <form id="quiz" action=learning-material.php method=post>
@@ -133,4 +172,14 @@ function startQuiz(quizid){
 </div>
 -->
 </body>
+<script>
+	//get deadline if exists, otherwise creats a new deadline
+	getDeadline(<?php echo $week; ?>);
+
+
+
+	function startQuiz(quizid) {
+		document.getElementById("quiz"+quizid).submit();
+	}
+</script>
 </html>

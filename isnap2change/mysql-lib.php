@@ -930,8 +930,8 @@ function getStudentScore(PDO $conn, $studentID)
 function updateStudentScore(PDO $conn, $studentID)
 {
     $updateSql = "UPDATE Student 
-                SET Score = ?
-                WHERE StudentID = ?";
+                  SET Score = ?
+                  WHERE StudentID = ?";
     $updateSql = $conn->prepare($updateSql);
     $updateSql->execute(array(calculateStudentScore($conn, $studentID), $studentID));
 }
