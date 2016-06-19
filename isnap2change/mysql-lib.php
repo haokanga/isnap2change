@@ -258,14 +258,39 @@ function getMaxWeek(PDO $conn)
 /* Week */
 
 /* Student Week Record*/
-function createStuWeekRecord(PDO $conn, $studentID, $week)
+function createStuWeekRecord(PDO $conn, $studentID, $week, $dueTime)
 {
     $updateSql = "INSERT IGNORE INTO Student_Week_Record(StudentID, Week, DueTime)
-             VALUES (?,?,DATE_ADD(NOW(), INTERVAL 1 HOUR))";
+                  VALUES (?,?,?)";
     $updateSql = $conn->prepare($updateSql);
-    $updateSql->execute(array($studentID, $week));
-    return $conn->lastInsertId();
+    $updateSql->execute(array($studentID, $week, $dueTime));
 }
+
+function getStuWeekRecord(PDO $conn, $studentID, $week)
+{
+    $weekRecordSql = "SELECT COUNT(*) 
+                      FROM Student_Week_Record
+                      WHERE StudentID = ? AND Week = ?";
+
+    $weekRecordQuery = $conn->prepare($weekRecordSql);
+    $weekRecordQuery->execute(array($studentID, $week));
+
+    if ($weekRecordQuery->fetchColumn() == 0){
+            return null;
+    }
+
+    $weekRecordSql = "SELECT DueTime 
+                      FROM Student_Week_Record
+                      WHERE StudentID = ? AND Week = ?";
+
+    $weekRecordQuery = $conn->prepare($weekRecordSql);
+    $weekRecordQuery->execute(array($studentID, $week));
+    $weekRecordRes = $weekRecordQuery->fetch(PDO::FETCH_OBJ);
+
+    return $weekRecordRes->DueTime;
+}
+
+
 
 /* Student Week Record*/
 

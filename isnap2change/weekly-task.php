@@ -25,6 +25,9 @@
 	try{
 		$conn = db_connect();
 
+		//get due time for this week
+		$dueTime = getStuWeekRecord($conn, $studentID, $week);
+
 		//get all quizzes and status by studentID and week
 		$quizzesStatusRes = getQuizzesStatusByWeek($conn, $studentID, $week);
 
@@ -145,6 +148,7 @@
 		}
 	</style>
 	<script src="js/timer.js"></script>
+	<script src="js/jquery-1.12.3.js"></script>
 </head>
 <body>
 <div id="clockdiv">
@@ -172,14 +176,64 @@
 </div>
 -->
 </body>
+
 <script>
-	//get deadline if exists, otherwise creats a new deadline
-	getDeadline(<?php echo $week; ?>);
+	<?php
+		 if($dueTime != null) { ?>
 
+			if((Date.parse(new Date()) - Date.parse(new Date("<?php echo $dueTime?>"))) <= 0) {
+				initializeClock(new Date("<?php echo $dueTime?>"), true);
+			} else {
 
+			}
+	<?php } else { ?>
+		  	newDue = new Date(Date.parse(new Date()) +  60 * 1000);
+	      	initializeClock(newDue, true);
+	
+			var dd = newDue.getDate();
+			var mm = newDue.getMonth() + 1;
+			var yyyy = newDue.getFullYear();
+
+			if(dd<10) {
+				dd="0"+dd;
+			}
+
+			if(mm<10) {
+				mm="0"+mm;
+			}
+
+			newDue = yyyy+"-"+mm+"-"+dd+ " " +newDue.getHours() + ":" + newDue.getMinutes()+":" + newDue.getSeconds();
+
+			saveDueTime(<?php echo $studentID ?>, <?php echo $week ?>, newDue);
+    <?php	} ?>
 
 	function startQuiz(quizid) {
 		document.getElementById("quiz"+quizid).submit();
 	}
+
+	function saveDueTime(studentID, week, dueTime) {
+		var xmlhttp = new XMLHttpRequest();
+
+		xmlhttp.onreadystatechange = function() {
+			if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
+				parseFeedback(xmlhttp.responseText);
+			}
+		};
+
+		xmlhttp.open("POST", "save-due-time.php", true);
+		xmlhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+		xmlhttp.send("studentID="+studentID +"&week="+week+"&dueTime="+ dueTime);
+	}
+
+	function parseFeedback(response){
+		var feedback = JSON.parse(response);
+
+		if(feedback.message != "success"){
+			alert(feedback.message + ". Please try again!");
+			//jump to error page
+		}
+	}
+
+
 </script>
 </html>
