@@ -102,6 +102,7 @@
 	}
 
 	db_close($conn);
+
     /**  game query move somewhere else
     $gameSql = "SELECT * FROM Game";    
     $gameQuery = $conn->prepare($gameSql);
@@ -119,77 +120,143 @@
 <html>
 <head>
 	<style>
-		#clockdiv{
-			font-family: sans-serif;
+		.countdown-container {
+			position: relative;
+			top: 50%;
+			-webkit-transform: translateY(-50%);
+			-moz-transform: translateY(-50%);
+			transform: translateY(-50%);
+		}
+		.clock-item .inner {
+			height: 0px;
+			padding-bottom: 100%;
+			position: relative;
+			width: 100%;
+		}
+		.clock-canvas {
+			background-color: rgba(255, 255, 255, .1);
+			border-radius: 50%;
+			height: 0px;
+			padding-bottom: 100%;
+		}
+		.text {
 			color: #fff;
-			display: inline-block;
-			font-weight: 100;
-			text-align: center;
 			font-size: 30px;
+			font-weight: bold;
+			margin-top: -50px;
+			position: absolute;
+			top: 50%;
+			text-align: center;
+			text-shadow: 1px 1px 1px rgba(0, 0, 0, 1);
+			width: 100%;
+		}
+		.text .val {
+			font-size: 50px;
+		}
+		.text .type-time {
+			font-size: 20px;
 		}
 
-		#clockdiv > div{
-			padding: 10px;
-			border-radius: 3px;
-			background: #00BF96;
-			display: inline-block;
+		@media (min-width: 768px) and (max-width: 991px) {
+			.clock-item {
+				margin-bottom: 30px;
+			}
 		}
-
-		#clockdiv div > span{
-			padding: 15px;
-			border-radius: 3px;
-			background: #00816A;
-			display: inline-block;
-		}
-
-		.smalltext{
-			padding-top: 5px;
-			font-size: 16px;
+		@media (max-width: 767px) {
+			.clock-item {
+				margin: 0px 30px 30px 30px;
+			}
 		}
 	</style>
-	<script src="js/timer.js"></script>
-	<script src="js/jquery-1.12.3.js"></script>
+	<link rel="stylesheet" href="http://netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css">
+	<link href="http://fonts.googleapis.com/css?family=Raleway:400,700" rel="stylesheet" type="text/css">
 </head>
 <body>
-<div id="clockdiv">
-	<div>
-		<span class="hours"></span>
-		<div class="smalltext">Hours</div>
-	</div>
-	<div>
-		<span class="minutes"></span>
-		<div class="smalltext">Minutes</div>
-	</div>
-	<div>
-		<span class="seconds"></span>
-		<div class="smalltext">Seconds</div>
-	</div>
-</div>
-<!--
-<div id="a" align="center">
-<form id="quiz" action=learning-material.php method=post>
-<button type=button onclick="startQuiz()"> Quiz </button>
-<input  type=hidden name="quizid" value=<?php echo $quizIDRes->QuizID; ?>>
-<input  type=hidden name="quiztype" value=<?php echo $quizIDRes->QuizType; ?>>
-<input  type=hidden name="week" value=<?php echo $week; ?>>
-</form>
-</div>
--->
-</body>
 
+<div class="countdown countdown-container container">
+<div class="clock row">
+	<div class="clock-item clock-days countdown-time-value col-sm-6 col-md-3">
+		<div class="wrap">
+			<div class="inner">
+				<div id="canvas-days" class="clock-canvas"></div>
+
+				<div class="text">
+					<p class="val">0</p>
+					<p class="type-days type-time">DAYS</p>
+				</div><!-- /.text -->
+			</div><!-- /.inner -->
+		</div><!-- /.wrap -->
+	</div><!-- /.clock-item -->
+
+	<div class="clock-item clock-hours countdown-time-value col-sm-6 col-md-3">
+		<div class="wrap">
+			<div class="inner">
+				<div id="canvas-hours" class="clock-canvas"></div>
+
+				<div class="text">
+					<p class="val">0</p>
+					<p class="type-hours type-time">HOURS</p>
+				</div><!-- /.text -->
+			</div><!-- /.inner -->
+		</div><!-- /.wrap -->
+	</div><!-- /.clock-item -->
+
+	<div class="clock-item clock-minutes countdown-time-value col-sm-6 col-md-3">
+		<div class="wrap">
+			<div class="inner">
+				<div id="canvas-minutes" class="clock-canvas"></div>
+
+				<div class="text">
+					<p class="val">0</p>
+					<p class="type-minutes type-time">MINUTES</p>
+				</div><!-- /.text -->
+			</div><!-- /.inner -->
+		</div><!-- /.wrap -->
+	</div><!-- /.clock-item -->
+
+	<div class="clock-item clock-seconds countdown-time-value col-sm-6 col-md-3">
+		<div class="wrap">
+			<div class="inner">
+				<div id="canvas-seconds" class="clock-canvas"></div>
+
+				<div class="text">
+					<p class="val">0</p>
+					<p class="type-seconds type-time">SECONDS</p>
+				</div><!-- /.text -->
+			</div><!-- /.inner -->
+		</div><!-- /.wrap -->
+	</div><!-- /.clock-item -->
+</div><!-- /.clock -->
+</div><!-- /.countdown-wrapper -->
+
+<script src="js/timer.js"></script>
+<script src="js/jquery-1.12.3.js"></script>
+<script type="text/javascript" src="js/kinetic.js"></script>
+<script type="text/javascript" src="js/jquery.final-countdown.js"></script>
 <script>
 	<?php
 		 if($dueTime != null) { ?>
 
 			if((Date.parse(new Date()) - Date.parse(new Date("<?php echo $dueTime?>"))) <= 0) {
-				initializeClock(new Date("<?php echo $dueTime?>"), true);
+				$('.countdown').final_countdown({
+					start: new Date().getTime() / 1000,
+					end: Date.parse(new Date("<?php echo $dueTime?>"))/1000,
+					now: new Date().getTime() / 1000
+				});
 			} else {
 
 			}
 	<?php } else { ?>
 		  	newDue = new Date(Date.parse(new Date()) +  60 * 1000);
-	      	initializeClock(newDue, true);
-	
+
+			$('.countdown').final_countdown({
+				start: new Date().getTime() / 1000,
+				end: Date.parse(newDue) / 1000,
+				now: new Date().getTime() / 1000
+			}, function() {
+					alert("Time is up!");
+			});
+
 			var dd = newDue.getDate();
 			var mm = newDue.getMonth() + 1;
 			var yyyy = newDue.getFullYear();
@@ -236,4 +303,5 @@
 
 
 </script>
+</body>
 </html>

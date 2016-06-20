@@ -34,7 +34,7 @@
 		//get quiz type
 		$quizType = getQuizType($conn, $quizID);
 		
-	} catch(Exception $e){
+	} catch(Exception $e) {
 		if($conn != null) {
 			db_close($conn);
 		}
@@ -64,7 +64,7 @@
          <script>
 
 			 if((Date.parse(new Date()) - Date.parse(new Date("<?php echo $dueTime?>"))) <= 0) {
-				 initializeClock(new Date("<?php echo $dueTime?>"), false);
+				 initializeClock(new Date("<?php echo $dueTime?>"));
 			 }
 
             // decide quiz type and begin quiz

@@ -17,23 +17,10 @@ function getTimeRemaining(endtime) {
     };
 }
 
-function initializeClock(endTime, visibility) {
-
-    if(visibility == true) {
-        var clock = document.getElementById('clockdiv');
-        var hoursSpan = clock.querySelector('.hours');
-        var minutesSpan = clock.querySelector('.minutes');
-        var secondsSpan = clock.querySelector('.seconds');
-    }
+function initializeClock(endTime) {
 
     function updateClock() {
         var t = getTimeRemaining(endTime);
-
-        if(visibility == true) {
-            hoursSpan.innerHTML = ('0' + t.hours).slice(-2);
-            minutesSpan.innerHTML = ('0' + t.minutes).slice(-2);
-            secondsSpan.innerHTML = ('0' + t.seconds).slice(-2);
-        }
 
         if (t.total <= 0) {
             clearInterval(timeInterval);
