@@ -217,11 +217,25 @@ function deleteStudent(PDO $conn, $studentID)
 function getStudents(PDO $conn)
 {
     $studentSql = "SELECT * , DATE(SubmissionTime) AS SubmissionDate FROM Student NATURAL JOIN Class
-               ORDER BY ClassID";
+                   ORDER BY ClassID";
     $studentQuery = $conn->prepare($studentSql);
     $studentQuery->execute();
     $studentResult = $studentQuery->fetchAll(PDO::FETCH_OBJ);
     return $studentResult;
+}
+
+function getStudentsRank(PDO $conn)
+{
+    $leaderboardSql = "SELECT Username, Score
+					   FROM Student
+					   ORDER BY Score DESC, SubmissionTime 
+					   Limit 10;";
+
+    $leaderboardQuery = $conn->prepare($leaderboardSql);
+    $leaderboardQuery->execute(array());
+    $leaderboardRes = $leaderboardQuery->fetchAll(PDO::FETCH_OBJ);
+
+    return $leaderboardRes;
 }
 
 function resetPassword(PDO $conn, $studentID)
@@ -1206,6 +1220,37 @@ function getSAQSubmissions(PDO $conn)
 }
 
 /* SAQ-Grading */
+
+
+/* Fact */
+
+function getFactTopics(PDO $conn)
+{
+    $topicSql = "SELECT DISTINCT TopicID
+				 FROM FACT;";
+
+    $topicQuery = $conn->prepare($topicSql);
+    $topicQuery->execute(array());
+    $topicRes = $topicQuery->fetchAll(PDO::FETCH_OBJ);
+
+    return $topicRes;
+}
+
+function getFactsByTopicID(PDO $conn, $topicID)
+{
+    $factSql = "SELECT *
+				FROM FACT NATURAL JOIN Topic
+				WHERE TopicID = ?;";
+
+    $factQuery = $conn->prepare($factSql);
+    $factQuery->execute(array($topicID));
+    $factRes = $factQuery->fetchAll(PDO::FETCH_OBJ);
+
+    return $factRes;
+}
+
+/* Fact */
+
 
 /* Unit Test */
 function generateRandomString($length = 10)
