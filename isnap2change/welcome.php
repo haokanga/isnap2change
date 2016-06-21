@@ -51,13 +51,12 @@
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <link rel="stylesheet" type="text/css" href="css/home.css" />
-        <link rel="icon" href="http://example.com/favicon.png">
 
         <!-- Latest compiled and minified CSS -->
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js" integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS" crossorigin="anonymous"></script>
         <script src="js/jquery-1.12.3.js"></script>
         <script src="js/bootstrap.js"></script>
-        <script src="js/bootstrap.min.js"></script>
         <script>
             $(document).ready(function () {
 
@@ -77,7 +76,7 @@
                 $('#nav .navbar-nav li>a').click(function () {
                     var link = $(this).attr('href');
                     var posi = $(link).offset().top;
-                    $('body,html').animate({scrollTop: posi}, 700);
+                    $('body,html').animate({scrollTop: posi}, 100);
                 });  });
 			
 			<!--Twitter widgets.js -->
@@ -161,16 +160,18 @@
                          <button type="button" class="close" data-dismiss="modal" aria-label="Close" style="color:white;"><span aria-hidden="true">&times;</span></button>
                          <div class="col-xs-6 col-xs-offset-3">
                              <img src="css/image/Snap_Logo_Inverted.png" style="height:20%; width: 100%;">
-                             <div class="input-group input-group-lg" style="margin-top:20%; text-align: center;">
-                                 <input type="text" style="text-align: center; border-radius: 10px; color:yellow; border: none; background-color: black; opacity: 0.7;" class="form-control" placeholder="Username" aria-describedby="sizing-addon1">
-                             </div>
-                             <div class="input-group input-group-lg" style="margin-top:5%; text-align: center;">
-                                 <input type="password" style="text-align: center; border-radius: 10px; border: none; color:yellow; background-color: black; opacity: 0.7;" class="form-control" placeholder="Password" aria-describedby="sizing-addon1">
-                             </div>
-                             <button type="button" data-dismiss="modal" aria-label="Close" class="btn btn-primary btn-lg btn-block" style="margin-top:5%; border-radius: 10px; border-color: yellow !important; color:yellow; background-color: black; opacity: 0.7;">Log In</button>
+                             <form method="post" action="login.php">
+                                 <div class="input-group input-group-lg" style="margin-top:20%; text-align: center;">
+                                     <input type="text" style="text-align: center; border-radius: 10px; color:yellow; border: none; background-color: black; opacity: 0.7;" class="form-control" placeholder="Username" aria-describedby="sizing-addon1">
+                                 </div>
+                                 <div class="input-group input-group-lg" style="margin-top:5%; text-align: center;">
+                                     <input type="password" style="text-align: center; border-radius: 10px; border: none; color:yellow; background-color: black; opacity: 0.7;" class="form-control" placeholder="Password" aria-describedby="sizing-addon1">
+                                 </div>
+                                 <input type="submit" data-dismiss="modal" aria-label="Close" class="btn btn-primary btn-lg btn-block" style="margin-top:5%; border-radius: 10px; border-color: yellow !important; color:yellow; background-color: black; opacity: 0.7;" value="Log In">
+                             </form>
                              <div style="text-align: center;">
                                  <span style="color: white;"> Don't have an account?</span>
-                                 <a href='#' onclick="location.href = '/HomePage/SignUp.html';" style='color:yellow;'>Sign Up</a>
+                                 <a href='#' onclick="location.href = 'SignUp.html';" style='color:yellow;'>Sign Up</a>
                              </div>
                          </div>
                      </div>

@@ -1,103 +1,45 @@
 <?php
-    //if true, echo debug output in dev mode, else production mode
-	$DEBUG_MODE = true;
-    
+
 	session_start();
-    require_once("mysql-lib.php");
-    $conn;
-       
-    if($DEBUG_MODE) {
-    	echo "DEBUG_MODE<br>";
-    }
-	
-	
-	if(isset($_POST['submit'])){
-		$errMsg = '';
-		//username and password
-		$username = security_check_text($_POST['username']);
-		$password = security_check_text($_POST['password']);
-		$usertype = $_POST['usertype'];
-		$tablename = "";
-		$idcolumnname = "";
-		if(!strcmp($usertype , "student")){
-			$tablename = "`Student`";
-			$idcolumnname = "StudentID";
-		} else if (!strcmp($usertype , "teacher")){
-			$tablename = "`Teacher`";
-			$idcolumnname = "TeacherID";
+	require_once('mysql-lib.php');
+	require_once('debug.php');
+	$pageName = "login";
+
+	if ($_SERVER["REQUEST_METHOD"] == "POST") {
+		if(isset($_POST["username"]) && isset($_POST["password"])){
+			$username = $_POST["username"];
+			$password = $_POST["password"];
+		} else {
+
+		}
+	} else {
+
+	}
+
+	$conn = null;
+
+	try {
+		$conn = db_connect();
+
+		//valid student
+		if(validStudent($conn, $username, $password)) {
+			echo "<script></script>>";
+		} else {
+
 		}
 
-        if($DEBUG_MODE) {
-    		echo $username."\t".$password."<br>";
-    		echo $tablename;
-   		}
-		
-		if($username == '')
-			$errMsg .= 'You must enter your Username<br>';
-		
-		if($password == '')
-			$errMsg .= 'You must enter your Password<br>';
-		
-		
-		if($errMsg == ''){
-			$conn = db_connect();
-			$sql = $conn->prepare('SELECT COUNT(*) FROM '.$tablename.' WHERE `Username` = BINARY :username AND `Password` = BINARY :password');
-			$sql->bindParam(':username', $username);
-			$sql->bindParam(':password', md5($password));
-			$sql->execute();
-			if ($sql->fetchColumn() > 0) {
-			    $sql = $conn->prepare('SELECT '.$idcolumnname.',`Username`,`Password` FROM '.$tablename.' WHERE `Username` = BINARY :username AND `Password` = BINARY :password');
-				$sql->bindParam(':username', $username);
-				$sql->bindParam(':password', md5($password));
-				$sql->execute();
-				$results = $sql->fetch(PDO::FETCH_ASSOC);
-	       		if($DEBUG_MODE) {
-	    			echo "count($results)".count($results);
-	   			}
-				$_SESSION['studentID'] = $results[$idcolumnname];
-				$_SESSION['username'] = $results['Username'];
-				header('location:welcome.php');
-				exit;			
-			}
-			else {
-			    $errMsg .= 'Invalid Username or Password<br>';
-			}
+
+	} catch(Exception $e) {
+		if($conn != null) {
 			db_close($conn);
 		}
+
+		debug_err($pageName, $e);
+		//to do: handle sql error
+		//...
+		exit;
 	}
 
-	//check input security to prevent malformed data/html injection
-	function security_check_text($data) {
-	  $data = trim($data);
-	  $data = stripslashes($data);
-	  $data = htmlspecialchars($data);
-	  return $data;
-	}
+	db_close($conn);
+
 ?>
-
-
-<html>
-<head><title>Login Page PHP Script</title></head>
-<body>
-	<div align="center">
-		<div style="width:300px; border: solid 1px #006D9C; " align="left">			
-			<?php
-				if(isset($errMsg)){
-					echo '<div style="color:#FF0000;text-align:center;font-size:12px;">'.$errMsg.'</div>';
-				}
-			?>
-			<div style="background-color:#006D9C; color:#FFFFFF; padding:3px;"><b>Login</b></div>
-			<div style="margin:30px">
-				<form method="post" action="<?php echo $_SERVER['PHP_SELF']; ?>">
-					<input type="radio" name="usertype" value="student" checked> Student
-					<input type="radio" name="usertype" value="teacher"> Teacher
-					<br><br>
-					<label>Username  :</label><input type="text" name="username" class="box"/><br/><br/>
-					<label>Password  :</label><input type="password" name="password" class="box"/><br/><br/>
-					<input type="submit" name='submit' value="Submit" class='submit'/><br />
-				</form>
-			</div>
-		</div>
-	</div>
-</body>
-</html>

@@ -247,6 +247,15 @@ function resetPassword(PDO $conn, $studentID)
     $updateSql->execute(array(md5('WelcomeToiSNAP2'), $studentID));
 }
 
+function validStudent(PDO $conn, $username, $password)
+{
+    $validStudentSql = "SELECT COUNT(*) FROM Student WHERE `Username` = BINARY ? AND `Password` = BINARY ?";
+    $validStudentQuery = $conn->prepare($validStudentSql);
+    $validStudentQuery->execute(array($username, md5($password)));
+    if($validStudentQuery->fetchColumn() != 1) {
+        return false;
+    } else return true;
+}
 /* Student */
 
 /* Week */
