@@ -111,6 +111,28 @@ body
     /* z-index: -1;  */
 }
 
+.modal-content, .modal
+{
+    background: url('image/miss_pacman.png') no-repeat center center;
+    background-size: cover;
+}
+
+input::-webkit-input-placeholder {
+color: yellow !important;
+}
+ 
+input:-moz-placeholder { /* Firefox 18- */
+color: yellow !important;  
+}
+ 
+input::-moz-placeholder {  /* Firefox 19+ */
+color: yellow !important;  
+}
+ 
+input:-ms-input-placeholder {  
+color: yellow !important;  
+}
+
 
 /*
 #nav.affix {

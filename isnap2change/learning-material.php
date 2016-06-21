@@ -24,14 +24,17 @@
 	
 	try {
 		$conn = db_connect();
-		
+
+		//get due time for this week
+		$dueTime = getStuWeekRecord($conn, $studentID, $week);
+
 		//get learning material
 		$materialRes = getLearningMaterial($conn, $quizID);
 
 		//get quiz type
 		$quizType = getQuizType($conn, $quizID);
 		
-	} catch(Exception $e){
+	} catch(Exception $e) {
 		if($conn != null) {
 			db_close($conn);
 		}
@@ -55,9 +58,15 @@
         <link href='https://fonts.googleapis.com/css?family=Raleway:400|Open+Sans' rel='stylesheet' type='text/css'>
         <link href='https://maxcdn.bootstrapcdn.com/font-awesome/4.6.2/css/font-awesome.min.css' rel='stylesheet' type='text/css'>
         <script type="text/javascript" src="js/jquery-1.12.3.js"></script>
+		<script src="js/timer.js"></script>
     </head>
     <body>
-         <script>         
+         <script>
+
+			 if((Date.parse(new Date()) - Date.parse(new Date("<?php echo $dueTime?>"))) <= 0) {
+				 initializeClock(new Date("<?php echo $dueTime?>"));
+			 }
+
             // decide quiz type and begin quiz
             function beginQuiz()
 			{

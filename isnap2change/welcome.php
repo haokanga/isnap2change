@@ -1,39 +1,48 @@
 <?php
 	require_once('mysql-lib.php');
-	
-	$conn = db_connect();
-	
-	$leaderboardSql = "SELECT Username, Score
-					   FROM Student
-					   ORDER BY Score DESC, SubmissionTime 
-					   Limit 10;";
-							
-	$leaderboardQuery = $conn->prepare($leaderboardSql);
-	$leaderboardQuery->execute(array());
-	$leaderboardRes = $leaderboardQuery->fetchAll(PDO::FETCH_OBJ);
-	
-	$topicSql = "SELECT DISTINCT TopicID
-				 FROM FACT;";
-	
-	$topicQuery = $conn->prepare($topicSql);
-	$topicQuery->execute(array());
-	$topicRes = $topicQuery->fetchAll(PDO::FETCH_OBJ);
-	
-	$topicArr = array();
-	
-	foreach($topicRes as $singleTopic) {
-		array_push($topicArr, $singleTopic->TopicID);
-	}
-	
-	$randKeys = array_rand($topicArr, 3);
-	
-	$factSql = "SELECT *
-				FROM FACT NATURAL JOIN Topic
-				WHERE TopicID = ?;";
-				
-	$factQuery = $conn->prepare($factSql);
-	
-	
+    require_once('debug.php');
+    $pageName = "welcome";
+
+    $conn = null;
+
+    try {
+        $conn = db_connect();
+
+        //get students' rank
+        $leaderboardRes = getStudentsRank($conn);
+
+        //get fact topics
+        $topicRes = getFactTopics($conn);
+
+        //randomly select three topics
+        $topicArr = array();
+
+        foreach($topicRes as $singleTopic) {
+            array_push($topicArr, $singleTopic->TopicID);
+        }
+
+        $randKeys = array_rand($topicArr, 3);
+
+        //randomly select one fact from each topic
+        $factRes = array();
+
+        for($i = 0; $i < 3; $i++) {
+            $factsRes = getFactsByTopicID($conn, $topicArr[$randKeys[$i]]);
+            $randFactKey = array_rand($factsRes, 1);
+            $factRes[$i] = $factsRes[$randFactKey];
+        }
+    } catch(Exception $e){
+        if($conn != null) {
+            db_close($conn);
+        }
+
+        debug_err($pageName, $e);
+        //to do: handle sql error
+        //...
+        exit;
+    }
+
+    db_close($conn);
 ?>
 
 <html>
@@ -46,9 +55,7 @@
 
         <!-- Latest compiled and minified CSS -->
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
-        <script src="js/jquery-1.12.3.js"></script>
-        <script src="js/bootstrap.js"></script>
-        <script src="js/bootstrap.min.js"></script>
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js" integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS" crossorigin="anonymous"></script>
         <script>
             $(document).ready(function () {
 
@@ -112,38 +119,62 @@
             </div>
         </header>
 
-        <nav class="navbar navbar-inverse navbar-static-top" id="nav">
-            <div class="container">
-                    <!-- .btn-navbar is used as the toggle for collapsed navbar content -->
-                    <a class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
-                        <span class="glyphicon glyphicon-bar"></span>
-                        <span class="glyphicon glyphicon-bar"></span>
-                        <span class="glyphicon glyphicon-bar"></span>
-                    </a>
-                    <div class="navbar-collapse collapse">
-                        <ul class="nav navbar-nav">
-                            <li class="active">
-                                <a class="navbar-brand" href="#">
-                                    <img alt="Brand" src="css/image/Snap_Single_Wordform_White.png" style="height: 100%;">
-                                </a>
-                            </li>
-                            <li class="divider"></li>
-                            <li><a href="#">Snap Facts</a></li>
-                        </ul>
-                        <ul class="nav pull-right navbar-nav">
-                            <!-- <li>
-                                 <form class="navbar-form">
-                                     <input type="text" class="form-control" placeholder="Search">
-                                     <button type="submit" class="btn btn-default"><i class="glyphicon glyphicon-search"></i></button>
-                                 </form>
-                             </li> -->
-                            <li>
-                                <a href="#"><i class="glyphicon glyphicon-off"></i> LOGIN</a>
-                            </li>
-                        </ul>
-                    </div>		
-                </div>
-        </nav>
+         <nav class="navbar navbar-inverse navbar-static-top" id="nav">
+             <div class="container">
+                 <!-- .btn-navbar is used as the toggle for collapsed navbar content -->
+                 <a class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                     <span class="glyphicon glyphicon-bar"></span>
+                     <span class="glyphicon glyphicon-bar"></span>
+                     <span class="glyphicon glyphicon-bar"></span>
+                 </a>
+                 <div class="navbar-collapse collapse">
+                     <ul class="nav navbar-nav">
+                         <li class="active">
+                             <a class="navbar-brand" href="#">
+                                 <img alt="Brand" src="css/image/Snap_Single_Wordform_White.png" style="height: 100%;">
+                             </a>
+                         </li>
+                         <li class="divider"></li>
+                         <li><a href="#">Snap Facts</a></li>
+                     </ul>
+                     <ul class="nav pull-right navbar-nav">
+                         <!-- <li>
+                              <form class="navbar-form">
+                                  <input type="text" class="form-control" placeholder="Search">
+                                  <button type="submit" class="btn btn-default"><i class="glyphicon glyphicon-search"></i></button>
+                              </form>
+                          </li> -->
+                         <li>
+                             <a href="#" data-toggle="modal" data-target="#myModal"><i class="glyphicon glyphicon-off"></i> LOGIN</a>
+                         </li>
+                     </ul>
+                 </div>
+             </div>
+         </nav>
+
+         <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" style="width:100%;">
+             <div class="modal-dialog" role="document" style="height:90%;">
+                 <div class="modal-content" style="height:90%;">
+                     <div class="modal-body">
+                         <button type="button" class="close" data-dismiss="modal" aria-label="Close" style="color:white;"><span aria-hidden="true">&times;</span></button>
+                         <div class="col-xs-6 col-xs-offset-3">
+                             <img src="css/image/Snap_Logo_Inverted.png" style="height:20%; width: 100%;">
+                             <div class="input-group input-group-lg" style="margin-top:20%; text-align: center;">
+                                 <input type="text" style="text-align: center; border-radius: 10px; color:yellow; border: none; background-color: black; opacity: 0.7;" class="form-control" placeholder="Username" aria-describedby="sizing-addon1">
+                             </div>
+                             <div class="input-group input-group-lg" style="margin-top:5%; text-align: center;">
+                                 <input type="password" style="text-align: center; border-radius: 10px; border: none; color:yellow; background-color: black; opacity: 0.7;" class="form-control" placeholder="Password" aria-describedby="sizing-addon1">
+                             </div>
+                             <button type="button" data-dismiss="modal" aria-label="Close" class="btn btn-primary btn-lg btn-block" style="margin-top:5%; border-radius: 10px; border-color: yellow !important; color:yellow; background-color: black; opacity: 0.7;">Log In</button>
+                             <div style="text-align: center;">
+                                 <span style="color: white;"> Don't have an account?</span>
+                                 <a href='#' onclick="location.href = '/HomePage/SignUp.html';" style='color:yellow;'>Sign Up</a>
+                             </div>
+                         </div>
+                     </div>
+                 </div>
+             </div>
+         </div>
 
         <div class="pg2" id="2">
             <div class="pg2_div" style="margin-top:5%;">
@@ -274,19 +305,12 @@
             </div> 
             <div class="facts" style="width:100%; margin-top:3%;">
                 <div class="row" style="margin-left:0px; margin-right:0px;">
-		<?php	for($i = 0; $i < 3; $i++) {
-					echo '<script>console.log('.$topicArr[$randKeys[$i]].')</script>';
-					//echo '<script>'.$topicArr[$randKeys[$i]].'</script>';
-					$factQuery->execute(array($topicArr[$randKeys[$i]]));
-					$factRes = $factQuery->fetchAll(PDO::FETCH_OBJ);
-					//array_rand($factRes);
-					$randFactKey = array_rand($factRes, 1);	?>
-					
+		<?php	for($i = 0; $i < 3; $i++) { ?>
                     <div class="col-xs-4 fact1">
                         <div class="row" style="margin-left:0px; margin-right:0px;">
                             <div class="col-xs-2">
 								<?php 
-									switch($factRes[$randFactKey]->TopicID) {
+									switch($factRes[$i]->TopicID) {
 										case 1: 
 											echo '<img src="css/image/Icon_Placeholder.png" style="">';
 											break;
@@ -317,11 +341,11 @@
 									if($i == 2) {
 										echo ' <h4 style="color:rgb(247,117,030); border: 0px solid rgb(247,117,030); border-bottom-color: rgb(247,117,030); border-bottom-width: 4px;">';
 									}									
-								        echo strtoupper($factRes[$randFactKey]->TopicName)." FACT #".$factRes[$randFactKey]->FactID;
+								        echo strtoupper($factRes[$i]->TopicName)." FACT #".$factRes[$i]->FactID;
 										echo '</h4>';
 								?>
                             
-                                <p style="color:white;"><?php echo $factRes[$randFactKey]->Content; ?></p>
+                                <p style="color:white;"><?php echo $factRes[$i]->Content; ?></p>
                             </div>
                         </div>   
                     </div>
