@@ -179,7 +179,7 @@
                               </form>
                           </li> -->
                          <li>
-                             <a href="#" data-toggle="modal" data-target="#myModal"><i class="glyphicon glyphicon-off"></i>LOGIN</a>
+                             <a href="#" data-toggle="modal" data-target="#myModal"><i class="glyphicon glyphicon-off"></i> LOGIN</a>
                          </li>
                      </ul>
                  </div>
@@ -202,7 +202,7 @@
                                  <div class="input-group input-group-lg" style="margin-top:5%; text-align: center;">
                                      <input id="password" type="password" style="text-align: center; border-radius: 10px; border: none; color:yellow; background-color: black; opacity: 0.7;" class="form-control" placeholder="Password" aria-describedby="sizing-addon1">
                                  </div>
-                             <button type="button" data-dismiss="modal" aria-label="Close" class="btn btn-primary btn-lg btn-block" style="margin-top:5%; border-radius: 10px; border-color: yellow !important; color:yellow; background-color: black; opacity: 0.7;" onclick="validStudent()">Log In</button>
+                             <button type="button" class="btn btn-primary btn-lg btn-block" style="margin-top:5%; border-radius: 10px; border-color: yellow !important; color:yellow; background-color: black; opacity: 0.7;" onclick="validStudent()">Log In</button>
                              <div style="text-align: center;">
                                  <span style="color: white;"> Don't have an account?</span>
                                  <a href='#' onclick="location.href = 'SignUp.html';" style='color:yellow;'>Sign Up</a>
