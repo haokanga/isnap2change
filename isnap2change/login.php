@@ -1,6 +1,4 @@
 <?php
-
-	session_start();
 	require_once('mysql-lib.php');
 	require_once('debug.php');
 	$pageName = "login";
@@ -23,23 +21,22 @@
 
 		//valid student
 		if(validStudent($conn, $username, $password)) {
-			echo "<script></script>>";
+			$feedback["result"] = "valid";
 		} else {
-
+			$feedback["result"] = "invalid";
 		}
-
-
 	} catch(Exception $e) {
 		if($conn != null) {
 			db_close($conn);
 		}
 
 		debug_err($pageName, $e);
-		//to do: handle sql error
-		//...
+		$feedback["message"] = $e->getMessage();
+		echo json_encode($feedback);
 		exit;
 	}
 
 	db_close($conn);
-
+	$feedback["message"] = "success";
+	echo json_encode($feedback);
 ?>
