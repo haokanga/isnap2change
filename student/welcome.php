@@ -78,6 +78,12 @@
                     $('body,html').animate({scrollTop: posi}, 100);
                 });
 
+                $('#login-close-btn').click(function () {
+                    $('#login-fail-text').text("");
+                    $('#username').val("");
+                    $('#password').val("");
+                });
+
             });
 
             function parseFeedback(response) {
@@ -91,7 +97,8 @@
                 if(feedback.result == "valid"){
                     location.href = 'avatar.php';
                 } else {
-                    $('#login-fail-text').text("Invalid username or password!");
+                    $('#login-fail-text').text("Invalid username and/or password!");
+                    $('#password').val("");
                 }
             }
 
@@ -179,7 +186,7 @@
                               </form>
                           </li> -->
                          <li>
-                             <a href="#" data-toggle="modal" data-target="#myModal"><i class="glyphicon glyphicon-off"></i>LOGIN</a>
+                             <a href="#" data-toggle="modal" data-target="#myModal"><i class="glyphicon glyphicon-off"></i> LOGIN</a>
                          </li>
                      </ul>
                  </div>
@@ -190,20 +197,20 @@
              <div class="modal-dialog" role="document" style="height:90%;">
                  <div class="modal-content" style="height:90%;">
                      <div class="modal-body">
-                         <button type="button" class="close" data-dismiss="modal" aria-label="Close" style="color:white;"><span aria-hidden="true">&times;</span></button>
+                         <button id="login-close-btn" type="button" class="close" data-dismiss="modal" aria-label="Close" style="color:white;"><span aria-hidden="true">&times;</span></button>
                          <div class="col-xs-6 col-xs-offset-3">
                              <img src="css/image/Snap_Logo_Inverted.png" style="height:20%; width: 100%;">
-                                 <div>
-                                     <span id="login-fail-text"></span>
+                                 <div style="text-align: center; margin-top: 15%">
+                                    <span id="login-fail-text" style="color:red"></span>
                                  </div>
-                                 <div class="input-group input-group-lg" style="margin-top:20%; text-align: center;">
-                                     <input id="username" type="text" style="text-align: center; border-radius: 10px; color:yellow; border: none; background-color: black; opacity: 0.7;" class="form-control" placeholder="Username" aria-describedby="sizing-addon1">
+                                 <div class="input-group input-group-lg" style="text-align: center; margin-top: 5%">
+                                     <input id="username" type="text" style="text-align: center; border-radius: 10px; color:white; border: none; background-color: black;" class="form-control" placeholder="Username" onfocus="this.placeholder=''" onblur="this.placeholder='Username'" aria-describedby="sizing-addon1" autocomplete="off">
                                  </div>
                                  <div class="input-group input-group-lg" style="margin-top:5%; text-align: center;">
-                                     <input id="password" type="password" style="text-align: center; border-radius: 10px; border: none; color:yellow; background-color: black; opacity: 0.7;" class="form-control" placeholder="Password" aria-describedby="sizing-addon1">
+                                     <input id="password" type="password" style="text-align: center; border-radius: 10px; border: none; color:white; background-color: black;" class="form-control" placeholder="Password" onfocus="this.placeholder=''" onblur="this.placeholder='Password'" aria-describedby="sizing-addon1">
                                  </div>
-                             <button type="button" data-dismiss="modal" aria-label="Close" class="btn btn-primary btn-lg btn-block" style="margin-top:5%; border-radius: 10px; border-color: yellow !important; color:yellow; background-color: black; opacity: 0.7;" onclick="validStudent()">Log In</button>
-                             <div style="text-align: center;">
+                             <button type="button" class="btn btn-primary btn-lg btn-block" style="margin-top:5%; border-radius: 10px; border-color: yellow !important; color:yellow; background-color: black; opacity: 0.7;" onclick="validStudent()">Log In</button>
+                             <div style="text-align: center; margin-top: 5%">
                                  <span style="color: white;"> Don't have an account?</span>
                                  <a href='#' onclick="location.href = 'SignUp.html';" style='color:yellow;'>Sign Up</a>
                              </div>
