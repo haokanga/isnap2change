@@ -43,7 +43,7 @@ body
     height: 100%;
     top: 0;
     left: 0;
-    background: url('image/Chain_Fence.png') no-repeat center center;
+    background: url('image/landing_page_background.png') no-repeat center center;
     background-size: cover;
     will-change: transform; 
     z-index: -1;
@@ -53,11 +53,12 @@ body
 
 .pg2
 { 
-    height: 100vh;
+    min-height: calc(100vh - 42px);
+    
     width: 100%;
     overflow: hidden; 
     position: relative;
-    background: url('image/BG_1.png') no-repeat center center;
+    background-color: black;
     background-size: cover;
     will-change: transform;  
     /* z-index: -1;  */
@@ -65,11 +66,11 @@ body
 
 .pg3
 { 
-    height: calc(100vh - 48px);
+    min-height: calc(100vh - 42px);
     width: 100%;
     overflow: hidden; 
     position: relative;
-    background: url('image/BG_2.png') no-repeat center center;
+    background-color: black;
     background-size: cover;
     will-change: transform;  
     /* z-index: -1; */
@@ -77,11 +78,11 @@ body
 
 .pg4
 { 
-    height: calc(100vh - 48px);
+    min-height: calc(100vh - 48px);
     width: 100%;
     overflow: hidden; 
     position: relative;
-    background: url('image/Crossing.png') no-repeat center center;
+    background: url('image/crossing_background.png') no-repeat center center;
     background-size: cover;
     will-change: transform;   
     /* z-index: -1; */
@@ -89,11 +90,11 @@ body
 
 .pg5
 { 
-    height: calc(100vh - 48px);
+    min-height: calc(100vh - 48px);
     width: 100%;
     overflow: hidden; 
     position: relative;
-    background: url('image/BG_1.png') no-repeat center center;
+    background-color: black;
     background-size: cover;
     will-change: transform; 
     /* z-index: -1 */
@@ -101,11 +102,12 @@ body
 
 .pg6
 { 
-    height: calc(100vh - 48px);
+    min-height: calc(100vh - 74px);
+    height: auto;
     width: 100%;
     overflow: hidden; 
     position: relative;
-    background: url('image/BG_2.png') no-repeat center center;
+    background-color: black;
     background-size: cover;
     will-change: transform; 
     /* z-index: -1;  */
@@ -143,6 +145,11 @@ color: yellow !important;
 }
 */
 
+.box
+{
+    display: none;
+}
+
 .navbar
 {
     margin-bottom: 0px !important;
@@ -160,6 +167,17 @@ color: yellow !important;
     border-color: yellow !important;
     border-radius: 0 !important;
     margin-right: 15px;
+}
+
+.carousel-indicators li
+{
+    border: 1px solid yellow !important;
+}
+
+.carousel-indicators
+.active
+{
+    background-color: yellow !important;
 }
 
 .scroll-top {
@@ -198,6 +216,12 @@ color: yellow !important;
     -webkit-transition: all .6s ease-in-out;
 }
 
+.table>tbody>tr>td
+{
+    padding: 5px !important;
+    vertical-align: middle !important;
+    border-top: 2px solid yellow !important;
+}
 .footer {
     margin-top: 3%;
     position: relative;

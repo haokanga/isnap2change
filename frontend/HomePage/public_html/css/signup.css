@@ -9,6 +9,7 @@ and open the template in the editor.
 */
 
 
+
 body
 {
     margin: 0px !important;
@@ -19,6 +20,16 @@ body
     -o-background-size: cover;
     height: 100vh;
     width: 100%;   
+}
+
+label
+{
+    padding: 2px;
+}
+
+.radio-inline
+{
+    vertical-align: -webkit-baseline-middle !important;
 }
 
 input::-webkit-input-placeholder {
