@@ -242,7 +242,7 @@
                     <button type="button" class="btn btn-primary btn-lg btn-block" style="margin-top:5%; border-radius: 10px; border-color: yellow !important; color:yellow; background-color: black; opacity: 0.7;" onclick="validStudent()">Log In</button>
                     <div style="text-align: center; margin-top: 5%">
                         <span style="color: white;"> Don't have an account?</span>
-                        <a href='#' onclick="location.href = 'SignUp.html';" style='color:yellow;'>Sign Up</a>
+                        <a href='#' onclick="location.href = 'valid-token.php';" style='color:yellow;'>Sign Up</a>
                     </div>
                 </div>
             </div>

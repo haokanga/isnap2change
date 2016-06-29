@@ -8,9 +8,7 @@ SET FOREIGN_KEY_CHECKS=0;
 # [Assert] Lines of Drop table declaration = Lines of Create table declaration
 DROP TABLE IF EXISTS `School`;
 DROP TABLE IF EXISTS `Class`;
-DROP TABLE IF EXISTS `Token`;
 DROP TABLE IF EXISTS `Student`;
-DROP TABLE IF EXISTS `Teacher`;
 DROP TABLE IF EXISTS `Researcher`;
 DROP TABLE IF EXISTS `Fact`;
 DROP TABLE IF EXISTS `Topic`;
@@ -48,21 +46,12 @@ CREATE TABLE IF NOT EXISTS `Class` (
     ClassID MEDIUMINT AUTO_INCREMENT,
     ClassName VARCHAR(190) UNIQUE,
     SchoolID MEDIUMINT NOT NULL,
+    TokenString TEXT NOT NULL,
     # UnlockedProgress
     UnlockedProgress MEDIUMINT NOT NULL DEFAULT 10,
     CONSTRAINT Class_ClassID_PK PRIMARY KEY (ClassID),
     CONSTRAINT Class_SchoolID_FK FOREIGN KEY (SchoolID)
         REFERENCES School (SchoolID)
-        ON DELETE CASCADE ON UPDATE CASCADE
-)  ENGINE=INNODB;
-
-CREATE TABLE IF NOT EXISTS `Token` (
-    ClassID MEDIUMINT NOT NULL,
-    `Type` ENUM('TEACHER', 'STUDENT'),
-    TokenString TEXT NOT NULL,
-    CONSTRAINT Token_PK PRIMARY KEY (ClassID, `Type`),
-    CONSTRAINT Token_ClassID_FK FOREIGN KEY (ClassID)
-        REFERENCES Class (ClassID)
         ON DELETE CASCADE ON UPDATE CASCADE
 )  ENGINE=INNODB;
 
@@ -76,22 +65,12 @@ CREATE TABLE IF NOT EXISTS `Student` (
     Email TEXT,
     Gender TEXT,
     DOB DATE,
+    Identity TEXT,
     Score MEDIUMINT DEFAULT 0,
     SubmissionTime TIMESTAMP DEFAULT CURRENT_TIMESTAMP,  
     ClassID MEDIUMINT NOT NULL,
     CONSTRAINT Student_StudentID_PK PRIMARY KEY (StudentID),
     CONSTRAINT Student_ClassID_FK FOREIGN KEY (ClassID)
-        REFERENCES Class (ClassID)
-        ON DELETE CASCADE ON UPDATE CASCADE
-)  ENGINE=INNODB;
-
-CREATE TABLE IF NOT EXISTS `Teacher` (
-    TeacherID MEDIUMINT AUTO_INCREMENT,
-    Username TEXT NOT NULL,
-    `Password` TEXT NOT NULL,
-    ClassID MEDIUMINT NOT NULL,
-    CONSTRAINT Teacher_TeacherID_PK PRIMARY KEY (TeacherID),
-    CONSTRAINT Teacher_ClassID_FK FOREIGN KEY (ClassID)
         REFERENCES Class (ClassID)
         ON DELETE CASCADE ON UPDATE CASCADE
 )  ENGINE=INNODB;
@@ -383,44 +362,35 @@ SET FOREIGN_KEY_CHECKS=1;
 INSERT IGNORE INTO School(SchoolName) VALUES('Sample School');
 INSERT IGNORE INTO School(SchoolName) VALUES('Sample Adelaide High School');
 INSERT IGNORE INTO School(SchoolName) VALUES('Sample Woodville High School');
-INSERT IGNORE INTO Class(ClassName,SchoolID) VALUES('Sample Class 1A',1);
-INSERT IGNORE INTO Class(ClassName,SchoolID) VALUES('Sample Class 1B',1);
-INSERT IGNORE INTO Class(ClassName,SchoolID) VALUES('Sample Class 1C',1);
-INSERT IGNORE INTO Class(ClassName,SchoolID) VALUES('Sample Class 2C',2);
-INSERT IGNORE INTO Token(`Type`,TokenString,ClassID) VALUES('STUDENT','TOKENSTRING01',1);
-INSERT IGNORE INTO Token(`Type`,TokenString,ClassID) VALUES('TEACHER','TOKENSTRING02',1);
-INSERT IGNORE INTO Token(`Type`,TokenString,ClassID) VALUES('STUDENT','TOKENSTRING03',2);
-INSERT IGNORE INTO Token(`Type`,TokenString,ClassID) VALUES('TEACHER','TOKENSTRING04',2);
-INSERT IGNORE INTO Token(`Type`,TokenString,ClassID) VALUES('STUDENT','TOKENSTRING03',3);
-INSERT IGNORE INTO Token(`Type`,TokenString,ClassID) VALUES('TEACHER','TOKENSTRING04',3);
-INSERT IGNORE INTO Token(`Type`,TokenString,ClassID) VALUES('STUDENT','TOKENSTRING03',4);
-INSERT IGNORE INTO Token(`Type`,TokenString,ClassID) VALUES('TEACHER','TOKENSTRING04',4);
+INSERT IGNORE INTO Class(ClassName,SchoolID,TokenString) VALUES('Sample Class 1A',1,'TOKENSTRING01');
+INSERT IGNORE INTO Class(ClassName,SchoolID,TokenString) VALUES('Sample Class 1B',1,'TOKENSTRING02');
+INSERT IGNORE INTO Class(ClassName,SchoolID,TokenString) VALUES('Sample Class 1C',1,'TOKENSTRING03');
+INSERT IGNORE INTO Class(ClassName,SchoolID,TokenString) VALUES('Sample Class 2C',2,'TOKENSTRING04');
 
-INSERT IGNORE INTO Student(Username,`Password`,Email,FirstName,LastName,Gender,DOB,ClassID) VALUES('Fernando','d59324e4d5acb950c4022cd5df834cc3','fernado@gmail.com','Fernando','Trump','Male',"2003-10-20",1);
-INSERT IGNORE INTO Student(Username,`Password`,Email,FirstName,LastName,Gender,DOB,ClassID,Score) VALUES('Todd','d59324e4d5acb950c4022cd5df834cc3','toddyy@gmail.com','Todd','Webb','Male',"2003-11-20",1,55);
-INSERT IGNORE INTO Student(Username,`Password`,Email,FirstName,LastName,Gender,DOB,ClassID,Score) VALUES('Theresa','d59324e4d5acb950c4022cd5df834cc3','theresa03@gmail.com','Theresa','Rios','Female',"2003-12-20",1,90);
-INSERT IGNORE INTO Student(Username,`Password`,Email,FirstName,LastName,Gender,DOB,ClassID,Score) VALUES('Hai','d59324e4d5acb950c4022cd5df834cc3','isnap2demo@gmail.com','Hai','Lam','Male',"2003-10-22",1,30);
-INSERT IGNORE INTO Student(Username,`Password`,Email,FirstName,LastName,Gender,DOB,ClassID,Score) VALUES('Lee','d59324e4d5acb950c4022cd5df834cc3','isnap2demo@gmail.com','Lee','Malone','Male',"2003-10-24",1,45);
-INSERT IGNORE INTO Student(Username,`Password`,Email,FirstName,LastName,Gender,DOB,ClassID,Score) VALUES('Tim','d59324e4d5acb950c4022cd5df834cc3','isnap2demo@gmail.com','Tim','Mason','Male',"2003-10-25",1,60);
-INSERT IGNORE INTO Student(Username,`Password`,Email,FirstName,LastName,Gender,DOB,ClassID) VALUES('Clinton','d59324e4d5acb950c4022cd5df834cc3','isnap2demo@gmail.com','Clinton','Snyder','Male',"2003-10-28",1);
-INSERT IGNORE INTO Student(Username,`Password`,Email,FirstName,LastName,Gender,DOB,ClassID) VALUES('Elbert','d59324e4d5acb950c4022cd5df834cc3','isnap2demo@gmail.com','Elbert','Chapman','Male',"2003-10-22",1);
-INSERT IGNORE INTO Student(Username,`Password`,Email,FirstName,LastName,Gender,DOB,ClassID) VALUES('Ervin','d59324e4d5acb950c4022cd5df834cc3','isnap2demo@gmail.com','Ervin','Murray','Male',"2003-11-20",1);
-INSERT IGNORE INTO Student(Username,`Password`,Email,FirstName,LastName,Gender,DOB,ClassID) VALUES('Sheila','d59324e4d5acb950c4022cd5df834cc3','isnap2demo@gmail.com','Sheila','Frank','Female',"2003-10-20",1);
-INSERT IGNORE INTO Student(Username,`Password`,Email,FirstName,LastName,Gender,DOB,ClassID) VALUES('Grace','d59324e4d5acb950c4022cd5df834cc3','isnap2demo@gmail.com','Grace','Austin','Female',"2003-10-29",1);
-INSERT IGNORE INTO Student(Username,`Password`,Email,FirstName,LastName,Gender,DOB,ClassID) VALUES('Ruby','d59324e4d5acb950c4022cd5df834cc3','isnap2demo@gmail.com','Ruby','Chavez','Female',"2003-10-20",1);
-INSERT IGNORE INTO Student(Username,`Password`,Email,FirstName,LastName,Gender,DOB,ClassID) VALUES('Sonya','d59324e4d5acb950c4022cd5df834cc3','isnap2demo@gmail.com','Sonya','Kelly','Female',"2003-10-20",1);
-INSERT IGNORE INTO Student(Username,`Password`,Email,FirstName,LastName,Gender,DOB,ClassID) VALUES('Donna','d59324e4d5acb950c4022cd5df834cc3','isnap2demo@gmail.com','Donna','Pratt','Female',"2003-10-20",1);
-INSERT IGNORE INTO Student(Username,`Password`,Email,FirstName,LastName,Gender,DOB,ClassID) VALUES('Stacy','d59324e4d5acb950c4022cd5df834cc3','isnap2demo@gmail.com','Stacy','Figueroa','Female',"2003-10-20",1);
-INSERT IGNORE INTO Student(Username,`Password`,Email,FirstName,LastName,Gender,DOB,ClassID) VALUES('Fannie','d59324e4d5acb950c4022cd5df834cc3','isnap2demo@gmail.com','Fannie','Waters','Female',"2003-10-28",1);
-INSERT IGNORE INTO Student(Username,`Password`,Email,FirstName,LastName,Gender,DOB,ClassID) VALUES('June','d59324e4d5acb950c4022cd5df834cc3','isnap2demo@gmail.com','June','West','Female',"2003-10-20",1);
-INSERT IGNORE INTO Student(Username,`Password`,Email,FirstName,LastName,Gender,DOB,ClassID) VALUES('Melinda','d59324e4d5acb950c4022cd5df834cc3','isnap2demo@gmail.com','Melinda','Kelley','Female',"2003-10-20",1);
-INSERT IGNORE INTO Student(Username,`Password`,Email,FirstName,LastName,Gender,DOB,ClassID) VALUES('Leo','d59324e4d5acb950c4022cd5df834cc3','isnap2demo@gmail.com','Leo','Potter','Male',"2002-04-22",1);
-INSERT IGNORE INTO Student(Username,`Password`,Email,FirstName,LastName,Gender,DOB,ClassID) VALUES('Hector','d59324e4d5acb950c4022cd5df834cc3','isnap2demo@gmail.com','Hector','Byrd','Male',"2002-04-20",1);
-INSERT IGNORE INTO Student(Username,`Password`,Email,FirstName,LastName,Gender,DOB,ClassID) VALUES('Otis','d59324e4d5acb950c4022cd5df834cc3','isnap2demo@gmail.com','Otis','Lawrence','Male',"2002-04-20",2);
-INSERT IGNORE INTO Student(Username,`Password`,Email,FirstName,LastName,Gender,DOB,ClassID) VALUES('Cassandra','d59324e4d5acb950c4022cd5df834cc3','isnap2demo@gmail.com','Cassandra','James','Female',"2002-04-20",2);
-INSERT IGNORE INTO Student(Username,`Password`,Email,FirstName,LastName,Gender,DOB,ClassID) VALUES('Marilyn','d59324e4d5acb950c4022cd5df834cc3','isnap2demo@gmail.com','Marilyn','Ryan','Female',"2002-04-20",1);
-INSERT IGNORE INTO Teacher(Username,`Password`,ClassID) VALUES('Lynette','d59324e4d5acb950c4022cd5df834cc3',1);
-INSERT IGNORE INTO Teacher(Username,`Password`,ClassID) VALUES('Rachael','d59324e4d5acb950c4022cd5df834cc3',2);
+INSERT IGNORE INTO Student(Username,`Password`,Email,FirstName,LastName,Gender,DOB,Identity,ClassID) VALUES('Fernando','d59324e4d5acb950c4022cd5df834cc3','fernado@gmail.com','Fernando','Trump','Male',"2003-10-20","Resident",1);
+INSERT IGNORE INTO Student(Username,`Password`,Email,FirstName,LastName,Gender,DOB,Identity,ClassID,Score) VALUES('Todd','d59324e4d5acb950c4022cd5df834cc3','toddyy@gmail.com','Todd','Webb','Male',"2003-11-20","Aboriginal",1,55);
+INSERT IGNORE INTO Student(Username,`Password`,Email,FirstName,LastName,Gender,DOB,Identity,ClassID,Score) VALUES('Theresa','d59324e4d5acb950c4022cd5df834cc3','theresa03@gmail.com','Theresa','Rios','Female',"2003-12-20","Aboriginal",1,90);
+INSERT IGNORE INTO Student(Username,`Password`,Email,FirstName,LastName,Gender,DOB,Identity,ClassID,Score) VALUES('Hai','d59324e4d5acb950c4022cd5df834cc3','isnap2demo@gmail.com','Hai','Lam','Male',"2003-10-22","Aboriginal",1,30);
+INSERT IGNORE INTO Student(Username,`Password`,Email,FirstName,LastName,Gender,DOB,Identity,ClassID,Score) VALUES('Lee','d59324e4d5acb950c4022cd5df834cc3','isnap2demo@gmail.com','Lee','Malone','Male',"2003-10-24","Aboriginal",1,45);
+INSERT IGNORE INTO Student(Username,`Password`,Email,FirstName,LastName,Gender,DOB,Identity,ClassID,Score) VALUES('Tim','d59324e4d5acb950c4022cd5df834cc3','isnap2demo@gmail.com','Tim','Mason','Male',"2003-10-25","Resident",1,60);
+INSERT IGNORE INTO Student(Username,`Password`,Email,FirstName,LastName,Gender,DOB,Identity,ClassID) VALUES('Clinton','d59324e4d5acb950c4022cd5df834cc3','isnap2demo@gmail.com','Clinton','Snyder','Male',"2003-10-28","Resident",1);
+INSERT IGNORE INTO Student(Username,`Password`,Email,FirstName,LastName,Gender,DOB,Identity,ClassID) VALUES('Elbert','d59324e4d5acb950c4022cd5df834cc3','isnap2demo@gmail.com','Elbert','Chapman','Male',"2003-10-22","Resident",1);
+INSERT IGNORE INTO Student(Username,`Password`,Email,FirstName,LastName,Gender,DOB,Identity,ClassID) VALUES('Ervin','d59324e4d5acb950c4022cd5df834cc3','isnap2demo@gmail.com','Ervin','Murray','Male',"2003-11-20","Resident",1);
+INSERT IGNORE INTO Student(Username,`Password`,Email,FirstName,LastName,Gender,DOB,Identity,ClassID) VALUES('Sheila','d59324e4d5acb950c4022cd5df834cc3','isnap2demo@gmail.com','Sheila','Frank','Female',"2003-10-20","Aboriginal",1);
+INSERT IGNORE INTO Student(Username,`Password`,Email,FirstName,LastName,Gender,DOB,Identity,ClassID) VALUES('Grace','d59324e4d5acb950c4022cd5df834cc3','isnap2demo@gmail.com','Grace','Austin','Female',"2003-10-29","Resident",1);
+INSERT IGNORE INTO Student(Username,`Password`,Email,FirstName,LastName,Gender,DOB,Identity,ClassID) VALUES('Ruby','d59324e4d5acb950c4022cd5df834cc3','isnap2demo@gmail.com','Ruby','Chavez','Female',"2003-10-20","Resident",1);
+INSERT IGNORE INTO Student(Username,`Password`,Email,FirstName,LastName,Gender,DOB,Identity,ClassID) VALUES('Sonya','d59324e4d5acb950c4022cd5df834cc3','isnap2demo@gmail.com','Sonya','Kelly','Female',"2003-10-20","Resident",1);
+INSERT IGNORE INTO Student(Username,`Password`,Email,FirstName,LastName,Gender,DOB,Identity,ClassID) VALUES('Donna','d59324e4d5acb950c4022cd5df834cc3','isnap2demo@gmail.com','Donna','Pratt','Female',"2003-10-20","Resident",1);
+INSERT IGNORE INTO Student(Username,`Password`,Email,FirstName,LastName,Gender,DOB,Identity,ClassID) VALUES('Stacy','d59324e4d5acb950c4022cd5df834cc3','isnap2demo@gmail.com','Stacy','Figueroa','Female',"2003-10-20","Resident",1);
+INSERT IGNORE INTO Student(Username,`Password`,Email,FirstName,LastName,Gender,DOB,Identity,ClassID) VALUES('Fannie','d59324e4d5acb950c4022cd5df834cc3','isnap2demo@gmail.com','Fannie','Waters','Female',"2003-10-28","Aboriginal",1);
+INSERT IGNORE INTO Student(Username,`Password`,Email,FirstName,LastName,Gender,DOB,Identity,ClassID) VALUES('June','d59324e4d5acb950c4022cd5df834cc3','isnap2demo@gmail.com','June','West','Female',"2003-10-20","Aboriginal",1);
+INSERT IGNORE INTO Student(Username,`Password`,Email,FirstName,LastName,Gender,DOB,Identity,ClassID) VALUES('Melinda','d59324e4d5acb950c4022cd5df834cc3','isnap2demo@gmail.com','Melinda','Kelley','Female',"2003-10-20","Resident",1);
+INSERT IGNORE INTO Student(Username,`Password`,Email,FirstName,LastName,Gender,DOB,Identity,ClassID) VALUES('Leo','d59324e4d5acb950c4022cd5df834cc3','isnap2demo@gmail.com','Leo','Potter','Male',"2002-04-22","Resident",1);
+INSERT IGNORE INTO Student(Username,`Password`,Email,FirstName,LastName,Gender,DOB,Identity,ClassID) VALUES('Hector','d59324e4d5acb950c4022cd5df834cc3','isnap2demo@gmail.com','Hector','Byrd','Male',"2002-04-20","Resident",1);
+INSERT IGNORE INTO Student(Username,`Password`,Email,FirstName,LastName,Gender,DOB,Identity,ClassID) VALUES('Otis','d59324e4d5acb950c4022cd5df834cc3','isnap2demo@gmail.com','Otis','Lawrence','Male',"2002-04-20","Aboriginal",2);
+INSERT IGNORE INTO Student(Username,`Password`,Email,FirstName,LastName,Gender,DOB,Identity,ClassID) VALUES('Cassandra','d59324e4d5acb950c4022cd5df834cc3','isnap2demo@gmail.com','Cassandra','James','Female',"2002-04-20","Aboriginal",2);
+INSERT IGNORE INTO Student(Username,`Password`,Email,FirstName,LastName,Gender,DOB,Identity,ClassID) VALUES('Marilyn','d59324e4d5acb950c4022cd5df834cc3','isnap2demo@gmail.com','Marilyn','Ryan','Female',"2002-04-20","Aboriginal",1);
+
 INSERT IGNORE INTO Researcher(Username,`Password`) VALUES('Ann','d59324e4d5acb950c4022cd5df834cc3');
 INSERT IGNORE INTO Researcher(Username,`Password`) VALUES('Patricia','d59324e4d5acb950c4022cd5df834cc3');
 

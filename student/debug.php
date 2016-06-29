@@ -23,12 +23,12 @@
                 //debug_alert("Unexpected MySQL Error occurred in ".$pageName.". Contact with developers.");        
                 //sql insert.. 
                 //Logger.write($pagename, $getMessage);
-                debug_alert($e->getMessage());
-                echo $e->getMessage();
-                echo "The exception was created on line: " . $e->getLine();
+            //    debug_alert($e->getMessage());
+            //    echo $e->getMessage();
+            //    echo "The exception was created on line: " . $e->getLine();
             }
         } else {
-            echo $e->getMessage();
+            //echo $e->getMessage();
         }        
     }
 ?>
