@@ -12,6 +12,12 @@ and open the template in the editor.
 body
 {
     margin: 0px !important;
+	font-family: 'Maitree', serif !important;
+}
+
+html
+{
+	font-family: 'Maitree', serif;
 }
 
 .start
@@ -80,14 +86,29 @@ body
 { 
     min-height: calc(100vh - 48px);
     width: 100%;
-    overflow: hidden; 
+    overflow: auto; 
     position: relative;
-    background: url('image/crossing_background.png') no-repeat center center;
+    background: url('image/crossing_background.png') no-repeat center center; 
     background-size: cover;
     will-change: transform;   
     /* z-index: -1; */
 }
 
+.fb_iframe_widget iframe
+{
+	height: 78vh !important;
+}
+
+
+.fb_iframe_widget span
+{
+	height: auto !important;
+}
+
+iframe
+{
+	height: 78vh !important;
+}
 .pg5
 { 
     min-height: calc(100vh - 48px);
@@ -113,7 +134,7 @@ body
     /* z-index: -1;  */
 }
 
-.modal-content, .modal
+.modal-content
 {
     background: url('image/miss_pacman.png') no-repeat center center;
     background-size: cover;
