@@ -1,0 +1,258 @@
+/**
+ * $normalize 页面整体样式调整
+ **/
+
+/**
+ * 设置整个项目默认字号, 行高, 颜色, 绝大部分元素不用再设置
+ **/
+html {
+    box-sizing: border-box;
+}
+*,
+*::before,
+*::after {
+    box-sizing: inherit;
+    margin: 0;
+    padding: 0;
+}
+body {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    font-family: Helvetica, arial, nimbussansl, liberationsans, freesans, clean, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+    font-size: 14px;
+    line-height: 1.8;
+    color: #fff;
+    overflow-x: hidden;
+}
+ul,
+ol {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+a {
+    color: #fff;
+    text-decoration: none;
+}
+/**
+ * $tool 工具类
+ **/
+.clearfix {
+    &:before,
+    &:after {
+        content: "";
+        display: table;
+    }
+    &:after {
+        clear: both;
+
+    };
+}
+
+/**
+ * $ 栅格
+ **/
+.mini-row {
+  margin: 0 -15px;
+}
+.mini-row:before,
+.mini-row:after {
+    content: "";
+    display: table;
+}
+.mini-row:after {
+    clear: both;
+}
+
+.col-4 {
+  width: 33.33333%;
+  float: left;
+  padding: 0 15px;
+  position: relative;
+}
+.col-6 {
+  width: 50%;
+  float: left;
+  padding: 0 15px;
+  position: relative;
+}
+.col-8 {
+  width: 66.66667%;
+  float: left;
+  padding: 0 15px;
+  position: relative;
+}
+
+.page-content {
+    background-color: #0d0d0d;
+}
+/**
+ * header
+ **/
+.header {
+    background-color: #000;
+}
+.home-link {
+    height: 20px;
+    line-height: 20px;
+    display: block;
+    text-align: center;
+}
+.nav-list {
+    width: 1000px;
+    margin: 0 auto;
+    display: -webkit-box;
+    display: -webkit-flex;
+    display: -moz-flex;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-box-pack: justify;
+    -ms-flex-pack: justify;
+    -webkit-justify-content: space-between;
+    -moz-justify-content: space-between;
+    justify-content: space-between;
+}
+.nav-item {
+    display: inline-block;
+}
+.nav-link {
+    height: 38px;
+    line-height: 38px;
+    display: inline-block;
+
+}
+
+/**
+ * footer
+ **/
+.footer {
+    border-top: 2px solid #4c4c4c;
+    background-color: #000;
+}
+.footer-content {
+    width: 1000px;
+    margin: 0 auto;
+    overflow: hidden;
+}
+.footer-logo {
+    float: left;
+    width: 30px;
+    height: 30px;
+    background-size: 100% 100%;
+    background-image: url("../img/footer-logo.png");
+    margin: 2px 0;
+}
+.footer-nav {
+    display: -webkit-box;
+    display: -webkit-flex;
+    display: -moz-flex;
+    display: -ms-flexbox;
+    display: flex;
+    -ms-flex-pack: distribute;
+    -webkit-justify-content: space-around;
+    -moz-justify-content: space-around;
+    justify-content: space-around;
+}
+.footer-nav-item {
+    display: inline-block;
+}
+.footer-nav-item a {
+    display: inline-block;
+    line-height: 1;
+    margin-top: 10px;
+}
+
+/**
+ * main.html
+ **/
+.main-content {
+    padding: 30px 0;
+    width: 1000px;
+    margin: 0 auto;
+}
+.operation-item {
+    display: block;
+    width: 100%;
+    text-align: center;
+    margin-bottom: 30px;
+}
+.operation-game {
+    color: #00f8cd;
+}
+.operation-achievements {
+    color: #faf600;
+}
+.operation-progress {
+    color: #ff6500;
+}
+.operation-reading-material {
+    color: #a90505;
+}
+.operation-logo {
+    width: 114px;
+    height: 114px;
+}
+.achievement-score {
+    font-size: 18px;
+    margin: 30px 0 50px 0;
+    text-align: center;
+}
+.achievement-showcase h3 {
+    font-size: 14px;
+    text-align: center;
+}
+.achievement-list {
+    height: 163px;
+    border-radius: 10px;
+    background-color: #000;
+    padding: 20px 20px;
+    overflow: hidden;
+    margin-left: 125px;
+}
+.achievement-item {
+    float: left;
+    margin: 0 25px;
+}
+.achievement-link {
+    display: block;
+}
+.achievement-logo {
+    width: 112px;
+    height: 112px;
+}
+
+/**
+ * $周轮播
+ **/
+.week-content {
+    width: 1000px;
+    margin: 0 auto;
+    padding-bottom: 30px;
+}
+.week-content .slick-slider {
+    margin-bottom: 0;
+}
+.week-item {
+    width: 154px;
+    height: 154px;
+    display: inline-block;
+}
+.week-link {
+    width: 110px;
+    height: 110px;
+    margin: 0 auto;
+    display: block;
+    background-size: 100% 100%;
+}
+.week-1 .week-link {
+    background-image: url("../img/one_icon.png");
+}
+.week-2 .week-link {
+    background-image: url("../img/two_icon.png");
+}
+.week-3 .week-link {
+    background-image: url("../img/three_icon.png");
+}
+.week-4 .week-link {
+    background-image: url("../img/four_icon.png");
+}
