@@ -1,4 +1,3 @@
-
 <html class="no-js" lang="en-au" >
 <head id="Head">
 <title>Standard Drink Tool</title>
@@ -10,38 +9,16 @@
     gtmDataLayer = [];
 </script>
 
-
-    <form method="post" action="/Alcohol-Your-Health/What-is-a-Standard-Drink/Standard-Drink-Tool" id="Form" enctype="multipart/form-data">
-  
-<div class="container"><!-- whole site -->
-		
-
-
-<div class="row"><!-- body content -->
-    <div id="content" class="row-content clearfix">
-		<div class="col-left"><!-- left column -->
-			<div class="col-inner">
-           	 	<h1>Standard Drink Tool</h1>
-            	<div id="dnn_contentPane" class="contentPane"><div class="DnnModule DnnModule-DNN_HTML DnnModule-624"><a name="624"></a>
-					<div class="DNNContainer_noTitle">
-								<div class="standard-drinks-tool-intro"> 
-									<div class="sdt-wrap clearfix">
-										<div class="std-drink-tool-banner"> 
-											<h3 class="std-drink-tool-heading">Do you know what a standard drink looks like?</h3> 
-												<a class="btn begin-sd-tool">Pour a standard drink</a>
-										</div>
-									</div>	
-									</div><!-- End_Module_624 -->
-								</div>
-							<div class="clear"></div>
+<div class="standard-drinks-tool-intro"> 
+	<div class="sdt-wrap clearfix">
+		<div class="std-drink-tool-banner"> 
+			<h3 class="std-drink-tool-heading">Do you know what a standard drink looks like?</h3> 
+			<a class="btn begin-sd-tool">Pour a standard drink</a>
+		</div>
+	</div>	
 </div>
-</div><div class="DnnModule DnnModule-ATAStandardDrinkTool DnnModule-626"><a name="626"></a>
-<div class="DNNContainer_noTitle">
-	<div id="dnn_ctr626_ContentPane"><!-- Start_Module_626 --><div id="dnn_ctr626_ModuleContent" class="DNNModuleContent ModATAStandardDrinkToolC">
-	<!--CDF(Css|/DesktopModules/ATAStandardDrinkTool/css/standard-drinks-tool.css?cdv=48)-->
 
-<!-- DRINK TOOL WRAPPER -->
-	<div id="standard-drink-tool-wrapper">
+<div id="standard-drink-tool-wrapper">
 		<!-- STEP 1 -->
 		<div class="drink-containers-wrapper">
 			<div class="flexslider carousel">
@@ -149,29 +126,5 @@
 	</div>
 
 <script src="./DesktopModules/ATAStandardDrinkTool/js/vendor/jquery.ui.touch-punch.min.js"></script>
-
 <script src="./DesktopModules/ATAStandardDrinkTool/js/standard-drinks-tool.js"></script>
-
 <script src="./DesktopModules/ATAStandardDrinkTool/js/vendor/jquery.flexslider.js"></script>
-
-</div><!-- End_Module_626 --></div>
-	<div class="clear"></div>
-</div>
-</div></div>
-            </div>
-		</div><!-- END left column -->
-
-	</div>
-</div>
-<!-- END header content -->
-
-
-	</div>
-	<!-- END Off Canvas Menu container -->
-</div>
-<!-- END whole site -->
-	</form>
-
-
-</body>
-</html>

@@ -194,6 +194,29 @@ function updateToken(PDO $conn, $classID, $tokenString, $type)
     $updateSql->execute(array($classID, $type, htmlspecialchars($tokenString), htmlspecialchars($tokenString)));
 }
 
+function getToken(PDO $conn, $token)
+{
+    $tokenSql = "SELECT COUNT(*)
+				 FROM `Class` NATURAL JOIN  School
+				 WHERE TokenString = BINARY ?";
+
+    $tokenQuery = $conn->prepare($tokenSql);
+    $tokenQuery->execute(array($token));
+
+    if($tokenQuery->fetchColumn() != 1){
+        throw new Exception("Fail to get token");
+    }
+
+    $tokenSql = "SELECT SchoolName, ClassID, ClassName
+				 FROM `Class` NATURAL JOIN  School
+				 WHERE TokenString = BINARY ?";
+
+    $tokenQuery = $conn->prepare($tokenSql);
+    $tokenQuery->execute(array($token));
+    $tokenRes = $tokenQuery->fetch(PDO::FETCH_OBJ);
+    return $tokenRes;
+}
+
 function getTokens(PDO $conn)
 {
     $tokenSql = "SELECT ClassID, `Type`, TokenString
@@ -204,9 +227,38 @@ function getTokens(PDO $conn)
     return $tokenResult;
 }
 
+function validToken(PDO $conn, $token)
+{
+    $tokenSql = "SELECT COUNT(*)
+				 FROM `Class`
+				 WHERE TokenString = BINARY ?";
+
+    $tokenQuery = $conn->prepare($tokenSql);
+    $tokenQuery->execute(array($token));
+    $tokenRes = $tokenQuery->fetchColumn();
+
+    if($tokenRes == 0){
+        return false;
+    } else if($tokenRes == 1){
+        return true;
+    } else throw new Exception("Duplicate tokens");
+}
+
 /* Token */
 
 /* Student */
+function createStudent(PDO $conn, $username, $password, $firstname, $lastname, $email, $gender, $dob, $identity, $classID)
+{
+    $insertStudentSql = "INSERT INTO Student(Username, `Password`, FirstName, LastName, Email, Gender, DOB, Identity, Score, ClassID)
+						 VALUES (?,?,?,?,?,?,?,?,?,?)";
+
+    $insertStudentSql = $conn->prepare($insertStudentSql);
+
+    if(!$insertStudentSql->execute(array($username, md5($password), $firstname, $lastname, $email, $gender, $dob, $identity, 0, $classID))){
+        throw new Exception("Fail to insert a student");
+    }
+}
+
 function deleteStudent(PDO $conn, $studentID)
 {
     $updateSql = "DELETE FROM Student WHERE StudentID = ?";
@@ -252,10 +304,32 @@ function validStudent(PDO $conn, $username, $password)
     $validStudentSql = "SELECT COUNT(*) FROM Student WHERE `Username` = BINARY ? AND `Password` = BINARY ?";
     $validStudentQuery = $conn->prepare($validStudentSql);
     $validStudentQuery->execute(array($username, md5($password)));
-    if($validStudentQuery->fetchColumn() != 1) {
+    $validStudentRes = $validStudentQuery->fetchColumn();
+
+    if($validStudentRes == 0){
         return false;
-    } else return true;
+    } else if($validStudentRes == 1){
+        return true;
+    } else throw new Exception("Duplicate students");
 }
+
+function validUsername(PDO $conn, $username)
+{
+    $userSql = "SELECT COUNT(*)
+				FROM Student
+				WHERE Username = BINARY ?";
+
+    $userQuery = $conn->prepare($userSql);
+    $userQuery->execute(array($username));
+    $userRes = $userQuery->fetchColumn();
+
+    if($userRes == 0){
+        return true;
+    } else if($userRes == 1){
+        return false;
+    } else throw new Exception("Two or more than two users have the same username");
+}
+
 /* Student */
 
 /* Week */
