@@ -123,18 +123,7 @@ db_close($conn);
                     <div class="panel-body">
                         <div class="dataTable_wrapper">
                             <table class="table table-striped table-bordered table-hover" id="datatables">
-                                <thead>
-                                <tr>
-                                    <?php for ($i = 0; $i < count($columnName); $i++) {
-                                        if ($i == 0) {
-                                            ?>
-                                            <th style="display:none"><?php echo $columnName[$i]; ?></th>
-                                        <?php } else { ?>
-                                            <th><?php echo $columnName[$i]; ?></th>
-                                        <?php }
-                                    } ?>
-                                </tr>
-                                </thead>
+                                <?php require_once('table-head.php'); ?>
                                 <tbody>
                                 <?php for ($i = 0; $i < count($quizResult); $i++) {
                                     $quizID = $quizResult[$i]->QuizID;

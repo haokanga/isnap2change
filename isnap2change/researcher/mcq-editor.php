@@ -4,8 +4,7 @@ require_once("../mysql-lib.php");
 require_once("../debug.php");
 require_once("researcher-validation.php");
 $pageName = "mcq-editor";
-$columnName = array('QuizID', 'Week', 'TopicName', 'Points', 'Questionnaires', 'Questions');
-$mcqQuesColName = array('MCQID', 'Question', 'Option', 'Explanation', 'Edit');
+$columnName = array('MCQID', 'Question', 'Option', 'Explanation', 'Edit');
 
 try {
     $conn = db_connect();
@@ -159,18 +158,7 @@ db_close($conn);
                     <div class="panel-body">
                         <div class="dataTable_wrapper">
                             <table class="table table-striped table-bordered table-hover" id="datatables">
-                                <thead>
-                                <tr>
-                                    <?php for ($i = 0; $i < count($mcqQuesColName); $i++) {
-                                        if ($i == 0) {
-                                            ?>
-                                            <th style="display:none"><?php echo $mcqQuesColName[$i]; ?></th>
-                                        <?php } else { ?>
-                                            <th><?php echo $mcqQuesColName[$i]; ?></th>
-                                        <?php }
-                                    } ?>
-                                </tr>
-                                </thead>
+                                <?php require_once('table-head.php'); ?>
                                 <tbody>
                                 <?php for ($i = 0; $i < count($mcqQuesResult); $i++) { ?>
                                     <tr class="<?php if ($i % 2 == 0) {
@@ -178,8 +166,8 @@ db_close($conn);
                                     } else {
                                         echo "even";
                                     } ?>">
-                                        <td style="display:none"><?php echo $mcqQuesResult[$i]->$mcqQuesColName[0]; ?></td>
-                                        <td><?php echo $mcqQuesResult[$i]->$mcqQuesColName[1] ?></td>
+                                        <td style="display:none"><?php echo $mcqQuesResult[$i]->$columnName[0]; ?></td>
+                                        <td><?php echo $mcqQuesResult[$i]->$columnName[1] ?></td>
                                         <td class="<?php if ($mcqQuesResult[$i]->Content == $mcqQuesResult[$i]->CorrectChoice && strlen($mcqQuesResult[$i]->Content) > 0) {
                                             echo 'bg-success';
                                         } else {
@@ -187,12 +175,12 @@ db_close($conn);
                                         } ?>">
                                             <?php echo $mcqQuesResult[$i]->Content; ?>
                                         </td>
-                                        <td><?php echo $mcqQuesResult[$i]->$mcqQuesColName[3] ?></td>
+                                        <td><?php echo $mcqQuesResult[$i]->$columnName[3] ?></td>
                                         <td>
                                             <span class="glyphicon glyphicon-remove pull-right "
                                                   aria-hidden="true"></span>
                                             <span class="pull-right" aria-hidden="true">&nbsp;</span>
-                                            <a href="mcq-option-editor.php?quizID=<?php echo $quizID ?>&mcqID=<?php echo $mcqQuesResult[$i]->$mcqQuesColName[0]; ?>">
+                                            <a href="mcq-option-editor.php?quizID=<?php echo $quizID ?>&mcqID=<?php echo $mcqQuesResult[$i]->$columnName[0]; ?>">
                                                 <span class="glyphicon glyphicon-edit pull-right" data-toggle="modal"
                                                       data-target="#dialog" aria-hidden="true"></span></a>
                                         </td>

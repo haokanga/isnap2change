@@ -82,15 +82,7 @@ db_close($conn);
                     <div class="panel-body">
                         <div class="dataTable_wrapper">
                             <table class="table table-striped table-bordered table-hover" id="datatables">
-                                <thead>
-                                <tr>
-                                    <?php for ($i = 0; $i < count($columnName); $i++) { ?>
-                                        <th <?php if ($i == 0) {
-                                            echo 'style="display:none"';
-                                        } ?>><?php echo $columnName[$i]; ?></th>
-                                    <?php } ?>
-                                </tr>
-                                </thead>
+                                <?php require_once('table-head.php'); ?>
                                 <tbody>
                                 <?php for ($i = 0; $i < count($quizResult); $i++) { ?>
                                     <tr class="<?php if ($i % 2 == 0) {

@@ -4,6 +4,7 @@ require_once("../mysql-lib.php");
 require_once("../debug.php");
 require_once("researcher-validation.php");
 $pageName = "class";
+$columnName = array('ClassID', 'ClassName', 'SchoolName', 'TokenString', 'EnrolledStudents', 'UnlockedProgress');
 
 //if insert/update/remove class
 try {
@@ -18,8 +19,7 @@ try {
                 $studentToken = $_POST['studentToken'];
                 $schoolID = getSchoolByName($conn, $schoolName)->SchoolID;
                 $classID = createClass($conn, $schoolID, $className);
-                updateToken($conn, $classID, $teacherToken, "TEACHER");
-                updateToken($conn, $classID, $studentToken, "STUDENT");
+                updateToken($conn, $classID, $teacherToken);
             } else if ($update == 0) {
                 $classID = $_POST['classID'];
                 $className = $_POST['className'];
@@ -30,8 +30,7 @@ try {
 
                 $schoolID = getSchoolByName($conn, $schoolName)->SchoolID;
                 updateClass($conn, $classID, $schoolID, $className, $unlockedProgress);
-                updateToken($conn, $classID, $teacherToken, "TEACHER");
-                updateToken($conn, $classID, $studentToken, "STUDENT");
+                updateToken($conn, $classID, $teacherToken);
             } else if ($update == -1) {
                 $classID = $_POST['classID'];
                 deleteClass($conn, $classID);
@@ -46,7 +45,6 @@ try {
     $weekResult = getMaxWeek($conn);
     $schoolResult = getSchools($conn);
     $classResult = getClasses($conn);
-    $tokenResult = getTokens($conn);
     $studentNumResult = getStudentNum($conn);
 } catch (Exception $e) {
     debug_err($pageName, $e);
@@ -87,17 +85,7 @@ db_close($conn);
                     <div class="panel-body">
                         <div class="dataTable_wrapper">
                             <table class="table table-striped table-bordered table-hover" id="datatables">
-                                <thead>
-                                <tr>
-                                    <th style="display:none">ClassID</th>
-                                    <th>ClassName</th>
-                                    <th>SchoolName</th>
-                                    <th>TeacherToken</th>
-                                    <th>StudentToken</th>
-                                    <th>EnrolledStudents</th>
-                                    <th>UnlockedProgress</th>
-                                </tr>
-                                </thead>
+                                <?php require_once('table-head.php'); ?>
                                 <tbody>
                                 <?php for ($i = 0; $i < count($classResult); $i++) { ?>
                                     <tr class="<?php if ($i % 2 == 0) {
@@ -110,12 +98,7 @@ db_close($conn);
                                             <a href="student.php?classID=<?php echo $classResult[$i]->ClassID ?>"><?php echo $classResult[$i]->ClassName ?></a>
                                         </td>
                                         <td><?php echo $classResult[$i]->SchoolName ?></td>
-                                        <td><?php for ($j = 0; $j < count($tokenResult); $j++) {
-                                                if ($tokenResult[$j]->ClassID == $classResult[$i]->ClassID && $tokenResult[$j]->Type == 'TEACHER') echo $tokenResult[$j]->TokenString;
-                                            } ?></td>
-                                        <td><?php for ($j = 0; $j < count($tokenResult); $j++) {
-                                                if ($tokenResult[$j]->ClassID == $classResult[$i]->ClassID && $tokenResult[$j]->Type == 'STUDENT') echo $tokenResult[$j]->TokenString;
-                                            } ?></td>
+                                        <td><?php echo $classResult[$i]->TokenString ?></td>
                                         <td><?php $count = 0;
                                             for ($j = 0; $j < count($studentNumResult); $j++) {
                                                 if ($studentNumResult[$j]->ClassID == $classResult[$i]->ClassID) $count = $studentNumResult[$j]->Count;
