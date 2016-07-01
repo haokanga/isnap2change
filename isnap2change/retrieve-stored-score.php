@@ -1,6 +1,6 @@
 <?php
-require_once("mysql-lib.php");
-require_once("debug.php");
+require_once("../mysql-lib.php");
+require_once("../debug.php");
 require_once("student-validation.php");
 $pageName = "retrieve-stored-score";
 

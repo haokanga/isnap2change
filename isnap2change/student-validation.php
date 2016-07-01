@@ -1,5 +1,5 @@
 <?php
-require_once('debug.php');
+require_once("../debug.php");
 if (!isset($_SESSION)) {
     session_start();
 }

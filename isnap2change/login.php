@@ -1,6 +1,6 @@
 <?php
-	require_once('mysql-lib.php');
-	require_once('debug.php');
+	require_once("../mysql-lib.php");
+	require_once("../debug.php");
 	$pageName = "login";
 
 	if ($_SERVER["REQUEST_METHOD"] == "POST") {
