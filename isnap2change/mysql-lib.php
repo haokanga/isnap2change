@@ -1390,5 +1390,16 @@ function getMiscQuizType(PDO $conn, $quizID)
     return $miscQuizTypeQueryRes->QuizSubType;
 }
 
+/* Game */
+
+function getGames(PDO $conn)
+{
+    $gameSql = "SELECT * FROM Game";
+    $gameQuery = $conn->prepare($gameSql);
+    $gameQuery->execute();
+    $gameResult = $gameQuery->fetchAll(PDO::FETCH_OBJ);
+    return $gameResult;
+}
+/* Game */
 
 ?>

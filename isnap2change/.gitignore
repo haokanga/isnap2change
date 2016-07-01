@@ -1,5 +1,6 @@
 /vendor
 /text-to-speech/*.wav
 /text-to-speech/*.ogg
+/text-to-speech/*.flac
 /*.unity3d
 /.idea

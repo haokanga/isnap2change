@@ -8,9 +8,9 @@
 	require_once('mysql-lib.php');
     require_once('retrieve-stored-score.php');
     if ($_SERVER["REQUEST_METHOD"] == "GET") {
-        if(isset($_GET["score"]) && isset($_GET["gameid"])){
+        if(isset($_GET["score"]) && isset($_GET["gameID"])){
             $score = $_GET["score"];
-            $gameid = $_GET["gameid"];
+            $gameID = $_GET["gameID"];
             if(isset($_SESSION['studentID'])){
                 $studentID = $_SESSION['studentID'];
                 echo "<script language=\"javascript\">  console.log(\"This is DEBUG_MODE with SESSION studentid = ".$studentID.".\"); </script>";
@@ -28,17 +28,17 @@
     }
     function upload_score()
     {
-        global $gameid, $studentID, $score, $highscore;
+        global $gameID, $studentID, $score, $highscore;
         $conn = db_connect();
         $updateSql = "INSERT INTO Game_Record(GameID,StudentID,`Level`,Score)
                      VALUES (?,?,?,?) ON DUPLICATE KEY UPDATE Score = ?";			
         $updateSql = $conn->prepare($updateSql);
         for($level=1; $level<=count($score); $level++){
             if($score[$level-1]>$highscore[$level-1]){
-                if(! $updateSql -> execute(array($gameid, $studentID, $level, $score[$level-1], $score[$level-1]))){
+                if(! $updateSql -> execute(array($gameID, $studentID, $level, $score[$level-1], $score[$level-1]))){
                     echo "<script language=\"javascript\">  alert(\"Error occurred to submit game score. Report this bug to reseachers.\"); </script>";
                 } else{            
-                    echo "<script language=\"javascript\">  console.log(\"Game Record Submitted. gameid: $gameid  studentid: $studentID\"); </script>";
+                    echo "<script language=\"javascript\">  console.log(\"Game Record Submitted. gameID: $gameID  studentid: $studentID\"); </script>";
                 }
             }
             else{

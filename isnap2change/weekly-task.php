@@ -102,19 +102,6 @@
 	}
 
 	db_close($conn);
-
-    /**  game query move somewhere else
-    $gameSql = "SELECT * FROM Game";    
-    $gameQuery = $conn->prepare($gameSql);
-    $gameQuery->execute(); 
-    while($gameResult = $gameQuery->fetch(PDO::FETCH_ASSOC)){
-        echo '<form id="game" method=post>
-        <button type=button onclick=""> '.$gameResult["Description"].'</button>
-        <input  type=hidden name="gameid" value='.$gameResult["GameID"].'>
-        <input  type=hidden name="week" value='.$week.'>
-        </form>';
-    }
-	*/
 ?>
 
 <html>
