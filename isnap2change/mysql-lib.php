@@ -40,9 +40,9 @@ function db_connect()
 
 }
 
-function db_close(PDO $connection)
+function db_close(PDO $conn)
 {
-    $connection = null;
+    $conn = null;
 }
 
 /* db connection*/
@@ -68,19 +68,12 @@ function updateSchool(PDO $conn, $schoolID, $schoolName)
 
 function deleteSchool(PDO $conn, $schoolID)
 {
-    $updateSql = "DELETE FROM School WHERE SchoolID = ?";
-    $updateSql = $conn->prepare($updateSql);
-    $updateSql->execute(array($schoolID));
+    deleteRecord($conn, $schoolID, "School");
 }
 
 function getSchool(PDO $conn, $schoolID)
 {
-    $schoolSql = "SELECT SchoolName
-                   FROM School WHERE SchoolID = ?";
-    $schoolQuery = $conn->prepare($schoolSql);
-    $schoolQuery->execute(array($schoolID));
-    $schoolResult = $schoolQuery->fetch(PDO::FETCH_OBJ);
-    return $schoolResult;
+    return getRecord($conn, $schoolID, "School");
 }
 
 function getSchoolByName(PDO $conn, $schoolName)
@@ -95,12 +88,7 @@ function getSchoolByName(PDO $conn, $schoolName)
 
 function getSchools(PDO $conn)
 {
-    $schoolSql = "SELECT SchoolID, SchoolName
-                   FROM School";
-    $schoolQuery = $conn->prepare($schoolSql);
-    $schoolQuery->execute();
-    $schoolResult = $schoolQuery->fetchAll(PDO::FETCH_OBJ);
-    return $schoolResult;
+    return getRecords($conn, "School");
 }
 
 /* School */
@@ -126,19 +114,12 @@ function updateClass(PDO $conn, $classID, $schoolID, $className, $unlockedProgre
 
 function deleteClass(PDO $conn, $classID)
 {
-    $updateSql = "DELETE FROM Class WHERE ClassID = ?";
-    $updateSql = $conn->prepare($updateSql);
-    $updateSql->execute(array($classID));
+    deleteRecord($conn, $classID, "Class");
 }
 
 function getClass(PDO $conn, $classID)
 {
-    $classSql = "SELECT *
-                   FROM Class WHERE ClassID = ?";
-    $classQuery = $conn->prepare($classSql);
-    $classQuery->execute(array($classID));
-    $classResult = $classQuery->fetch(PDO::FETCH_OBJ);
-    return $classResult;
+    return getRecord($conn, $classID, "Class");
 }
 
 function getClassByName(PDO $conn, $className)
@@ -164,12 +145,7 @@ function getClassNum(PDO $conn)
 
 function getClasses(PDO $conn)
 {
-    $classSql = "SELECT *
-                   FROM Class NATURAL JOIN School";
-    $classQuery = $conn->prepare($classSql);
-    $classQuery->execute();
-    $classResult = $classQuery->fetchAll(PDO::FETCH_OBJ);
-    return $classResult;
+    return getRecords($conn, "Class", array("School"));
 }
 
 function getStudentNum(PDO $conn)
@@ -186,29 +162,30 @@ function getStudentNum(PDO $conn)
 /* Class */
 
 /* Token */
-function updateToken(PDO $conn, $classID, $tokenString, $type)
+function updateToken(PDO $conn, $classID, $tokenString)
 {
-    $updateSql = "INSERT INTO Token(ClassID, `Type`, TokenString)
-                                    VALUES (?,?,?) ON DUPLICATE KEY UPDATE TokenString = ?";
+    $updateSql = "UPDATE Class 
+            SET TokenString = ?
+            WHERE ClassID = ?";
     $updateSql = $conn->prepare($updateSql);
-    $updateSql->execute(array($classID, $type, htmlspecialchars($tokenString), htmlspecialchars($tokenString)));
+    $updateSql->execute(array($classID, htmlspecialchars($tokenString)));
 }
 
 function getToken(PDO $conn, $token)
 {
     $tokenSql = "SELECT COUNT(*)
-				 FROM `Class` NATURAL JOIN  School
+				 FROM Class NATURAL JOIN School
 				 WHERE TokenString = BINARY ?";
 
     $tokenQuery = $conn->prepare($tokenSql);
     $tokenQuery->execute(array($token));
 
-    if($tokenQuery->fetchColumn() != 1){
+    if ($tokenQuery->fetchColumn() != 1) {
         throw new Exception("Fail to get token");
     }
 
     $tokenSql = "SELECT SchoolName, ClassID, ClassName
-				 FROM `Class` NATURAL JOIN  School
+				 FROM Class NATURAL JOIN  School
 				 WHERE TokenString = BINARY ?";
 
     $tokenQuery = $conn->prepare($tokenSql);
@@ -217,29 +194,19 @@ function getToken(PDO $conn, $token)
     return $tokenRes;
 }
 
-function getTokens(PDO $conn)
-{
-    $tokenSql = "SELECT ClassID, `Type`, TokenString
-                   FROM Token NATURAL JOIN Class";
-    $tokenQuery = $conn->prepare($tokenSql);
-    $tokenQuery->execute();
-    $tokenResult = $tokenQuery->fetchAll(PDO::FETCH_OBJ);
-    return $tokenResult;
-}
-
 function validToken(PDO $conn, $token)
 {
     $tokenSql = "SELECT COUNT(*)
-				 FROM `Class`
+				 FROM Class
 				 WHERE TokenString = BINARY ?";
 
     $tokenQuery = $conn->prepare($tokenSql);
     $tokenQuery->execute(array($token));
     $tokenRes = $tokenQuery->fetchColumn();
 
-    if($tokenRes == 0){
+    if ($tokenRes == 0) {
         return false;
-    } else if($tokenRes == 1){
+    } else if ($tokenRes == 1) {
         return true;
     } else throw new Exception("Duplicate tokens");
 }
@@ -254,16 +221,14 @@ function createStudent(PDO $conn, $username, $password, $firstname, $lastname, $
 
     $insertStudentSql = $conn->prepare($insertStudentSql);
 
-    if(!$insertStudentSql->execute(array($username, md5($password), $firstname, $lastname, $email, $gender, $dob, $identity, 0, $classID))){
+    if (!$insertStudentSql->execute(array($username, md5($password), $firstname, $lastname, $email, $gender, $dob, $identity, 0, $classID))) {
         throw new Exception("Fail to insert a student");
     }
 }
 
 function deleteStudent(PDO $conn, $studentID)
 {
-    $updateSql = "DELETE FROM Student WHERE StudentID = ?";
-    $updateSql = $conn->prepare($updateSql);
-    $updateSql->execute(array($studentID));
+    deleteRecord($conn, $studentID, "Student");
 }
 
 function getStudents(PDO $conn)
@@ -281,7 +246,7 @@ function getStudentsRank(PDO $conn)
     $leaderboardSql = "SELECT Username, Score
 					   FROM Student
 					   ORDER BY Score DESC, SubmissionTime 
-					   Limit 10;";
+					   LIMIT 10;";
 
     $leaderboardQuery = $conn->prepare($leaderboardSql);
     $leaderboardQuery->execute(array());
@@ -306,9 +271,9 @@ function validStudent(PDO $conn, $username, $password)
     $validStudentQuery->execute(array($username, md5($password)));
     $validStudentRes = $validStudentQuery->fetchColumn();
 
-    if($validStudentRes == 0){
+    if ($validStudentRes == 0) {
         return false;
-    } else if($validStudentRes == 1){
+    } else if ($validStudentRes == 1) {
         return true;
     } else throw new Exception("Duplicate students");
 }
@@ -323,9 +288,9 @@ function validUsername(PDO $conn, $username)
     $userQuery->execute(array($username));
     $userRes = $userQuery->fetchColumn();
 
-    if($userRes == 0){
+    if ($userRes == 0) {
         return true;
-    } else if($userRes == 1){
+    } else if ($userRes == 1) {
         return false;
     } else throw new Exception("Two or more than two users have the same username");
 }
@@ -372,8 +337,8 @@ function getStuWeekRecord(PDO $conn, $studentID, $week)
     $weekRecordQuery = $conn->prepare($weekRecordSql);
     $weekRecordQuery->execute(array($studentID, $week));
 
-    if ($weekRecordQuery->fetchColumn() == 0){
-            return null;
+    if ($weekRecordQuery->fetchColumn() == 0) {
+        return null;
     }
 
     $weekRecordSql = "SELECT DueTime 
@@ -386,7 +351,6 @@ function getStuWeekRecord(PDO $conn, $studentID, $week)
 
     return $weekRecordRes->DueTime;
 }
-
 
 
 /* Student Week Record*/
@@ -412,9 +376,7 @@ function updateQuiz(PDO $conn, $quizID, $topicID, $week)
 
 function deleteQuiz(PDO $conn, $quizID)
 {
-    $updateSql = "DELETE FROM Quiz WHERE QuizID = ?";
-    $updateSql = $conn->prepare($updateSql);
-    $updateSql->execute(array($quizID));
+    deleteRecord($conn, $quizID, "Quiz");
 }
 
 function getStuQuizScore(PDO $conn, $quizID, $studentID)
@@ -547,11 +509,7 @@ function getQuizPoints(PDO $conn, $quizID)
 /* Topic */
 function getTopic(PDO $conn, $topicID)
 {
-    $topicSql = "SELECT * FROM Topic WHERE TopicID = ?";
-    $topicQuery = $conn->prepare($topicSql);
-    $topicQuery->execute(array($topicID));
-    $topicResult = $topicQuery->fetch(PDO::FETCH_OBJ);
-    return $topicResult;
+    return getRecord($conn, $topicID, "Topic");
 }
 
 function getTopicByName(PDO $conn, $topicName)
@@ -565,11 +523,7 @@ function getTopicByName(PDO $conn, $topicName)
 
 function getTopics(PDO $conn)
 {
-    $topicSql = "SELECT * FROM Topic ORDER BY TopicID";
-    $topicQuery = $conn->prepare($topicSql);
-    $topicQuery->execute(array());
-    $topicResult = $topicQuery->fetchAll(PDO::FETCH_OBJ);
-    return $topicResult;
+    return getRecords($conn, "Topic");
 }
 
 /* Topic */
@@ -1334,6 +1288,127 @@ function getFactsByTopicID(PDO $conn, $topicID)
 
 /* Fact */
 
+/* Misc Quiz */
+function getMiscQuizType(PDO $conn, $quizID)
+{
+    $miscQuizTypeSql = "SELECT COUNT(*) 
+                            FROM   Misc_Section
+                            WHERE  QuizID = ?";
+    $miscQuizTypeQuery = $conn->prepare($miscQuizTypeSql);
+    $miscQuizTypeQuery->execute(array($quizID));
+    if ($miscQuizTypeQuery->fetchColumn() != 1) {
+        throw new Exception("Failed to get misc quiz type");
+    }
+
+    $miscQuizTypeSql = "SELECT QuizSubType 
+                            FROM   Misc_Section
+                            WHERE  QuizID = ?";
+
+    $miscQuizTypeQuery = $conn->prepare($miscQuizTypeSql);
+    $miscQuizTypeQuery->execute(array($quizID));
+    $miscQuizTypeQueryRes = $miscQuizTypeQuery->fetch(PDO::FETCH_OBJ);
+    return $miscQuizTypeQueryRes->QuizSubType;
+}
+
+/* Misc Quiz */
+
+/* Game */
+function getGame(PDO $conn, $gameID)
+{
+    return getRecord($conn, $gameID, "Game");
+}
+
+function getGames(PDO $conn)
+{
+    return getRecords($conn, "Game");
+}
+
+function getStudentGameScores(PDO $conn, $gameID, $studentID)
+{
+    $levels = getGame($conn, [$gameID - 1])->Levels;
+    $scoreArray = array_fill(0, $levels, 0);
+
+    for ($level = 1; $level <= $levels; $level++) {
+        $retrieveScorePreSql = "SELECT COUNT(*) FROM Game_Record WHERE `GameID` = ? AND `StudentID` = ? AND `Level` = ?";
+        $retrieveScorePreQuery = $conn->prepare($retrieveScorePreSql);
+        $retrieveScorePreQuery->execute(array($gameID, $studentID, $level));
+        if ($retrieveScorePreQuery->fetchColumn() > 0) {
+            $retrieveScoreSql = "SELECT GameID,StudentID,`Level`,Score FROM Game_Record WHERE `GameID` = ? AND `StudentID` = ? AND `Level` = ?";
+            $retrieveScoreQuery = $conn->prepare($retrieveScoreSql);
+            $retrieveScoreQuery->execute(array($gameID, $studentID, $level));
+            $retrieveScoreResult = $retrieveScoreQuery->fetch(PDO::FETCH_OBJ);
+            $scoreArray[$level] = $retrieveScoreResult->Score;
+        } else {
+            $scoreArray[$level] = 0;
+        }
+    }
+
+    return $scoreArray;
+}
+
+function updateStudentGameScores(PDO $conn, $gameID, $studentID, $score)
+{
+
+    $historyHighScore = getStudentGameScores($conn, $gameID, $studentID);
+    $updateSql = "INSERT INTO Game_Record(GameID,StudentID,`Level`,Score)
+                     VALUES (?,?,?,?) ON DUPLICATE KEY UPDATE Score = ?";
+    $updateSql = $conn->prepare($updateSql);
+    for ($level = 1; $level <= count($score); $level++) {
+        if ($score[$level - 1] > $historyHighScore[$level - 1]) {
+            if (!$updateSql->execute(array($gameID, $studentID, $level, $score[$level - 1], $score[$level - 1]))) {
+                debug_alert("Error occurred to submit game score. Report this bug to reseachers.");
+            } else {
+                debug_log("Game Record Submitted. gameID: $gameID  studentid: $studentID");
+            }
+        } else {
+            debug_log("Score does not exceed highscore. highscore: " . $historyHighScore[$level - 1] . "  score: " . $score[$level - 1]);
+        }
+    }
+}
+
+/* Game */
+
+/* Helper Function */
+function deleteRecord(PDO $conn, $recordID, $tableName)
+{
+    $updateSql = "DELETE FROM $tableName WHERE " . $tableName . "ID = ?";
+    $updateSql = $conn->prepare($updateSql);
+    $updateSql->execute(array($recordID));
+}
+
+function getRecord(PDO $conn, $recordID, $tableName)
+{
+    $tableSql = "SELECT COUNT(*)
+				 FROM $tableName
+				 WHERE " . $tableName . "ID = ?";
+    $tableQuery = $conn->prepare($tableSql);
+    $tableQuery->execute(array($recordID));
+    if ($tableQuery->fetchColumn() != 1) {
+        throw new Exception("Fail to get record from $tableName where ID = $recordID");
+    }
+
+    $tableSql = "SELECT * FROM $tableName WHERE " . $tableName . "ID = ?";
+    $tableQuery = $conn->prepare($tableSql);
+    $tableQuery->execute(array($recordID));
+    $tableResult = $tableQuery->fetch(PDO::FETCH_OBJ);
+    return $tableResult;
+}
+
+function getRecords(PDO $conn, $tableName, array $joinTables = null)
+{
+    $tableSql = "SELECT * FROM " . $tableName;
+    if ($joinTables != null) {
+        foreach ($joinTables as $joinTable) {
+            $tableSql .= " NATURAL JOIN " . $joinTable;
+        }
+    }
+    $tableQuery = $conn->prepare($tableSql);
+    $tableQuery->execute();
+    $tableResult = $tableQuery->fetchAll(PDO::FETCH_OBJ);
+    return $tableResult;
+}
+
+/* Helper Function */
 
 /* Unit Test */
 function generateRandomString($length = 10)
@@ -1368,60 +1443,4 @@ function generateRandomSAQSubmissions(PDO $conn)
 }
 
 /* Unit Test */
-
-function getMiscQuizType(PDO $conn, $quizID)
-{
-    $miscQuizTypeSql = "SELECT COUNT(*) 
-                            FROM   Misc_Section
-                            WHERE  QuizID = ?";
-    $miscQuizTypeQuery = $conn->prepare($miscQuizTypeSql);
-    $miscQuizTypeQuery->execute(array($quizID));
-    if ($miscQuizTypeQuery->fetchColumn() != 1) {
-        throw new Exception("Failed to get misc quiz type");
-    }
-
-    $miscQuizTypeSql = "SELECT QuizSubType 
-                            FROM   Misc_Section
-                            WHERE  QuizID = ?";
-
-    $miscQuizTypeQuery = $conn->prepare($miscQuizTypeSql);
-    $miscQuizTypeQuery->execute(array($quizID));
-    $miscQuizTypeQueryRes = $miscQuizTypeQuery->fetch(PDO::FETCH_OBJ);
-    return $miscQuizTypeQueryRes->QuizSubType;
-}
-
-/* Game */
-
-function getGames(PDO $conn)
-{
-    $gameSql = "SELECT * FROM Game";
-    $gameQuery = $conn->prepare($gameSql);
-    $gameQuery->execute();
-    $gameResult = $gameQuery->fetchAll(PDO::FETCH_OBJ);
-    return $gameResult;
-}
-
-function getStudentGameScores(PDO $conn, $NUM_OF_LEVEL, $gameID, $studentID)
-{
-    $scoreArray = array_fill(0, $NUM_OF_LEVEL[$gameID - 1], 0);
-
-    for ($level = 1; $level <= $NUM_OF_LEVEL[$gameID - 1]; $level++) {
-        $retrieveScorePreSql = "SELECT COUNT(*) FROM Game_Record WHERE `GameID` = ? AND `StudentID` = ? AND `Level` = ?";
-        $retrieveScorePreQuery = $conn->prepare($retrieveScorePreSql);
-        $retrieveScorePreQuery->execute(array($gameID, $studentID, $level));
-        if ($retrieveScorePreQuery->fetchColumn() > 0) {
-            $retrieveScoreSql = "SELECT GameID,StudentID,`Level`,Score FROM Game_Record WHERE `GameID` = ? AND `StudentID` = ? AND `Level` = ?";
-            $retrieveScoreQuery = $conn->prepare($retrieveScoreSql);
-            $retrieveScoreQuery->execute(array($gameID, $studentID, $level));
-            $retrieveScoreResult = $retrieveScoreQuery->fetch(PDO::FETCH_OBJ);
-            $scoreArray[$level] = $retrieveScoreResult->Score;
-        } else {
-            $scoreArray[$level] = 0;
-        }
-    }
-
-    return $scoreArray;
-}
-/* Game */
-
 ?>

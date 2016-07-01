@@ -6,35 +6,35 @@ USE isnap2changedb;
 SET FOREIGN_KEY_CHECKS=0;
 
 # [Assert] Lines of Drop table declaration = Lines of Create table declaration
-DROP TABLE IF EXISTS `School`;
-DROP TABLE IF EXISTS `Class`;
-DROP TABLE IF EXISTS `Student`;
-DROP TABLE IF EXISTS `Researcher`;
-DROP TABLE IF EXISTS `Fact`;
-DROP TABLE IF EXISTS `Topic`;
-DROP TABLE IF EXISTS `Learning_Material`;
-DROP TABLE IF EXISTS `Student_Week_Record`;
-DROP TABLE IF EXISTS `Quiz`;
-DROP TABLE IF EXISTS `Quiz_Record`;
-DROP TABLE IF EXISTS `MCQ_Section`;
-DROP TABLE IF EXISTS `MCQ_Question`;
-DROP TABLE IF EXISTS `MCQ_Option`;
-DROP TABLE IF EXISTS `MCQ_Question_Record`;
-DROP TABLE IF EXISTS `SAQ_Section`;
-DROP TABLE IF EXISTS `SAQ_Question`;
-DROP TABLE IF EXISTS `SAQ_Question_Record`;
-DROP TABLE IF EXISTS `Matching_Section`;
-DROP TABLE IF EXISTS `Matching_Question`;
-DROP TABLE IF EXISTS `Matching_Option`;
-DROP TABLE IF EXISTS `Poster_Section`;
-DROP TABLE IF EXISTS `Poster_Record`;
-DROP TABLE IF EXISTS `Misc_Section`;
-DROP TABLE IF EXISTS `Game`;
-DROP TABLE IF EXISTS `Game_Record`;
-DROP TABLE IF EXISTS `Bonus`;
-DROP TABLE IF EXISTS `Bonus_Record`;
-DROP TABLE IF EXISTS `Bonus_Task`;
-DROP TABLE IF EXISTS `Bonus_Task_Record`;
+DROP TABLE IF EXISTS School;
+DROP TABLE IF EXISTS Class;
+DROP TABLE IF EXISTS Student;
+DROP TABLE IF EXISTS Researcher;
+DROP TABLE IF EXISTS Fact;
+DROP TABLE IF EXISTS Topic;
+DROP TABLE IF EXISTS Learning_Material;
+DROP TABLE IF EXISTS Student_Week_Record;
+DROP TABLE IF EXISTS Quiz;
+DROP TABLE IF EXISTS Quiz_Record;
+DROP TABLE IF EXISTS MCQ_Section;
+DROP TABLE IF EXISTS MCQ_Question;
+DROP TABLE IF EXISTS MCQ_Option;
+DROP TABLE IF EXISTS MCQ_Question_Record;
+DROP TABLE IF EXISTS SAQ_Section;
+DROP TABLE IF EXISTS SAQ_Question;
+DROP TABLE IF EXISTS SAQ_Question_Record;
+DROP TABLE IF EXISTS Matching_Section;
+DROP TABLE IF EXISTS Matching_Question`
+DROP TABLE IF EXISTS Matching_Option;
+DROP TABLE IF EXISTS Poster_Section;
+DROP TABLE IF EXISTS Poster_Record;
+DROP TABLE IF EXISTS Misc_Section;
+DROP TABLE IF EXISTS Game;
+DROP TABLE IF EXISTS Game_Record;
+DROP TABLE IF EXISTS Bonus;
+DROP TABLE IF EXISTS Bonus_Record;
+DROP TABLE IF EXISTS Bonus_Task;
+DROP TABLE IF EXISTS Bonus_Task_Record;
 
 CREATE TABLE IF NOT EXISTS `School` (
     SchoolID MEDIUMINT AUTO_INCREMENT,
@@ -290,9 +290,8 @@ CREATE TABLE IF NOT EXISTS `Misc_Section` (
 
 CREATE TABLE IF NOT EXISTS `Game` (
     GameID MEDIUMINT AUTO_INCREMENT,
-    Description TEXT,
-    Week MEDIUMINT,
-    Points MEDIUMINT,
+    Description TEXT NOT NULL,
+    Levels MEDIUMINT NOT NULL,
     CONSTRAINT Game_GameID_PK PRIMARY KEY (GameID)
 )  ENGINE=INNODB;
 
@@ -624,8 +623,8 @@ INSERT IGNORE INTO Learning_Material(Content,QuizID) VALUES('
 <p>Learning materials for this quiz has not been added.</p>',8);
 
 # [Formal] Games
-INSERT IGNORE INTO Game(Description,Week,Points) VALUES('Fruit Ninja',1,10);
-INSERT IGNORE INTO Game(Description,Week,Points) VALUES('Candy Crush',1,10);
+INSERT IGNORE INTO Game(Description,Levels) VALUES('Fruit Ninja',5);
+INSERT IGNORE INTO Game(Description,Levels) VALUES('Candy Crush',50);
 
 # [Example] Game_Record
 INSERT IGNORE INTO Game_Record(GameID,StudentID,`Level`,Score) VALUES(1,2,1,30);
