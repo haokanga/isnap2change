@@ -184,7 +184,7 @@ function getToken(PDO $conn, $token)
         throw new Exception("Fail to get token");
     }
 
-    $tokenSql = "SELECT SchoolName, ClassID, ClassName
+    $tokenSql = "SELECT SchoolName, ClassID, ClassName, TokenString
 				 FROM Class NATURAL JOIN  School
 				 WHERE TokenString = BINARY ?";
 

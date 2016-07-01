@@ -39,6 +39,7 @@ db_close($conn);
     <link href="../bower_components/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
     <script src="//cdn.tinymce.com/4/tinymce.min.js"></script>
     <script>
+        tinymce.EditorManager.editors = []; //remove the old instances
         tinymce.init({
             selector: 'textarea',
             height: 500,
@@ -58,8 +59,8 @@ db_close($conn);
                 {title: 'Infograph Demo', url: '../infograph/demo.html'}
             ],
             content_css: [
-                'https://fast.fonts.net/cssapi/e6dc9b99-64fe-4292-ad98-6974f93cd2a2.css',
-                'https://www.tinymce.com/css/codepen.min.css'
+                '//fonts.googleapis.com/css?family=Lato:300,300i,400,400i',
+                '//www.tinymce.com/css/codepen.min.css'
             ]
         });
     </script>

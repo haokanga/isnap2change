@@ -52,7 +52,7 @@ module.exports = function (grunt) {
     // Task configuration.
     clean: {
       dist: 'dist',
-      docs: 'docs/dist'
+      docs: 'docs/sb-admin'
     },
 
     jshint: {
@@ -120,7 +120,7 @@ module.exports = function (grunt) {
           'js/tab.js',
           'js/affix.js'
         ],
-        dest: 'dist/js/<%= pkg.name %>.js'
+        dest: 'sb-admin/js/<%= pkg.name %>.js'
       }
     },
 
@@ -134,7 +134,7 @@ module.exports = function (grunt) {
       },
       core: {
         src: '<%= concat.bootstrap.dest %>',
-        dest: 'dist/js/<%= pkg.name %>.min.js'
+        dest: 'sb-admin/js/<%= pkg.name %>.min.js'
       },
       customize: {
         src: configBridge.paths.customizerJs,
@@ -160,10 +160,10 @@ module.exports = function (grunt) {
           sourceMap: true,
           outputSourceFiles: true,
           sourceMapURL: '<%= pkg.name %>.css.map',
-          sourceMapFilename: 'dist/css/<%= pkg.name %>.css.map'
+          sourceMapFilename: 'sb-admin/css/<%= pkg.name %>.css.map'
         },
         src: 'less/bootstrap.less',
-        dest: 'dist/css/<%= pkg.name %>.css'
+        dest: 'sb-admin/css/<%= pkg.name %>.css'
       },
       compileTheme: {
         options: {
@@ -171,10 +171,10 @@ module.exports = function (grunt) {
           sourceMap: true,
           outputSourceFiles: true,
           sourceMapURL: '<%= pkg.name %>-theme.css.map',
-          sourceMapFilename: 'dist/css/<%= pkg.name %>-theme.css.map'
+          sourceMapFilename: 'sb-admin/css/<%= pkg.name %>-theme.css.map'
         },
         src: 'less/theme.less',
-        dest: 'dist/css/<%= pkg.name %>-theme.css'
+        dest: 'sb-admin/css/<%= pkg.name %>-theme.css'
       }
     },
 
@@ -186,13 +186,13 @@ module.exports = function (grunt) {
         options: {
           map: true
         },
-        src: 'dist/css/<%= pkg.name %>.css'
+        src: 'sb-admin/css/<%= pkg.name %>.css'
       },
       theme: {
         options: {
           map: true
         },
-        src: 'dist/css/<%= pkg.name %>-theme.css'
+        src: 'sb-admin/css/<%= pkg.name %>-theme.css'
       },
       docs: {
         src: ['docs/assets/css/src/docs.css']
@@ -210,8 +210,8 @@ module.exports = function (grunt) {
         csslintrc: 'less/.csslintrc'
       },
       dist: [
-        'dist/css/bootstrap.css',
-        'dist/css/bootstrap-theme.css'
+        'sb-admin/css/bootstrap.css',
+        'sb-admin/css/bootstrap-theme.css'
       ],
       examples: [
         'docs/examples/**/*.css'
@@ -235,12 +235,12 @@ module.exports = function (grunt) {
         advanced: false
       },
       minifyCore: {
-        src: 'dist/css/<%= pkg.name %>.css',
-        dest: 'dist/css/<%= pkg.name %>.min.css'
+        src: 'sb-admin/css/<%= pkg.name %>.css',
+        dest: 'sb-admin/css/<%= pkg.name %>.min.css'
       },
       minifyTheme: {
-        src: 'dist/css/<%= pkg.name %>-theme.css',
-        dest: 'dist/css/<%= pkg.name %>-theme.min.css'
+        src: 'sb-admin/css/<%= pkg.name %>-theme.css',
+        dest: 'sb-admin/css/<%= pkg.name %>-theme.min.css'
       },
       docs: {
         src: [
@@ -258,9 +258,9 @@ module.exports = function (grunt) {
       },
       dist: {
         expand: true,
-        cwd: 'dist/css/',
+        cwd: 'sb-admin/css/',
         src: ['*.css', '!*.min.css'],
-        dest: 'dist/css/'
+        dest: 'sb-admin/css/'
       },
       examples: {
         expand: true,
@@ -278,15 +278,15 @@ module.exports = function (grunt) {
       fonts: {
         expand: true,
         src: 'fonts/*',
-        dest: 'dist/'
+        dest: 'sb-admin/'
       },
       docs: {
         expand: true,
-        cwd: 'dist/',
+        cwd: 'sb-admin/',
         src: [
           '**/*'
         ],
-        dest: 'docs/dist/'
+        dest: 'docs/sb-admin/'
       }
     },
 
@@ -380,7 +380,7 @@ module.exports = function (grunt) {
         })(),
         replacement: grunt.option('newver'),
         exclude: [
-          'dist/fonts',
+          'sb-admin/fonts',
           'docs/assets',
           'fonts',
           'js/tests/vendor',
@@ -413,7 +413,7 @@ module.exports = function (grunt) {
     compress: {
       main: {
         options: {
-          archive: 'bootstrap-<%= pkg.version %>-dist.zip',
+          archive: 'bootstrap-<%= pkg.version %>-sb-admin.zip',
           mode: 'zip',
           level: 9,
           pretty: true
@@ -421,9 +421,9 @@ module.exports = function (grunt) {
         files: [
           {
             expand: true,
-            cwd: 'dist/',
+            cwd: 'sb-admin/',
             src: ['**'],
-            dest: 'bootstrap-<%= pkg.version %>-dist'
+            dest: 'bootstrap-<%= pkg.version %>-sb-admin'
           }
         ]
       }
@@ -452,7 +452,7 @@ module.exports = function (grunt) {
   if (runSubset('core') &&
       // Skip core tests if this is a Savage build
       process.env.TRAVIS_REPO_SLUG !== 'twbs-savage/bootstrap') {
-    testSubtasks = testSubtasks.concat(['dist-css', 'dist-js', 'csslint:dist', 'test-js', 'docs']);
+    testSubtasks = testSubtasks.concat(['sb-admin-css', 'sb-admin-js', 'csslint:sb-admin', 'test-js', 'docs']);
   }
   // Skip HTML validation if running a different subset of the test suite
   if (runSubset('validate-html') &&
@@ -473,17 +473,17 @@ module.exports = function (grunt) {
   grunt.registerTask('test-js', ['jshint:core', 'jshint:test', 'jshint:grunt', 'jscs:core', 'jscs:test', 'jscs:grunt', 'qunit']);
 
   // JS distribution task.
-  grunt.registerTask('dist-js', ['concat', 'uglify:core', 'commonjs']);
+  grunt.registerTask('sb-admin-js', ['concat', 'uglify:core', 'commonjs']);
 
   // CSS distribution task.
   grunt.registerTask('less-compile', ['less:compileCore', 'less:compileTheme']);
-  grunt.registerTask('dist-css', ['less-compile', 'autoprefixer:core', 'autoprefixer:theme', 'csscomb:dist', 'cssmin:minifyCore', 'cssmin:minifyTheme']);
+  grunt.registerTask('sb-admin-css', ['less-compile', 'autoprefixer:core', 'autoprefixer:theme', 'csscomb:sb-admin', 'cssmin:minifyCore', 'cssmin:minifyTheme']);
 
   // Full distribution task.
-  grunt.registerTask('dist', ['clean:dist', 'dist-css', 'copy:fonts', 'dist-js']);
+  grunt.registerTask('dist', ['clean:sb-admin', 'sb-admin-css', 'copy:fonts', 'sb-admin-js']);
 
   // Default task.
-  grunt.registerTask('default', ['clean:dist', 'copy:fonts', 'test']);
+  grunt.registerTask('default', ['clean:sb-admin', 'copy:fonts', 'test']);
 
   // Version numbering task.
   // grunt change-version-number --oldver=A.B.C --newver=X.Y.Z
@@ -500,9 +500,9 @@ module.exports = function (grunt) {
     generateRawFiles(grunt, banner);
   });
 
-  grunt.registerTask('commonjs', 'Generate CommonJS entrypoint module in dist dir.', function () {
+  grunt.registerTask('commonjs', 'Generate CommonJS entrypoint module in sb-admin dir.', function () {
     var srcFiles = grunt.config.get('concat.bootstrap.src');
-    var destFilepath = 'dist/js/npm.js';
+    var destFilepath = 'sb-admin/js/npm.js';
     generateCommonJSModule(grunt, srcFiles, destFilepath);
   });
 

@@ -12,7 +12,7 @@
 <script src="../bower_components/datatables-plugins/integration/bootstrap/3/dataTables.bootstrap.min.js"></script>
 
 <!-- Custom Theme JavaScript -->
-<script src="../dist/js/sb-admin-2.js"></script>
+<script src="../sb-admin/js/sb-admin-2.js"></script>
 
 <!--jQuery Validate plugin-->
 <script src="//ajax.aspnetcdn.com/ajax/jquery.validate/1.15.0/jquery.validate.min.js"></script>

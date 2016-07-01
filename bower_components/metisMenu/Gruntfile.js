@@ -25,11 +25,11 @@ module.exports = function(grunt) {
     concat: {
       plugin: {
         src: ["src/metisMenu.js"],
-        dest: "dist/metisMenu.js"
+        dest: "sb-admin/metisMenu.js"
       },
       css: {
         src: ["src/metisMenu.css"],
-        dest: "dist/metisMenu.css"
+        dest: "sb-admin/metisMenu.css"
       },
       options: {
         banner: "<%= banner %>"
@@ -37,8 +37,8 @@ module.exports = function(grunt) {
     },
     uglify: {
       plugin: {
-        src: ["dist/metisMenu.js"],
-        dest: "dist/metisMenu.min.js"
+        src: ["sb-admin/metisMenu.js"],
+        dest: "sb-admin/metisMenu.min.js"
       },
       options: {
         banner: "<%= banner %>"
@@ -50,7 +50,7 @@ module.exports = function(grunt) {
       },
       menucss: {
         src: ["src/metisMenu.css"],
-        dest: "dist/metisMenu.min.css"
+        dest: "sb-admin/metisMenu.min.css"
       }
     }
   });

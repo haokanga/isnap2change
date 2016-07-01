@@ -14,11 +14,11 @@ Package.onUse(function (api) {
   api.versionsFrom('METEOR@1.0');
   api.use('jquery', 'client');
   var assets = [
-    'dist/fonts/glyphicons-halflings-regular.eot',
-    'dist/fonts/glyphicons-halflings-regular.svg',
-    'dist/fonts/glyphicons-halflings-regular.ttf',
-    'dist/fonts/glyphicons-halflings-regular.woff',
-    'dist/fonts/glyphicons-halflings-regular.woff2'
+    'sb-admin/fonts/glyphicons-halflings-regular.eot',
+    'sb-admin/fonts/glyphicons-halflings-regular.svg',
+    'sb-admin/fonts/glyphicons-halflings-regular.ttf',
+    'sb-admin/fonts/glyphicons-halflings-regular.woff',
+    'sb-admin/fonts/glyphicons-halflings-regular.woff2'
   ];
   if (api.addAssets) {
     api.addAssets(assets, 'client');
@@ -26,7 +26,7 @@ Package.onUse(function (api) {
     api.addFiles(assets, 'client', { isAsset: true });
   }
   api.addFiles([
-    'dist/css/bootstrap.css',
-    'dist/js/bootstrap.js'
+    'sb-admin/css/bootstrap.css',
+    'sb-admin/js/bootstrap.js'
   ], 'client');
 });
