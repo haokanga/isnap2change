@@ -49,7 +49,7 @@ html
     height: 100%;
     top: 0;
     left: 0;
-    background: url('image/landing_page_background.png') no-repeat center center;
+    background: url('../img/landing_page_background.png') no-repeat center center;
     background-size: cover;
     will-change: transform; 
     z-index: -1;
@@ -88,7 +88,7 @@ html
     width: 100%;
     overflow: auto; 
     position: relative;
-    background: url('image/crossing_background.png') no-repeat center center; 
+    background: url('../img/crossing_background.png') no-repeat center center; 
     background-size: cover;
     will-change: transform;   
     /* z-index: -1; */
@@ -136,7 +136,7 @@ iframe
 
 .modal-content
 {
-    background: url('image/miss_pacman.png') no-repeat center center;
+    background: url('../img/miss_pacman.png') no-repeat center center;
     background-size: cover;
 }
 

@@ -123,7 +123,7 @@
     <body>
         <div class="col-xs-offset-3 col-xs-6" style="height: 100%; text-align: center; align-items: center; color: white; margin-top: 3%;">
             <input id="classid-hidden" type="hidden" value="<?php echo $tokenRes->ClassID?>">
-            <span style="color:yellow;">TOKEN_NAME_001</span>
+            <span style="color:yellow;"> <?php echo $tokenRes->TokenString?> </span>
             <br>
             School: <?php echo $tokenRes->SchoolName?>
             <br>
