@@ -46,143 +46,29 @@
 ?>
 
 <!DOCTYPE html>
-<!--
-To change this license header, choose License Headers in Project Properties.
-To change this template file, choose Tools | Templates
-and open the template in the editor.
--->
 <html>
     <head>
         <title>SNAP</title>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <link rel="stylesheet" type="text/css" href="css/home.css" />
-        <link rel="stylesheet" type="text/css" href="css/animate.css" />
-
-        <!-- Latest compiled and minified CSS -->
+        <link rel="stylesheet" type="text/css" href="./css/home.css"/>
+        <link rel="stylesheet" type="text/css" href="./css/vendor/animate.css"/>
+        <link rel='stylesheet' type='text/css' href='https://fonts.googleapis.com/css?family=Maitree|Lato:400,900'>
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
-        <link href='https://fonts.googleapis.com/css?family=Maitree|Lato:400,900' rel='stylesheet' type='text/css'>
-        <!--Javascripts-->
-        <script src="js/jquery.js"></script>
+        <script src="./js/vendor/jquery.js"></script>
+        <script src="./js/vendor/wow.js"></script>
+        <script src="./js/home.js"></script>
         <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js" integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS" crossorigin="anonymous"></script>
-        <script src="js/wow.js"></script>
-        <script>
-              wow = new WOW(
-                      {
-                      boxClass:     'wow',      // default
-                      animateClass: 'animated', // default
-                      offset:       0,          // default
-                      mobile:       true,       // default
-                      live:         true        // default
-                    }
-                    )
-                    wow.init();
-        </script>
-        <script>
-            $(document).ready(function () {
-                
-               $('.scrollToTop').click(function(){
-		         $('html, body').animate({scrollTop : 0},800);
-		         return false;
-	           });
-
-               $('#nav').affix({
-                    offset: {
-                        top: $('header').height() - $('#nav').height()
-                    }
-                });
-
-                $('body').scrollspy({target: '#nav'});
-
-                $('.scroll-top').click(function () {
-                    $('body,html').animate({scrollTop: 0}, 1000);
-                });
-
-                /* smooth scrolling for nav sections */
-                $('#nav .navbar-nav li>a').click(function () {
-                    var link = $(this).attr('href');
-                    var posi = $(link).offset().top;
-                    $('body,html').animate({scrollTop: posi}, 700);
-                });
-
-                 $('#login-close-btn').click(function () {
-                $('#login-fail-text').text("");
-                $('#username').val("");
-                $('#password').val("");
-            });
-            });
-
-             function parseFeedback(response) {
-                var feedback = JSON.parse(response);
-
-                if(feedback.message != "success"){
-                    alert(feedback.message + ". Please try again!");
-                    return;
-                }
-
-                if(feedback.result == "valid"){
-                    location.href = 'avatar.php';
-                } else {
-                    $('#login-fail-text').text("Invalid username and/or password!");
-                    $('#password').val("");
-                }
-             }
-
-        function validStudent() {
-            var username = document.getElementById("username").value;
-            var password = document.getElementById("password").value;
-
-            //send request
-            var xmlhttp = new XMLHttpRequest();
-
-            xmlhttp.onreadystatechange = function() {
-                if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
-                    parseFeedback(xmlhttp.responseText);
-                }
-            };
-
-            xmlhttp.open("POST", "login.php", true);
-            xmlhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-            xmlhttp.send("username="+username+"&password="+password);
-        }
-
-        <!--Twitter widgets.js -->
-        window.twttr = (function(d, s, id) {
-            var js, fjs = d.getElementsByTagName(s)[0],
-                t = window.twttr || {};
-            if (d.getElementById(id)) return t;
-            js = d.createElement(s);
-            js.id = id;
-            js.src = "https://platform.twitter.com/widgets.js";
-            fjs.parentNode.insertBefore(js, fjs);
-
-            t._e = [];
-            t.ready = function(f) {
-                t._e.push(f);
-            };
-
-            return t;
-        }(document, "script", "twitter-wjs"));
-        </script>
-
     </head>
     <body>
-    <div id="fb-root"></div>
-<script>(function(d, s, id) {
-            var js, fjs = d.getElementsByTagName(s)[0];
-            if (d.getElementById(id)) return;
-            js = d.createElement(s); js.id = id;
-            js.src = "//connect.facebook.net/en_US/sdk.js#xfbml=1&version=v2.6&appId=909271749154924";
-            fjs.parentNode.insertBefore(js, fjs);
-        }(document, 'script', 'facebook-jssdk'));</script>
 
         <header class="start" id="1">
             <div class="logo" style="display:flex;justify-content:center;align-items:center;width:100%;height:70%; margin-top: 5%;">
-                <img class="wow flipInY" wow-data-delay="0.0s" wow-data-duration="0.9s" src="img/Snap_Logo_Inverted.png" alt="SNAP" style="width:50%;height:68%;">
+                <img class="wow flipInY" wow-data-delay="0.0s" wow-data-duration="0.9s" src="./img/Snap_Logo_Inverted.png" alt="SNAP" style="width:50%;height:68%;">
             </div>
             <div class="tagline" style="color: white; font-size: 5vh; display:flex;justify-content:center;align-items:center; margin-top:1%;">
                 <span class="wow fadeInLeftBig" wow-data-delay="0.15s" wow-data-duration="0.3s">To inspire a healthier future.</span>
-                <!-- <input type="image" src="img/Refresh.png" name="saveForm" class="btTxt" id="scrollDown" style="border: none;" /> -->
+                <!-- <input type="image" src="./img/Refresh.png" name="saveForm" class="btTxt" id="scrollDown" style="border: none;" /> -->
             </div>
         </header>
 
@@ -199,7 +85,7 @@ and open the template in the editor.
                     <ul class="nav navbar-nav">
                         <li class="active">
                             <a class="navbar-brand" href="#">
-                                <img alt="Brand" src="img/Snap_Single_Wordform_White.png" style="height: 100%;">
+                                <img alt="Brand" src="./img/Snap_Single_Wordform_White.png" style="height: 100%;">
                             </a>
                         </li>
                         <li class="divider"></li>
@@ -225,7 +111,7 @@ and open the template in the editor.
                     <div class="modal-body">
                         <button id="login-close-btn" type="button" class="close" data-dismiss="modal" aria-label="Close" style="color:white;"><span aria-hidden="true">&times;</span></button>
                         <div class="col-xs-6 col-xs-offset-3">
-                            <img src="img/Snap_Logo_Inverted.png" style="height:20%; width: 100%;">
+                            <img src="./img/Snap_Logo_Inverted.png" style="height:20%; width: 100%;">
                              <div style="text-align: center; margin-top: 15%">
                         <span id="login-fail-text" style="color:red"></span>
                     </div>
@@ -256,7 +142,7 @@ and open the template in the editor.
                         <div class="panel-body" style="padding: 0px; height: 100%; width: 100%;">
                             <div class="col-xs-8 col-xs-offset-2" style="text-align: center; height: 55%;">
 
-                                <img src="img/achievment_icon.png" style="height: 60%; width: 20%;">
+                                <img src="./img/achievment_icon.png" style="height: 60%; width: 20%;">
                                 <br>
                                 <span style="color: white; font-size: 3.2vh;"> Achievement of the week </span>
 
@@ -274,7 +160,7 @@ and open the template in the editor.
                         <div class="panel-body" style="padding: 0px; height: 100%; width: 100%;">
                             <div class="col-xs-8 col-xs-offset-2" style="text-align: center; height: 45%;">
 
-                                <img src="img/game_icon.png" style="height:65%; width: 20%;">
+                                <img src="./img/game_icon.png" style="height:65%; width: 20%;">
                                 <br>
                                 <span style="color: white; font-size: 3.2vh;"> Gaming High Scores </span>
 
@@ -293,7 +179,7 @@ and open the template in the editor.
 
                                     <div class="carousel-inner" role="listbox"> 
                                         <div class="item active">
-                                            <img src="img/Temple.png" alt="..." style="border-radius:30px;">
+                                            <img src="./img/Temple.png" alt="..." style="border-radius:30px;">
                                             <div class="carousel-caption">
                                                 <div style="font-size: 2.5vh; color:rgb(54,232,197); border: 0px solid rgb(54,232,197); border-bottom-color: rgb(54,232,197); border-bottom-width: 2px; ">TEMPLE HIGH SCORE </div>
                                                 <p style="font-size: 50px;">
@@ -302,7 +188,7 @@ and open the template in the editor.
                                             </div>
                                         </div>
                                         <div class="item">
-                                            <img src="img/Fruit.png" alt="..." style="border-radius:30px;">
+                                            <img src="./img/Fruit.png" alt="..." style="border-radius:30px;">
                                             <div class="carousel-caption">
                                                 <div style="font-size: 2.5vh; color:rgb(54,232,197); border: 0px solid rgb(54,232,197); border-bottom-color: rgb(54,232,197); border-bottom-width: 2px; ">FRUIT NINJA HIGH SCORE </div>
                                                 <p style="font-size: 50px;">
@@ -311,7 +197,7 @@ and open the template in the editor.
                                             </div>
                                         </div>
                                         <div class="item">
-                                            <img src="img/Angry.png" alt="..." style="border-radius:30px;">
+                                            <img src="./img/Angry.png" alt="..." style="border-radius:30px;">
                                             <div class="carousel-caption">
                                                 <div style="font-size: 2.5vh; color:rgb(54,232,197); border: 0px solid rgb(54,232,197); border-bottom-color: rgb(54,232,197); border-bottom-width: 2px; ">ANGRY BIRDS HIGH SCORE </div>
                                                 <p style="font-size: 50px;">
@@ -320,7 +206,7 @@ and open the template in the editor.
                                             </div>
                                         </div>
                                         <div class="item">
-                                            <img src="img/Candy.png" alt="..." style="border-radius:30px;">
+                                            <img src="./img/Candy.png" alt="..." style="border-radius:30px;">
                                             <div class="carousel-caption">
                                                 <div style="font-size: 2.5vh; color:rgb(54,232,197); border: 0px solid rgb(54,232,197); border-bottom-color: rgb(54,232,197); border-bottom-width: 2px; ">CANDY CRUSH HIGH SCORE </div>
                                                 <p style="font-size: 50px;">
@@ -351,7 +237,7 @@ and open the template in the editor.
                 <div class="col-xs-10 col-xs-offset-1 col-md-4 col-md-offset-0" style="background-color: black; padding-right:0px; padding-left:0px; padding-bottom:0px; height: 100%;">
                     <div class="scoreboard" style="height: 100%;">
                         <div class="scoreboard_header" style="height: 15%; text-align: center;">
-                            <img src="img/leader_board_icon.png" alt="..." style="width: 17%; height: 70%;">
+                            <img src="./img/leader_board_icon.png" alt="..." style="width: 17%; height: 70%;">
                             <br>
                             <span style="text-align:center; color:white; font-size: 3.2vh;">Leaderboard</span>
                         </div>
@@ -373,25 +259,25 @@ and open the template in the editor.
                     case 0: ?>
                         <tr style="font-size: 2.9vh;">
                             <td style="width: 35%;">
-                                <img src="img/first_place_icon.png" alt="..." style="width: 34%;">
+                                <img src="./img/first_place_icon.png" alt="..." style="width: 34%;">
                             </td> <?php ;
                         break;
                     case 1: ?>
                         <tr style="font-size: 2.7vh;">
                             <td style="width: 30%;">
-                                <img src="img/second_place_icon.png" alt="..." style="width: 30%;">
+                                <img src="./img/second_place_icon.png" alt="..." style="width: 30%;">
                             </td> <?php ;
                         break;
                     case 2: ?>
                         <tr style="font-size: 2.5vh;">
                             <td style="width: 40%;">
-                                <img src="img/third_place_icon.png" alt="..."  style="width: 28%;">
+                                <img src="./img/third_place_icon.png" alt="..."  style="width: 28%;">
                             </td> <?php ;
                         break;
                     case 3: ?>
                         <tr style="font-size: 2.3vh;">
                             <td style="width: 40%;">
-                                <img src="img/fourth_place_icon.png" alt="..."  style="width: 25%;">
+                                <img src="./img/fourth_place_icon.png" alt="..."  style="width: 25%;">
                             </td> <?php ;
                         break;
                     case 4: ?>
@@ -466,16 +352,16 @@ and open the template in the editor.
         <?php
             switch($factRes[$i]->TopicID) {
                 case 1: ?>
-                    <img src="img/smoking_icon.png" style="height: 100%; width: 90%;"> <?php ;
+                    <img src="./img/smoking_icon.png" style="height: 100%; width: 90%;"> <?php ;
                     break;
                 case 2: ?>
-                    <img src="img/nutrition_icon.png" style="height: 100%; width: 90%;"> <?php ;
+                    <img src="./img/nutrition_icon.png" style="height: 100%; width: 90%;"> <?php ;
                     break;
                 case 3: ?>
-                    <img src="img/alcohol_icon.png" style="height: 100%; width: 90%;"> <?php ;
+                    <img src="./img/alcohol_icon.png" style="height: 100%; width: 90%;"> <?php ;
                     break;
                 case 4: ?>
-                    <img src="img/physical_activity_icon.png" style="height: 100%; width: 90%;"> <?php ;
+                    <img src="./img/physical_activity_icon.png" style="height: 100%; width: 90%;"> <?php ;
                     break;
             } ?>
                         </div>
@@ -514,7 +400,7 @@ and open the template in the editor.
                     <span class="p1">Want to know more?</span>
                     <br>
                     <span style="height: 50%;">
-                        <img src="img/snap_facts_icon.png" style="height: inherit; width: 10%;">
+                        <img src="./img/snap_facts_icon.png" style="height: inherit; width: 10%;">
                     </span>
                 </div>
             </div>  
@@ -544,7 +430,7 @@ and open the template in the editor.
                 <div class="col-xs-8 col-xs-offset-2 celeb1" style="margin-top:4%; height: 38%;">
                     <div class="row" style="height:100%;">
                         <div class="col-xs-4" style="height:100%;">
-                            <img src="img/chris.jpg" style="width:90%; height:90%;">
+                            <img src="./img/chris.jpg" style="width:90%; height:90%;">
                         </div>
                         <div class="col-xs-8" style="color:white; height: 100%;">
                             <span class="header3" style="border: 0px solid #FCEE2D; border-bottom-color: #FCEE2D; border-bottom-width: 2px;">
@@ -558,7 +444,7 @@ and open the template in the editor.
                 <div class="col-xs-8 col-xs-offset-2 celeb2" style="margin-top:2%; height:38%">
                     <div class="row" style="height:100%;">
                         <div class="col-xs-4" style="height:100%;">
-                            <img src="img/ch2.jpg" style="width:90%; height: 90%;">
+                            <img src="./img/ch2.jpg" style="width:90%; height: 90%;">
                         </div>
                         <div class="col-xs-8" style="color:white; height: 100%;">
                             <span class="header3" style="border: 0px solid #FCEE2D; border-bottom-color: #FCEE2D; border-bottom-width: 2px;">
@@ -596,7 +482,7 @@ and open the template in the editor.
                         <div style="width:50%;color:#FCEE2D; text-align:center;">
                             <span>
                             <a href='#'>
-                                <img src="img/send_icon.png" style="height: 75px; width: 75px;">
+                                <img src="./img/send_icon.png" style="height: 75px; width: 75px;">
                             </a>
                             </span>
                         </div>
@@ -604,7 +490,7 @@ and open the template in the editor.
                 </div>
                 <div class="col-xs-10 col-xs-offset-1 col-md-3 col-md-offset-1 contact2" style="margin-top:3%; height:50%; margin-bottom: 1%;">                  
                     <div class="logo" style="height:35%;">
-                        <img src="img/Snap_Logo_Inverted.png" style="width:90%; height: 90%;">
+                        <img src="./img/Snap_Logo_Inverted.png" style="width:90%; height: 90%;">
                     </div>
                     <div style="margin-top:3%;text-align: justify">
                         <span class="p1">Tobacco smoking is one of the largest causes of preventable illness and death in Australia. Research estimates that two in three lifetime smokers will die from a disease caused by their smoking. The most recent estimate of deaths caused by tobacco in Australia is for the financial year 2004–05.
@@ -616,7 +502,7 @@ and open the template in the editor.
                         <div style="width:50%;color:#FCEE2D; text-align:center; height: 100%;">
                             <span>
                                 <a class='scrollToTop' href="#">
-                                <img src="img/back_to_top_icon.png" style="height: 30%; width: 30%;">
+                                <img src="./img/back_to_top_icon.png" style="height: 30%; width: 30%;">
                                 </a>
                             </span>
                             <br>
@@ -631,7 +517,7 @@ and open the template in the editor.
                             <ul class="nav navbar-nav">
                                 <li class="active">
                                     <a class="navbar-brand" href="#">
-                                        <img alt="Brand" src="img/Snap_Logo_Inverted.png" style="height: 100%;">
+                                        <img alt="Brand" src="./img/Snap_Logo_Inverted.png" style="height: 100%;">
                                     </a>
                                 </li>
                                 <li class="divider"></li>
@@ -643,5 +529,46 @@ and open the template in the editor.
             </div>
         </div>
 
+        <div id="fb-root"></div>
+
+        <script>
+            wow = new WOW(
+                {
+                    boxClass:     'wow',      // default
+                    animateClass: 'animated', // default
+                    offset:       0,          // default
+                    mobile:       true,       // default
+                    live:         true        // default
+                }
+            )
+            wow.init();
+
+            (function(d, s, id) {
+                var js, fjs = d.getElementsByTagName(s)[0];
+                if (d.getElementById(id)) return;
+                js = d.createElement(s); js.id = id;
+                js.src = "//connect.facebook.net/en_US/sdk.js#xfbml=1&version=v2.6&appId=909271749154924";
+                fjs.parentNode.insertBefore(js, fjs);
+            }(document, 'script', 'facebook-jssdk'));
+
+            <!--Twitter widgets.js -->
+            window.twttr = (function(d, s, id) {
+                var js, fjs = d.getElementsByTagName(s)[0],
+                    t = window.twttr || {};
+                if (d.getElementById(id)) return t;
+                js = d.createElement(s);
+                js.id = id;
+                js.src = "https://platform.twitter.com/widgets.js";
+                fjs.parentNode.insertBefore(js, fjs);
+
+                t._e = [];
+                t.ready = function(f) {
+                    t._e.push(f);
+                };
+
+                return t;
+            }(document, "script", "twitter-wjs"));
+        </script>
+                        
     </body>
 </html>

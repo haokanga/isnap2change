@@ -36,89 +36,11 @@
         <title>Sign Up</title>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <link rel="stylesheet" type="text/css" href="css/signup.css" />
-        <script src="js/jquery.js"></script>
-        <!-- Latest compiled and minified CSS -->
+        <link rel="stylesheet" type="text/css" href="./css/signup.css"/>
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
+        <script src="./js/vendor/jquery.js"></script>
+        <script src="./js/signup.js"></script>
         <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js" integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS" crossorigin="anonymous"></script>
-        <script>
-            function parseValidInfoFeedback(response){
-                var feedback = JSON.parse(response);
-
-                if(feedback.message != "success"){
-                    alert(feedback.message + ". Please try again!");
-                    return;
-                }
-
-                if(feedback.result == "invalid"){
-                    $('#username-validation-text').css("color","red");
-                    $('#username-validation-text').text("This username is used!");
-                    $('#username-text').val("");
-                } else if(feedback.result == "valid"){
-                    $('#username-validation-text').css("color","green");
-                    $('#username-validation-text').text("This username is valid!");
-                }
-            }
-
-            function parseSubmitInfoFeedback(response){
-                var feedback = JSON.parse(response);
-
-                if(feedback.message != "success"){
-                    alert(feedback.message + ". Please try again!");
-                    return;
-                } else if(feedback.message == "success"){
-                    alert("You have successfully registered!");
-                }
-
-
-            }
-
-            function validInfo(action){
-                var username = document.getElementById("username-text").value;
-                var postData = "username="+username+"&action="+action;
-
-                var xmlhttp = new XMLHttpRequest();
-                xmlhttp.onreadystatechange = function() {
-                    if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
-                        parseValidInfoFeedback(xmlhttp.responseText);
-                    }
-                };
-
-                xmlhttp.open("POST", "signup-feedback.php", true);
-                xmlhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-                xmlhttp.send(postData);
-            }
-
-            function submitInfo(action){
-                var username = $('#username-text').val();
-                var password = $('#password-text').val();
-                var lastname = $('#lastname-text').val();
-                var firstname = $("#firstname-text").val();
-                var email = $('#email-text').val();
-                var dobDay = $('#dob-dd-selection').val();
-                var dobMon = $('#dob-mm-selection').val();
-                var dobYear = $('#dob-yyyy-selection').val();
-                var gender = $("input[type='radio'][name='gender-radio']:checked").val();
-                var identity = $('#identity-selection').val();
-                var classID = $('#classid-hidden').val();
-
-                var postData = "username="+username+"&password="+password+"&lastname="+lastname+"&firstname="+firstname
-                               +"&email="+email+"&dobDay="+dobDay+"&dobMon="+dobMon+"&dobYear="+dobYear+"&gender="+gender
-                               +"&identity="+identity+"&classID="+classID+"&action="+action;
-
-                var xmlhttp = new XMLHttpRequest();
-                xmlhttp.onreadystatechange = function() {
-                    if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
-                        parseSubmitInfoFeedback(xmlhttp.responseText);
-                    }
-                };
-
-                xmlhttp.open("POST", "signup-feedback.php", true);
-                xmlhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-                xmlhttp.send(postData);
-            }
-
-        </script>
     </head>
     <body>
         <div class="col-xs-offset-3 col-xs-6" style="height: 100%; text-align: center; align-items: center; color: white; margin-top: 3%;">
@@ -153,20 +75,70 @@
             </div>
             <div class="input-group" style="margin-top:2%; text-align: center; align-items: center; width: 100%;">
                 <span style="display: table-cell; vertical-align: middle; padding: 6px; color: yellow; width: 25%; text-align:right;">Date Of Birth</span>
-               <select id="dob-dd-selection" class="form-control" style="opacity: 0.7; font-size: 0.7em; margin: 0.8%; width: 22%; background-color: black; color:white; border-radius: 10px; border: none; text-align: center;">
+                <select id="dob-dd-selection" class="form-control" style="opacity: 0.7; font-size: 0.7em; margin: 0.8%; width: 22%; background-color: black; color:white; border-radius: 10px; border: none; text-align: center;">
                     <option value="" selected disabled>DD</option>
+                    <option>01</option>
+                    <option>02</option>
+                    <option>03</option>
+                    <option>04</option>
+                    <option>05</option>
+                    <option>06</option>
+                    <option>07</option>
+                    <option>08</option>
+                    <option>09</option>
+                    <option>10</option>
+                    <option>11</option>
                     <option>12</option>
                     <option>13</option>
+                    <option>14</option>
+                    <option>15</option>
+                    <option>16</option>
+                    <option>17</option>
+                    <option>18</option>
+                    <option>19</option>
+                    <option>20</option>
+                    <option>21</option>
+                    <option>22</option>
+                    <option>23</option>
+                    <option>24</option>
+                    <option>25</option>
+                    <option>26</option>
+                    <option>27</option>
+                    <option>28</option>
+                    <option>29</option>
+                    <option>30</option>
+                    <option>31</option>
                 </select>
                 <select id="dob-mm-selection" class="form-control" style="opacity: 0.7; font-size: 0.7em; margin: 0.8%; width: 22%; background-color: black; color:white; border-radius: 10px; border: none; text-align: center;">
                     <option value="" selected disabled>MM</option>
                     <option>1</option>
                     <option>2</option>
+                    <option>3</option>
+                    <option>4</option>
+                    <option>5</option>
+                    <option>6</option>
+                    <option>7</option>
+                    <option>8</option>
+                    <option>9</option>
+                    <option>10</option>
+                    <option>11</option>
+                    <option>12</option>
                 </select>
-                 <select id="dob-yyyy-selection" class="form-control" style="opacity: 0.7; font-size: 0.7em; margin: 0.8%; width: 22%; background-color: black; color:white; border-radius: 10px; border: none; text-align: center;">
+                <select id="dob-yyyy-selection" class="form-control" style="opacity: 0.7; font-size: 0.7em; margin: 0.8%; width: 22%; background-color: black; color:white; border-radius: 10px; border: none; text-align: center;">
                     <option value="" selected disabled>YYYY</option>
+                    <option>2000</option>
                     <option>2001</option>
                     <option>2002</option>
+                    <option>2003</option>
+                    <option>2004</option>
+                    <option>2005</option>
+                    <option>2006</option>
+                    <option>2007</option>
+                    <option>2008</option>
+                    <option>2009</option>
+                    <option>2010</option>
+                    <option>2011</option>
+                    <option>2012</option>
                 </select>
             </div>
             <div class="input-group" style="margin-top:2%; text-align: center; align-items: center; width: 100%;">
