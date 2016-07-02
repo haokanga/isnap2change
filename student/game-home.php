@@ -1,18 +1,33 @@
 <?php
-session_start();
+    //check login status
+    require_once('./student-validation.php');
 
-//check login status
-require_once('./student-validation.php');
+    require_once("../mysql-lib.php");
+    require_once("../debug.php");
+    $pageName = "game-home";
 
-require_once("../mysql-lib.php");
-require_once("../debug.php");
-$pageName = "game-home";
+    $conn = null;
+
+    try {
+        $conn = db_connect();
+
+        //get student score
+        $studentScore = getStudentScore($conn, $studentID);
 
 
 
+    } catch(Exception $e) {
+        if($conn != null) {
+            db_close($conn);
+        }
 
+        debug_err($pageName, $e);
+        //to do: handle sql error
+        //...
+        exit;
+    }
 
-
+    db_close($conn);
 
 ?>
 
@@ -193,7 +208,7 @@ $pageName = "game-home";
             </ul>
             <a href="#" class="settings">
                 <span class="setting-icon"></span>
-                <span class="setting-text">NoButSrsly</span>
+                <span class="setting-text"><?php echo $studentUsername?></span>
             </a>
         </div>
     </div>
@@ -272,7 +287,7 @@ $pageName = "game-home";
                 </div>
                 <div class="col-8">
                     <h2 class="achievement-score">Total Score:
-                        <span class="count">1000</span>
+                        <span class="count"><?php echo $studentScore?></span>
                     </h2>
                     <div class="achievement-showcase">
                         <h3>Achievement Showcase</h3>

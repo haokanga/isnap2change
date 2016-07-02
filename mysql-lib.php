@@ -277,9 +277,15 @@ function validStudent(PDO $conn, $username, $password)
     $validStudentRes = $validStudentQuery->fetchColumn();
 
     if ($validStudentRes == 0) {
-        return false;
+        return null;
     } else if ($validStudentRes == 1) {
-        return true;
+
+        $validStudentSql = "SELECT StudentID, Username FROM Student WHERE `Username` = BINARY ? AND `Password` = BINARY ?";
+        $validStudentQuery = $conn->prepare($validStudentSql);
+        $validStudentQuery->execute(array($username, md5($password)));
+        $validStudentRes = $validStudentQuery->fetch(PDO::FETCH_OBJ);
+
+        return $validStudentRes;
     } else throw new Exception("Duplicate students in Database");
 }
 
