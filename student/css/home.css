@@ -12,13 +12,9 @@ and open the template in the editor.
 body
 {
     margin: 0px !important;
-	font-family: 'Maitree', serif !important;
+    font-family: 'Lato', sans-serif;
 }
 
-html
-{
-	font-family: 'Maitree', serif;
-}
 
 .start
 { 
@@ -56,6 +52,46 @@ html
 
 
 }
+.p1
+{
+    font-family: 'Maitree', sans-serif;
+    font-size: 18px;
+    font-weight: lighter;
+    color: white;
+}
+
+.fact
+{
+    font-family: 'Maitree', sans-serif;
+    font-size: 24px;
+    font-weight: lighter;
+    color: white;
+}
+
+
+.header3
+{
+    font-family: 'Lato', sans-serif;
+    font-size: 24px;
+    font-weight: normal;
+    color: #FCEE2D;
+}
+
+.header4
+{
+    font-family: 'Lato', sans-serif;
+    font-size: 20px;
+    font-weight: normal;
+    color: #FCEE2D;
+}
+
+.header5
+{
+    font-family: 'Lato', sans-serif;
+    font-size: 18px;
+    font-weight: normal;
+}
+
 
 .pg2
 { 
