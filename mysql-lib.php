@@ -168,7 +168,7 @@ function updateToken(PDO $conn, $classID, $tokenString)
             SET TokenString = ?
             WHERE ClassID = ?";
     $updateSql = $conn->prepare($updateSql);
-    $updateSql->execute(array($classID, htmlspecialchars($tokenString)));
+    $updateSql->execute(array(htmlspecialchars($tokenString), $classID));
 }
 
 function getToken(PDO $conn, $token)
