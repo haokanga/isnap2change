@@ -4,8 +4,8 @@
 	//check login status
 	require_once('student-validation.php');
 
-	require_once('mysql-lib.php');
-	require_once('debug.php');
+	require_once("../mysql-lib.php");
+	require_once("../debug.php");
 	$pageName = "multiple-choice-question";
 	
 	if ($_SERVER["REQUEST_METHOD"] == "POST") {

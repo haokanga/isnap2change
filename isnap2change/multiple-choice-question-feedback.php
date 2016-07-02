@@ -1,6 +1,6 @@
 <?php
-    require_once("mysql-lib.php");
-	require_once('debug.php');
+    require_once("../mysql-lib.php");
+	require_once("../debug.php");
 	$pageName = "multiple-choice-question-feedback";
 
 	if($_SERVER["REQUEST_METHOD"] == "POST"){

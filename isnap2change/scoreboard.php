@@ -15,7 +15,7 @@
     //if true, echo debug output in dev mode, else production mode
 	$DEBUG_MODE = false;
     session_start(); 
-	require_once('mysql-lib.php');
+	require_once("../mysql-lib.php");
     if ($_SERVER["REQUEST_METHOD"] == "POST") {    
         if(isset($_SESSION['studentID'])){
             $studentID = $_SESSION['studentID'];

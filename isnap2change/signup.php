@@ -1,5 +1,5 @@
 <?php
-	require_once('mysql-lib.php');
+	require_once("../mysql-lib.php");
 	
 	if ($_SERVER["REQUEST_METHOD"] == "POST") {
 		

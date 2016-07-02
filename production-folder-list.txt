@@ -1,0 +1,4 @@
+/student
+/researcher
+/sb-admin
+/bower_components

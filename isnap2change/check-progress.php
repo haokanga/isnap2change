@@ -1,6 +1,6 @@
 <?php
 	session_start();
-	require_once("mysql-lib.php");
+	require_once("../mysql-lib.php");
 	
 	if(isset($_SESSION["studentID"])){
 		$studentID = $_SESSION["studentID"];
