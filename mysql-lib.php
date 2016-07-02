@@ -231,6 +231,11 @@ function deleteStudent(PDO $conn, $studentID)
     deleteRecord($conn, $studentID, "Student");
 }
 
+function getStudent(PDO $conn, $studentID)
+{
+    return getRecord($conn, $studentID, "Student", array("Class"));
+}
+
 function getStudents(PDO $conn)
 {
     $studentSql = "SELECT * , DATE(SubmissionTime) AS SubmissionDate FROM Student NATURAL JOIN Class
@@ -1301,9 +1306,16 @@ function getGames(PDO $conn)
     return getRecords($conn, "Game");
 }
 
+function getStudentGameWeek(PDO $conn, $studentID)
+{
+    $classID = getStudent($conn, $studentID)->ClassID;
+    $week = min(getClass($conn, $classID)->UnlockedProgress, getMaxWeek($conn)->WeekNum);
+    return $week;
+}
+
 function getStudentGameScores(PDO $conn, $gameID, $studentID)
 {
-    $levels = getGame($conn, [$gameID - 1])->Levels;
+    $levels = getGame($conn, $gameID)->Levels;
     $scoreArray = array_fill(0, $levels, 0);
 
     for ($level = 1; $level <= $levels; $level++) {
@@ -1315,9 +1327,9 @@ function getStudentGameScores(PDO $conn, $gameID, $studentID)
             $retrieveScoreQuery = $conn->prepare($retrieveScoreSql);
             $retrieveScoreQuery->execute(array($gameID, $studentID, $level));
             $retrieveScoreResult = $retrieveScoreQuery->fetch(PDO::FETCH_OBJ);
-            $scoreArray[$level] = $retrieveScoreResult->Score;
+            $scoreArray[$level - 1] = $retrieveScoreResult->Score;
         } else {
-            $scoreArray[$level] = 0;
+            $scoreArray[$level - 1] = 0;
         }
     }
 

@@ -1,36 +1,39 @@
 <?php
 require_once("../mysql-lib.php");
 require_once("../debug.php");
-require_once("student-validation.php");
+if (!isset($_SESSION)) {
+    session_start();
+}
+if (isset($_SESSION['studentID'])) {
+    $studentID = $_SESSION['studentID'];
+} else {
+    if ($DEBUG_MODE) {
+        $studentID = 1;
+    }
+}
 $pageName = "retrieve-stored-score";
 
 if ($_SERVER["REQUEST_METHOD"] == "GET") {
-    if (isset($_GET["score"]) && isset($_GET["gameID"])) {
-        $score = $_GET["score"];
+    $conn = db_connect();
+    if (isset($_GET["command"]) && isset($_GET["gameID"])) {
         $gameID = $_GET["gameID"];
-        $conn = db_connect();
-        updateStudentGameScores($conn, $gameID, $studentID, $score);
-        db_close($conn);
+
+        if ($_GET["command"] == "get_week") {
+            // return current week to unlock levels
+            echo getStudentGameWeek($conn, $studentID);
+        } else if ($_GET["command"] == "retrieve") {
+            // retrieve high score
+            $scoreArray = getStudentGameScores($conn, $gameID, $studentID);
+            echo join(',', $scoreArray);
+
+        } else if ($_GET["command"] == "upload") {
+            // update high score
+            if (isset($_GET["score"])) {
+                $score = $_GET["score"];
+                updateStudentGameScores($conn, $gameID, $studentID, $score);
+            }
+        }
     }
+    db_close($conn);
 }
-
-
 ?>
-<html>
-<head>
-</head>
-<body>
-<!--Test Code-->
-<!--
-<div id="a" align="center">
-<form id="quiz" action="<?php echo $_SERVER['PHP_SELF']; ?>" method=get>
-Score:<input name="score[]" value="15">
-Score:<input name="score[]" value="15">
-Score:<input name="score[]" value="15">
-Score:<input name="score[]" value="15">
-Score:<input name="score[]" value="15">
-<input type="submit" name='submit' value="Submit" class='submit'/>
-</form>
--->
-</body>
-</html>
