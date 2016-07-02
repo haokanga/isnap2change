@@ -61,7 +61,7 @@ and open the template in the editor.
 
         <!-- Latest compiled and minified CSS -->
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
-        <link href="https://fonts.googleapis.com/css?family=Maitree" rel="stylesheet">
+        <link href='https://fonts.googleapis.com/css?family=Maitree|Lato:400,900' rel='stylesheet' type='text/css'>
         <!--Javascripts-->
         <script src="js/jquery.js"></script>
         <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js" integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS" crossorigin="anonymous"></script>
@@ -233,12 +233,12 @@ and open the template in the editor.
                                 <input id="username" type="text" style="text-align: center; border-radius: 10px; color:white; border: none; background-color: black;" class="form-control" placeholder="Username" onfocus="this.placeholder=''" onblur="this.placeholder='Username'" aria-describedby="sizing-addon1" autocomplete="off">
                             </div>
                             <div class="input-group input-group-lg" style="margin-top:5%; text-align: center;">
-                                <input id="password" type="password" style="text-align: center; border-radius: 10px; border: none; color:yellow; background-color: black; opacity: 0.7;" class="form-control" placeholder="Password" aria-describedby="sizing-addon1">
+                                <input id="password" type="password" style="text-align: center; border-radius: 10px; border: none; color:white; background-color: black;" class="form-control" placeholder="Password" onfocus="this.placeholder=''" onblur="this.placeholder='Password'" aria-describedby="sizing-addon1">
                             </div>
-                            <button type="button" class="btn btn-primary btn-lg btn-block" style="margin-top:5%; border-radius: 10px; border-color: yellow !important; color:yellow; background-color: black; opacity: 0.7;" onclick="validStudent()">Log In</button>
+                            <button type="button" class="btn btn-primary btn-lg btn-block" style="margin-top:5%; border-radius: 10px; border-color: #FCEE2D !important; color:#FCEE2D; background-color: black; opacity: 0.7;" onclick="validStudent()">Log In</button>
                             <div style="text-align: center; margin-top: 5%">
                         <span style="color: white;"> Don't have an account?</span>
-                        <a href='#' onclick="location.href = 'valid-token.php';" style='color:yellow;'>Sign Up</a>
+                        <a href='#' onclick="location.href = 'valid-token.php';" style='color:#FCEE2D;'>Sign Up</a>
                     </div>
                         </div>
                     </div>
@@ -250,8 +250,8 @@ and open the template in the editor.
 
         <!-- Page 2 -->
         <div class="pg2" id="2">
-            <div class="pg2_div" style="margin-top:2%; height: 100%; width: 100%;">
-                <div class="col-xs-10 col-xs-offset-1 col-md-6 col-md-offset-1" style="height: 100%;">  
+            <div class="pg2_div" style="margin-top:4%; height: 100%; width: 100%;">
+                <div class="col-xs-10 col-xs-offset-1 col-md-6 col-md-offset-1" style="height: 100%;">
                     <div class="panel" style="background-color:black; border-radius:30px; height: 40%; width: 100%;">
                         <div class="panel-body" style="padding: 0px; height: 100%; width: 100%;">
                             <div class="col-xs-8 col-xs-offset-2" style="text-align: center; height: 55%;">
@@ -262,10 +262,10 @@ and open the template in the editor.
 
                             </div>
                             <div class="col-xs-8 col-xs-offset-2" style="text-align: center; height: 40%; margin-top:0.2%;">                            
-                                <div style="width: 100%; font-size: 3vh; color: yellow; border: 0px solid yellow; border-bottom-color: yellow; border-bottom-width: 2px;">
-                                    Perfect Attendance</div>                 
+                                <div style="width: 100%; border: 0px solid; border-bottom-color: #FCEE2D; border-bottom-width: 2px;">
+                                    <span class="header4">Perfect Attendance</span></div>
                                 <br>
-                                <span style="color:white; font-size: 2.5vh;">Log in every day for the entire SNAP Program to unlock this achievement </span>
+                                <span class="p1">Log in every day for the entire SNAP Program to unlock this achievement </span>
                             </div>                                                        
                         </div>
                     </div>
@@ -357,15 +357,15 @@ and open the template in the editor.
                         </div>
                         <div class="table-res" style="height: 85%;">
                             <table class="table" style="background-color:black; text-align:center; color: white; vertical-align: middle !important;">
-                                <thead style="color:yellow;">
+                                <thead style="color:#FCEE2D;">
                                 <td>
-                                    <strong>Rank</strong>
+                                    <span class="header4">Rank</span>
                                 </td>
                                 <td>
-                                    <strong>Username</strong>
+                                    <span class="header4">Username</span>
                                 </td>
                                 <td>
-                                    <strong>Score</strong>
+                                    <span class="header4">Score</span>
                                 </td>
                                 </thead>
                                 <?php  for($i = 0; $i < count($leaderboardRes); $i++) {
@@ -431,8 +431,8 @@ and open the template in the editor.
                             </td> <?php ;
                         break;
                 }   ?>
-                            <td> <?php echo $leaderboardRes[$i]->Username ?> </td>
-                            <td> <?php echo $leaderboardRes[$i]->Score ?> </td>
+                            <td class="header5"> <?php echo $leaderboardRes[$i]->Username ?> </td>
+                            <td class="header5"> <?php echo $leaderboardRes[$i]->Score ?> </td>
                         </tr>
 <?php   } ?>
                     </table>
@@ -445,7 +445,7 @@ and open the template in the editor.
         <!-- Page 3 div -->
         <div class="pg3" id="3">
             <div class="pg3_heading" style="display:flex;justify-content:center;align-items:center;width:100%;height:15%;">
-                <div style="width:50%;color:yellow; text-align:center; margin-top:2%; height: inherit;">
+                <div style="width:50%;color:#FCEE2D; text-align:center; margin-top:2%; height: inherit;">
                     <span style="font-size: 5vh;">
                         Facts of the Week
                     </span>
@@ -483,22 +483,22 @@ and open the template in the editor.
                             <?php
                     switch($factRes[$i]->TopicID) {
                         case 1: ?>
-                            <div style="color:rgb(252,238,045); border: 0px solid rgb(252,238,045); border-bottom-color: rgb(252,238,045); border-bottom-width: 2px; font-size:3vh; width: 100%;"> <?php ;
+                            <div style="color:rgb(252,238,045); border: 0px solid rgb(252,238,045); border-bottom-color: rgb(252,238,045); border-bottom-width: 2px; font-size:3vh; width: 100%;margin-bottom: 20pt;padding-bottom:10pt; "> <?php ;
                             break;
                         case 2: ?>
-                            <div style="color:rgb(247,117,030); border: 0px solid rgb(247,117,030); border-bottom-color: rgb(247,117,030); border-bottom-width: 2px; font-size:3vh; width: 100%;"> <?php ;
+                            <div style="color:rgb(247,117,030); border: 0px solid rgb(247,117,030); border-bottom-color: rgb(247,117,030); border-bottom-width: 2px; font-size:3vh; width: 100%;margin-bottom: 20pt;padding-bottom:10pt;"> <?php ;
                             break;
                         case 3: ?>
-                            <div style="color:rgb(175,36,209); border: 0px solid rgb(175,36,209); border-bottom-color: rgb(175,36,209); border-bottom-width: 2px; font-size:3vh; width: 100%;"> <?php ;
+                            <div style="color:rgb(175,36,209); border: 0px solid rgb(175,36,209); border-bottom-color: rgb(175,36,209); border-bottom-width: 2px; font-size:3vh; width: 100%;margin-bottom: 20pt;padding-bottom:10pt;"> <?php ;
                             break;
                         case 4: ?>
-                            <div style="color:rgb(219,27,27); border: 0px solid rgb(219,27,27); border-bottom-color: rgb(219,27,27); border-bottom-width: 2px; font-size:3vh; width: 100%;"> <?php ;
+                            <div style="color:rgb(219,27,27); border: 0px solid rgb(219,27,27); border-bottom-color: rgb(219,27,27); border-bottom-width: 2px; font-size:3vh; width: 100%;margin-bottom: 20pt;padding-bottom:10pt;"> <?php ;
                             break;
                     }
                         echo strtoupper($factRes[$i]->TopicName)." FACT #".$factRes[$i]->FactID; ?>
                     </div>
 
-                            <span style="color:white; font-size: 2.4vh;"><?php echo $factRes[$i]->Content; ?></span>
+                            <span class="fact"><?php echo $factRes[$i]->Content; ?></span>
                         </div>
 
                     </div>
@@ -509,9 +509,9 @@ and open the template in the editor.
                 </div>
 
             </div>
-            <div class="pg3_footer" style="display:flex;justify-content:center;align-items:center;width:100%;height:10%; margin-top: 9%;">
+            <div class="pg3_footer" style="display:flex;justify-content:center;align-items:center;width:100%;height:10%; margin-top: 4%;">
                 <div style="width:50%;color:white; text-align:center; height: 100%;">
-                    <span style="font-size:1.8vh; height: 20%;">Want to know more?</span>
+                    <span class="p1">Want to know more?</span>
                     <br>
                     <span style="height: 50%;">
                         <img src="img/snap_facts_icon.png" style="height: inherit; width: 10%;">
@@ -522,16 +522,16 @@ and open the template in the editor.
 
         <!-- Page 4 -->
         <div class="pg4" id="4">           
-            <div class="social" style="width:100%; height:100%;">
+            <div class="social" style="width:100%; height:100%; align-content: center">
                 <div class="row" style="margin-left:0px; margin-right:0px; align-content:center; height:100%;">
                     <div class="col-xs-8 col-xs-offset-2 col-md-4 col-md-offset-2 social1" style="margin-top:1.5%; height: 90%; margin-bottom: 4%;">
-                    <div class="fb-page" data-width="480" data-height="630" data-href="https://www.facebook.com/cpuresearch" data-tabs="timeline, messages" data-small-header="true" data-adapt-container-width="true" data-hide-cover="false" data-show-facepile="true">
+                    <div class="fb-page" data-width="400" data-height="500" data-href="https://www.facebook.com/cpuresearch" data-tabs="timeline, messages" data-small-header="true" data-adapt-container-width="true" data-hide-cover="false" data-show-facepile="true">
                     <div style="height: 90%; width:95%;" class="fb-xfbml-parse-ignore"><blockquote cite="https://www.facebook.com/cpuresearch"><a href="https://www.facebook.com/cpuresearch">CPU Research</a></blockquote></div>
                 </div>
                         
                     </div>
                     <div class="col-xs-8 col-xs-offset-2 col-md-4 col-md-offset-0 social2" style="margin-top:3%; height:90%; margin-bottom:4%;">
-                        <a class="twitter-timeline" data-width="480" data-height="630" href="https://twitter.com/CPUResearch" data-widget-id="732758309019607040">Tweets by @CPUResearch</a>
+                        <a class="twitter-timeline" data-width="400" data-height="500" href="https://twitter.com/CPUResearch" data-widget-id="732758309019607040">Tweets by @CPUResearch</a>
                 <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+"://platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
                     </div>
                 </div>
@@ -547,10 +547,10 @@ and open the template in the editor.
                             <img src="img/chris.jpg" style="width:90%; height:90%;">
                         </div>
                         <div class="col-xs-8" style="color:white; height: 100%;">
-                            <span style="color:yellow; font-size: 3.8vh; border: 0px solid yellow; border-bottom-color: yellow; border-bottom-width: 2px;">
+                            <span class="header3" style="border: 0px solid #FCEE2D; border-bottom-color: #FCEE2D; border-bottom-width: 2px;">
                                 Celebrity #1</span>
-                            <div class="text" style="font-size: 2.7vh; margin-top: 1.2%;">
-                                Tobacco smoking is one of the largest causes of preventable illness and death in Australia. Research estimates that two in three lifetime smokers will die from a disease caused by their smoking. The most recent estimate of deaths caused by tobacco in Australia is for the financial year 2004–05. Tobacco use caused a total of 14,901 deaths in that year.
+                            <div style="margin-top: 1.2%;">
+                                <span class="p1">Tobacco smoking is one of the largest causes of preventable illness and death in Australia. Research estimates that two in three lifetime smokers will die from a disease caused by their smoking. The most recent estimate of deaths caused by tobacco in Australia is for the financial year 2004–05. Tobacco use caused a total of 14,901 deaths in that year.</span>
                             </div>
                         </div>
                     </div>
@@ -561,10 +561,10 @@ and open the template in the editor.
                             <img src="img/ch2.jpg" style="width:90%; height: 90%;">
                         </div>
                         <div class="col-xs-8" style="color:white; height: 100%;">
-                            <span style="color:yellow; font-size: 3.8vh; border: 0px solid yellow; border-bottom-color: yellow; border-bottom-width: 2px;">
+                            <span class="header3" style="border: 0px solid #FCEE2D; border-bottom-color: #FCEE2D; border-bottom-width: 2px;">
                                 Celebrity #2</span>
-                            <div class="text" style="font-size: 2.7vh; margin-top: 1.2%;">
-                                Tobacco smoking is one of the largest causes of preventable illness and death in Australia. Research estimates that two in three lifetime smokers will die from a disease caused by their smoking. The most recent estimate of deaths caused by tobacco in Australia is for the financial year 2004–05. Tobacco use caused a total of 14,901 deaths in that year.
+                            <div style=" margin-top: 1.2%;">
+                                <span class="p1">Tobacco smoking is one of the largest causes of preventable illness and death in Australia. Research estimates that two in three lifetime smokers will die from a disease caused by their smoking. The most recent estimate of deaths caused by tobacco in Australia is for the financial year 2004–05. Tobacco use caused a total of 14,901 deaths in that year.</span>
                             </div>
                         </div> 
                     </div>
@@ -574,28 +574,29 @@ and open the template in the editor.
 
         <!-- Page 6 -->
         <div class="pg6" id="6">           
-            <div class="contact" style="width:100%; height:100%;">
-                <div class="col-xs-10 col-xs-offset-1 col-md-6 col-md-offset-1 contact1" style="margin-top:2%; height: 50%; color:white; text-align: center; font-size: 2.5vh;">
-                    Any questions or comments?
-                    <br> Please contact us and we will reach out to you shortly.
-                    <br>
-                    <br>
+            <div class="contact" style="width:100%; height:100%; text-align: center;">
+                <div class="col-xs-10 col-xs-offset-1 col-md-6 col-md-offset-1 contact1" style="margin-top:2%; height: 50%; ">
+                    <span class="p1">Any questions or comments?
+                        <br> Please contact us and we will reach out to you shortly.
+                        <br>
+                        <br>
+                    </span>
                     <form>
                         <div class="form-group" style="text-align: center;">
-                            <label for="name" style='color: yellow;'>Name</label>
+                            <label class="header5" style="color: #FCEE2D">Name</label>
                             <input type="text" class="form-control" id="myName">
                         </div>
                         <div class="form-group" style="text-align: center;">
-                            <label for="email" style='color: yellow;'>Email</label>
+                            <label class="header5" style="color: #FCEE2D">Email</label>
                             <input type="email" class="form-control" id="emailID">
                         </div>     
-                        <textarea class="form-control" rows="4"></textarea>
+                        <textarea class="form-control" rows="4" style="margin-top: 3%"></textarea>
                     </form>
                     <div class="sendbutton" style="display:flex;justify-content:center;align-items:center;width:100%;height:20%; margin-top:1%;">
-                        <div style="width:50%;color:yellow; text-align:center;">
+                        <div style="width:50%;color:#FCEE2D; text-align:center;">
                             <span>
                             <a href='#'>
-                                <img src="img/send_icon.png" style="height: 45px; width: 45px;">
+                                <img src="img/send_icon.png" style="height: 75px; width: 75px;">
                             </a>
                             </span>
                         </div>
@@ -605,21 +606,21 @@ and open the template in the editor.
                     <div class="logo" style="height:35%;">
                         <img src="img/Snap_Logo_Inverted.png" style="width:90%; height: 90%;">
                     </div>
-                    <div class="snaptext" style="color:white; margin-top:3%;">
-                        <span style='font-size: 2.5vh;'>Tobacco smoking is one of the largest causes of preventable illness and death in Australia. Research estimates that two in three lifetime smokers will die from a disease caused by their smoking. The most recent estimate of deaths caused by tobacco in Australia is for the financial year 2004–05.
+                    <div style="margin-top:3%;text-align: justify">
+                        <span class="p1">Tobacco smoking is one of the largest causes of preventable illness and death in Australia. Research estimates that two in three lifetime smokers will die from a disease caused by their smoking. The most recent estimate of deaths caused by tobacco in Australia is for the financial year 2004–05.
                         </span>
                     </div> 
                 </div>
                 <div class="col-xs-4 col-xs-offset-4 col-md-2 col-md-offset-5" style="height: 10%; margin-top:1%; margin-bottom: 1%;">
                     <div class="back2top" style="display:flex;justify-content:center;align-items:center;width:100%; height: 10%;">
-                        <div style="width:50%;color:yellow; text-align:center; height: 100%;">
+                        <div style="width:50%;color:#FCEE2D; text-align:center; height: 100%;">
                             <span>
                                 <a class='scrollToTop' href="#">
                                 <img src="img/back_to_top_icon.png" style="height: 30%; width: 30%;">
                                 </a>
                             </span>
                             <br>
-                            <span style="font-size:1.5vh;">Back to Top</span>
+                            <span class="header5">Back to Top</span>
                         </div>
                     </div> 
                 </div>
