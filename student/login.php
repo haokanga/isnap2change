@@ -23,9 +23,12 @@
 		$conn = db_connect();
 
 		//valid student
-		if(validStudent($conn, $username, $password)) {
+		$validRes = validStudent($conn, $username, $password);
+
+		if($validRes != null) {
 			$feedback["result"] = "valid";
-			$_SESSION["studentID"] = "";
+			$_SESSION["studentID"] = $validRes->StudentID;
+			$_SESSION["studentUsername"] = $validRes->Username;
 		} else {
 			$feedback["result"] = "invalid";
 		}
