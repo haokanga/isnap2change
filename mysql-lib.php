@@ -168,7 +168,7 @@ function updateToken(PDO $conn, $classID, $tokenString)
             SET TokenString = ?
             WHERE ClassID = ?";
     $updateSql = $conn->prepare($updateSql);
-    $updateSql->execute(array($classID, htmlspecialchars($tokenString)));
+    $updateSql->execute(array(htmlspecialchars($tokenString), $classID));
 }
 
 function getToken(PDO $conn, $token)
@@ -214,14 +214,14 @@ function validToken(PDO $conn, $token)
 /* Token */
 
 /* Student */
-function createStudent(PDO $conn, $username, $password, $firstname, $lastname, $email, $gender, $dob, $identity, $classID)
+function createStudent(PDO $conn, $username, $password, $firstName, $lastName, $email, $gender, $dob, $identity, $classID)
 {
     $insertStudentSql = "INSERT INTO Student(Username, `Password`, FirstName, LastName, Email, Gender, DOB, Identity, Score, ClassID)
 						 VALUES (?,?,?,?,?,?,?,?,?,?)";
 
     $insertStudentSql = $conn->prepare($insertStudentSql);
 
-    if (!$insertStudentSql->execute(array($username, md5($password), $firstname, $lastname, $email, $gender, $dob, $identity, 0, $classID))) {
+    if (!$insertStudentSql->execute(array($username, md5($password), $firstName, $lastName, $email, $gender, $dob, $identity, 0, $classID))) {
         throw new Exception("Fail to insert a student");
     }
 }
@@ -275,7 +275,7 @@ function validStudent(PDO $conn, $username, $password)
         return false;
     } else if ($validStudentRes == 1) {
         return true;
-    } else throw new Exception("Duplicate students");
+    } else throw new Exception("Duplicate students in Database");
 }
 
 function validUsername(PDO $conn, $username)
@@ -452,12 +452,7 @@ function getQuizType(PDO $conn, $quizID)
 
 function getQuizzes(PDO $conn)
 {
-    $quizSql = "SELECT QuizID, Week, QuizType, TopicName
-                   FROM Quiz NATURAL JOIN Topic";
-    $quizQuery = $conn->prepare($quizSql);
-    $quizQuery->execute();
-    $quizResult = $quizQuery->fetchAll(PDO::FETCH_OBJ);
-    return $quizResult;
+    return getRecords($conn, "Quiz", array("Topic"));
 }
 
 function getQuizzesByWeek(PDO $conn, $week)
@@ -959,24 +954,7 @@ function updateLearningMaterial(PDO $conn, $quizID, $content)
 
 function getLearningMaterial(PDO $conn, $quizID)
 {
-    $materialPreSql = "SELECT COUNT(*) 
-                       FROM   Learning_Material
-                       WHERE  QuizID = ?";
-    $materialPreQuery = $conn->prepare($materialPreSql);
-    $materialPreQuery->execute(array($quizID));
-    if ($materialPreQuery->fetchColumn() != 1) {
-        throw new Exception("Failed to get learning material");
-    }
-
-    $materialSql = "SELECT * 
-                        FROM   Learning_Material NATURAL JOIN Quiz
-                                                 NATURAL JOIN Topic
-                        WHERE  QuizID = ?";
-
-    $materialQuery = $conn->prepare($materialSql);
-    $materialQuery->execute(array($quizID));
-    $materialRes = $materialQuery->fetch(PDO::FETCH_OBJ);
-    return $materialRes;
+    return getRecord($conn, $quizID, "Learning_Material", array("Quiz", "Topic"));
 }
 
 /* Learning_Material */
@@ -1356,12 +1334,12 @@ function updateStudentGameScores(PDO $conn, $gameID, $studentID, $score)
     for ($level = 1; $level <= count($score); $level++) {
         if ($score[$level - 1] > $historyHighScore[$level - 1]) {
             if (!$updateSql->execute(array($gameID, $studentID, $level, $score[$level - 1], $score[$level - 1]))) {
-                debug_alert("Error occurred to submit game score. Report this bug to reseachers.");
+                debug_alert("Error occurred to submit game score. Report this bug to researchers.");
             } else {
-                debug_log("Game Record Submitted. gameID: $gameID  studentid: $studentID");
+                debug_log("Game Record Submitted. gameID: $gameID  studentID: $studentID");
             }
         } else {
-            debug_log("Score does not exceed highscore. highscore: " . $historyHighScore[$level - 1] . "  score: " . $score[$level - 1]);
+            debug_log("Score does not exceed high score. high score: " . $historyHighScore[$level - 1] . "  score: " . $score[$level - 1]);
         }
     }
 }
@@ -1376,18 +1354,27 @@ function deleteRecord(PDO $conn, $recordID, $tableName)
     $updateSql->execute(array($recordID));
 }
 
-function getRecord(PDO $conn, $recordID, $tableName)
+function getRecord(PDO $conn, $recordID, $tableName, array $joinTables = null)
 {
+    $tablePK = $tableName . "ID";
+    if ($tableName == "Learning_Material") $tablePK = "QuizID";
+
     $tableSql = "SELECT COUNT(*)
 				 FROM $tableName
-				 WHERE " . $tableName . "ID = ?";
+				 WHERE $tablePK = ?";
     $tableQuery = $conn->prepare($tableSql);
     $tableQuery->execute(array($recordID));
     if ($tableQuery->fetchColumn() != 1) {
         throw new Exception("Fail to get record from $tableName where ID = $recordID");
     }
 
-    $tableSql = "SELECT * FROM $tableName WHERE " . $tableName . "ID = ?";
+    $tableSql = "SELECT * FROM $tableName";
+    if ($joinTables != null) {
+        foreach ($joinTables as $joinTable) {
+            $tableSql .= " NATURAL JOIN " . $joinTable;
+        }
+    }
+    $tableSql .= " WHERE $tablePK = ?";
     $tableQuery = $conn->prepare($tableSql);
     $tableQuery->execute(array($recordID));
     $tableResult = $tableQuery->fetch(PDO::FETCH_OBJ);

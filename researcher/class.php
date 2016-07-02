@@ -15,22 +15,20 @@ try {
             if ($update == 1) {
                 $className = $_POST['className'];
                 $schoolName = $_POST['schoolName'];
-                $teacherToken = $_POST['teacherToken'];
-                $studentToken = $_POST['studentToken'];
+                $tokenString = $_POST['tokenString'];
                 $schoolID = getSchoolByName($conn, $schoolName)->SchoolID;
                 $classID = createClass($conn, $schoolID, $className);
-                updateToken($conn, $classID, $teacherToken);
+                updateToken($conn, $classID, $tokenString);
             } else if ($update == 0) {
                 $classID = $_POST['classID'];
                 $className = $_POST['className'];
                 $schoolName = $_POST['schoolName'];
-                $teacherToken = $_POST['teacherToken'];
-                $studentToken = $_POST['studentToken'];
+                $tokenString = $_POST['tokenString'];
                 $unlockedProgress = $_POST['unlockedProgress'];
 
                 $schoolID = getSchoolByName($conn, $schoolName)->SchoolID;
                 updateClass($conn, $classID, $schoolID, $className, $unlockedProgress);
-                updateToken($conn, $classID, $teacherToken);
+                updateToken($conn, $classID, $tokenString);
             } else if ($update == -1) {
                 $classID = $_POST['classID'];
                 deleteClass($conn, $classID);
@@ -156,31 +154,29 @@ db_close($conn);
                     <!--if 1, insert; else if 0 update; else if -1 delete;-->
                     <input type=hidden name="update" id="update" value="1" required>
                     <label for="ClassID" style="display:none">ClassID</label>
-                    <input type="text" class="form-control dialoginput" id="ClassID" name="classID"
+                    <input type="text" class="form-control dialogInput" id="ClassID" name="classID"
                            style="display:none">
                     <br><label for="ClassName">ClassName</label>
-                    <input type="text" class="form-control dialoginput" id="ClassName" name="className" required>
+                    <input type="text" class="form-control dialogInput" id="ClassName" name="className" required>
                     <br><label for="SchoolName">SchoolName</label>
-                    <select class="form-control dialoginput" id="SchoolName" form="submission" name="schoolName"
+                    <select class="form-control dialogInput" id="SchoolName" form="submission" name="schoolName"
                             required>
                         <?php for ($i = 0; $i < count($schoolResult); $i++) { ?>
                             <option
                                 value="<?php echo $schoolResult[$i]->SchoolName ?>"><?php echo $schoolResult[$i]->SchoolName ?></option>
                         <?php } ?>
                     </select>
-                    <br><label for="TeacherToken">TeacherToken</label><span
+                    <br><label for="tokenString">TokenString</label><span
                         class="glyphicon glyphicon-random pull-right"></span>
-                    <input type="text" class="form-control dialoginput" id="TeacherToken" name="teacherToken" required>
-                    <br><label for="StudentToken">StudentToken</label><span
-                        class="glyphicon glyphicon-random pull-right"></span>
-                    <input type="text" class="form-control dialoginput" id="StudentToken" name="studentToken" required>
+                    <input type="text" class="form-control dialogInput" id="tokenString" name="tokenString" required>
                     <br>
                     <label for="EnrolledStudents">EnrolledStudents</label>
-                    <input type="text" class="form-control dialoginput" id="EnrolledStudents" name="enrolledstudents">
+                    <input type="text" class="form-control dialogInput" id="EnrolledStudents" name="enrolledStudents">
                     <br>
+                    <label for="textInput" style="display:none"></label>
+                    <input type="text" class="dialogInput pull-right" id="textInput" value="" disabled>
                     <label for="UnlockedProgress">UnlockedProgress</label>
-                    <input type="text" class="dialoginput pull-right" id="textInput" value="" disabled>
-                    <input type="range" class="dialoginput" min="0"
+                    <input type="range" class="dialogInput" min="0"
                            max="<?php echo $weekResult->WeekNum ?>"
                            id="UnlockedProgress" name="unlockedProgress" onchange="updateTextInput(this.value);">
                 </form>
@@ -214,35 +210,42 @@ if (isset($_GET['schoolID'])) {
     function randomString(length) {
         return Math.round((Math.pow(36, length + 1) - Math.random() * Math.pow(36, length))).toString(36).slice(1);
     }
-    
+
     function updateTextInput(val) {
         document.getElementById('textInput').value = val;
     }
+
+
     //DO NOT put them in $(document).ready() since the table has multi pages
 
-    var dialogInputArr = $('.dialoginput');
+    var dialogInputArr = $('.dialogInput');
+    var len = dialogInputArr.length;
+    function showCurrentWeekInDialog(currentWeek) {
+        dialogInputArr.eq(len - 2).val(currentWeek);
+        dialogInputArr.eq(len - 1).val(currentWeek);
+    }
     $('.glyphicon-edit').on('click', function () {
         $('#dialogTitle').text("Edit Class");
         $('#update').val(0);
-        for (i = 0; i < dialogInputArr.length - 2; i++) {
+        for (i = 0; i < len - 2; i++) {
             dialogInputArr.eq(i).val($(this).parent().parent().children('td').eq(i).text().trim());
         }
-        var currentWeek = $(this).parent().parent().children('td').eq(6).text().trim().split("/")[0];
-        dialogInputArr.eq(6).val(currentWeek);
-        dialogInputArr.eq(7).val(currentWeek);
+        var currentWeek = $(this).parent().parent().children('td').eq(len - 2).text().trim().split("/")[0];
+        showCurrentWeekInDialog(currentWeek);
         //disable ClassID, EnrolledStudents, UnlockedProgress
         dialogInputArr.eq(0).attr('disabled', 'disabled');
-        dialogInputArr.eq(5).attr('disabled', 'disabled');
+        dialogInputArr.eq(len - 3).attr('disabled', 'disabled');
     });
     $('.glyphicon-plus').on('click', function () {
         $('#dialogTitle').text("Add Class");
         $('#update').val(1);
-        for (i = 0; i < dialogInputArr.length; i++) {
+        for (i = 0; i < len; i++) {
             dialogInputArr.eq(i).val('');
         }
+        showCurrentWeekInDialog(0);
         //disable ClassID, EnrolledStudents, UnlockedProgress
         dialogInputArr.eq(0).attr('disabled', 'disabled');
-        dialogInputArr.eq(5).attr('disabled', 'disabled');
+        dialogInputArr.eq(len - 3).attr('disabled', 'disabled');
     });
     $('.glyphicon-remove').on('click', function () {
         if (confirm('[WARNING] Are you sure to remove this class? All the student data in this class will also get deleted (not recoverable). It includes student information, their submissions of every task and your grading/feedback, not only the class itself.')) {
@@ -252,18 +255,13 @@ if (isset($_GET['schoolID'])) {
             for (i = 0; i < dialogInputArr.length - 2; i++) {
                 dialogInputArr.eq(i).val($(this).parent().parent().children('td').eq(i).text().trim());
             }
-            var currentWeek = $(this).parent().parent().children('td').eq(6).text().trim().split("/")[0];
-            dialogInputArr.eq(6).val(currentWeek);
-            dialogInputArr.eq(7).val(currentWeek);
+            var currentWeek = $(this).parent().parent().children('td').eq(len - 2).text().trim().split("/")[0];
+            showCurrentWeekInDialog(currentWeek);
             $('#submission').submit();
         }
     });
     $('.glyphicon-random').on('click', function () {
-        var index = $(this).index();
-        if (index == $("#TeacherToken").index() - 1)
-            $('#TeacherToken').val(randomString(16));
-        else if (index == $("#StudentToken").index() - 1)
-            $('#StudentToken').val(randomString(16));
+        $('#tokenString').val(randomString(16));
     });
     $('#btnSave').on('click', function () {
         $('#submission').validate();
