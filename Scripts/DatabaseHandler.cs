@@ -24,9 +24,9 @@ class DatabaseHandler : MonoBehaviour
     void init()
     {
         //for LOCAL_TEST
-        //private string gameHandlerURL = "http://localhost:8080/isnap2change/isnap2change/game-handler.php?";
+        //private string gameHandlerURL = "http://localhost:8080/isnap2change/isnap2change/game-handler.php";
         //for DEPLOYMENT     
-        //private string gameHandlerURL = "http://localhost/isnap2change/game-handler.php?";
+        //private string gameHandlerURL = "http://localhost/isnap2change/game-handler.php";
         if (gameHandlerURL == null)
         {
             if (LOCAL_TEST) gameHandlerURL = "http://localhost:8080/isnap2change/isnap2change/" + gameHandlerPage;
@@ -34,6 +34,7 @@ class DatabaseHandler : MonoBehaviour
         }
     }
 
+    //use System.Action<?> to pseudo "return" result
     public IEnumerator getStudentGameWeek(Action<Int32> week)
     {
         gameHandlerParameters = "?command=get_week&gameID=1";
@@ -56,7 +57,7 @@ class DatabaseHandler : MonoBehaviour
         }
     }
 
-    //use System.Action<ResultType> to return result
+    //use System.Action<?> to pseudo "return" result
     public IEnumerator getSavedScore(Action<String[]> retrievedText)
     {
         gameHandlerParameters = "?command=retrieve&gameID=1";
