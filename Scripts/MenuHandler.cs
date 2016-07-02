@@ -1,14 +1,32 @@
 ﻿using UnityEngine;
 using System.Collections;
+using UnityEngine.UI;
 
 public class MenuHandler : MonoBehaviour {
 
+    private GameObject levelTrackerRef;
+    /* DatabaseHandler */
+    private DatabaseHandler databaseHandler;
+
+    public Button[] levelbuttons;
 	private AudioSource audiosource;
 	public AudioClip hoverSound;
 	public AudioClip cheer;
 
-
 	void Start(){
+        //get level data from the leveltracker
+        levelTrackerRef = GameObject.Find("leveltracker");
+        /* DatabaseHandler init */
+        databaseHandler = levelTrackerRef.AddComponent<DatabaseHandler>();
+        StartCoroutine(databaseHandler.getStudentGameWeek((week) =>
+        {
+            //lambda function to process retrieved week
+            for (int i = 0; 2 * i <= week; i++)
+            {
+                levelbuttons[i].interactable = true;
+            }
+        }));
+
 		Time.timeScale = 1;
 		audiosource = gameObject.GetComponent<AudioSource> ();
 		AudioListener.pause = false;
@@ -17,7 +35,7 @@ public class MenuHandler : MonoBehaviour {
 		//Camera.main.GetComponent<AudioSource> ().ignoreListenerPause = true;
 	}
 
-	public void LoadScene(int level){
+    public void LoadScene(int level){
 
 		//if the level in level tracker has not yet been played, then show instructions
 		if (GameObject.Find ("leveltracker").GetComponent<LevelData> ().levels[level] == true) {
