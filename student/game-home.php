@@ -14,6 +14,11 @@
         //get student score
         $studentScore = getStudentScore($conn, $studentID);
 
+        //get student week
+        $studentWeek = getStudentWeek($conn, $studentID);
+
+        //get max week
+        $maxWeek = getMaxWeek($conn)->WeekNum;
 
 
     } catch(Exception $e) {
@@ -160,6 +165,10 @@
             text-align: center;
             font-size: 20px;
         }
+
+        .week-locked .week-img {
+            background-image: url("./img/locked_icon.png");
+        }
         .week-1 .week-img {
             background-image: url("./img/one_icon.png");
         }
@@ -178,7 +187,21 @@
         .week-6 .week-img {
             background-image: url("./img/six_icon.png");
         }
-
+        .week-7 .week-img {
+            background-image: url("./img/seven_icon.png");
+        }
+        .week-8 .week-img {
+            background-image: url("./img/eight_icon.png");
+        }
+        .week-9 .week-img {
+            background-image: url("./img/nine_icon.png");
+        }
+        .week-10 .week-img {
+            background-image: url("./img/ten_icon.png");
+        }
+        .week-more .week-img {
+            background-image: url("./img/one_icon.png");
+        }
 
         .week-content .slick-dots li {
             width: 16px;
@@ -216,42 +239,29 @@
     <div class="page-content ">
         <div class="week-content">
             <div class="week-carousel">
-                <div class="week-item week-1">
-                    <a href="#" class="week-link">
+<?php
+         for($i = 0; $i < $studentWeek; $i++) {
+             if($i >= 10){ ?>
+                <div class="week-item week-more">
+<?php        } else { ?>
+                <div class="week-item week-<?php echo ($i+1)?>">
+<?php        } ?>
+                    <a href="weekly-task.php?week=<?php echo ($i+1)?>" class="week-link">
                         <span class="week-img"></span>
-                        <span class="week-text">Week 1</span>
+                        <span class="week-text">Week <?php echo ($i+1)?></span>
                     </a>
                 </div>
-                <div class="week-item week-2">
-                    <a href="#" class="week-link">
+<?php    }
+
+             for($i = $studentWeek; $i < $maxWeek; $i++) {  ?>
+                 <div class="week-item week-locked">
+                    <a class="week-link">
                         <span class="week-img"></span>
-                        <span class="week-text">Week 2</span>
+                        <span class="week-text">Week <?php echo ($i+1)?></span>
                     </a>
                 </div>
-                <div class="week-item week-3">
-                    <a href="#" class="week-link">
-                        <span class="week-img"></span>
-                        <span class="week-text">Week 3</span>
-                    </a>
-                </div>
-                <div class="week-item week-4">
-                    <a href="#" class="week-link">
-                        <span class="week-img"></span>
-                        <span class="week-text">Week 4</span>
-                    </a>
-                </div>
-                <div class="week-item week-5">
-                    <a href="#" class="week-link">
-                        <span class="week-img"></span>
-                        <span class="week-text">Week 5</span>
-                    </a>
-                </div>
-                <div class="week-item week-6">
-                    <a href="#" class="week-link">
-                        <span class="week-img"></span>
-                        <span class="week-text">Week 6</span>
-                    </a>
-                </div>
+
+    <?php    } ?>
 
             </div>
         </div>
@@ -332,6 +342,7 @@
         centerMode: true,
         centerPadding: 0,
         infinite: true,
+        initialSlide: <?php echo $studentWeek-1?>,
         slidesToShow: 5,
         slidesToScroll: 1,
         dots: true,
