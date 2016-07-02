@@ -1306,7 +1306,7 @@ function getGames(PDO $conn)
     return getRecords($conn, "Game");
 }
 
-function getStudentGameWeek(PDO $conn, $studentID)
+function getStudentWeek(PDO $conn, $studentID)
 {
     $classID = getStudent($conn, $studentID)->ClassID;
     $week = min(getClass($conn, $classID)->UnlockedProgress, getMaxWeek($conn)->WeekNum);
