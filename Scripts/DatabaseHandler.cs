@@ -10,7 +10,7 @@ class DatabaseHandler : MonoBehaviour
     private static bool DEBUG_MODE = false;
     private static bool LOCAL_TEST = true;
     // TODO: [Safety] Edit this value and make sure it's the same as the one stored on the server
-    // private string secretKey = "ISNAPSecretKey";
+    private string secretKey = "ISNAPSecretKey";
     private string gameHandlerURL = null;
     private string gameHandlerParameters = null;
     private string gameHandlerPage = "game-handler.php";
@@ -25,18 +25,22 @@ class DatabaseHandler : MonoBehaviour
         //for LOCAL_TEST
         //private string gameHandlerURL = "http://localhost:8080/isnap2change/isnap2change/game-handler.php";
         //for DEPLOYMENT     
-        //private string gameHandlerURL = "http://localhost/isnap2change/game-handler.php";
+        //private string gameHandlerURL = "http://localhost/game-handler.php";
         if (gameHandlerURL == null)
         {
-            if (LOCAL_TEST) gameHandlerURL = "http://localhost:8080/isnap2change/isnap2change/" + gameHandlerPage;
-            else gameHandlerURL = "http://localhost/isnap2change/" + gameHandlerPage;
+            if (LOCAL_TEST) gameHandlerURL = "http://localhost:8080/isnap2change/isnap2change/" + gameHandlerPage + "?secretKey=" + secretKey;
+            else gameHandlerURL = "http://localhost/" + gameHandlerPage + "?secretKey=" + secretKey;
         }
+    }
+
+    public int getNumOfLevel() {
+        return NUM_OF_LEVEL;
     }
 
     //use System.Action<?> to pseudo "return" result
     public IEnumerator getStudentGameWeek(Action<Int32> week)
     {
-        gameHandlerParameters = "?command=get_week&gameID=1";
+        gameHandlerParameters = "&command=get_week&gameID=1";
         string get_url = gameHandlerURL + gameHandlerParameters;
         if (DEBUG_MODE)
         {
@@ -57,9 +61,9 @@ class DatabaseHandler : MonoBehaviour
     }
 
     //use System.Action<?> to pseudo "return" result
-    public IEnumerator getSavedScore(Action<String[]> retrievedText)
+    public IEnumerator getSavedScore(Action<String[]> storedHSArray)
     {
-        gameHandlerParameters = "?command=retrieve&gameID=1";
+        gameHandlerParameters = "&command=retrieve&gameID=1";
         string get_url = gameHandlerURL + gameHandlerParameters;
         if (DEBUG_MODE)
         {
@@ -80,23 +84,19 @@ class DatabaseHandler : MonoBehaviour
                 Debug.Log("[INFO] Page retrieved:\t" + retrieved_result.text);
             }
             //pseudo "return" retrievedText
-            retrievedText(retrieved_result.text.Split(','));
+            storedHSArray(retrieved_result.text.Split(','));
         }
     }
 
     public IEnumerator updateScore(int[] scoreArray)
     {
-        gameHandlerParameters = "?command=upload&gameID=1&";
-        if (DEBUG_MODE)
-        {
-            //Debug.Log("[INFO] updateScore()");
-        }
+        gameHandlerParameters = "&command=upload&gameID=1";
+
         string scoreListSequence = "";
         foreach (int s in scoreArray)
         {
-            scoreListSequence += "score[]=" + s + "&";
+            scoreListSequence += "&score[]=" + s;
         }
-        scoreListSequence = scoreListSequence.Substring(0, scoreListSequence.Length - 1);
 
         string get_url = gameHandlerURL + gameHandlerParameters + scoreListSequence;
         //string get_url = gameHandlerURL + gameHandlerParameters + "score[]=0&score[]0&score[]=0&score[]=0&score[]=0";
@@ -112,10 +112,6 @@ class DatabaseHandler : MonoBehaviour
         if (upload_result.error != null)
         {
             Debug.Log("[FAIL] There was an error uploading score: " + upload_result.error);
-        }
-        else
-        {
-            //Debug.Log("[SUCCESS] Score upload successfully.");
         }
     }
 }

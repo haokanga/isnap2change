@@ -6,7 +6,6 @@ public class LevelData : MonoBehaviour
     private GameObject levelTrackerRef;
     /* DatabaseHandler */
     private DatabaseHandler databaseHandler;
-    public static int NUM_OF_LEVEL = 5;
 
     //determining whether a level has been played yet or not to decide whether to show instructions
     //**********eventually pull this data from a Database**********
@@ -48,12 +47,12 @@ public class LevelData : MonoBehaviour
         databaseHandler = levelTrackerRef.AddComponent<DatabaseHandler>();
 
         /* retrieve high score from database */
-        StartCoroutine(databaseHandler.getSavedScore((retrievedText) =>
+        StartCoroutine(databaseHandler.getSavedScore((storedHSArray) =>
         {
             //lambda function to process retrievedText
-            for (int i = 0; i < NUM_OF_LEVEL; i++)
+            for (int i = 0; i < databaseHandler.getNumOfLevel(); i++)
             {
-                setHS(Int32.Parse(retrievedText[i]), i);
+                setHS(Int32.Parse(storedHSArray[i]), i);
             }
             classic = classicHS != 0 ? true : false;
             timeAttack = timeAttHS != 0 ? true : false;
@@ -77,22 +76,7 @@ public class LevelData : MonoBehaviour
 
     public int[] getHSArray()
     {
-        int[] HSArray = new int[NUM_OF_LEVEL];
-        HSArray[0] = classicHS;
-        HSArray[1] = timeAttHS;
-        HSArray[2] = ciggieHS;
-        HSArray[3] = timeManHS;
-        HSArray[4] = wildWestHS;
-        /**
-        if (DEBUG_MODE)
-        {
-            foreach (int s in HSArray)
-            {
-                Debug.Log("HSArray[]:" + s);
-            }
-        }
-        */
-        return HSArray;
+        return new int[] { classicHS,timeAttHS, ciggieHS, timeManHS, wildWestHS };
     }
 
     private void setHS(int highscore, int index)

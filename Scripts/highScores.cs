@@ -15,7 +15,7 @@ public class highScores : MonoBehaviour
     public Text timeMania;
     public Text wildWest;
 
-    // DatabaseHandler
+    /* DatabaseHandler */
     private DatabaseHandler databaseHandler;
 
 
