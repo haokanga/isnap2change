@@ -2,18 +2,20 @@
 using System.Collections;
 using UnityEngine.UI;
 
-public class MenuHandler : MonoBehaviour {
+public class MenuHandler : MonoBehaviour
+{
 
     private GameObject levelTrackerRef;
     /* DatabaseHandler */
     private DatabaseHandler databaseHandler;
 
     public Button[] levelbuttons;
-	private AudioSource audiosource;
-	public AudioClip hoverSound;
-	public AudioClip cheer;
+    private AudioSource audiosource;
+    public AudioClip hoverSound;
+    public AudioClip cheer;
 
-	void Start(){
+    void Start()
+    {
         //get level data from the leveltracker
         levelTrackerRef = GameObject.Find("leveltracker");
         /* DatabaseHandler init */
@@ -21,62 +23,75 @@ public class MenuHandler : MonoBehaviour {
         StartCoroutine(databaseHandler.getStudentGameWeek((week) =>
         {
             //lambda function to process retrieved week
-            for (int i = 0; 2 * i <= week; i++)
+            if (levelbuttons != null)
             {
-                levelbuttons[i].interactable = true;
+                for (int i = 0; 2 * i <= week; i++)
+                {
+                    levelbuttons[i].interactable = true;
+                }
             }
+
+
         }));
 
-		Time.timeScale = 1;
-		audiosource = gameObject.GetComponent<AudioSource> ();
-		AudioListener.pause = false;
-		//just so these continue to play when game is paused and user returns to main menu
-		//audiosource.ignoreListenerPause = true;
-		//Camera.main.GetComponent<AudioSource> ().ignoreListenerPause = true;
-	}
+        Time.timeScale = 1;
+        audiosource = gameObject.GetComponent<AudioSource>();
+        AudioListener.pause = false;
+        //just so these continue to play when game is paused and user returns to main menu
+        //audiosource.ignoreListenerPause = true;
+        //Camera.main.GetComponent<AudioSource> ().ignoreListenerPause = true;
+    }
 
-    public void LoadScene(int level){
+    public void LoadScene(int level)
+    {
 
-		//if the level in level tracker has not yet been played, then show instructions
-		if (GameObject.Find ("leveltracker").GetComponent<LevelData> ().levels[level] == true) {
-			Application.LoadLevel (level);
-		} else {
+        //if the level in level tracker has not yet been played, then show instructions
+        if (GameObject.Find("leveltracker").GetComponent<LevelData>().levels[level] == true)
+        {
+            Application.LoadLevel(level);
+        }
+        else {
 
-			GameObject.Find ("leveltracker").GetComponent<LevelData> ().levels[level] = true;
-			Application.LoadLevel (level+6);
-		}
+            GameObject.Find("leveltracker").GetComponent<LevelData>().levels[level] = true;
+            Application.LoadLevel(level + 6);
+        }
 
-	}
+    }
 
-	public void Retry(){
+    public void Retry()
+    {
 
-		Application.LoadLevel (Application.loadedLevel);
-	}
+        Application.LoadLevel(Application.loadedLevel);
+    }
 
-	public void LoadInstructions (int instructionScene){
+    public void LoadInstructions(int instructionScene)
+    {
 
-		Application.LoadLevel (instructionScene);
+        Application.LoadLevel(instructionScene);
 
-	}
+    }
 
-	public void QuitGame(){
+    public void QuitGame()
+    {
 
-		Application.Quit ();
-	}
-
-
-	public void PlayHoverSound(){
-
-		audiosource.PlayOneShot (hoverSound);
-
-	}
-
+        Application.Quit();
+    }
 
 
-	public void PlayCheer(){
-	
-		LevelData.instance.GetComponent<AudioSource> ().PlayOneShot (cheer);
-	
-	}
+    public void PlayHoverSound()
+    {
+
+        audiosource.PlayOneShot(hoverSound);
+
+    }
+
+
+
+    public void PlayCheer()
+    {
+
+        LevelData.instance.GetComponent<AudioSource>().PlayOneShot(cheer);
+
+    }
 
 }
