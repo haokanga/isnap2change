@@ -627,6 +627,8 @@ INSERT IGNORE INTO Game(Description,Levels) VALUES('Fruit Ninja',5);
 INSERT IGNORE INTO Game(Description,Levels) VALUES('Candy Crush',50);
 
 # [Example] Game_Record
+INSERT IGNORE INTO Game_Record(GameID,StudentID,`Level`,Score) VALUES(1,1,1,5);
+INSERT IGNORE INTO Game_Record(GameID,StudentID,`Level`,Score) VALUES(1,1,2,40);
 INSERT IGNORE INTO Game_Record(GameID,StudentID,`Level`,Score) VALUES(1,2,1,30);
 INSERT IGNORE INTO Game_Record(GameID,StudentID,`Level`,Score) VALUES(1,3,1,30);
 INSERT IGNORE INTO Game_Record(GameID,StudentID,`Level`,Score) VALUES(1,4,1,30);
