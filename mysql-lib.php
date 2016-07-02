@@ -954,24 +954,7 @@ function updateLearningMaterial(PDO $conn, $quizID, $content)
 
 function getLearningMaterial(PDO $conn, $quizID)
 {
-    $materialPreSql = "SELECT COUNT(*) 
-                       FROM   Learning_Material
-                       WHERE  QuizID = ?";
-    $materialPreQuery = $conn->prepare($materialPreSql);
-    $materialPreQuery->execute(array($quizID));
-    if ($materialPreQuery->fetchColumn() != 1) {
-        throw new Exception("Failed to get learning material");
-    }
-
-    $materialSql = "SELECT * 
-                        FROM   Learning_Material NATURAL JOIN Quiz
-                                                 NATURAL JOIN Topic
-                        WHERE  QuizID = ?";
-
-    $materialQuery = $conn->prepare($materialSql);
-    $materialQuery->execute(array($quizID));
-    $materialRes = $materialQuery->fetch(PDO::FETCH_OBJ);
-    return $materialRes;
+    return getRecord($conn, $quizID, "Learning_Material", array("Quiz", "Topic"));
 }
 
 /* Learning_Material */
@@ -1351,12 +1334,12 @@ function updateStudentGameScores(PDO $conn, $gameID, $studentID, $score)
     for ($level = 1; $level <= count($score); $level++) {
         if ($score[$level - 1] > $historyHighScore[$level - 1]) {
             if (!$updateSql->execute(array($gameID, $studentID, $level, $score[$level - 1], $score[$level - 1]))) {
-                debug_alert("Error occurred to submit game score. Report this bug to reseachers.");
+                debug_alert("Error occurred to submit game score. Report this bug to researchers.");
             } else {
-                debug_log("Game Record Submitted. gameID: $gameID  studentid: $studentID");
+                debug_log("Game Record Submitted. gameID: $gameID  studentID: $studentID");
             }
         } else {
-            debug_log("Score does not exceed highscore. highscore: " . $historyHighScore[$level - 1] . "  score: " . $score[$level - 1]);
+            debug_log("Score does not exceed high score. high score: " . $historyHighScore[$level - 1] . "  score: " . $score[$level - 1]);
         }
     }
 }
@@ -1371,18 +1354,27 @@ function deleteRecord(PDO $conn, $recordID, $tableName)
     $updateSql->execute(array($recordID));
 }
 
-function getRecord(PDO $conn, $recordID, $tableName)
+function getRecord(PDO $conn, $recordID, $tableName, array $joinTables = null)
 {
+    $tablePK = $tableName . "ID";
+    if ($tableName == "Learning_Material") $tablePK = "QuizID";
+
     $tableSql = "SELECT COUNT(*)
 				 FROM $tableName
-				 WHERE " . $tableName . "ID = ?";
+				 WHERE $tablePK = ?";
     $tableQuery = $conn->prepare($tableSql);
     $tableQuery->execute(array($recordID));
     if ($tableQuery->fetchColumn() != 1) {
         throw new Exception("Fail to get record from $tableName where ID = $recordID");
     }
 
-    $tableSql = "SELECT * FROM $tableName WHERE " . $tableName . "ID = ?";
+    $tableSql = "SELECT * FROM $tableName";
+    if ($joinTables != null) {
+        foreach ($joinTables as $joinTable) {
+            $tableSql .= " NATURAL JOIN " . $joinTable;
+        }
+    }
+    $tableSql .= " WHERE $tablePK = ?";
     $tableQuery = $conn->prepare($tableSql);
     $tableQuery->execute(array($recordID));
     $tableResult = $tableQuery->fetch(PDO::FETCH_OBJ);
