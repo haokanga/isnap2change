@@ -41,7 +41,7 @@ function parseFeedback(response) {
     }
 
     if(feedback.result == "valid"){
-        location.href = 'avatar.php';
+        location.href = 'game-home.php';
     } else {
         $('#login-fail-text').text("Invalid username and/or password!");
         $('#password').val("");

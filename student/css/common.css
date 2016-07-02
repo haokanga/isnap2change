@@ -1,0 +1,196 @@
+/**
+ * $normalize 页面整体样式调整
+ **/
+
+/**
+ * 设置整个项目默认字号, 行高, 颜色, 绝大部分元素不用再设置
+ **/
+html {
+    box-sizing: border-box;
+    height: 100%;
+}
+*,
+*::before,
+*::after {
+    box-sizing: inherit;
+    margin: 0;
+    padding: 0;
+}
+body {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    font-family: 'Lato', sans-serif;
+    font-size: 14px;
+    line-height: 1.8;
+    color: #fff;
+    overflow-x: hidden;
+    height: 100%;
+    background-size: 100% 100%;
+    background-image: url("../img/main_background.jpg");
+}
+ul,
+ol {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+a {
+    color: #fff;
+    text-decoration: none;
+}
+h2 {
+    font-weight: normal;
+}
+h3 {
+    font-weight: normal;
+}
+
+/**
+ * $tool 工具类
+ **/
+.clearfix {
+    &:before,
+    &:after {
+        content: "";
+        display: table;
+    }
+    &:after {
+        clear: both;
+
+    };
+}
+
+/**
+ * $ 栅格
+ **/
+.mini-row {
+  margin: 0 -15px;
+}
+.mini-row:before,
+.mini-row:after {
+    content: "";
+    display: table;
+}
+.mini-row:after {
+    clear: both;
+}
+
+.col-4 {
+  width: 33.33333%;
+  float: left;
+  padding: 0 15px;
+  position: relative;
+}
+.col-6 {
+  width: 50%;
+  float: left;
+  padding: 0 15px;
+  position: relative;
+}
+.col-8 {
+  width: 66.66667%;
+  float: left;
+  padding: 0 15px;
+  position: relative;
+}
+
+.page-wrapper {
+    height: 100%;
+}
+.page-content {
+    background-color: #0d0d0d;
+    height: calc(100% - 100px);
+}
+/**
+ * header
+ **/
+ .header-wrapper {
+    background-color: #000;
+ }
+.header {
+    font-family: 'Lato', sans-serif;
+    height: 50px;
+    max-width: 1000px;
+    margin: 0 auto;
+}
+.home-link {
+    float: left;
+    text-indent: -9999em;
+    width: 60px;
+    height: 20px;
+    background-size: 100% 100%;
+    margin-top: 15px;
+    background-image: url("../img/snap_single_wordform_white.png");
+}
+.nav-list {
+    float: left;
+}
+.nav-item {
+    float: left;
+    margin-left: 100px;
+}
+.nav-link {
+    height: 50px;
+    line-height: 50px;
+    display: inline-block;
+    font-weight: 18px;
+}
+.settings {
+    float: right;
+}
+.setting-icon {
+    float: left;
+    margin-top: 17px;
+    margin-right: 20px;
+    width: 16px;
+    height: 16px;
+    display: inline-block;
+    background-size: 100% 100%;
+    background-image: url("../img/settings_icon.png");
+}
+.setting-text {
+    float: left;
+    height: 50px;
+    line-height: 50px;
+}
+/**
+ * footer
+ **/
+.footer {
+    border-top: 2px solid #4c4c4c;
+    background-color: #000;
+    font-family: 'Lato', sans-serif;
+    height: 50px;
+}
+.footer-content {
+    max-width: 1000px;
+    margin: 0 auto;
+    overflow: hidden;
+}
+.footer-logo {
+    float: left;
+    width: 30px;
+    height: 30px;
+    background-size: 100% 100%;
+    background-image: url("../img/footer-logo.png");
+    margin: 2px 0;
+}
+.footer-nav {
+    display: -webkit-box;
+    display: -webkit-flex;
+    display: -moz-flex;
+    display: -ms-flexbox;
+    display: flex;
+    -ms-flex-pack: distribute;
+    -webkit-justify-content: space-around;
+    -moz-justify-content: space-around;
+    justify-content: space-around;
+}
+.footer-nav-item {
+    display: inline-block;
+}
+.footer-nav-item a {
+    display: inline-block;
+    line-height: 1;
+    margin-top: 10px;
+}

@@ -1,4 +1,7 @@
 <?php
+
+	session_start();
+
 	require_once('../mysql-lib.php');
 	require_once('../debug.php');
 	$pageName = "login";
@@ -22,6 +25,7 @@
 		//valid student
 		if(validStudent($conn, $username, $password)) {
 			$feedback["result"] = "valid";
+			$_SESSION["studentID"] = "";
 		} else {
 			$feedback["result"] = "invalid";
 		}
