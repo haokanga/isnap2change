@@ -214,14 +214,14 @@ function validToken(PDO $conn, $token)
 /* Token */
 
 /* Student */
-function createStudent(PDO $conn, $username, $password, $firstname, $lastname, $email, $gender, $dob, $identity, $classID)
+function createStudent(PDO $conn, $username, $password, $firstName, $lastName, $email, $gender, $dob, $identity, $classID)
 {
     $insertStudentSql = "INSERT INTO Student(Username, `Password`, FirstName, LastName, Email, Gender, DOB, Identity, Score, ClassID)
 						 VALUES (?,?,?,?,?,?,?,?,?,?)";
 
     $insertStudentSql = $conn->prepare($insertStudentSql);
 
-    if (!$insertStudentSql->execute(array($username, md5($password), $firstname, $lastname, $email, $gender, $dob, $identity, 0, $classID))) {
+    if (!$insertStudentSql->execute(array($username, md5($password), $firstName, $lastName, $email, $gender, $dob, $identity, 0, $classID))) {
         throw new Exception("Fail to insert a student");
     }
 }
@@ -275,7 +275,7 @@ function validStudent(PDO $conn, $username, $password)
         return false;
     } else if ($validStudentRes == 1) {
         return true;
-    } else throw new Exception("Duplicate students");
+    } else throw new Exception("Duplicate students in Database");
 }
 
 function validUsername(PDO $conn, $username)
@@ -452,12 +452,7 @@ function getQuizType(PDO $conn, $quizID)
 
 function getQuizzes(PDO $conn)
 {
-    $quizSql = "SELECT QuizID, Week, QuizType, TopicName
-                   FROM Quiz NATURAL JOIN Topic";
-    $quizQuery = $conn->prepare($quizSql);
-    $quizQuery->execute();
-    $quizResult = $quizQuery->fetchAll(PDO::FETCH_OBJ);
-    return $quizResult;
+    return getRecords($conn, "Quiz", array("Topic"));
 }
 
 function getQuizzesByWeek(PDO $conn, $week)
