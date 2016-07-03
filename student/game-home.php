@@ -33,7 +33,6 @@
     }
 
     db_close($conn);
-
 ?>
 
 <!DOCTYPE html>
@@ -41,7 +40,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="initial-scale=1.0, width=device-width, user-scalable=no">
-    <title>Document</title>
+    <title>GAME HOME</title>
     <link rel="stylesheet" href="./css/common.css">
     <link rel="stylesheet" href="./css/vendor/slick.css">
     <link rel="stylesheet" href="./css/vendor/slick-theme.css">

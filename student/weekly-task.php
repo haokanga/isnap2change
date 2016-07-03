@@ -23,6 +23,12 @@
     try{
         $conn = db_connect();
 
+        //check whether the week is locked or not
+        if ($week >= getStudentWeek($conn, $studentID)) {
+            echo '<script>alert("This is a locked week!")</script>';
+            echo '<script>window.location="game-home.php"</script>';
+        }
+
         //get due time for this week
         $dueTime = getStuWeekRecord($conn, $studentID, $week);
 
@@ -48,7 +54,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="initial-scale=1.0, width=device-width, user-scalable=no">
-    <title>Document</title>
+    <title>WEEKLY TASK</title>
     <link rel="stylesheet" href="./css/common.css">
     <link href='https://fonts.googleapis.com/css?family=Maitree|Lato:400,900' rel='stylesheet' type='text/css'>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
