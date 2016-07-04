@@ -125,6 +125,7 @@ CREATE TABLE IF NOT EXISTS `Quiz_Record` (
 CREATE TABLE IF NOT EXISTS `Learning_Material` (
     QuizID MEDIUMINT,
     Content LONGTEXT,
+    Excluded BOOLEAN DEFAULT 0,
     CONSTRAINT Learning_Material_QuizID_PK PRIMARY KEY (QuizID),
     CONSTRAINT Learning_Material_QuizID_FK FOREIGN KEY (QuizID)
         REFERENCES Quiz (QuizID)
@@ -399,6 +400,9 @@ INSERT IGNORE INTO Topic(TopicName) VALUES('Nutrition');
 INSERT IGNORE INTO Topic(TopicName) VALUES('Alcohol');
 INSERT IGNORE INTO Topic(TopicName) VALUES('Physical Activity');
 INSERT IGNORE INTO Topic(TopicName) VALUES('Introduction');
+INSERT IGNORE INTO Topic(TopicName) VALUES('Drugs');
+INSERT IGNORE INTO Topic(TopicName) VALUES('Sexual Health');
+INSERT IGNORE INTO Topic(TopicName) VALUES('Health and Wellbeing');
 
 
 # [Formal] insert MCQ section with multiple questions
