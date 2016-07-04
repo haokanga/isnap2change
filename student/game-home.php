@@ -287,7 +287,7 @@
                             </a>
                         </div>
                         <div class="col-6">
-                            <a href="#" class="operation-item operation-reading-material">
+                            <a href="reading-material.php" class="operation-item operation-reading-material">
                                 <img src="./img/reading_material_icon.png" alt="" class="operation-logo">
                                 <span>Reading Material</span>
                             </a>

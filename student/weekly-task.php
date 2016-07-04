@@ -24,7 +24,7 @@
         $conn = db_connect();
 
         //check whether the week is locked or not
-        if ($week >= getStudentWeek($conn, $studentID)) {
+        if ($week > getStudentWeek($conn, $studentID)) {
             echo '<script>alert("This is a locked week!")</script>';
             echo '<script>window.location="game-home.php"</script>';
         }

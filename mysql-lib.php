@@ -949,9 +949,9 @@ function getMaxMatchingOptionNum(PDO $conn, $quizID)
 function createEmptyLearningMaterial(PDO $conn, $quizID)
 {
     $content = '<p>Learning materials for this quiz has not been added.</p>';
-    $updateSql = "INSERT INTO Learning_Material(Content,QuizID) VALUES (?,?)";
+    $updateSql = "INSERT INTO Learning_Material(Content,QuizID, Excluded) VALUES (?,?,?)";
     $updateSql = $conn->prepare($updateSql);
-    $updateSql->execute(array($content, $quizID));
+    $updateSql->execute(array($content, $quizID, 1));
 }
 
 function updateLearningMaterial(PDO $conn, $quizID, $content)
