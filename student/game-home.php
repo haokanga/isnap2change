@@ -198,8 +198,23 @@
         .week-10 .week-img {
             background-image: url("./img/ten_icon.png");
         }
+        .week-11 .week-img {
+            background-image: url("./img/11_icon.png");
+        }
+        .week-12 .week-img {
+            background-image: url("./img/12_icon.png");
+        }
+        .week-13 .week-img {
+            background-image: url("./img/13_icon.png");
+        }
+        .week-14 .week-img {
+            background-image: url("./img/14_icon.png");
+        }
+        .week-15 .week-img {
+            background-image: url("./img/15_icon.png");
+        }
         .week-more .week-img {
-            background-image: url("./img/one_icon.png");
+            background-image: url("./img/extra_week_icon.png");
         }
 
         .week-content .slick-dots li {
@@ -224,7 +239,7 @@
         <div class="header">
             <a class="home-link" href="#">SNAP</a>
             <ul class="nav-list">
-                <li class="nav-item"><a  class="nav-link" href="http://taobao.com">GAME HOME</a></li>
+                <li class="nav-item"><a  class="nav-link" href="game-home.php">GAME HOME</a></li>
                 <li class="nav-item"><a  class="nav-link" href="http://taobao.com">Snap Facts</a></li>
                 <li class="nav-item"><a  class="nav-link" href="http://taobao.com">Resources</a></li>
             </ul>
@@ -240,7 +255,7 @@
             <div class="week-carousel">
 <?php
          for($i = 0; $i < $studentWeek; $i++) {
-             if($i >= 10){ ?>
+             if($i >= 15) { ?>
                 <div class="week-item week-more">
 <?php        } else { ?>
                 <div class="week-item week-<?php echo ($i+1)?>">

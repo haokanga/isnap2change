@@ -17,6 +17,12 @@
         //get max week
         $maxWeek = getMaxWeek($conn)->WeekNum;
 
+        //get material topics
+        $materialTopics = array();
+
+        for($i = 0; $i < $studentWeek; $i++) {
+            array_push($materialTopics, getLearningMaterialByWeek($conn, ($i+1)));
+        }
 
     } catch(Exception $e) {
         if($conn != null) {
@@ -26,10 +32,8 @@
         debug_err($pageName, $e);
         //to do: handle sql error
         //...
-        exit;
+        //exit;
     }
-
-    db_close($conn);
 ?>
 
 <!DOCTYPE html>
@@ -103,7 +107,6 @@
             font-size: 18px;
             margin: 0 auto;
         }
-
         .reading-tab {
             padding-top: 40px;
             padding-bottom: 30px;
@@ -181,10 +184,28 @@
             background-image: url("./img/alcohol_icon.png");
         }
         .reading-item-physical-activity {
-            color: #f7751e;
+            color: #DB1B1B;
         }
         .reading-item-physical-activity .reading-item-logo {
             background-image: url("./img/physical_activity_icon.png");
+        }
+        .reading-item-drugs {
+            color: #00f8cd;
+        }
+        .reading-item-drugs .reading-item-logo {
+            background-image: url("./img/drugs_icon.png");
+        }
+        .reading-item-sexual-health {
+            color: #AF24D1;
+        }
+        .reading-item-sexual-health .reading-item-logo {
+            background-image: url("./img/sexual_health_icon.png");
+        }
+        .reading-item-health-and-wellbeing {
+            color: #DB1B1B;
+        }
+        .reading-item-health-and-wellbeing .reading-item-logo {
+            background-image: url("./img/health_and_wellbeing_icon.png");
         }
         .reading-item-title {
             font-size: 20px;
@@ -218,8 +239,26 @@
             font-size: 24px;
             text-align: center;
         }
+        .material-smoking .material-title {
+            color: #FCEE2D;
+        }
+        .material-nutrition .material-title {
+            color: #f7751e;
+        }
         .material-alcohol .material-title {
             color: #af24d1;
+        }
+        .material-physical-activity .material-title {
+            color: #DB1B1B;
+        }
+        .material-drugs .material-title {
+            color: #00f8cd;
+        }
+        .material-sexual-health .material-title {
+            color: #AF24D1;
+        }
+        .material-health-and-wellbeing .material-title {
+            color: #DB1B1B;
         }
         .material-content {
             padding: 20px 60px;
@@ -296,94 +335,98 @@
                 </div>
             </div>
             <div class="reading-tab-content">
-
         <?php
-                for ($i = 0; $i < ($studentWeek-1); $i++) { ?>
+            for ($i = 0; $i < $studentWeek; $i++) {
+                if($i == ($studentWeek-1)) { ?>
+                    <div class="reading-week-detail reading-week-detail-active mini-row">
+        <?php   } else { ?>
                     <div class="reading-week-detail mini-row">
-                        for () {
+        <?php   }
 
-        <?php                }
-
-        ?>
-                <!-- index=0 -->
-                <div class="reading-week-detail reading-week-detail-active mini-row">
-                    <div class="col-6">
-                        <div class="reading-item reading-item-nutrition" data-target=".material-nutrition">
+               for ($j = 0; $j < count($materialTopics[$i]); $j++) { ?>
+                        <div class="col-6">
+        <?php       switch ($materialTopics[$i][$j]->TopicName) {
+                        case "Smoking": ?>
+                            <div class="reading-item reading-item-smoking" data-target=".material-<?php echo $materialTopics[$i][$j]->QuizID?>">
+                    <?php
+                            break;
+                        case "Nutrition": ?>
+                            <div class="reading-item reading-item-nutrition" data-target=".material-<?php echo $materialTopics[$i][$j]->QuizID?>">
+                    <?php
+                            break;
+                        case "Alcohol": ?>
+                            <div class="reading-item reading-item-alcohol" data-target=".material-<?php echo $materialTopics[$i][$j]->QuizID?>">
+                    <?php
+                            break;
+                        case "Physical Activity": ?>
+                            <div class="reading-item reading-item-physical-activity" data-target=".material-<?php echo $materialTopics[$i][$j]->QuizID?>">
+                    <?php
+                            break;
+                        case "Drugs": ?>
+                            <div class="reading-item reading-item-drugs" data-target=".material-<?php echo $materialTopics[$i][$j]->QuizID?>">
+                    <?php
+                            break;
+                        case "Sexual Health": ?>
+                            <div class="reading-item reading-item-sexual-health" data-target=".material-<?php echo $materialTopics[$i][$j]->QuizID?>">
+                    <?php
+                            break;
+                        case "Health and Wellbeing": ?>
+                            <div class="reading-item reading-item-health-and-wellbeing" data-target=".material-<?php echo $materialTopics[$i][$j]->QuizID?>">
+                    <?php
+                            break;
+                    } ?>
                             <div class="reading-item-logo"></div>
-                            <div class="reading-item-title">Nutrition</div>
+                            <div class="reading-item-title"><?php echo $materialTopics[$i][$j]->TopicName ?></div>
                             <div class="reading-item-divider"></div>
                             <div class="reading-item-desc">Information on the types of food we eat</div>
                         </div>
                     </div>
-                    <div class="col-6">
-                        <div class="reading-item reading-item-nutrition" data-target=".material-nutrition">
-                            <div class="reading-item-logo"></div>
-                            <div class="reading-item-title">Nutrition</div>
-                            <div class="reading-item-divider"></div>
-                            <div class="reading-item-desc">Information on the types of food we eat</div>
-                        </div>
+        <?php     } ?>
                     </div>
-                    <div class="col-6">
-                        <div class="reading-item reading-item-alcohol" data-target=".material-alcohol">
-                            <div class="reading-item-logo"></div>
-                            <div class="reading-item-title">Nutrition</div>
-                            <div class="reading-item-divider"></div>
-                            <div class="reading-item-desc">Information on the types of food we eat</div>
-                        </div>
-                    </div>
-                </div>
-
-
-                <!-- index=1 -->
-                <div class="reading-week-detail mini-row">
-                    <div class="col-6">
-                        <div class="reading-item reading-item-alcohol" data-target=".material-alcohol">
-                            <div class="reading-item-logo"></div>
-                            <div class="reading-item-title">Nutrition</div>
-                            <div class="reading-item-divider"></div>
-                            <div class="reading-item-desc">Information on the types of food we eat</div>
-                        </div>
-                    </div>
-                    <div class="col-6">
-                        <div class="reading-item reading-item-nutrition" data-target=".material-nutrition">
-                            <div class="reading-item-logo"></div>
-                            <div class="reading-item-title">Nutrition</div>
-                            <div class="reading-item-divider"></div>
-                            <div class="reading-item-desc">Information on the types of food we eat</div>
-                        </div>
-                    </div>
-                    <div class="col-6">
-                        <div class="reading-item reading-item-nutrition" data-target=".material-nutrition">
-                            <div class="reading-item-logo"></div>
-                            <div class="reading-item-title">Nutrition</div>
-                            <div class="reading-item-divider"></div>
-                            <div class="reading-item-desc">Information on the types of food we eat</div>
-                        </div>
-                    </div>
-
-                </div>
-
+        <?php   } ?>
             </div>
 
             <div class="material-list">
-                <div class="material-item material-alcohol ">
-                    <h2 class="material-title">Alcohhol</h2>
-                    <div class="material-content">
-                        <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Minus ducimus, quia atque, velit ipsum adipisci ad voluptas totam, accusantium culpa obcaecati eum voluptatibus vel vero aliquam iste commodi. Necessitatibus, odit!</p>
-                        <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Cumque nam, quod mollitia unde consectetur facilis, id in tempora nesciunt officia quam suscipit velit aliquam molestias, ratione, veritatis. Fuga, culpa, vero.</p>
+<?php
+            for ($i = 0; $i < $studentWeek; $i++) {
+                for ($j = 0; $j < count($materialTopics[$i]); $j++) {
+                    switch ($materialTopics[$i][$j]->TopicName) {
+                        case "Smoking": ?>
+                        <div class="material-item material-smoking material-<?php echo $materialTopics[$i][$j]->QuizID?>">
+                    <?php   break;
+                        case "Nutrition": ?>
+                            <div class="material-item material-nutrition material-<?php echo $materialTopics[$i][$j]->QuizID?>">
+                    <?php
+                            break;
+                        case "Alcohol": ?>
+                            <div class="material-item material-alcohol material-<?php echo $materialTopics[$i][$j]->QuizID?>">
+                    <?php
+                            break;
+                        case "Physical Activity": ?>
+                            <div class="material-item material-physical-activity material-<?php echo $materialTopics[$i][$j]->QuizID?>">
+                    <?php
+                            break;
+                        case "Drugs": ?>
+                            <div class="material-item material-drugs material-<?php echo $materialTopics[$i][$j]->QuizID?>">
+                    <?php
+                            break;
+                        case "Sexual Health": ?>
+                            <div class="material-item material-sexual-health material-<?php echo $materialTopics[$i][$j]->QuizID?>">
+                    <?php
+                            break;
+                        case "Health and Wellbeing": ?>
+                            <div class="material-item material-health-and-wellbeing material-<?php echo $materialTopics[$i][$j]->QuizID?>">
+                    <?php
+                            break;
+                    } ?>
+                        <h2 class="material-title"><?php echo $materialTopics[$i][$j]->TopicName ?></h2>
+                        <div class="material-content">
+                            <?php echo $materialTopics[$i][$j]->Content ?>
+                        </div>
                     </div>
-                </div>
-                <div class="material-item material-nutrition">
-                    <h2 class="material-title">Alcohhol</h2>
-                    <div class="material-content">
-                        <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Minus ducimus, quia atque, velit ipsum adipisci ad voluptas totam, accusantium culpa obcaecati eum voluptatibus vel vero aliquam iste commodi. Necessitatibus, odit!</p>
-                        <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Cumque nam, quod mollitia unde consectetur facilis, id in tempora nesciunt officia quam suscipit velit aliquam molestias, ratione, veritatis. Fuga, culpa, vero.</p>
-                    </div>
-                </div>
-
+<?php           }
+            } ?>
             </div>
-
-
 
             <div class="back-top">
                 <div class="icon-top"></div>

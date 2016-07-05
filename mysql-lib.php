@@ -968,6 +968,18 @@ function getLearningMaterial(PDO $conn, $quizID)
     return getRecord($conn, $quizID, "Learning_Material", array("Quiz", "Topic"));
 }
 
+function getLearningMaterialByWeek(PDO $conn, $week)
+{
+    $learniningMaterialSql = "SELECT TopicName, QuizID, Content
+                              FROM Quiz NATURAL JOIN Topic
+                                        NATURAL JOIN Learning_Material
+                              WHERE Week = ? AND Excluded = ?";
+
+    $learningMaterialQuery = $conn->prepare($learniningMaterialSql);
+    $learningMaterialQuery->execute(array($week, 0));
+    $learningMaterialResult = $learningMaterialQuery->fetchAll(PDO::FETCH_OBJ);
+    return $learningMaterialResult;
+}
 /* Learning_Material */
 
 

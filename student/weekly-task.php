@@ -35,7 +35,6 @@
         //get all quizzes and status by studentID and week
         $quizzesStatusRes = getQuizzesStatusByWeek($conn, $studentID, $week);
 
-
     } catch(Exception $e) {
         if($conn != null) {
             db_close($conn);
@@ -54,7 +53,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="initial-scale=1.0, width=device-width, user-scalable=no">
-    <title>WEEKLY TASK</title>
+    <title>Weekly Task</title>
     <link rel="stylesheet" href="./css/common.css">
     <link href='https://fonts.googleapis.com/css?family=Maitree|Lato:400,900' rel='stylesheet' type='text/css'>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
@@ -226,30 +225,44 @@
             margin: 0 auto 0 auto;
             background-size: 100% 100%;
         }
-        .game-fruit-ninja {
-            color: #2fedc9;
-        }
-        .game-fruit-ninja .game-nav-logo {
-            background-image: url("./img/game_icon.png");
-        }
-        .game-short-answer-question {
-            color: #f7751e;
-        }
-        .game-short-answer-question .game-nav-logo {
-            background-image: url("./img/quiz_icon.png");
-        }
+
         .game-multiple-choice-quiz {
             color: #f7751e;
         }
         .game-multiple-choice-quiz .game-nav-logo {
             background-image: url("./img/quiz_icon.png");
         }
-        .game-video {
-            color: #93c;
+        .game-short-answer-question {
+            color: #00f8cd;
         }
-        .game-video .game-nav-logo {
-            background-image: url("./img/video_icon.png");
+        .game-short-answer-question .game-nav-logo {
+            background-image: url("./img/short_answer_question_icon.png");
         }
+        .game-poster {
+            color: #f7751e;
+        }
+        .game-poster .game-nav-logo {
+            background-image: url("./img/poster_icon.png");
+        }
+        .game-matching {
+            color: #AF24D1;
+        }
+        .game-matching .game-nav-logo {
+            background-image: url("./img/matching_icon.png");
+        }
+        .game-cost-calculator {
+            color: #FCEE2D;
+        }
+        .game-cost-calculator .game-nav-logo {
+            background-image: url("./img/calculator_icon.png");
+        }
+        .game-standard-drinking-tool {
+            color: #DB1B1B;
+        }
+        .game-standard-drinking-tool .game-nav-logo {
+            background-image: url("./img/standard_drinking_tool_icon.png");
+        }
+
         .game-nav-title {
             font-size: 24px;
         }
@@ -515,38 +528,118 @@
             </div>
 
             <div class="game-nav">
+    <?php
+            for($i=0; $i<count($quizzesStatusRes); $i++) { ?>
                 <div class="col-6">
-                    <div class="game-nav-item game-fruit-ninja">
-                        <div class="game-nav-logo"></div>
-                        <div class="game-nav-title">Fruit Ninja</div>
-                        <div class="game-nav-divider"></div>
-                        <div class="game-nav-desc">Play the new game mode and score 20 points.</div>
-                    </div>
-                </div>
-                <div class="col-6">
-                    <div class="game-nav-item game-short-answer-question">
-                        <div class="game-nav-logo"></div>
-                        <div class="game-nav-title">Fruit Ninja</div>
-                        <div class="game-nav-divider"></div>
-                        <div class="game-nav-desc">Play the new game mode and score 20 points.</div>
-                    </div>
-                </div>
-                <div class="col-6">
-                    <div class="game-nav-item game-multiple-choice-quiz">
-                        <div class="game-nav-logo"></div>
-                        <div class="game-nav-title">Fruit Ninja</div>
-                        <div class="game-nav-divider"></div>
-                        <div class="game-nav-desc">Play the new game mode and score 20 points.</div>
-                    </div>
-                </div>
-                <div class="col-6">
-                    <div class="game-nav-item game-video">
-                        <div class="game-nav-logo"></div>
-                        <div class="game-nav-title">Fruit Ninja</div>
-                        <div class="game-nav-divider"></div>
-                        <div class="game-nav-desc">Play the new game mode and score 20 points.</div>
-                    </div>
-                </div>
+    <?php
+
+                //list of question type
+                switch($quizzesStatusRes[$i]->QuizType){
+                    case "MCQ":
+                        if(isset($quizzesStatusRes[$i]->Status)) { ?>
+                            <a href="game-home.php">
+    <?php               } else { ?>
+                            <a href="game-home.php">
+    <?php               } ?>
+                             <div class="game-nav-item game-multiple-choice-quiz">
+                                 <div class="game-nav-logo"></div>
+                                 <div class="game-nav-title">Multiple Choice Question</div>
+                                 <div class="game-nav-divider"></div>
+                                 <div class="game-nav-desc">Play the new game mode and score 20 points.</div>
+                             </div>
+                            </a>
+    <?php                break;
+                    case "SAQ":
+                         if(isset($quizzesStatusRes[$i]->Status)) { ?>
+                            <a href="game-home.php">
+    <?php                } else { ?>
+                            <a href="game-home.php">
+     <?php               } ?>
+                              <div class="game-nav-item game-short-answer-question">
+                                  <div class="game-nav-logo"></div>
+                                  <div class="game-nav-title">Short Answer Question</div>
+                                  <div class="game-nav-divider"></div>
+                                  <div class="game-nav-desc">Play the new game mode and score 20 points.</div>
+                              </div>
+                            </a>
+    <?php                break;
+                    case "Matching":
+                          if(isset($quizzesStatusRes[$i]->Status)) { ?>
+                            <a href="game-home.php">
+    <?php                 } else { ?>
+                            <a href="game-home.php">
+    <?php                 } ?>
+                                <div class="game-nav-item game-matching">
+                                    <div class="game-nav-logo"></div>
+                                    <div class="game-nav-title">Matching</div>
+                                    <div class="game-nav-divider"></div>
+                                    <div class="game-nav-desc">Play the new game mode and score 20 points.</div>
+                                </div>
+                            </a>
+    <?php                break;
+                    case "Poster":
+                            if(isset($quizzesStatusRes[$i]->Status)) { ?>
+                               <a href="game-home.php">
+    <?php                    } else { ?>
+                               <a href="game-home.php">
+    <?php                    } ?>
+                                <div class="game-nav-item game-poster">
+                                    <div class="game-nav-logo"></div>
+                                    <div class="game-nav-title">Poster</div>
+                                    <div class="game-nav-divider"></div>
+                                    <div class="game-nav-desc">Play the new game mode and score 20 points.</div>
+                                </div>
+                               </a>
+    <?php                break;
+                    case "Misc":
+                        try {
+                            $miscQuizType = getMiscQuizType($conn, $quizzesStatusRes[$i]->QuizID);
+                        } catch (Exception $e){
+                            if($conn != null) {
+                                db_close($conn);
+                            }
+
+                            debug_err($pageName, $e);
+                            //to do: handle sql error
+                            //...
+                            exit;
+                        }
+
+                        switch($miscQuizType){
+                            case "Calculator":
+                                if(isset($quizzesStatusRes[$i]->Status)) { ?>
+                                    <a href="game-home.php">
+    <?php                       } else { ?>
+                                    <a href="game-home.php">
+    <?php                       } ?>
+                                        <div class="game-nav-item game-cost-calculator">
+                                            <div class="game-nav-logo"></div>
+                                            <div class="game-nav-title">Cost Calculator</div>
+                                            <div class="game-nav-divider"></div>
+                                            <div class="game-nav-desc">Play the new game mode and score 20 points.</div>
+                                        </div>
+                                    </a>
+    <?php                       break;
+                            case "DrinkingTool":
+                                if(isset($quizzesStatusRes[$i]->Status)) { ?>
+                                    <a href="game-home.php">
+    <?php                       } else { ?>
+                                    <a href="game-home.php">
+    <?php                       } ?>
+                                        <div class="game-nav-item game-standard-drinking-tool">
+                                            <div class="game-nav-logo"></div>
+                                            <div class="game-nav-title">Standard Drinking Tool</div>
+                                            <div class="game-nav-divider"></div>
+                                            <div class="game-nav-desc">Play the new game mode and score 20 points.</div>
+                                        </div>
+                                    </a>
+    <?php                       break;
+                        }
+                        break;
+                 } ?>
+                            </div>
+
+     <?php       }    ?>
 
             </div>
         </div>

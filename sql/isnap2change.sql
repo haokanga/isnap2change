@@ -612,7 +612,7 @@ INSERT IGNORE INTO `Matching_Option`(Content, MatchingID) VALUES('Rice', @MATCHI
 INSERT IGNORE INTO Learning_Material(Content,QuizID) VALUES('<p>Eating a balanced diet is vital for your health and wellbeing. The food we eat is responsible for providing us with the energy to do all the tasks of daily life. For optimum performance and growth a balance of protein, essential fats, vitamins and minerals are required. We need a wide variety of different foods to provide the right amounts of nutrients for good health. The different types of food and how much of it you should be aiming to eat is demonstrated on the pyramid below. (my own words)</p>
 <p><img style="display: block; margin-left: auto; margin-right: auto;" src="https://cmudream.files.wordpress.com/2016/05/0.jpg" alt="" width="632" height="884" /></p>
 <p>There are three main layers of the food pyramid. The bottom layer is the most important one for your daily intake of food. It contains vegetables, fruits, grains and legumes. You should be having most of your daily food from this layer. These foods are all derived or grow on plants and contain important nutrients such as vitamins, minerals and antioxidants. They are also responsible for being the main contributor of carbohydrates and fibre to our diet.<br />The middle layer is comprised of dairy based products such as milk, yoghurt, cheese. These are essential to providing our bodies with calcium and protein and important vitamins and minerals.<br />They layer also contains lean meat, poultry, fish, eggs, nuts, seeds, legumes. These foods are our main source of protein and are also responsible for providing other nutrients to us including iodine, iron, zinc, B12 vitamins and healthy fats.<br />The top layer, which is the smallest layer, is the layer you should me eating the least off. This layer is made up of food which has unsaturated fats such as sugar, butter, margarine and oils; small amounts of these unsaturated fats are needed for healthy brain and hear function.<br />(my own words)<br />Source: The Healthy Living Pyramid. Nutrition Australia. [Accessed 28/04/2016 http://www.nutritionaustralia.org/national/resource/healthy-living-pyramid]</p>',1);
-INSERT IGNORE INTO Learning_Material(Content,QuizID) VALUES('https://www.youtube.com/watch?v=1ey0EDVjyeY&index=89&list=PLIGEVr8ox1oGsi-XcwSjudMi_uCPxGzSs',2);
+INSERT IGNORE INTO Learning_Material(Content,QuizID, Excluded) VALUES('https://www.youtube.com/watch?v=1ey0EDVjyeY&index=89&list=PLIGEVr8ox1oGsi-XcwSjudMi_uCPxGzSs',2,1);
 INSERT IGNORE INTO Learning_Material(Content,QuizID) VALUES('
 <p>Learning materials for week 3.</p>',3);
 INSERT IGNORE INTO Learning_Material(Content,QuizID) VALUES('
@@ -721,6 +721,12 @@ INSERT INTO `isnap2changedb`.`poster_section` (`QuizID`, `Points`) VALUES ('9', 
 
 # [Example] insert a learning material for a Poster task with QuizID = 9
 INSERT INTO `isnap2changedb`.`learning_material` (`Content`, `QuizID`) VALUES ('<p>Learning materials for this quiz has not been added.</p>', '9');
+
+# [Example] insert one more learning material
+INSERT INTO `isnap2changedb`.`learning_material` (`Content`, `QuizID`, Excluded) VALUES ('<p>Learning materials for this quiz has not been added.</p>', '10', 1);
+
+# [Example] change a class's (classID = 1) unlocked progress to 3
+UPDATE `isnap2changedb`.`class` SET `UnlockedProgress`='3' WHERE `ClassID`='1';
 /*
 #TEST
 
