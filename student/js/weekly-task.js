@@ -16,7 +16,13 @@ function parseFeedback(response) {
     var feedback = JSON.parse(response);
 
     if(feedback.message != "success"){
-        alert(feedback.message + ". Please try again!");
+        //alert(feedback.message + ". Please try again!");
         //jump to error page
+        snap.alert({
+            content: feedback.message + '. Please try again!',
+            onClose: function () {
+                console.log('alert close')
+            }
+        })
     }
 }

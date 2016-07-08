@@ -32,8 +32,8 @@
         //get due time for this week
         $dueTime = getStuWeekRecord($conn, $studentID, $week);
 
-        //get all quizzes and status by studentID and week
-        $quizzesStatusRes = getQuizzesStatusByWeek($conn, $studentID, $week);
+        //get all quizzes by studentID and week
+        $quizzesRes = getQuizzesStatusByWeek($conn, $studentID, $week);
 
     } catch(Exception $e) {
         if($conn != null) {
@@ -46,6 +46,7 @@
         exit;
     }
 
+    db_close($conn);
 ?>
 
 <!DOCTYPE html>
@@ -60,46 +61,8 @@
     <script src="./js/vendor/kinetic.js"></script>
     <script src="./js/vendor/jquery.final-countdown.min.js"></script>
     <script src="./js/weekly-task.js"></script>
+    <script src="./js/snap.js"></script>
     <style>
-        .page-wrapper {
-            padding-top: 50px;
-            margin: 0 auto;
-        }
-        .header-fixed {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            z-index: 1024;
-        }
-        .sitenav {
-            position: fixed;
-            left: 20px;
-            top: 20%;
-        }
-        .sitenav-item a {
-            display: block;
-            width: 64px;
-            height: 64px;
-            background-size: 100% 100%;
-            margin-bottom: 20px;
-        }
-        .sitenav-game-home a {
-            background-image: url("./img/game_icon.png");
-        }
-        .sitenav-achievement a {
-            background-image: url("./img/achievement_logo.png");
-
-        }
-        .sitenav-progress a {
-            background-image: url("./img/progress_icon.png");
-
-        }
-        .sitenav-reading-material a {
-            background-image: url("./img/reading_material_icon.png");
-        }
-
-
         .week-detail {
             max-width: 1000px;
             margin: 0 auto 0 auto;
@@ -121,8 +84,8 @@
             height: 120px;
         }
         .week-img {
-            width: 100px;
-            height: 100px;
+            width: 120px;
+            height: 120px;
             margin: 0 auto;
             display: block;
             background-size: 100% 100%;
@@ -177,6 +140,7 @@
         }
         .time-remain-title {
             font-size: 24px;
+            margin-bottom: 10px;
         }
         .time-remain-detail {
             margin: 20px 0 0 0;
@@ -281,20 +245,6 @@
             position: absolute;
             left: -9999em;
         }
-        html, body {
-            height: 100%;
-        }
-        html {
-            background-position: center center;
-            background-repeat: no-repeat;
-            background-size: cover;
-        }
-        body {
-            background-color: rgba(44,62,80 , 0.6 );
-            background-position: center;
-            background-repeat: repeat;
-            font-family: 'Raleway', 'Arial', sans-serif;
-        }
         .countdown-container {
             position: relative;
         }
@@ -346,8 +296,8 @@
         .clock-item {
             display: inline-block;
             margin: 0 15px;
-            width: 150px;
-            height: 150px;
+            width: 128px;
+            height: 128px;
         }
 
     </style>
@@ -355,7 +305,7 @@
 <body>
 
 <div class="page-wrapper">
-    <div class="header-wrapper header-fixed">
+    <div class="header-wrapper">
         <div class="header">
             <a class="home-link" href="#">SNAP</a>
             <ul class="nav-list">
@@ -529,14 +479,14 @@
 
             <div class="game-nav">
     <?php
-            for($i=0; $i<count($quizzesStatusRes); $i++) { ?>
+            for($i=0; $i<count($quizzesRes); $i++) { ?>
                 <div class="col-6">
     <?php
 
                 //list of question type
-                switch($quizzesStatusRes[$i]->QuizType){
+                switch($quizzesRes[$i]['QuizType']){
                     case "MCQ":
-                        if(isset($quizzesStatusRes[$i]->Status)) { ?>
+                        if(isset($quizzesRes[$i]['Status'])) { ?>
                             <a href="game-home.php">
     <?php               } else { ?>
                             <a href="game-home.php">
@@ -545,12 +495,12 @@
                                  <div class="game-nav-logo"></div>
                                  <div class="game-nav-title">Multiple Choice Question</div>
                                  <div class="game-nav-divider"></div>
-                                 <div class="game-nav-desc">Play the new game mode and score 20 points.</div>
+                                 <div class="game-nav-desc">Complete Multiple Choice Question on <?php echo $quizzesRes[$i]['TopicName']?> to receive <?php echo $quizzesRes[$i]['Points']?> points.</div>
                              </div>
                             </a>
     <?php                break;
                     case "SAQ":
-                         if(isset($quizzesStatusRes[$i]->Status)) { ?>
+                         if(isset($quizzesRes[$i]['Status'])) { ?>
                             <a href="game-home.php">
     <?php                } else { ?>
                             <a href="game-home.php">
@@ -559,12 +509,12 @@
                                   <div class="game-nav-logo"></div>
                                   <div class="game-nav-title">Short Answer Question</div>
                                   <div class="game-nav-divider"></div>
-                                  <div class="game-nav-desc">Play the new game mode and score 20 points.</div>
+                                  <div class="game-nav-desc">Complete Short Answer Question on <?php echo $quizzesRes[$i]['TopicName']?> to receive <?php echo $quizzesRes[$i]['Points']?> points.</div>
                               </div>
                             </a>
     <?php                break;
                     case "Matching":
-                          if(isset($quizzesStatusRes[$i]->Status)) { ?>
+                          if(isset($quizzesRes[$i]['Status'])) { ?>
                             <a href="game-home.php">
     <?php                 } else { ?>
                             <a href="game-home.php">
@@ -573,12 +523,12 @@
                                     <div class="game-nav-logo"></div>
                                     <div class="game-nav-title">Matching</div>
                                     <div class="game-nav-divider"></div>
-                                    <div class="game-nav-desc">Play the new game mode and score 20 points.</div>
+                                    <div class="game-nav-desc">Complete Matching on <?php echo $quizzesRes[$i]['TopicName']?> to receive <?php echo $quizzesRes[$i]['Points']?> points.</div>
                                 </div>
                             </a>
     <?php                break;
                     case "Poster":
-                            if(isset($quizzesStatusRes[$i]->Status)) { ?>
+                            if(isset($quizzesRes[$i]['Status'])) { ?>
                                <a href="game-home.php">
     <?php                    } else { ?>
                                <a href="game-home.php">
@@ -587,55 +537,39 @@
                                     <div class="game-nav-logo"></div>
                                     <div class="game-nav-title">Poster</div>
                                     <div class="game-nav-divider"></div>
-                                    <div class="game-nav-desc">Play the new game mode and score 20 points.</div>
+                                    <div class="game-nav-desc">Complete Poster on <?php echo $quizzesRes[$i]['TopicName']?> to receive <?php echo $quizzesRes[$i]['Points']?> points.</div>
                                 </div>
                                </a>
     <?php                break;
-                    case "Misc":
-                        try {
-                            $miscQuizType = getMiscQuizType($conn, $quizzesStatusRes[$i]->QuizID);
-                        } catch (Exception $e){
-                            if($conn != null) {
-                                db_close($conn);
-                            }
-
-                            debug_err($pageName, $e);
-                            //to do: handle sql error
-                            //...
-                            exit;
-                        }
-
-                        switch($miscQuizType){
-                            case "Calculator":
-                                if(isset($quizzesStatusRes[$i]->Status)) { ?>
-                                    <a href="game-home.php">
-    <?php                       } else { ?>
-                                    <a href="game-home.php">
-    <?php                       } ?>
-                                        <div class="game-nav-item game-cost-calculator">
-                                            <div class="game-nav-logo"></div>
-                                            <div class="game-nav-title">Cost Calculator</div>
-                                            <div class="game-nav-divider"></div>
-                                            <div class="game-nav-desc">Play the new game mode and score 20 points.</div>
-                                        </div>
-                                    </a>
+                    case "Calculator":
+                            if(isset($quizzesRes[$i]['Status'])) { ?>
+                                <a href="game-home.php">
+    <?php                   } else { ?>
+                                <a href="game-home.php">
+    <?php                   } ?>
+                                <div class="game-nav-item game-cost-calculator">
+                                    <div class="game-nav-logo"></div>
+                                    <div class="game-nav-title">Cost Calculator</div>
+                                    <div class="game-nav-divider"></div>
+                                    <div class="game-nav-desc">Complete Cost Calculator on <?php echo $quizzesRes[$i]['TopicName']?> to receive <?php echo $quizzesRes[$i]['Points']?> points.</div>
+                                </div>
+                                </a>
     <?php                       break;
-                            case "DrinkingTool":
-                                if(isset($quizzesStatusRes[$i]->Status)) { ?>
-                                    <a href="game-home.php">
-    <?php                       } else { ?>
-                                    <a href="game-home.php">
-    <?php                       } ?>
+                    case "DrinkingTool":
+                            if(isset($quizzesRes[$i]['Status'])) { ?>
+                                <a href="game-home.php">
+    <?php                   } else { ?>
+                                <a href="game-home.php">
+    <?php                   } ?>
                                         <div class="game-nav-item game-standard-drinking-tool">
                                             <div class="game-nav-logo"></div>
                                             <div class="game-nav-title">Standard Drinking Tool</div>
                                             <div class="game-nav-divider"></div>
-                                            <div class="game-nav-desc">Play the new game mode and score 20 points.</div>
+                                            <div class="game-nav-desc">Complete Standard Drinking Tool on <?php echo $quizzesRes[$i]['TopicName']?> to receive <?php echo $quizzesRes[$i]['Points']?> points.</div>
                                         </div>
                                     </a>
     <?php                       break;
-                        }
-                        break;
+
                  } ?>
                             </div>
 
@@ -649,15 +583,17 @@
         <li class="sitenav-item sitenav-game-home"><a href="#"></a></li>
         <li class="sitenav-item sitenav-achievement"><a href="#"></a></li>
         <li class="sitenav-item sitenav-progress"><a href="#"></a></li>
-        <li class="sitenav-item sitenav-reading-material"><a href="#"></a></li>
+        <li class="sitenav-item sitenav-reading-material"><a href="reading-material.php"></a></li>
     </ul>
-    <div class="footer">
-        <div class="footer-content">
-            <a href="#" class="footer-logo"></a>
-            <ul class="footer-nav">
-                <li class="footer-nav-item"><a href="#">Any Legal Stuff</a></li>
-                <li class="footer-nav-item"><a href="#">Acknowledgements</a></li>
-            </ul>
+    <div class="footer-wrapper">
+        <div class="footer">
+            <div class="footer-content">
+                <a href="#" class="footer-logo"></a>
+                <ul class="footer-nav">
+                    <li class="footer-nav-item"><a href="#">Any Legal Stuff</a></li>
+                    <li class="footer-nav-item"><a href="#">Acknowledgements</a></li>
+                </ul>
+            </div>
         </div>
     </div>
 </div>
@@ -672,7 +608,12 @@
                     end: Date.parse(new Date("<?php echo $dueTime?>"))/1000,
                     now: new Date().getTime() / 1000
                 }, function() {
-                    alert("Time is up!");
+                    snap.alert({
+                        content: 'You\'re out of time!',
+                        onClose: function () {
+                            console.log('alert close')
+                        }
+                    })
                 });
             } else {
 
@@ -685,7 +626,12 @@
                 end: Date.parse(newDue) / 1000,
                 now: new Date().getTime() / 1000
             }, function() {
-                alert("Time is up!");
+                snap.alert({
+                    content: 'You\'re out of time!',
+                    onClose: function () {
+                        console.log('alert close')
+                    }
+                })
             });
 
             var dd = newDue.getDate();
@@ -703,7 +649,59 @@
             newDue = yyyy+"-"+mm+"-"+dd+ " " +newDue.getHours() + ":" + newDue.getMinutes()+":" + newDue.getSeconds();
 
             saveDueTime(<?php echo $studentID ?>, <?php echo $week ?>, newDue);
+/*
+            $.ajax({
+                url: "cost-calculator-feedback.php",
+                data: {
+                    studentID: <?php echo $studentID?>,
+                    quizID: <?php echo $quizID?>,
+                    answerArr: JSON.stringify(answerArr)
+                },
+                type: "POST",
+                dataType : "json"
+            })
+
+                .done(function(feedback) {
+                    parseFeedback(feedback);
+                })
+
+                .fail(function( xhr, status, errorThrown ) {
+                    alert( "Sorry, there was a problem!" );
+                    console.log( "Error: " + errorThrown );
+                    console.log( "Status: " + status );
+                    console.dir( xhr );
+                });
+*/
 <?php	} ?>
+
+        function saveDueTime(studentID, week, dueTime) {
+            var xmlhttp = new XMLHttpRequest();
+
+            xmlhttp.onreadystatechange = function() {
+                if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
+                    parseFeedback(xmlhttp.responseText);
+                }
+            };
+
+            xmlhttp.open("POST", "save-due-time.php", true);
+            xmlhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+            xmlhttp.send("studentID="+studentID +"&week="+week+"&dueTime="+ dueTime);
+        }
+
+        function parseFeedback(response) {
+            var feedback = JSON.parse(response);
+
+            if(feedback.message != "success"){
+                //alert(feedback.message + ". Please try again!");
+                //jump to error page
+                snap.alert({
+                    content: feedback.message + '. Please try again!',
+                    onClose: function () {
+                        console.log('alert close')
+                    }
+                })
+            }
+        }
 </script>
 
 </body>

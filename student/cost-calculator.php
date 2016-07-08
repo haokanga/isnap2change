@@ -8,7 +8,7 @@
     $pageName = "cost-calculaor";
 
     //check whether a request is GET or POST
-    if($_SERVER["REQUEST_METHOD"] == "POST"){
+ /*   if($_SERVER["REQUEST_METHOD"] == "POST"){
         if(isset($_POST["quizID"]) && isset($_POST["week"])){
             $quizID = $_POST["quizID"];
             $week = $_POST["week"];
@@ -18,6 +18,9 @@
     } else{
 
     }
+*/
+    $quizID = 5;
+
 
 ?>
 
@@ -26,16 +29,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="initial-scale=1.0, width=device-width, user-scalable=no">
-    <title>Document</title>
+    <title>Cost Calculator</title>
     <link rel="stylesheet" href="./css/common.css">
-    <link rel="stylesheet" href="./css/vendor/slick.css">
-    <link rel="stylesheet" href="./css/vendor/slick-theme.css">
     <link href='https://fonts.googleapis.com/css?family=Maitree|Lato:400,900' rel='stylesheet' type='text/css'>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
-    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.6.0/slick.min.js"></script>
     <style>
         .calculator-header {
-            margin-top: 20px;
+            padding-top: 20px;
             text-align: center;
         }
         .calculator-title {
@@ -57,7 +57,6 @@
             font-size: 18px;
         }
 
-
         .result-list {
             padding-top: 20px;
         }
@@ -76,8 +75,6 @@
         .result-value {
             color: #fcee2f;
         }
-
-
 
         .question-form {
             font-size: 18px;
@@ -127,7 +124,7 @@
 
     <style>
         /**
-         * range style
+         * range样式
          **/
         input[type=range] {
             /*removes default webkit styles*/
@@ -188,12 +185,13 @@
             </ul>
             <a href="#" class="settings">
                 <span class="setting-icon"></span>
-                <span class="setting-text">NoButSrsly</span>
+                <span class="setting-text"><?php echo $studentUsername?></span>
             </a>
         </div>
     </div>
 
-    <div class="page-content ">
+    <div class="content-wrapper">
+        <div class="page-container">
 
         <div class="calculator-header">
             <h2 class="calculator-title">Cost Calculator</h2>
@@ -206,9 +204,18 @@
                         <div class="factor-item">
                             <div class="factor-title">How much do you pay for a pack of cigarettes?</div>
                             <div class="factor-slider">
-                                <input type="range" min="0" max="50" value="0" name="price">
+                                <input type="range" min="0" max="50" value="1" name="price">
                             </div>
                             <div class="factor-label">$<span class="factor-value">1</span></div>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="factor-item">
+                            <div class="factor-title">How many cigarettes are in each pack?</div>
+                            <div class="factor-slider">
+                                <input type="range" min="1" max="50" value="20" name="cigaretteAmount">
+                            </div>
+                            <div class="factor-label"><span class="factor-value">999</span></div>
                         </div>
                     </div>
                     <div class="col-6">
@@ -222,19 +229,9 @@
                     </div>
                     <div class="col-6">
                         <div class="factor-item">
-                            <div class="factor-title">How many cigarettes are in each pack?</div>
-                            <div class="factor-slider">
-                                <input type="range" min="1" max="50" value="1" name="cigaretteAmount">
-                            </div>
-                            <div class="factor-label"><span class="factor-value">999</span></div>
-                        </div>
-                    </div>
-
-                    <div class="col-6">
-                        <div class="factor-item">
                             <div class="factor-title">How many years have you been smoking?</div>
                             <div class="factor-slider">
-                                <input type="range" min="0" max="100" value="0" name="smokeYear">
+                                <input type="range" min="0" max="100" value="5" name="smokeYear">
                             </div>
                             <div class="factor-label"><span class="factor-value">1</span></div>
                         </div>
@@ -285,22 +282,22 @@
                 </form>
             </div>
 
+            </div>
         </div>
-
     </div>
 
-
-    <div class="footer">
-        <div class="footer-content">
-            <a href="#" class="footer-logo"></a>
-            <ul class="footer-nav">
-                <li class="footer-nav-item"><a href="#">Any Legal Stuff</a></li>
-                <li class="footer-nav-item"><a href="#">Acknowledgements</a></li>
-            </ul>
+    <div class="footer-wrapper">
+        <div class="footer">
+            <div class="footer-content">
+                <a href="#" class="footer-logo"></a>
+                <ul class="footer-nav">
+                    <li class="footer-nav-item"><a href="#">Any Legal Stuff</a></li>
+                    <li class="footer-nav-item"><a href="#">Acknowledgements</a></li>
+                </ul>
+            </div>
         </div>
     </div>
 </div>
-
 
 <script>
     var ResultCtrl = {
@@ -317,9 +314,8 @@
             this.$tenYearCost = $main.find('.result-item-ten-year-cost')
         },
         /**
-         * 更新计算结果
-         * @parm data {Object} 包含计算结果的键值对, 键必须在一下范围内, 值需要自带$符号
-         * @param data.costToDate {string} Cost to Date的值
+         * refresh calculation result
+         * @param data.costToDate {string} Cost to Date
          * @param data.weeklyCost {String} weekly cost
          * @param data.monthlyCost {string} monthly cost
          * @param data.yearlyCost {string} yearly cost
@@ -330,15 +326,15 @@
                 var $item = this['$' + key];
                 if ($item.length) {
                     $item.find('.result-value')
-                        .text(data[key])
+                        .text(data[key]);
                 }
 
             }
         }
     };
+
     ResultCtrl.init();
 
-    // 左上角滑块控制
     var RangeCtrl = {
         init: function (opt) {
             opt = opt || {
@@ -347,23 +343,23 @@
             this.onChange = opt.onChange;
             this.cacheElements();
             this.addListeners();
-            this.normalizeLabel()
+            this.normalizeLabel();
         },
         cacheElements: function () {
             var $main = $('.factor-list');
             this.$main = $main;
-            this.$ranges = $main.find('input[type=range]')
+            this.$ranges = $main.find('input[type=range]');
         },
         addListeners: function () {
             var that = this;
 
-            this.$main.on('change', 'input[type=range]', function (e) {
+            this.$main.on('input', 'input[type=range]', function (e) {
                 var $target = $(e.currentTarget);
                 $target.closest('.factor-item')
                     .find('.factor-value')
                     .text($target.val());
 
-                that.onChange(that.getRangeData())
+                that.onChange(that.getRangeData());
             })
         },
         getRangeData: function () {
@@ -371,8 +367,8 @@
             var rangeData = {};
             rangeArray.forEach(function (range) {
                 rangeData[range.name] = +range.value
-            })
-            return rangeData
+            });
+            return rangeData;
         },
         normalizeLabel: function () {
             this.$ranges.each(function () {
@@ -384,82 +380,144 @@
             this.onChange(this.getRangeData())
         }
     };
+
+    var formatCost = function(cost){
+        cost = cost.toFixed(2);
+        cost += '';
+        var costParts = cost.split('.');
+        var cost1 = costParts[0].replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,');
+        var cost2 = costParts.length > 1 ? '.' + costParts[1] : '';
+
+        return '$' + cost1 + cost2;
+    };
+
     RangeCtrl.init({
         /**
-         * 左侧四个滑块变化时调用, data包含四个滑块变化后的值
          * @param data {Object}
-         * @param data.price {number} 左上角: 一包香烟价格
-         * @param data.frequency {number} 右上角: 每天抽烟多少
-         * @param data.cigaretteAmount {number} 右下角: 一包烟有几只
-         * @param data.smokeYear {number} 右下角:抽烟多少年
+         * @param data.price {number}
+         * @param data.frequency {number}
+         * @param data.cigaretteAmount {number}
+         * @param data.smokeYear {number}
          **/
         onChange: function (data) {
-            console.log(data)
-            // 使用data进行计算
+            var formatCost = function(cost){
+                cost = cost.toFixed(2);
+                cost += '';
+                var costParts = cost.split('.');
+                cost1 = costParts[0].replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1,");
+                cost2 = costParts.length > 1 ? '.' + costParts[1] : '';
 
+                return '$' + cost1 + cost2;
+            };
 
+            var costPerPack = data.price;
+            var cigarettesPerPack = data.cigaretteAmount;
+            var cigarettesPerDay = data.frequency;
+            var numberOfYears = data.smokeYear;
+            var costPerDay, costPerWeek, costPerYear, costPerMonth, costPer5Years, costPer10Years, costToDate;
 
-            // 计算的结果传给下面
+            if(numberOfYears > 0 && cigarettesPerDay > 0){
+                costPerDay = (costPerPack / cigarettesPerPack) * cigarettesPerDay;
+                costPerWeek = costPerDay * 7;
+                costPerYear = costPerDay * 365;
+                costPerMonth = costPerYear / 12;
+                costPer5Years = costPerYear * 5;
+                costPer10Years = costPerYear * 10;
+                costToDate = costPerYear * numberOfYears;
+            }
+            else{
+                costPerDay = costPerWeek = costPerYear = costPerMonth = costPer5Years = costPer10Years = costToDate = gramsTarPerYear = percentageTar = 0;
+            }
+
             ResultCtrl.setLabel({
-                costToDate: '$' + Math.random(),
-                weeklyCost: '$' + Math.random(),
-                monthlyCost: '$' + Math.random(),
-                yearlyCost: '$' + Math.random(),
-                tenYearCost: '$' + Math.random()
+                costToDate: formatCost(costToDate),
+                weeklyCost:  formatCost(costPerWeek),
+                monthlyCost:formatCost(costPerMonth),
+                yearlyCost: formatCost(costPerYear),
+                tenYearCost: formatCost(costPer10Years)
             })
         }
-    })
-
-
-
-
-
-
-
-
+    });
 
     var QuestionCtrl = {
         init: function (opt) {
             opt = opt || {
                     onSubmit: $.noop
-                }
-            this.onSubmit = opt.onSubmit
-            this.cacheElements()
-            this.addListeners()
+                };
+            this.onSubmit = opt.onSubmit;
+            this.cacheElements();
+            this.addListeners();
         },
         cacheElements: function () {
-            var $main = $('.question-form')
-            this.$main = $main
+            var $main = $('.question-form');
+            this.$main = $main;
         },
         addListeners: function () {
-            var that = this
+            var that = this;
             this.$main.on('submit', function (e) {
-                e.preventDefault()
-                that.onSubmit(that.getFormData())
+                e.preventDefault();
+                that.onSubmit(that.getFormData());
             })
         },
         getFormData: function () {
-            var dataArray = this.$main.serializeArray()
-            var data = {}
+            var dataArray = this.$main.serializeArray();
+            var data = {};
             dataArray.forEach(function (item) {
                 data[item.name] = item.value
-            })
-            return data
+            });
+            return data;
         }
-    }
+    };
     QuestionCtrl.init({
         /**
-         * 用户点击提交之后触发. data包含三个问题的答案
-         * @param data.q1 {string} 第一个问题答案
-         * @param data.q2 {string} 第二个问题答案
-         * @param data.q3 {string} 第三个问题答案
+         * @param data.q1 {string} answer for the first question
+         * @param data.q2 {string} answer for the second question
+         * @param data.q3 {string} answer for the third question
          **/
         onSubmit: function (data) {
-            console.log(data)
+            var answerArr = [data.q1, data.q2, data.q3];
+
+            $.ajax({
+                url: "cost-calculator-feedback.php",
+                data: {
+                    studentID: <?php echo $studentID?>,
+                    quizID: <?php echo $quizID?>,
+                    answerArr: JSON.stringify(answerArr)
+                },
+                type: "POST",
+                dataType : "json"
+            })
+
+                .done(function(feedback) {
+                    parseFeedback(feedback);
+                })
+
+                .fail(function( xhr, status, errorThrown ) {
+                    alert( "Sorry, there was a problem!" );
+                    console.log( "Error: " + errorThrown );
+                    console.log( "Status: " + status );
+                    console.dir( xhr );
+                });
         }
-    })
+    });
+
+    function parseFeedback(feedback) {
+        if(feedback.message != "success") {
+            alert(feedback.message + ". Please try again!");
+            return;
+        }
+
+        if(feedback.result == "pass") {
+            alert("Congratulation! You have passed this quiz.");
+        //    $("#submitBtn").attr("disabled","disabled");
+        } else if(feedback.result == "fail") {
+            alert("Sorry! You have failed this quiz.");
+        }
+    }
 </script>
 
 </body>
 </html>
+
+
 

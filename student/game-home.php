@@ -48,7 +48,6 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.6.0/slick.min.js"></script>
     <style>
-
         /**
          * main.html
          **/
@@ -104,10 +103,7 @@
             width: 128px;
             height: 128px;
         }
-
-        /**
-         * $周轮播
-         **/
+        
         .week-content {
             max-width: 1000px;
             margin: 0 auto;
@@ -164,7 +160,6 @@
             text-align: center;
             font-size: 20px;
         }
-
         .week-locked .week-img {
             background-image: url("./img/locked_icon.png");
         }
@@ -216,7 +211,6 @@
         .week-more .week-img {
             background-image: url("./img/extra_week_icon.png");
         }
-
         .week-content .slick-dots li {
             width: 16px;
             height: 16px;
@@ -250,7 +244,7 @@
         </div>
     </div>
 
-    <div class="page-content ">
+    <div class="content-wrapper">
         <div class="week-content">
             <div class="week-carousel">
 <?php
@@ -339,16 +333,20 @@
         </div>
 
     </div>
-    <div class="footer">
-        <div class="footer-content">
-            <a href="#" class="footer-logo"></a>
-            <ul class="footer-nav">
-                <li class="footer-nav-item"><a href="#">Any Legal Stuff</a></li>
-                <li class="footer-nav-item"><a href="#">Acknowledgements</a></li>
-            </ul>
+
+    <div class="footer-wrapper">
+        <div class="footer">
+            <div class="footer-content">
+                <a href="#" class="footer-logo"></a>
+                <ul class="footer-nav">
+                    <li class="footer-nav-item"><a href="#">Any Legal Stuff</a></li>
+                    <li class="footer-nav-item"><a href="#">Acknowledgements</a></li>
+                </ul>
+            </div>
         </div>
     </div>
-</div>
+
+    </div>
 
 
 <script>

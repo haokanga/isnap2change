@@ -7,7 +7,6 @@
  **/
 html {
     box-sizing: border-box;
-    height: 100%;
 }
 *,
 *::before,
@@ -21,10 +20,9 @@ body {
     -moz-osx-font-smoothing: grayscale;
     font-family: 'Lato', sans-serif;
     font-size: 14px;
-    line-height: 1.8;
+    line-height: 1.4;
     color: #fff;
     overflow-x: hidden;
-    height: 100%;
     background-size: 100% 100%;
     background-image: url("../img/main_background.jpg");
 }
@@ -38,12 +36,47 @@ a {
     color: #fff;
     text-decoration: none;
 }
+a:focus {
+    outline: 0;
+}
 h2 {
     font-weight: normal;
 }
 h3 {
     font-weight: normal;
 }
+
+/**
+ * $layout 页面总体布局
+ **/
+html,
+body {
+    height: 100%;
+}
+.page-wrapper {
+    height: 100%;
+    padding-top: 50px;
+}
+.header-wrapper {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 50px;
+    z-index: 1024;
+    background-color: #000;
+}
+.content-wrapper {
+    min-height: calc(100% - 50px);
+}
+.footer-wrapper {
+    height: 50px;
+}
+.page-container {
+    max-width: 1000px;
+    margin: 0 auto;
+}
+
 
 /**
  * $tool 工具类
@@ -94,19 +127,10 @@ h3 {
   position: relative;
 }
 
-.page-wrapper {
-    height: 100%;
-}
-.page-content {
-    background-color: #0d0d0d;
-    height: calc(100% - 100px);
-}
+
 /**
  * header
  **/
- .header-wrapper {
-    background-color: #000;
- }
 .header {
     font-family: 'Lato', sans-serif;
     height: 50px;
@@ -193,4 +217,92 @@ h3 {
     display: inline-block;
     line-height: 1;
     margin-top: 10px;
+}
+
+/**
+ * $sitenav
+ **/
+
+.sitenav {
+    position: fixed;
+    left: 20px;
+    top: 20%;
+}
+.sitenav-item a {
+    display: block;
+    width: 64px;
+    height: 64px;
+    background-size: 100% 100%;
+    margin-bottom: 20px;
+}
+.sitenav-game-home a {
+    background-image: url("../img/game_icon.png");
+}
+.sitenav-achievement a {
+    background-image: url("../img/achievement_logo.png");
+
+}
+.sitenav-progress a {
+    background-image: url("../img/progress_icon.png");
+
+}
+.sitenav-reading-material a {
+    background-image: url("../img/reading_material_icon.png");
+}
+
+
+/**
+ * $snap-alert
+ **/
+.snap-alert {
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    z-index: 2048;
+}
+.snap-alert-mask {
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+}
+.snap-alert-container {
+    text-align: center;
+    border: 2px solid #fff;
+    padding: 24px;
+    width: 350px;
+    height: 200px;
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    margin: auto;
+    background-size: 100% 100%;
+    background-image: url("../img/game_home_background.png");
+}
+.snap-alert-logo {
+    width: 83px;
+    height: 28px;
+    margin: 0 auto;
+    display: block;
+    background-size: 100% 100%;
+    background-image: url("../img/snap_single_wordform_white.png");
+}
+.snap-alert-content {
+    padding-top: 20px;
+    height: 85px;
+    font-family: Maitree, serif;
+    font-size: 18px;
+}
+.snap-alert-confirm {
+    margin: 0 auto;
+    width: 110px;
+    height: 40px;
+    line-height: 40px;
+    border-radius: 4px;
+    background-color: rgba(0, 0, 0, 0.8);
+    font-size: 18px;
+    cursor: pointer;
 }

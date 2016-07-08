@@ -1,4 +1,5 @@
 <?php
+	require_once ("student-validation.php");
 	require_once("../mysql-lib.php");
 	require_once("../debug.php");
 
@@ -19,7 +20,7 @@
 	$feedback = array();
 	$feedback["detail"] = array();
 	
-	$correctAns = array("12.12", "13.13", "14.14");
+	$correctAns = array("45625.00", "182500.00", "365000.00");
 	
 	$correctCount = 0;
 	

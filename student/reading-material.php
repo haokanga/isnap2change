@@ -34,6 +34,8 @@
         //...
         //exit;
     }
+
+    db_close($conn);
 ?>
 
 <!DOCTYPE html>
@@ -46,45 +48,6 @@
     <link href='https://fonts.googleapis.com/css?family=Maitree|Lato:400,900' rel='stylesheet' type='text/css'>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
     <style>
-        .page-wrapper {
-            padding-top: 50px;
-            margin: 0 auto;
-        }
-        .header-fixed {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            z-index: 1024;
-        }
-        .sitenav {
-            position: fixed;
-            left: 20px;
-            top: 20%;
-        }
-        .sitenav-item a {
-            display: block;
-            width: 64px;
-            height: 64px;
-            background-size: 100% 100%;
-            margin-bottom: 20px;
-        }
-        .sitenav-game-home a {
-            background-image: url("./img/game_icon.png");
-        }
-        .sitenav-achievement a {
-            background-image: url("./img/achievement_logo.png");
-
-        }
-        .sitenav-progress a {
-            background-image: url("./img/progress_icon.png");
-
-        }
-        .sitenav-reading-material a {
-            background-image: url("./img/reading_material_icon.png");
-        }
-
-
         .reading-detail {
             padding-top: 20px;
         }
@@ -223,7 +186,7 @@
         }
 
         .material-list {
-            margin: 30px auto 0;
+            margin: 0 auto 0;
             max-width: 1000px;
         }
         .material-item {
@@ -295,7 +258,7 @@
 <body>
 
 <div class="page-wrapper">
-    <div class="header-wrapper header-fixed">
+    <div class="header-wrapper">
         <div class="header">
             <a class="home-link" href="#">SNAP</a>
             <ul class="nav-list">
@@ -445,13 +408,15 @@
         <li class="sitenav-item sitenav-progress"><a href="#"></a></li>
         <li class="sitenav-item sitenav-reading-material"><a href="#"></a></li>
     </ul>
-    <div class="footer">
-        <div class="footer-content">
-            <a href="#" class="footer-logo"></a>
-            <ul class="footer-nav">
-                <li class="footer-nav-item"><a href="#">Any Legal Stuff</a></li>
-                <li class="footer-nav-item"><a href="#">Acknowledgements</a></li>
-            </ul>
+    <div class="footer-wrapper">
+        <div class="footer">
+            <div class="footer-content">
+                <a href="#" class="footer-logo"></a>
+                <ul class="footer-nav">
+                    <li class="footer-nav-item"><a href="#">Any Legal Stuff</a></li>
+                    <li class="footer-nav-item"><a href="#">Acknowledgements</a></li>
+                </ul>
+            </div>
         </div>
     </div>
 </div>
