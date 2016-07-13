@@ -4,4 +4,4 @@
 /text-to-speech/*.flac
 /*.unity3d
 /.idea
-isnap2change/java/.idea
+/java/.*
