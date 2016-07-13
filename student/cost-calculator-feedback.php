@@ -28,7 +28,7 @@
 		if($answerArr[$i] == $correctAns[$i]) {
 			$correctCount++;
 		} else {
-			array_push($feedback["detail"], ($i+1));
+			array_push($feedback["detail"], $i);
 		}
 	}
 	

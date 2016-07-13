@@ -57,7 +57,6 @@
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
         <script src="./js/vendor/jquery.js"></script>
         <script src="./js/vendor/wow.js"></script>
-        <script src="./js/home.js"></script>
         <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js" integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS" crossorigin="anonymous"></script>
     </head>
     <body>
@@ -568,6 +567,80 @@
 
                 return t;
             }(document, "script", "twitter-wjs"));
+
+
+            $(document).ready(function () {
+
+                $('.scrollToTop').click(function(){
+                    $('html, body').animate({scrollTop : 0},800);
+                    return false;
+                });
+
+                $('#nav').affix({
+                    offset: {
+                        top: $('header').height() - $('#nav').height()
+                    }
+                });
+
+                $('body').scrollspy({target: '#nav'});
+
+                $('.scroll-top').click(function () {
+                    $('body,html').animate({scrollTop: 0}, 1000);
+                });
+
+                /* smooth scrolling for nav sections */
+                $('#nav .navbar-nav li>a').click(function () {
+                    var link = $(this).attr('href');
+                    var posi = $(link).offset().top;
+                    $('body,html').animate({scrollTop: posi}, 700);
+                });
+
+                $('#login-close-btn').click(function () {
+                    $('#login-fail-text').text("");
+                    $('#username').val("");
+                    $('#password').val("");
+                });
+            });
+
+            function validStudent() {
+                var username = $('#username').val();
+                var password = $('#password').val();
+
+                $.ajax({
+                    url: "login.php",
+                    data: {
+                        username: username,
+                        password: password
+                    },
+                    type: "POST",
+                    dataType : "json"
+                })
+
+                    .done(function(feedback) {
+                        parseFeedback(feedback);
+                    })
+
+                    .fail(function( xhr, status, errorThrown ) {
+                        alert( "Sorry, there was a problem!" );
+                        console.log( "Error: " + errorThrown );
+                        console.log( "Status: " + status );
+                        console.dir( xhr );
+                    });
+            }
+
+            function parseFeedback(feedback) {
+                if(feedback.message != "success"){
+                    alert(feedback.message + ". Please try again!");
+                    return;
+                }
+
+                if(feedback.result == "valid"){
+                    location.href = 'game-home.php';
+                } else {
+                    $('#login-fail-text').text("Invalid username and/or password!");
+                    $('#password').val("");
+                }
+            }
         </script>
                         
     </body>

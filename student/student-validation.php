@@ -3,7 +3,7 @@
 
     session_start();
 
-    if (isset($_SESSION['studentID'])) {
+    if (isset($_SESSION['studentID']) && isset($_SESSION['studentUsername'])) {
         $studentID = $_SESSION['studentID'];
         $studentUsername = $_SESSION['studentUsername'];
     } else {

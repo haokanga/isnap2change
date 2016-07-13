@@ -8,19 +8,45 @@
     $pageName = "cost-calculaor";
 
     //check whether a request is GET or POST
- /*   if($_SERVER["REQUEST_METHOD"] == "POST"){
-        if(isset($_POST["quizID"]) && isset($_POST["week"])){
-            $quizID = $_POST["quizID"];
-            $week = $_POST["week"];
+    if($_SERVER["REQUEST_METHOD"] == "GET"){
+        if(isset($_GET["quiz_id"])){
+            $quizID = $_GET["quiz_id"];
         } else{
 
         }
-    } else{
+    } else {
 
     }
-*/
-    $quizID = 5;
 
+    $conn = null;
+
+    try {
+        $conn = db_connect();
+
+        $week = getWeekByQuiz($conn, $quizID);
+
+        //check whether the week is locked or not
+        if ($week > getStudentWeek($conn, $studentID)) {
+            echo '<script>alert("This is a locked quiz!")</script>';
+            echo '<script>window.location="game-home.php"</script>';
+        }
+
+        //check quiz status
+        $status = getQuizStatus($conn, $quizID, $studentID);
+
+
+    } catch(Exception $e) {
+        if($conn != null) {
+            db_close($conn);
+        }
+
+        debug_err($pageName, $e);
+        //to do: handle sql error
+        //...
+        exit;
+    }
+
+    db_close($conn);
 
 ?>
 
@@ -31,7 +57,9 @@
     <meta name="viewport" content="initial-scale=1.0, width=device-width, user-scalable=no">
     <title>Cost Calculator</title>
     <link rel="stylesheet" href="./css/common.css">
+    <link rel="stylesheet" href="./css/vendor/jqx.base.css">
     <link href='https://fonts.googleapis.com/css?family=Maitree|Lato:400,900' rel='stylesheet' type='text/css'>
+    <script src="./js/snap.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
     <style>
         .calculator-header {
@@ -105,19 +133,14 @@
             -moz-box-shadow: none;
             box-shadow: none;
         }
-        .question-submit {
+        .question-error {
+            color: red;
             display: block;
-            text-align: center;
-            color: #fcee2f;
-            width: 100px;
-            height: 30px;
-            line-height: 30px;
-            border-radius: 15px;
-            border: 0;
-            cursor: pointer;
+            margin: 5px 0;
+            display: none;
         }
-        .question-submit:focus {
-            outline: 0;
+        .question-error-show {
+            display: block;
         }
     </style>
 
@@ -177,16 +200,18 @@
 <div class="page-wrapper">
     <div class="header-wrapper">
         <div class="header">
-            <a class="home-link" href="#">SNAP</a>
-            <ul class="nav-list">
-                <li class="nav-item"><a  class="nav-link" href="http://taobao.com">GAME HOME</a></li>
-                <li class="nav-item"><a  class="nav-link" href="http://taobao.com">Snap Facts</a></li>
-                <li class="nav-item"><a  class="nav-link" href="http://taobao.com">Resources</a></li>
-            </ul>
-            <a href="#" class="settings">
-                <span class="setting-icon"></span>
-                <span class="setting-text"><?php echo $studentUsername?></span>
-            </a>
+            <a href="weekly-task.php?week=<?php echo $week?>" class="header-back-link"></a>
+            <a class="home-link">SNAP</a>
+
+            <div class="settings">
+                <div class="setting-icon dropdown">
+                    <ul class="dropdown-menu">
+                        <li class="dropdown-item"><a href="setting.php">Setting</a></li>
+                        <li class="dropdown-item"><a href="logout.php">Logout</a></li>
+                    </ul>
+                </div>
+                <a class="setting-text"><?php echo $studentUsername?></a>
+            </div>
         </div>
     </div>
 
@@ -268,17 +293,44 @@
                 <form class="question-form">
                     <label class="question-item">
                         <span class="question-title">Q.1 What would the cost be of smoking 10 cigarettes a day for 10 years if a packet of 20 cigarettes costs $25?</span>
+            <?php
+                    if($status == "UNANSWERED"){ ?>
                         <input type="text" name="q1" class="question-field">
+            <?php   }
+                    if($status == "GRADED"){ ?>
+                        <input type="text" name="q1" class="question-field" value="$45625.00" disabled="disabled">
+            <?php   } ?>
+                        <span class="question-error">Error</span>
                     </label>
                     <label class="question-item">
                         <span class="question-title">Q.2 What would the cost be of smoking 20 cigarettes a day for 20 years if a packet of 20 cigarettes costs $25?</span>
+            <?php
+                    if($status == "UNANSWERED"){ ?>
                         <input type="text" name="q2" class="question-field">
+            <?php   }
+                    if($status == "GRADED"){ ?>
+                        <input type="text" name="q2" class="question-field" value="$182500.00" disabled="disabled">
+            <?php   } ?>
+                        <span class="question-error">Error</span>
                     </label>
                     <label class="question-item">
                         <span class="question-title">Q.3 What would the cost be of smoking 40 cigarettes a day for 20 years if a packet of 20 cigarettes costs $25?</span>
+            <?php
+                    if($status == "UNANSWERED"){ ?>
                         <input type="text" name="q3" class="question-field">
+            <?php   }
+                    if($status == "GRADED"){ ?>
+                        <input type="text" name="q3" class="question-field" value="$365000.00" disabled="disabled">
+            <?php   } ?>
+                        <span class="question-error">Error</span>
                     </label>
-                    <button type="submit" class="question-submit">SUBMIT</button>
+            <?php
+                    if($status == "UNANSWERED"){ ?>
+                    <button type="submit" class="question-submit"></button>
+            <?php   }
+                    if($status == "GRADED"){ ?>
+                    <button type="submit" class="question-submit" disabled="disabled"></button>
+            <?php   } ?>
                 </form>
             </div>
 
@@ -298,6 +350,10 @@
         </div>
     </div>
 </div>
+
+<script src="./js/vendor/jqxcore.js"></script>
+<script src="./js/vendor/jqxnumberinput.js"></script>
+<script src="./js/vendor/jqxbuttons.js"></script>
 
 <script>
     var ResultCtrl = {
@@ -446,11 +502,16 @@
                 };
             this.onSubmit = opt.onSubmit;
             this.cacheElements();
+<?php   if($status == "UNANSWERED"){ ?>
+            this.$fields.find('input').jqxNumberInput({width: '100%', spinButtons: true, symbol: '$'});
             this.addListeners();
+<?php   } ?>
+
         },
         cacheElements: function () {
             var $main = $('.question-form');
             this.$main = $main;
+            this.$fields = $main.find('.question-item')
         },
         addListeners: function () {
             var that = this;
@@ -460,12 +521,36 @@
             })
         },
         getFormData: function () {
-            var dataArray = this.$main.serializeArray();
+
             var data = {};
-            dataArray.forEach(function (item) {
-                data[item.name] = item.value
-            });
+            this.$fields.find('input')
+                .each(function () {
+                    var $field = $(this);
+                    var name = $field.prop('name');
+                    if (name) {
+                        data[name] = $field.jqxNumberInput('val')
+                    }
+                });
+
             return data;
+        },
+        /**
+         * 设置错误信息
+         * @param errors {Array} 错误信息数组
+         * @param err.index 错误字段下标
+         * @param err.text 错误信息文本
+         **/
+        setError: function (errors) {
+            errors = errors || [];
+            var that = this;
+            that.$fields.removeClass('question-error-show');
+            errors.forEach(function (err) {
+                var $error = that.$fields.eq(err.index).find('.question-error');
+                $error.addClass('question-error-show');
+                if (err.text) {
+                    $error.text(err.text)
+                }
+            })
         }
     };
     QuestionCtrl.init({
@@ -475,6 +560,9 @@
          * @param data.q3 {string} answer for the third question
          **/
         onSubmit: function (data) {
+
+            $('.question-error').removeClass('question-error-show');
+
             var answerArr = [data.q1, data.q2, data.q3];
 
             $.ajax({
@@ -508,11 +596,28 @@
         }
 
         if(feedback.result == "pass") {
-            alert("Congratulation! You have passed this quiz.");
-        //    $("#submitBtn").attr("disabled","disabled");
+            snap.alert({
+                content: 'Congratulation! You have passed this quiz.',
+                onClose: function () { }
+            });
+
+            $('.question-field').jqxNumberInput('disabled','true');
+
+            $(".question-submit").attr("disabled","disabled");
         } else if(feedback.result == "fail") {
-            alert("Sorry! You have failed this quiz.");
+            //alert("Sorry! You have failed this quiz.");
+
+            for(i = 0; i < feedback.detail.length; i++) {
+                QuestionCtrl.setError([
+                    {
+                        index: feedback.detail[i],
+                        text: 'Wrong answer, please try again'
+                    }
+                ])
+            }
+
         }
+
     }
 </script>
 

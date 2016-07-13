@@ -1,8 +1,8 @@
 <?php
 
-    session_start();
+    //session_start();
 	//check login status
-	require_once('student-validation.php');
+/*	require_once('student-validation.php');
 
 	require_once("../mysql-lib.php");
 	require_once("../debug.php");
@@ -18,6 +18,10 @@
 	} else {
 		
 	}
+*/
+	require_once("../mysql-lib.php");
+	$studentID = 1;
+	$quizID = 1;
 
 	$conn = null;
 
@@ -276,15 +280,14 @@
 				<?php
 						if($status == "GRADED"){ ?>
 						<form id="goBack" method=post action=weekly-task.php>
-							 <button type="button" onclick="return goBack()" class="btn btn-success">GO BACK</button> 
-							 <input type=hidden name="week" value=<?php echo $week; ?>>
+							 <button type="button" onclick="return goBack()" class="btn btn-success">GO BACK</button>
 						</form>
 				<?php	}
 					
 						if($status == "UNANSWERED"){ ?>
 						<form id="goBack" method=post action=weekly-task.php>
 							<button id="back-btn" type="button" onclick="return submitQuiz(<?php echo $quizID; ?>, <?php echo $studentID; ?>);" class="btn btn-success">SUBMIT</button>
-							<input type=hidden name="week" value=<?php echo $week; ?>>
+
 						</form>
 				<?php	} ?>
 					
@@ -446,11 +449,10 @@
 			
 			<form id="hiddenReturnQuiz" action="learning-material.php" method=post>
 					<input  type=hidden name="quizID" value=<?php echo $quizID; ?>>
-					<input  type=hidden name="week" value=<?php echo $week; ?>>
 			</form>
 			
 			<form id="hiddenReturnTask" action="weekly-task.php" method=post>
-					<input  type=hidden name="week" value=<?php echo $week; ?>>
+
 			</form>
 		</div>
         </div>

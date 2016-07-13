@@ -46,6 +46,7 @@
     <title>Reading Material</title>
     <link rel="stylesheet" href="./css/common.css">
     <link href='https://fonts.googleapis.com/css?family=Maitree|Lato:400,900' rel='stylesheet' type='text/css'>
+    <script src="./js/snap.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
     <style>
         .reading-detail {
@@ -186,7 +187,7 @@
         }
 
         .material-list {
-            margin: 0 auto 0;
+            margin: 0 auto 40px;
             max-width: 1000px;
         }
         .material-item {
@@ -194,6 +195,18 @@
         }
         .material-item-active {
             display: block;
+        }
+        .material-header {
+            overflow: hidden;
+        }
+        .material-close {
+            float: right;
+            width: 24px;
+            height: 24px;
+            margin: 14px 4px 0 0;
+            background-size: 100% 100%;
+            background-image: url("./img/cancel_icon.png");
+            cursor: pointer;
         }
         .material-title {
             width: 200px;
@@ -232,27 +245,6 @@
             margin-bottom: 20px;
             font-size: 18px;
         }
-
-        .back-top {
-            width: 160px;
-            margin: 50px auto 20px;
-            cursor: pointer;
-        }
-        .back-top .icon-top {
-            width: 48px;
-            height: 48px;
-            margin: 0 auto 20px;
-            background-size: 100% 100%;
-            background-image: url("./img/direction_icon.png");
-            transform: rotate(270deg);
-        }
-        .back-top-label {
-            text-align: center;
-            color: #fcee2d;
-            font-size: 18px;
-        }
-
-
     </style>
 </head>
 <body>
@@ -382,7 +374,10 @@
                     <?php
                             break;
                     } ?>
-                        <h2 class="material-title"><?php echo $materialTopics[$i][$j]->TopicName ?></h2>
+                        <div class="material-header">
+                            <span class="material-close"></span>
+                            <h2 class="material-title"><?php echo $materialTopics[$i][$j]->TopicName ?></h2>
+                        </div>
                         <div class="material-content">
                             <?php echo $materialTopics[$i][$j]->Content ?>
                         </div>
@@ -390,13 +385,6 @@
 <?php           }
             } ?>
             </div>
-
-            <div class="back-top">
-                <div class="icon-top"></div>
-                <div class="back-top-label">Back to Top</div>
-            </div>
-
-
         </div>
 
 
@@ -493,6 +481,9 @@
                 var $target = $(e.currentTarget);
                 var targetMaterialCls = $target.data('target');
                 that.showMaterialDetail(targetMaterialCls)
+            });
+            that.$materialList.on('click', '.material-close', function (e) {
+                that.hideMaterialDetail()
             })
         },
         showNavPanel: function (index) {
@@ -511,17 +502,15 @@
                 .addClass('material-item-active')
         },
         hideMaterialDetail: function () {
+            this.$navMain.show();
             this.$materialList.hide();
             this.$materialItems.removeClass('material-item-active')
         }
     };
     MaterialCtrl.init();
 
-    // back to top
-    var $body = $('body');
-    $body.on('click', '.back-top', function () {
-        $body.animate({ scrollTop: 0 }, 'fast');
-    })
+    snap.enableBackTop();
+    
 </script>
 
 </body>

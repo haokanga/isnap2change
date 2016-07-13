@@ -5,10 +5,10 @@
 
 
     if ($_SERVER["REQUEST_METHOD"] == "POST") {
-        if(isset($_POST["studentID"]) && isset($_POST["week"]) && isset($_POST["dueTime"])){
-            $studentID = $_POST["studentID"];
+        if(isset($_POST["student_id"]) && isset($_POST["week"]) && isset($_POST["due_time"])){
+            $studentID = $_POST["student_id"];
             $week = $_POST["week"];
-            $dueTime = $_POST["dueTime"];
+            $dueTime = $_POST["due_time"];
         } else {
 
         }

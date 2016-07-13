@@ -319,6 +319,29 @@ function removeWeek(PDO $conn, $week)
     return $updateSql;
 }
 
+function getWeekByQuiz(PDO $conn, $quizID)
+{
+    $weekSql = "SELECT COUNT(*)
+                FROM Quiz
+                WHERE QuizID = ?";
+    $weekQuery = $conn->prepare($weekSql);
+    $weekQuery->execute(array($quizID));
+
+    if ($weekQuery->fetchColumn() != 1) {
+        throw new Exception("Failed to get week by quiz id");
+    }
+
+    $weekSql = "SELECT Week
+                FROM Quiz
+                WHERE QuizID = ?";
+    $weekQuery = $conn->prepare($weekSql);
+    $weekQuery->execute(array($quizID));
+    $weekRes = $weekQuery->fetch(PDO::FETCH_OBJ);
+    $week = $weekRes->Week;
+
+    return $week;
+}
+
 function getMaxWeek(PDO $conn)
 {
     $weekSql = "SELECT MAX(Week) AS WeekNum FROM Quiz";
@@ -509,7 +532,6 @@ function getQuizPoints(PDO $conn, $quizID)
 
     return $points;
 }
-
 /* Quiz */
 
 /* Topic */

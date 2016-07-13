@@ -60,7 +60,6 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
     <script src="./js/vendor/kinetic.js"></script>
     <script src="./js/vendor/jquery.final-countdown.min.js"></script>
-    <script src="./js/weekly-task.js"></script>
     <script src="./js/snap.js"></script>
     <style>
         .week-detail {
@@ -299,7 +298,6 @@
             width: 128px;
             height: 128px;
         }
-
     </style>
 </head>
 <body>
@@ -307,16 +305,21 @@
 <div class="page-wrapper">
     <div class="header-wrapper">
         <div class="header">
-            <a class="home-link" href="#">SNAP</a>
+            <a class="home-link" href="welcome.php">SNAP</a>
             <ul class="nav-list">
-                <li class="nav-item"><a  class="nav-link" href="http://taobao.com">GAME HOME</a></li>
+                <li class="nav-item"><a  class="nav-link" href="game-home.php">GAME HOME</a></li>
                 <li class="nav-item"><a  class="nav-link" href="http://taobao.com">Snap Facts</a></li>
                 <li class="nav-item"><a  class="nav-link" href="http://taobao.com">Resources</a></li>
             </ul>
-            <a href="#" class="settings">
-                <span class="setting-icon"></span>
-                <span class="setting-text"><?php echo $studentUsername?></span>
-            </a>
+            <div class="settings">
+                <div class="setting-icon dropdown">
+                    <ul class="dropdown-menu">
+                        <li class="dropdown-item"><a href="setting.php">Setting</a></li>
+                        <li class="dropdown-item"><a href="logout.php">Logout</a></li>
+                    </ul>
+                </div>
+                <a class="setting-text"><?php echo $studentUsername?></a>
+            </div>
         </div>
     </div>
 
@@ -489,7 +492,7 @@
                         if(isset($quizzesRes[$i]['Status'])) { ?>
                             <a href="game-home.php">
     <?php               } else { ?>
-                            <a href="game-home.php">
+                            <a href="pre-task-material.php?quiz_id=<?php echo $quizzesRes[$i]['QuizID']?>">
     <?php               } ?>
                              <div class="game-nav-item game-multiple-choice-quiz">
                                  <div class="game-nav-logo"></div>
@@ -503,7 +506,7 @@
                          if(isset($quizzesRes[$i]['Status'])) { ?>
                             <a href="game-home.php">
     <?php                } else { ?>
-                            <a href="game-home.php">
+                            <a href="pre-task-material.php?quiz_id=<?php echo $quizzesRes[$i]['QuizID']?>">
      <?php               } ?>
                               <div class="game-nav-item game-short-answer-question">
                                   <div class="game-nav-logo"></div>
@@ -517,7 +520,7 @@
                           if(isset($quizzesRes[$i]['Status'])) { ?>
                             <a href="game-home.php">
     <?php                 } else { ?>
-                            <a href="game-home.php">
+                            <a href="pre-task-material.php?quiz_id=<?php echo $quizzesRes[$i]['QuizID']?>">
     <?php                 } ?>
                                 <div class="game-nav-item game-matching">
                                     <div class="game-nav-logo"></div>
@@ -531,7 +534,7 @@
                             if(isset($quizzesRes[$i]['Status'])) { ?>
                                <a href="game-home.php">
     <?php                    } else { ?>
-                               <a href="game-home.php">
+                               <a href="pre-task-material.php?quiz_id=<?php echo $quizzesRes[$i]['QuizID']?>">
     <?php                    } ?>
                                 <div class="game-nav-item game-poster">
                                     <div class="game-nav-logo"></div>
@@ -543,9 +546,9 @@
     <?php                break;
                     case "Calculator":
                             if(isset($quizzesRes[$i]['Status'])) { ?>
-                                <a href="game-home.php">
+                                <a href="cost-calculator.php?quiz_id=<?php echo $quizzesRes[$i]['QuizID']?>">
     <?php                   } else { ?>
-                                <a href="game-home.php">
+                                <a href="pre-task-material.php?quiz_id=<?php echo $quizzesRes[$i]['QuizID']?>">
     <?php                   } ?>
                                 <div class="game-nav-item game-cost-calculator">
                                     <div class="game-nav-logo"></div>
@@ -559,7 +562,7 @@
                             if(isset($quizzesRes[$i]['Status'])) { ?>
                                 <a href="game-home.php">
     <?php                   } else { ?>
-                                <a href="game-home.php">
+                                <a href="pre-task-material.php?quiz_id=<?php echo $quizzesRes[$i]['QuizID']?>">
     <?php                   } ?>
                                         <div class="game-nav-item game-standard-drinking-tool">
                                             <div class="game-nav-logo"></div>
@@ -648,14 +651,12 @@
 
             newDue = yyyy+"-"+mm+"-"+dd+ " " +newDue.getHours() + ":" + newDue.getMinutes()+":" + newDue.getSeconds();
 
-            saveDueTime(<?php echo $studentID ?>, <?php echo $week ?>, newDue);
-/*
             $.ajax({
-                url: "cost-calculator-feedback.php",
+                url: "save-due-time.php",
                 data: {
-                    studentID: <?php echo $studentID?>,
-                    quizID: <?php echo $quizID?>,
-                    answerArr: JSON.stringify(answerArr)
+                    student_id: <?php echo $studentID?>,
+                    week: <?php echo $week?>,
+                    due_time: newDue
                 },
                 type: "POST",
                 dataType : "json"
@@ -671,26 +672,9 @@
                     console.log( "Status: " + status );
                     console.dir( xhr );
                 });
-*/
 <?php	} ?>
 
-        function saveDueTime(studentID, week, dueTime) {
-            var xmlhttp = new XMLHttpRequest();
-
-            xmlhttp.onreadystatechange = function() {
-                if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
-                    parseFeedback(xmlhttp.responseText);
-                }
-            };
-
-            xmlhttp.open("POST", "save-due-time.php", true);
-            xmlhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-            xmlhttp.send("studentID="+studentID +"&week="+week+"&dueTime="+ dueTime);
-        }
-
-        function parseFeedback(response) {
-            var feedback = JSON.parse(response);
-
+        function parseFeedback(feedback) {
             if(feedback.message != "success"){
                 //alert(feedback.message + ". Please try again!");
                 //jump to error page
