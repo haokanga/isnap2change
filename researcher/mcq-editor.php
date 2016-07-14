@@ -168,7 +168,7 @@ db_close($conn);
                                     } ?>">
                                         <td style="display:none"><?php echo $mcqQuesResult[$i]->$columnName[0]; ?></td>
                                         <!--Question-->
-                                        <td><?php echo $mcqQuesResult[$i]->$columnName[1]?><span class="glyphicon glyphicon-volume-up pull-right" aria-hidden="true"></span>
+                                        <td><?php echo $mcqQuesResult[$i]->$columnName[1]?>
                                         </td>
                                         <td class="<?php if ($mcqQuesResult[$i]->Content == $mcqQuesResult[$i]->CorrectChoice && strlen($mcqQuesResult[$i]->Content) > 0) {
                                             echo 'bg-success';
@@ -307,6 +307,9 @@ db_close($conn);
         });
     });
 </script>
+
+<script src="researcher-tts.js"></script>
+
 </body>
 
 </html>
