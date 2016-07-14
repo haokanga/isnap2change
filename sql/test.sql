@@ -110,3 +110,4 @@ SELECT * FROM SAQ_Question_Record WHERE SAQID = 1 AND StudentID  =3;
 UPDATE SAQ_Question_Record
                   SET Feedback = 'QUACK', Grading =  2
                   WHERE SAQID = 1 AND StudentID = 3;
+SELECT * FROM Fact NATURAL JOIN Topic LEFT JOIN SubFact USING (FactID);

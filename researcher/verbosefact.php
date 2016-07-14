@@ -54,14 +54,9 @@ try {
 }
 
 try {
-    if (isset($_GET['quizID'])) {
-        $quizID = $_GET['quizID'];
-        $quizResult = getMCQQuiz($conn, $quizID);
-        $topicResult = getTopics($conn);
-        $materialRes = getLearningMaterial($conn, $quizID);
-        $mcqQuesResult = getMCQQuestions($conn, $quizID);
-        $phpSelf = $pageName . '.php?quizID=' . $quizID;
-    }
+    $topicResult = getTopics($conn);
+    $verboseFactResult = getVerboseFacts($conn);
+    $phpSelf = $pageName;
 } catch (Exception $e) {
     debug_err($pageName, $e);
 }
@@ -84,71 +79,17 @@ db_close($conn);
     <div id="page-wrapper">
         <div class="row">
             <div class="col-lg-12">
-                <h1 class="page-header">Multiple Choice Quiz Editor</h1>
+                <h1 class="page-header">VerboseFact Overview</h1>
             </div>
             <!-- /.col-lg-12 -->
         </div>
         <!-- /.row -->
         <div class="row">
             <div class="col-lg-12">
-
-                <!-- MetaData -->
-                <div class="panel panel-default">
-                    <div class="panel-heading">
-                        Quiz MetaData
-                    </div>
-                    <!-- /.panel-heading -->
-                    <div class="panel-body">
-                        <form id="metadata-submission" method="post" action="<?php echo $phpSelf; ?>">
-                            <!--if 0 update; else if -1 delete;-->
-                            <input type=hidden name="metadataUpdate" id="metadataUpdate" value="1" required>
-                            <label for="QuizID" style="display:none">QuizID</label>
-                            <input type="text" class="form-control" id="QuizID" name="quizID" style="display:none"
-                                   value="<?php echo $quizResult->QuizID; ?>">
-                            <br>
-                            <label for="Week">Week</label>
-                            <input type="text" class="form-control" id="Week" name="week"
-                                   placeholder="Input Week Number" value="<?php echo $quizResult->Week; ?>">
-                            <br>
-                            <label for='TopicName'>TopicName</label>
-                            <select class="form-control" id="TopicName" form="metadata-submission" name="topicName"
-                                    required>
-                                <?php for ($j = 0; $j < count($topicResult); $j++) { ?>
-                                    <option
-                                        value='<?php echo $topicResult[$j]->TopicName ?>' <?php if ($topicResult[$j]->TopicName == $quizResult->TopicName) echo 'selected' ?> ><?php echo $topicResult[$j]->TopicName ?></option>
-                                <?php } ?>
-                            </select>
-                            <br>
-                            <label for="Points">Points</label>
-                            <input type="text" class="form-control" id="Points" name="points" placeholder="Input Points"
-                                   value="<?php echo $quizResult->Points; ?>" required>
-                            <br>
-                            <label for="Questionnaires">Questionnaires</label>
-                            <input type="hidden" class="form-control" id="Questionnaires" name="questionnaires"
-                                   value="0">
-                            <input type="checkbox" class="form-control" id="Questionnaires" name="questionnaires"
-                                   value="1" <?php if ($quizResult->Questionnaires != 0) echo 'checked'; ?>>
-                            <label for="Questions">Questions</label>
-                            <input type="text" class="form-control" id="Questions" name="questions"
-                                   value="<?php echo $quizResult->Questions; ?>" disabled>
-                            <br>
-                        </form>
-                        <!--edit metadata-->
-                        <span class="glyphicon glyphicon-remove pull-right" id="metadata-remove"
-                              aria-hidden="true"></span><span class="pull-right" aria-hidden="true">&nbsp;</span><span
-                            class="glyphicon glyphicon-floppy-saved pull-right" id="metadata-save"
-                            aria-hidden="true"></span>
-                    </div>
-                    <!-- /.panel-body -->
-                </div>
-                <!-- /.panel -->
-
-                <?php require_once('learning-material-editor-iframe.php'); ?>
-
                 <!-- Options -->
                 <div class="panel panel-default">
                     <div class="panel-heading">
-                        Questions and Options
+                        Verbose Fact and SubTitles
                         <span class="glyphicon glyphicon-plus pull-right" data-toggle="modal"
                               data-target="#dialog"></span>
                     </div>
@@ -158,32 +99,17 @@ db_close($conn);
                             <table class="table table-striped table-bordered table-hover" id="datatables">
                                 <?php require_once('table-head.php'); ?>
                                 <tbody>
-                                <?php for ($i = 0; $i < count($mcqQuesResult); $i++) { ?>
+                                <?php for ($i = 0; $i < count($verboseFactResult); $i++) { ?>
                                     <tr class="<?php if ($i % 2 == 0) {
                                         echo "odd";
                                     } else {
                                         echo "even";
                                     } ?>">
-                                        <td style="display:none"><?php echo $mcqQuesResult[$i]->$columnName[0]; ?></td>
-                                        <!--Question-->
-                                        <td><?php echo $mcqQuesResult[$i]->$columnName[1]?>
-                                        </td>
-                                        <td class="<?php if ($mcqQuesResult[$i]->Content == $mcqQuesResult[$i]->CorrectChoice && strlen($mcqQuesResult[$i]->Content) > 0) {
-                                            echo 'bg-success';
-                                        } else {
-                                            echo 'bg-danger';
-                                        } ?>">
-                                            <?php echo $mcqQuesResult[$i]->Content; ?>
-                                        </td>
-                                        <td><?php echo $mcqQuesResult[$i]->$columnName[3] ?></td>
-                                        <td>
-                                            <span class="glyphicon glyphicon-remove pull-right "
-                                                  aria-hidden="true"></span>
-                                            <span class="pull-right" aria-hidden="true">&nbsp;</span>
-                                            <a href="mcq-option-editor.php?quizID=<?php echo $quizID ?>&mcqID=<?php echo $mcqQuesResult[$i]->$columnName[0]; ?>">
-                                                <span class="glyphicon glyphicon-edit pull-right" data-toggle="modal"
-                                                      data-target="#dialog" aria-hidden="true"></span></a>
-                                        </td>
+                                        <?php for ($j = 0; $j < count($columnName); $j++) { ?>
+                                            <td <?php if ($j == 0) echo 'style="display:none"'; ?>><?php if ($j != 4) echo $verboseFactResult[$i]->$columnName[$j]; ?>
+                                                <?php if ($j == 4) echo '<span class="glyphicon glyphicon-remove pull-right" aria-hidden="true"></span><span class="pull-right" aria-hidden="true">&nbsp;</span><span class="glyphicon glyphicon-edit pull-right" data-toggle="modal" data-target="#dialog" aria-hidden="true"></span>'; ?>
+                                            </td>
+                                        <?php } ?>
                                     </tr>
                                 <?php } ?>
                                 </tbody>
