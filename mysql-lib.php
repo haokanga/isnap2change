@@ -1458,6 +1458,11 @@ function getRecords(PDO $conn, $tableName, array $joinTables = null)
     return $tableResult;
 }
 
+function encodeURIComponent($str) {
+    $revert = array('%21'=>'!', '%2A'=>'*', '%27'=>"'", '%28'=>'(', '%29'=>')');
+    return strtr(rawurlencode($str), $revert);
+}
+
 /* Helper Function */
 
 /* Unit Test */

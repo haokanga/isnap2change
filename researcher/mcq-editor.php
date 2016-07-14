@@ -167,7 +167,9 @@ db_close($conn);
                                         echo "even";
                                     } ?>">
                                         <td style="display:none"><?php echo $mcqQuesResult[$i]->$columnName[0]; ?></td>
-                                        <td><?php echo $mcqQuesResult[$i]->$columnName[1] ?></td>
+                                        <!--Question-->
+                                        <td><?php echo $mcqQuesResult[$i]->$columnName[1]?><span class="glyphicon glyphicon-volume-up pull-right" aria-hidden="true"></span>
+                                        </td>
                                         <td class="<?php if ($mcqQuesResult[$i]->Content == $mcqQuesResult[$i]->CorrectChoice && strlen($mcqQuesResult[$i]->Content) > 0) {
                                             echo 'bg-success';
                                         } else {
@@ -258,6 +260,7 @@ db_close($conn);
             dialogInputArr.eq(i).val('');
         }
     });
+
     $('div > .glyphicon-remove').on('click', function () {
         if (confirm('[WARNING] Are you sure to remove this quiz? If you remove one quiz. All the questions and submission of this quiz will also get deleted (not recoverable). It includes learning material, questions and options, their submissions and your grading/feedback, not only the quiz itself.')) {
             $('#metadataUpdate').val(-1);
