@@ -21,8 +21,7 @@ try {
                     $conn->beginTransaction();
 
                     //insert and get topicID
-                    $topicResult = getTopicByName($conn, $topicName);
-                    $topicID = $topicResult->TopicID;
+                    $topicID = getTopicByName($conn, $topicName)->TopicID;
                     $quizID = createQuiz($conn, $topicID, $quizType, $week);
                     createMatchingSection($conn, $quizID, $description, $points);
                     createEmptyLearningMaterial($conn, $quizID);

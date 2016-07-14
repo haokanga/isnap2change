@@ -18,8 +18,8 @@ try {
                     $topicName = $_POST['topicName'];
                     $conn->beginTransaction();
 
-                    $topicResult = getTopicByName($conn, $topicName);
-                    $topicID = $topicResult->TopicID;
+                    //insert and get topicID
+                    $topicID = getTopicByName($conn, $topicName)->TopicID;
                     updateQuiz($conn, $quizID, $topicID, $week);
 
                     $conn->commit();

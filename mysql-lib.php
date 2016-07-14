@@ -466,7 +466,8 @@ function getQuizType(PDO $conn, $quizID)
 
 }
 
-function getQuiz(PDO $conn, $quizID){
+function getQuiz(PDO $conn, $quizID)
+{
     return getRecord($conn, $quizID, "Quiz");
 }
 
@@ -518,6 +519,7 @@ function getQuizPoints(PDO $conn, $quizID)
 
     return $points;
 }
+
 /* Quiz */
 
 /* Topic */
@@ -543,7 +545,8 @@ function getTopics(PDO $conn)
 /* Topic */
 
 /* Fact */
-function createSnapFact(PDO $conn, $topicID ,$content){
+function createSnapFact(PDO $conn, $topicID, $content)
+{
     $updateSql = "INSERT INTO Fact(Content, TopicID)
              VALUES (?,?)";
     $updateSql = $conn->prepare($updateSql);
@@ -551,7 +554,7 @@ function createSnapFact(PDO $conn, $topicID ,$content){
     return $conn->lastInsertId();
 }
 
-function updateSnapFact(PDO $conn, $factID, $topicID ,$content)
+function updateSnapFact(PDO $conn, $factID, $topicID, $content)
 {
     $updateSql = "UPDATE Fact 
                 SET Content = ?, TopicID = ?
@@ -565,19 +568,41 @@ function deleteSnapFact(PDO $conn, $factID)
     deleteRecord($conn, $factID, "Fact");
 }
 
-function getSnapFact(PDO $conn, $factID){
+function getSnapFact(PDO $conn, $factID)
+{
     return getRecord($conn, $factID, "Fact");
 }
 
 function getSnapFacts(PDO $conn)
 {
+    $facts = getFacts($conn);
+    $filteredResult = array();
+    for ($i = 0; $i < count($facts); $i++) {
+        if($facts[$i]->SnapFact){
+            $filteredResult[] = $facts[$i];
+        }
+    }
+    return $filteredResult;
+}
+
+function getVerboseFacts(PDO $conn)
+{
+    $facts = getFacts($conn);
+    $filteredResult = array();
+    for ($i = 0; $i < count($facts); $i++) {
+        if(!$facts[$i]->SnapFact){
+            $filteredResult[] = $facts[$i];
+        }
+    }
+    return $filteredResult;
+}
+
+function getFacts(PDO $conn)
+{
     return getRecords($conn, "Fact", array("Topic"));
 }
+
 /* Fact */
-
-
-
-
 
 
 /* MCQ */
@@ -1026,6 +1051,7 @@ function getLearningMaterialByWeek(PDO $conn, $week)
     $learningMaterialResult = $learningMaterialQuery->fetchAll(PDO::FETCH_OBJ);
     return $learningMaterialResult;
 }
+
 /* Learning_Material */
 
 
@@ -1125,18 +1151,18 @@ function getQuizzesStatusByWeek(PDO $conn, $studentID, $week)
     $quizzesStatusQuery->execute(array($studentID, $week));
     $quizzesStatusRes = $quizzesStatusQuery->fetchAll(PDO::FETCH_OBJ);
 
-    for($i = 0; $i < count($quizzesStatusRes) ; $i++) {
+    for ($i = 0; $i < count($quizzesStatusRes); $i++) {
         $quizzesRes[$i]['QuizID'] = $quizzesStatusRes[$i]->QuizID;
         $quizzesRes[$i]['Status'] = $quizzesStatusRes[$i]->Status;
         $quizzesRes[$i]['TopicName'] = $quizzesStatusRes[$i]->TopicName;
 
-        if($quizzesStatusRes[$i]->QuizType == "Misc") {
-            switch(getMiscQuizType($conn, $quizzesStatusRes[$i]->QuizID)) {
+        if ($quizzesStatusRes[$i]->QuizType == "Misc") {
+            switch (getMiscQuizType($conn, $quizzesStatusRes[$i]->QuizID)) {
                 case "Calculator":
                     $quizzesRes[$i]['QuizType'] = "Calculator";
                     break;
                 case "DrinkingTool":
-                    $quizzesRes[$i]['QuizType']= "DrinkingTool";
+                    $quizzesRes[$i]['QuizType'] = "DrinkingTool";
                     break;
             }
         } else {
@@ -1496,8 +1522,9 @@ function getRecords(PDO $conn, $tableName, array $joinTables = null)
     return $tableResult;
 }
 
-function encodeURIComponent($str) {
-    $revert = array('%21'=>'!', '%2A'=>'*', '%27'=>"'", '%28'=>'(', '%29'=>')');
+function encodeURIComponent($str)
+{
+    $revert = array('%21' => '!', '%2A' => '*', '%27' => "'", '%28' => '(', '%29' => ')');
     return strtr(rawurlencode($str), $revert);
 }
 

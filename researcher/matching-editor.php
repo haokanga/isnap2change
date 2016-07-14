@@ -22,8 +22,8 @@ try {
                     $points = $_POST['points'];
                     $conn->beginTransaction();
 
-                    $topicResult = getTopicByName($conn, $topicName);
-                    $topicID = $topicResult->TopicID;
+                    //insert and get topicID
+                    $topicID = getTopicByName($conn, $topicName)->TopicID;
                     updateQuiz($conn, $quizID, $topicID, $week);
                     updateMatchingSection($conn, $quizID, $description, $points);
 
