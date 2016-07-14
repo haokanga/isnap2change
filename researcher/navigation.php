@@ -2,7 +2,7 @@
 
 $userAdminPageList = array('School', 'Class', 'Student');
 $userAdminIconList = array('mortar-board', 'users', 'child');
-$contentAdminPageList = array('Week', 'Quiz', 'Fact', 'MCQ', 'SAQ', 'Matching', 'Poster','Misc');
+$contentAdminPageList = array('Week', 'Quiz', 'SnapFact', 'MCQ', 'SAQ', 'Matching', 'Poster','Misc');
 $contentAdminIconList = array('calendar', 'book', 'exclamation-triangle', 'check', 'pencil', 'th-list', 'exclamation-triangle','exclamation-triangle');
 $gradingPageList = array('SAQ-Grading', 'Poster-Grading');
 $gradingIconList = array('check', 'exclamation-triangle');

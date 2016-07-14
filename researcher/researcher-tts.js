@@ -3,6 +3,7 @@ $(document).ready(function () {
 });
 
 function appendTTSButton() {
+    //foreach td in data table
     $('.dataTable td').each(function () {
         // ignore hidden cols
         if ($(this).is(':visible')) {

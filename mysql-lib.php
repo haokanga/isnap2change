@@ -542,6 +542,44 @@ function getTopics(PDO $conn)
 
 /* Topic */
 
+/* Fact */
+function createSnapFact(PDO $conn, $topicID ,$content){
+    $updateSql = "INSERT INTO Fact(Content, TopicID)
+             VALUES (?,?)";
+    $updateSql = $conn->prepare($updateSql);
+    $updateSql->execute(array($content, $topicID));
+    return $conn->lastInsertId();
+}
+
+function updateSnapFact(PDO $conn, $factID, $topicID ,$content)
+{
+    $updateSql = "UPDATE Fact 
+                SET Content = ?, TopicID = ?
+                WHERE FactID = ?";
+    $updateSql = $conn->prepare($updateSql);
+    $updateSql->execute(array($content, $topicID, $factID));
+}
+
+function deleteSnapFact(PDO $conn, $factID)
+{
+    deleteRecord($conn, $factID, "Fact");
+}
+
+function getSnapFact(PDO $conn, $factID){
+    return getRecord($conn, $factID, "Fact");
+}
+
+function getSnapFacts(PDO $conn)
+{
+    return getRecords($conn, "Fact", array("Topic"));
+}
+/* Fact */
+
+
+
+
+
+
 /* MCQ */
 function createMCQSection(PDO $conn, $quizID, $points, $questionnaires)
 {
