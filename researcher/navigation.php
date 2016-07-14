@@ -2,7 +2,7 @@
 
 $userAdminPageList = array('School', 'Class', 'Student');
 $userAdminIconList = array('mortar-board', 'users', 'child');
-$contentAdminPageList = array('Week', 'Quiz', 'SnapFact', 'VerboseFact', 'MCQ', 'SAQ', 'Matching', 'Poster', 'Misc');
+$contentAdminPageList = array('Week', 'Quiz', 'Snap Fact', 'Verbose Fact', 'MCQ', 'SAQ', 'Matching', 'Poster', 'Misc');
 $contentAdminIconList = array('calendar', 'book', 'lightbulb-o', 'folder-open', 'check', 'pencil', 'th-list', 'exclamation-triangle', 'exclamation-triangle');
 $gradingPageList = array('SAQ-Grading', 'Poster-Grading');
 $gradingIconList = array('check', 'exclamation-triangle');
@@ -259,7 +259,7 @@ $gradingIconList = array('check', 'exclamation-triangle');
                     <ul id="contenteditor" class="collapse in nav nav-second-level" aria-expanded="true">
                         <?php for ($i = 0; $i < count($contentAdminPageList); $i++) { ?>
                             <li>
-                                <a href="<?php echo strtolower($contentAdminPageList[$i]); ?>.php"><i
+                                <a href="<?php echo str_replace(" ", "-", strtolower($contentAdminPageList[$i])); ?>.php"><i
                                         class="fa fa-fw fa-<?php echo $contentAdminIconList[$i]; ?>"></i>&nbsp;<?php echo $contentAdminPageList[$i]; ?>
                                     Overview</a>
                             </li>

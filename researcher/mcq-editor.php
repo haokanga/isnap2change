@@ -181,8 +181,7 @@ db_close($conn);
                                                   aria-hidden="true"></span>
                                             <span class="pull-right" aria-hidden="true">&nbsp;</span>
                                             <a href="mcq-option-editor.php?quizID=<?php echo $quizID ?>&mcqID=<?php echo $mcqQuesResult[$i]->$columnName[0]; ?>">
-                                                <span class="glyphicon glyphicon-edit pull-right" data-toggle="modal"
-                                                      data-target="#dialog" aria-hidden="true"></span></a>
+                                                <span class="glyphicon glyphicon-edit pull-right" aria-hidden="true"></span></a>
                                         </td>
                                     </tr>
                                 <?php } ?>

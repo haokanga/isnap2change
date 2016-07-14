@@ -586,10 +586,13 @@ function getSnapFacts(PDO $conn)
 
 function getVerboseFacts(PDO $conn)
 {
-    $factSql = "SELECT * FROM Fact 
-                LEFT JOIN SubFact USING (FactID)  
-                NATURAL JOIN Topic
-                WHERE SnapFact = 0 ";
+    //get verbose fact for all the topics (TOPIC.Introduction excluded)
+    $factSql = "SELECT * FROM Topic 
+                LEFT JOIN (
+                  SELECT * FROM Fact 
+                  LEFT JOIN SubFact USING (FactID) 
+                  WHERE SnapFact = 0) AS VerboseFacts 
+                USING (TopicID) WHERE TopicName != 'Introduction'";
     $factQuery = $conn->prepare($factSql);
     $factQuery->execute();
     $factResult = $factQuery->fetchAll(PDO::FETCH_OBJ);
