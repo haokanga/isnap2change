@@ -22,6 +22,3 @@
 
 <link rel="stylesheet" href="//code.jquery.com/ui/1.11.4/themes/ui-lightness/jquery-ui.css"/>
 <link rel="stylesheet" href="//code.jquery.com/qunit/qunit-1.18.0.css"/>
-
-<!-- Custom Text-To-Speech JS-->
-<script src="../sb-admin/js/sb-admin-2.js"></script>

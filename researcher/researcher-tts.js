@@ -14,3 +14,7 @@ function appendTTSButton() {
         }
     });
 }
+
+//include tts.js to play audio
+$.getScript('../student/js/tts.js', function () {
+});
