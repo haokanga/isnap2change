@@ -74,15 +74,13 @@ db_close($conn);
 <!DOCTYPE html>
 <html lang="en">
 
-<head>
-    <!-- Header Library -->
-    <?php require_once('header-lib.php'); ?>
-</head>
+<!-- Header Library -->
+<?php require_once('header-lib.php'); ?>
 
 <body>
 
 <div id="wrapper">
-
+    <!-- Navigation Layout-->
     <?php require_once('navigation.php'); ?>
 
     <div id="page-wrapper">

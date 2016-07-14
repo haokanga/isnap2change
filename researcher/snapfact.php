@@ -4,7 +4,7 @@ require_once("../mysql-lib.php");
 require_once("../debug.php");
 require_once("researcher-validation.php");
 $pageName = "snapfact";
-$columnName = array('FactID', 'TopicName', 'Content');
+$columnName = array('FactID', 'TopicName', 'Content', 'Edit');
 
 try {
     $conn = db_connect();
@@ -12,18 +12,18 @@ try {
         if (isset($_POST['update'])) {
             $update = $_POST['update'];
             if ($update == 1) {
-                $topicID = $_POST['topicID'];
+                $topicName = $_POST['topicName'];
+                $topicID = getTopicByName($conn, $topicName)->TopicID;
                 $content = $_POST['content'];
-                createSnapFact($conn, $topicID ,$content);
-            }
-            else if ($update == 0) {
-                $factID = $_POST['$factID'];
-                $topicID = $_POST['topicID'];
+                createSnapFact($conn, $topicID, $content);
+            } else if ($update == 0) {
+                $factID = $_POST['factID'];
+                $topicName = $_POST['topicName'];
+                $topicID = getTopicByName($conn, $topicName)->TopicID;
                 $content = $_POST['content'];
-                updateSnapFact($conn, $factID, $topicID ,$content);
-            }
-            else if ($update == -1) {
-                $factID = $_POST['$factID'];
+                updateSnapFact($conn, $factID, $topicID, $content);
+            } else if ($update == -1) {
+                $factID = $_POST['factID'];
                 deleteSnapFact($conn, $factID);
             }
         }
@@ -34,6 +34,7 @@ try {
 
 try {
     $snapFactResult = getSnapFacts($conn);
+    $topicResult = getTopics($conn);
 } catch (Exception $e) {
     debug_err($pageName, $e);
 }
@@ -44,21 +45,19 @@ db_close($conn);
 <!DOCTYPE html>
 <html lang="en">
 
-<head>
-    <!-- Header Library -->
-    <?php require_once('header-lib.php'); ?>
-</head>
+<!-- Header Library -->
+<?php require_once('header-lib.php'); ?>
 
 <body>
 
 <div id="wrapper">
-
+    <!-- Navigation Layout-->
     <?php require_once('navigation.php'); ?>
 
     <div id="page-wrapper">
         <div class="row">
             <div class="col-lg-12">
-                <h1 class="page-header">Student Overview</h1>
+                <h1 class="page-header">SnapFact Overview</h1>
             </div>
             <!-- /.col-lg-12 -->
         </div>
@@ -67,7 +66,8 @@ db_close($conn);
             <div class="col-lg-12">
                 <div class="panel panel-default">
                     <div class="panel-heading">
-                        Student Information Table
+                        SnapFact Information Table <span class="glyphicon glyphicon-plus pull-right" data-toggle="modal"
+                                                         data-target="#dialog"></span>
                     </div>
                     <!-- /.panel-heading -->
                     <div class="panel-body">
@@ -82,8 +82,8 @@ db_close($conn);
                                         echo "even";
                                     } ?>">
                                         <?php for ($j = 0; $j < count($columnName); $j++) { ?>
-                                            <td <?php if ($j == 0) echo 'style="display:none"'; ?>><?php echo $snapFactResult[$i]->$columnName[$j]; ?>
-                                                <?php if ($j == 2) echo '<span class="glyphicon glyphicon-remove pull-right" aria-hidden="true"></span><span class="pull-right" aria-hidden="true">&nbsp;</span><span class="glyphicon glyphicon-edit pull-right" data-toggle="modal" data-target="#dialog" aria-hidden="true"></span>'; ?>
+                                            <td <?php if ($j == 0) echo 'style="display:none"'; ?>><?php if ($j != 3) echo $snapFactResult[$i]->$columnName[$j]; ?>
+                                                <?php if ($j == 3) echo '<span class="glyphicon glyphicon-remove pull-right" aria-hidden="true"></span><span class="pull-right" aria-hidden="true">&nbsp;</span><span class="glyphicon glyphicon-edit pull-right" data-toggle="modal" data-target="#dialog" aria-hidden="true"></span>'; ?>
                                             </td>
                                         <?php } ?>
                                     </tr>
@@ -93,15 +93,10 @@ db_close($conn);
                         </div>
                         <!-- /.table-responsive -->
                         <div class="well row">
-                            <h4>Student Overview Notification</h4>
+                            <h4>SnapFact Overview Notification</h4>
                             <div class="alert alert-info">
-                                <p>View students by filtering or searching. You can <strong>reset student
-                                        password</strong> or delete students.</p>
-                            </div>
-                            <div class="alert alert-danger">
-                                <p><strong>Reminder</strong> : If you remove one student. All the data of this student
-                                    will also get deleted (not recoverable). It includes <strong>student submissions of
-                                        every task and your grading/feedback</strong>, not only the student itself.</p>
+                                <p>View snap facts by filtering or searching. You can create/update/delete any snap
+                                    fact.</p>
                             </div>
                         </div>
                     </div>
@@ -125,110 +120,90 @@ db_close($conn);
         <div class="modal-content">
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal">&times;</button>
-                <h4 class="modal-title" id="dialogTitle">Reset Password</h4>
+                <h4 class="modal-title" id="dialogTitle">Edit SnapFact</h4>
             </div>
             <div class="modal-body">
-                <form id="submission" method="post"
-                      action="<?php if (isset($_GET['classID'])) echo $_SERVER['PHP_SELF'] . '?classID=' . $_GET['classID']; else echo $_SERVER['PHP_SELF']; ?>">
-                    <!--if 0 update; else if -1 delete;-->
+                <form id="submission" method="post" action="<?php echo $_SERVER['PHP_SELF']; ?>">
+                    <!--if 1, insert; else if 0 update; else if -1 delete;-->
                     <input type=hidden name="update" id="update" value="1">
-                    <?php for ($i = 0; $i < count($columnName); $i++) {
-                        if ($columnName[$i] == 'StudentID' || $columnName[$i] == 'Username') {
-                            ?>
-                            <label for="<?php echo $columnName[$i]; ?>" <?php if ($i == 0) {
-                                echo 'style="display:none"';
-                            } ?>><?php echo $columnName[$i]; ?></label>
-                            <input type="text" class="form-control dialoginput" id="<?php echo $columnName[$i]; ?>"
-                                   name="<?php echo lcfirst($columnName[$i]); ?>"
-                                <?php if ($i == 0) {
-                                    echo 'style="display:none"';
-                                } ?> >
-                        <?php }
-                    } ?>
+                    <label for="factID" style="display:none">FactID</label>
+                    <input type="text" class="form-control dialoginput" id="factID" name="factID"
+                           style="display:none">
                     <br>
-                    <div class="alert alert-info">
-                        <p>You can <strong>reset student password</strong> to <code>WelcomeToiSNAP2</code>.</p>
-                    </div>
+
+                    <label for='topicName'>TopicName</label>
+                    <select class="form-control dialoginput" id="TopicName" form="submission" name="topicName" required>
+                        <option value="" disabled selected>Select Topic</option>
+                        <?php for ($j = 0; $j < count($topicResult); $j++) { ?>
+                            <option
+                                value='<?php echo $topicResult[$j]->TopicName ?>'><?php echo $topicResult[$j]->TopicName ?></option>
+                        <?php } ?>
+                    </select>
+                    <br>
+
+                    <label for="content">Content</label>
+                    <textarea class="form-control dialoginput" id="content" name="content" rows="8" required></textarea>
+                    <br>
                 </form>
             </div>
             <div class="modal-footer">
-                <button type="button" id="btmResetPwd" class="btn btn-default">Reset Password</button>
+                <button type="button" id="btnSave" class="btn btn-default">Save</button>
                 <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
             </div>
         </div>
     </div>
 </div>
-<input type=hidden name="keyword" id="keyword" value="
-      <?php
-if (isset($_GET['classID'])) {
-    // get ClassName
-    try {
-        $classID = $_GET['classID'];
-        $classResult = getClass($conn, $classID);
-        echo $classResult->ClassName;
-    } catch (Exception $e) {
-        debug_err($pageName, $e);
-        echo '';
-    }
-} else
-    echo '';
-?>">
 <!-- SB Admin Library -->
 <?php require_once('sb-admin-lib.php'); ?>
 <!-- Page-Level Scripts -->
 <script>
-    function randomString(length) {
-        return Math.round((Math.pow(36, length + 1) - Math.random() * Math.pow(36, length))).toString(36).slice(1);
-    }
     //DO NOT put them in $(document).ready() since the table has multi pages
     var dialogInputArr = $('.dialoginput');
     $('.glyphicon-edit').on('click', function () {
+        $('#dialogTitle').text("Edit <?php echo $pageName ?>");
         $('#update').val(0);
-        //studentID, username
-        dialogInputArr.eq(0).val($(this).parent().parent().children('td').eq(0).text());
-        dialogInputArr.eq(1).val($(this).parent().text());
-        dialogInputArr.each(function () {
-            $(this).attr('disabled', 'disabled');
-        });
+        for (i = 0; i < dialogInputArr.length; i++) {
+            dialogInputArr.eq(i).val($(this).parent().parent().children('td').eq(i).text().trim());
+        }
+        //disable factID and Classes
+        dialogInputArr.eq(0).attr('disabled', 'disabled');
+    });
+    $('.glyphicon-plus').on('click', function () {
+        $('#dialogTitle').text("Add <?php echo $pageName ?>");
+        $('#update').val(1);
+        for (i = 0; i < dialogInputArr.length; i++) {
+            dialogInputArr.eq(i).val('');
+        }
+        //disable factID and Classes
+        dialogInputArr.eq(0).attr('disabled', 'disabled');
     });
     $('.glyphicon-remove').on('click', function () {
-        if (confirm('[WARNING] Are you sure to remove this student? All the data of this student will also get deleted (not recoverable). It includes student submissions of every task and your grading/feedback, not only the student itself.')) {
-            $('#update').val(-1);
-            //studentID, username
-            dialogInputArr.eq(0).val($(this).parent().parent().children('td').eq(0).text());
-            dialogInputArr.eq(1).val($(this).parent().text());
-            //enable all the input
-            dialogInputArr.each(function () {
-                $(this).prop('disabled', false);
-            });
-            $('#submission').submit();
+        $('#update').val(-1);
+        //fill required input
+        dialogInputArr.eq(0).prop('disabled', false);
+        for (i = 0; i < dialogInputArr.length; i++) {
+            dialogInputArr.eq(i).val($(this).parent().parent().children('td').eq(i).text().trim());
         }
-    });
-    $('#btmResetPwd').on('click', function () {
-        $('#submission').validate();
-        //enable all the input
-        dialogInputArr.each(function () {
-            $(this).prop('disabled', false);
-        });
-        if (confirm('[WARNING] Are you sure to reset this student password to `WelcomeToiSNAP2`? (not recoverable).')) {
-            $('#submission').submit();
-        }
-    });
+        $('#submission').submit();
 
+    });
+    $('#btnSave').on('click', function () {
+        $('#submission').validate();
+        //enable factID
+        dialogInputArr.eq(0).prop('disabled', false);
+        $('#submission').submit();
+    });
     $(document).ready(function () {
         var table = $('#datatables').DataTable({
             responsive: true,
-            "initComplete": function (settings, json) {
-                $('.input-sm').eq(1).val($("#keyword").val().trim());
-            },
-            "pageLength": 100
+            "pageLength": 100,
+            "aoColumnDefs": [
+                {"bSearchable": false, "aTargets": [0]}
+            ]
         })
-        //search keyword, exact match
-        table.search(
-            $("#keyword").val().trim(), true, false, true
-        ).draw();
     });
 </script>
+<script src="researcher-tts.js"></script>
 </body>
 
 </html>

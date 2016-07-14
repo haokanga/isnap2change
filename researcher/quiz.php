@@ -26,8 +26,7 @@ try {
                     $conn->beginTransaction();
 
                     //insert and get topicID
-                    $topicResult = getTopicByName($conn, $topicName);
-                    $topicID = $topicResult->TopicID;
+                    $topicID = getTopicByName($conn, $topicName)->TopicID;
                     $quizID = createQuiz($conn, $topicID, $quizType, $week);
 
                     $points = 0;
@@ -86,10 +85,8 @@ db_close($conn);
 <!DOCTYPE html>
 <html lang="en">
 
-<head>
-    <!-- Header Library -->
-    <?php require_once('header-lib.php'); ?>
-</head>
+<!-- Header Library -->
+<?php require_once('header-lib.php'); ?>
 
 <body>
 
