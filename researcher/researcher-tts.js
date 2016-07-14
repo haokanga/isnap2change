@@ -7,8 +7,8 @@ function appendTTSButton() {
         // ignore hidden cols
         if ($(this).is(':visible')) {
             var text = $(this).text();
-            // ignore no-text cells
-            if (text.trim().length > 0) {
+            // ignore no-text/numeric cells
+            if (text.trim().length > 0 && !$.isNumeric(text.trim())) {
                 $(this).append($('<span class="glyphicon glyphicon-volume-up pull-right tts" aria-hidden="true"></span>'));
             }
         }
