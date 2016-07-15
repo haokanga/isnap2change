@@ -118,7 +118,7 @@ db_close($conn);
                             <br>
                         </form>
                         <!--No CorrectChoice Reminder-->
-                        <div class="alert alert-danger" id="noCorrectChoiceReminder">
+                        <div class="alert alert-danger" id="noCorrectChoiceReminder" hidden>
                             <p><strong>Reminder</strong> : You have not chosen any correct choice for this question!
                         </div>
                         <!--edit metadata-->

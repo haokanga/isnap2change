@@ -76,29 +76,45 @@ db_close($conn);
                                 define("EDIT_INDEX", 4);
                                 define("OMIT_LEN", 40);
 
-                                for ($i = 0; $i < count($verboseFactResult); $i++) { ?>
+                                for ($i = 0;
+                                     $i < count($verboseFactResult);
+                                     $i++) { ?>
                                     <tr class="<?php if ($i % 2 == 0) {
                                         echo "odd";
                                     } else {
                                         echo "even";
                                     } ?>">
                                         <?php
-                                        for ($j = 0; $j < count($columnName); $j++) { ?>
+                                        for ($j = 0;
+                                             $j < count($columnName);
+                                             $j++) { ?>
                                             <td <?php if ($j == 0) echo 'style="display:none"'; ?>>
                                                 <?php if ($j != EDIT_INDEX && $j != SUB_CONTENT_INDEX)
                                                 echo $verboseFactResult[$i]->$columnName[$j];
                                                 else if ($j == SUB_CONTENT_INDEX) {
-                                                    $subContent = $verboseFactResult[$i]->$columnName[$j];
-                                                    if (strlen($subContent) == 0) { ?>
+                                                    $content = $verboseFactResult[$i]->$columnName[$j];
+                                                    $collapseTextID = "collapse-" . $verboseFactResult[$i]->VerboseFactID;
+                                                    if (strlen($content) == 0) { ?>
                                                         <div class="alert alert-danger">
                                                             <p><strong>Reminder</strong> : You have not added any
                                                                 verbose fact for this topic!
                                                         </div>
-                                                    <?php } else {
-                                                        echo mb_strcut($subContent, 0, OMIT_LEN);
-                                                        if (strlen($subContent) >= OMIT_LEN) echo "...";
-                                                    }
+                                                    <?php } else if (strlen($content) < OMIT_LEN) {
+                                                        echo $content;
+                                                    } else { ?>
+                                                        <p>
+                                                            <?php echo mb_strcut($content, 0, OMIT_LEN) . "..."; ?></p>
+                                                        <a href="#<?php echo $collapseTextID; ?>"
+                                                               class="btn btn-info" data-toggle="collapse">Show Full
+                                                            Paragraph</a>
+                                                        <div id="<?php echo $collapseTextID; ?>" class="collapse">
+                                                            <?php echo $content; ?>
+                                                            <span
+                                                                class="glyphicon glyphicon-volume-up pull-right tts"
+                                                                aria-hidden="true"></span>
+                                                        </div>
 
+                                                    <?php }
                                                 } else if ($j == EDIT_INDEX){ ?>
                                                 <a href="verbose-fact-editor.php?topicID=<?php echo $verboseFactResult[$i]->TopicID ?>"><span
                                                         class="pull-right" aria-hidden="true">&nbsp;</span><span
@@ -118,6 +134,9 @@ db_close($conn);
                             <div class="alert alert-info">
                                 <p>View verbose facts for each topic by filtering or searching. You can
                                     edit the facts in one topic by clicking the edit button.</p>
+                            </div>
+                            <div class="alert alert-info">
+                                <p>For long paragraphs, it will only show part of content to make this table clean, if you want to view full paragraph, you can click the buttons in the cells.</p>
                             </div>
                         </div>
                     </div>

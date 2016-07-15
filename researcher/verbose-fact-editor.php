@@ -93,7 +93,7 @@ db_close($conn);
                             <br>
                         </form>
                         <!--No Verbose Fact Reminder-->
-                        <div class="alert alert-danger" id="noVerboseFactReminder">
+                        <div class="alert alert-danger" id="noVerboseFactReminder" hidden>
                             <p><strong>Reminder</strong> : You have not added any verbose fact for this
                                 topic!
                         </div>
@@ -239,7 +239,7 @@ db_close($conn);
         var table = $('#datatables').DataTable({
             responsive: true,
             "order": [[1, "asc"]],
-            "pageLength": 10,
+            "pageLength": 100,
             "aoColumnDefs": [
                 {"bSearchable": false, "aTargets": [0]}
             ]
