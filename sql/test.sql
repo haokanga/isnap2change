@@ -114,3 +114,7 @@ SELECT * FROM Fact LEFT JOIN SubFact USING (FactID)
                 WHERE SnapFact = 0;                  
 SELECT * FROM Topic 
                 LEFT JOIN (SELECT * FROM Fact LEFT JOIN SubFact USING (FactID) WHERE SnapFact = 0) AS VerboseFacts USING (TopicID);
+                
+SELECT COUNT(*)
+				 FROM Fact NATURAL JOIN SubFact
+				 WHERE SnapFact = 0 AND TopicID = 1;

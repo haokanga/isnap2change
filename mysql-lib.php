@@ -584,6 +584,16 @@ function getSnapFacts(PDO $conn)
     return $factResult;
 }
 
+
+function createVerboseFact(PDO $conn, $topicID)
+{
+    $updateSql = "INSERT INTO Fact(TopicID, SnapFact)
+             VALUES (?,?)";
+    $updateSql = $conn->prepare($updateSql);
+    $updateSql->execute(array($topicID, 0));
+    return $conn->lastInsertId();
+}
+
 function getVerboseFacts(PDO $conn)
 {
     //get verbose fact for all the topics (TOPIC.Introduction excluded)
@@ -597,6 +607,43 @@ function getVerboseFacts(PDO $conn)
     $factQuery->execute();
     $factResult = $factQuery->fetchAll(PDO::FETCH_OBJ);
     return $factResult;
+}
+
+function getVerboseFact(PDO $conn, $topicID)
+{
+    $tableSql = "SELECT COUNT(*)
+				 FROM Fact NATURAL JOIN SubFact
+				 WHERE SnapFact = 0 AND TopicID = ?";
+    $tableQuery = $conn->prepare($tableSql);
+    $tableQuery->execute(array($topicID));
+    if ($tableQuery->fetchColumn() == 0) {
+        createVerboseFact($conn, $topicID);
+    }
+    $tableSql = "SELECT TopicID, TopicName, COUNT(*) AS SubFacts
+				 FROM Fact NATURAL JOIN Topic NATURAL JOIN SubFact
+				 WHERE SnapFact = 0 AND TopicID = ?";
+    $tableQuery = $conn->prepare($tableSql);
+    $tableQuery->execute(array($topicID));
+    $tableResult = $tableQuery->fetch(PDO::FETCH_OBJ);
+    return $tableResult;
+}
+
+function getVerboseSubFacts(PDO $conn, $topicID){
+    $tableSql = "SELECT COUNT(*)
+				 FROM Fact NATURAL JOIN SubFact
+				 WHERE SnapFact = 0 AND TopicID = ?";
+    $tableQuery = $conn->prepare($tableSql);
+    $tableQuery->execute(array($topicID));
+    if ($tableQuery->fetchColumn() == 0) {
+        createVerboseFact($conn, $topicID);
+    }
+    $tableSql = "SELECT *
+				 FROM Fact NATURAL JOIN SubFact
+				 WHERE SnapFact = 0 AND TopicID = ?";
+    $tableQuery = $conn->prepare($tableSql);
+    $tableQuery->execute(array($topicID));
+    $tableResult = $tableQuery->fetchAll(PDO::FETCH_OBJ);
+    return $tableResult;
 }
 
 function getFacts(PDO $conn)

@@ -3,7 +3,7 @@ session_start();
 require_once("../mysql-lib.php");
 require_once("../debug.php");
 require_once("researcher-validation.php");
-$pageName = "snapfact";
+$pageName = "snap-fact";
 $columnName = array('FactID', 'TopicName', 'Content', 'Edit');
 
 try {

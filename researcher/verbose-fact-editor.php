@@ -3,41 +3,27 @@ session_start();
 require_once("../mysql-lib.php");
 require_once("../debug.php");
 require_once("researcher-validation.php");
-$pageName = "mcq-option-editor";
-$columnName = array('OptionID', 'Content', 'Explanation', 'Edit');
+$pageName = "verbose-fact-editor";
+$columnName = array('SubFactID', 'SubTitle', 'SubContent', 'Edit');
 
 try {
     $conn = db_connect();
     if ($_SERVER["REQUEST_METHOD"] == "POST") {
-        if (isset($_POST['metadataUpdate'])) {
-            $metadataUpdate = $_POST['metadataUpdate'];
-            if ($metadataUpdate == 0) {
-                $mcqID = $_POST['mcqID'];
-                $correctChoice = $_POST['correctChoice'];
-                $question = $_POST['question'];
-                updateMCQQuestion($conn, $mcqID, $correctChoice, $question);
-            } else if ($metadataUpdate == -1) {
-                $mcqID = $_POST['mcqID'];
-                $quizID = getMCQQuestion($conn, $mcqID)->QuizID;
-                deleteMCQQuestion($conn, $mcqID);
-                header('Location: mcq-editor.php?quizID=' . $quizID);
-            }
-        }
         if (isset($_POST['update'])) {
             $update = $_POST['update'];
             if ($update == 1) {
                 $mcqID = $_POST['mcqID'];
                 $content = $_POST['content'];
                 $explanation = $_POST['explanation'];
-                createOption($conn, $mcqID, $content, $explanation);
+                createVerboseFact($conn, $mcqID, $content, $explanation);
             } else if ($update == 0) {
-                $optionID = $_POST['optionID'];
+                $verboseSubFactID = $_POST['optionID'];
                 $content = $_POST['content'];
                 $explanation = $_POST['explanation'];
-                updateOption($conn, $optionID, $content, $explanation);
+                updateVerboseFact($conn, $verboseSubFactID, $content, $explanation);
             } else if ($update == -1) {
-                $optionID = $_POST['optionID'];
-                deleteOption($conn, $optionID);
+                $verboseSubFactID = $_POST['optionID'];
+                deleteVerboseFact($conn, $verboseSubFactID);
             }
         }
     }
@@ -46,12 +32,12 @@ try {
 }
 
 try {
-    if (isset($_GET['quizID']) && isset($_GET['mcqID'])) {
-        $quizID = $_GET['quizID'];
-        $mcqID = $_GET['mcqID'];
-        $mcqQuesResult = getMCQQuestion($conn, $mcqID);
-        $optionResult = getOptions($conn, $mcqID);
-        $phpSelf = $pageName . '.php?quizID=' . $quizID . '&mcqID=' . $mcqID;
+    if (isset($_GET['topicID'])) {
+        $topicID = $_GET['topicID'];
+        $topicName = getTopic($conn, $topicID)->TopicName;
+        $verboseFactResult = getVerboseFact($conn, $topicID);
+        $verboseSubFactResult = getVerboseSubFacts($conn, $topicID);
+        $phpSelf = $pageName . '.php?topicID=' . $topicID;
     }
 } catch (Exception $e) {
     debug_err($pageName, $e);
@@ -75,9 +61,9 @@ db_close($conn);
     <div id="page-wrapper">
         <div class="row">
             <div class="col-lg-12">
-                <h1 class="page-header">Multiple Choice Question Editor
+                <h1 class="page-header">Verbose Fact Editor
                     <button type="button" class="btn btn-lg btn-info pull-right"
-                            onclick="location.href='<?php echo "mcq-editor.php?quizID=" . $quizID; ?>'">GO BACK
+                            onclick="location.href='<?php echo "verbose-fact.php"; ?>'">GO BACK
                     </button>
                 </h1>
             </div>
@@ -89,43 +75,29 @@ db_close($conn);
                 <!-- MetaData -->
                 <div class="panel panel-default">
                     <div class="panel-heading">
-                        Multiple Choice Question MetaData
+                        Verbose Fact MetaData
                     </div>
                     <!-- /.panel-heading -->
                     <div class="panel-body">
                         <form id="metadata-submission" method="post" action="<?php echo $phpSelf; ?>">
-                            <!--if 0 update; else if -1 delete;-->
-                            <input type=hidden name="metadataUpdate" id="metadataUpdate" value="1" required>
-                            <label for="MCQID" style="display:none">MCQID</label>
-                            <input type="text" class="form-control" id="MCQID" name="mcqID" style="display:none"
-                                   value="<?php echo $mcqQuesResult->MCQID; ?>" required>
+                            <label for="topicID" style="display:none">TopicID</label>
+                            <input type="text" class="form-control" id="topicID" name="topicID" style="display:none"
+                                   value="<?php echo $topicID; ?>" required>
                             <br>
-                            <label for="Question">Question</label>
-                            <input type="text" class="form-control" id="Question" name="question"
-                                   value="<?php echo $mcqQuesResult->Question; ?>" required>
+                            <label for="topicName">TopicName</label>
+                            <input type="text" class="form-control" id="topicName" name="topicName"
+                                   value="<?php echo $topicName; ?>" disabled>
                             <br>
-                            <label for="CorrectChoice">CorrectChoice</label>
-                            <select class="form-control" id="CorrectChoice" form="metadata-submission"
-                                    name="correctChoice">
-                                <option value='' selected>No Correct Choice Selected</option>
-                                <?php for ($i = 0; $i < count($optionResult); $i++) { ?>
-                                    <option
-                                        value="<?php echo $optionResult[$i]->Content; ?>" <?php if ($mcqQuesResult->CorrectChoice == $optionResult[$i]->Content) {
-                                        echo 'selected';
-                                    } ?>><?php echo $optionResult[$i]->Content; ?></option>
-                                <?php } ?>
-                            </select>
+                            <label for="verboseFacts">Verbose Facts</label>
+                            <input type="text" class="form-control" id="verboseFacts" name="verboseFacts"
+                                   value="<?php echo $verboseFactResult->SubFacts; ?>" disabled>
                             <br>
                         </form>
-                        <!--No CorrectChoice Reminder-->
+                        <!--No Verbose Fact Reminder-->
                         <div class="alert alert-danger" id="noCorrectChoiceReminder">
-                            <p><strong>Reminder</strong> : You have not chosen any correct choice for this question!
+                            <p><strong>Reminder</strong> : You have not You have not added any verbose fact for this
+                                topic!
                         </div>
-                        <!--edit metadata-->
-                        <span class="glyphicon glyphicon-remove pull-right" id="metadata-remove"
-                              aria-hidden="true"></span><span class="pull-right" aria-hidden="true">&nbsp;</span><span
-                            class="glyphicon glyphicon-floppy-saved pull-right" id="metadata-save"
-                            aria-hidden="true"></span>
                     </div>
                     <!-- /.panel-body -->
                 </div>
@@ -134,8 +106,9 @@ db_close($conn);
 
                 <div class="panel panel-default">
                     <div class="panel-heading">
-                        Option Information Table <span class="glyphicon glyphicon-plus pull-right" data-toggle="modal"
-                                                       data-target="#dialog"></span>
+                        Verbose Fact Information Table <span class="glyphicon glyphicon-plus pull-right"
+                                                             data-toggle="modal"
+                                                             data-target="#dialog"></span>
                     </div>
                     <!-- /.panel-heading -->
                     <div class="panel-body">
@@ -143,7 +116,7 @@ db_close($conn);
                             <table class="table table-striped table-bordered table-hover" id="datatables">
                                 <?php require_once('table-head.php'); ?>
                                 <tbody>
-                                <?php for ($i = 0; $i < count($optionResult); $i++) { ?>
+                                <?php for ($i = 0; $i < count($verboseSubFactResult); $i++) { ?>
                                     <tr class="<?php if ($i % 2 == 0) {
                                         echo "odd";
                                     } else {
@@ -155,7 +128,7 @@ db_close($conn);
                                             } ?>>
                                                 <?php
                                                 if ($j != count($columnName) - 1)
-                                                    echo $optionResult[$i]->$columnName[$j];
+                                                    echo $verboseSubFactResult[$i]->$columnName[$j];
                                                 else { ?>
                                                     <span class="glyphicon glyphicon-remove pull-right"
                                                           aria-hidden="true"></span>
@@ -172,10 +145,9 @@ db_close($conn);
                         </div>
                         <!-- /.table-responsive -->
                         <div class="well row">
-                            <h4>Multiple Choice Question Editor Notification</h4>
+                            <h4>Verbose Fact Notification</h4>
                             <div class="alert alert-info">
-                                <p>You can create/update/delete any options of this multiple choice question or the
-                                    question itself.</p>
+                                <p>You can create/update/delete any verbose fact for this topic.</p>
                             </div>
                         </div>
                     </div>
@@ -199,14 +171,14 @@ db_close($conn);
         <div class="modal-content">
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal">&times;</button>
-                <h4 class="modal-title" id="dialogTitle">Edit Option</h4>
+                <h4 class="modal-title" id="dialogTitle">Edit VerboseFact</h4>
             </div>
             <div class="modal-body">
                 <form id="submission" method="post" action="<?php echo $phpSelf; ?>">
                     <!--if 1, insert; else if -1 delete;-->
                     <input type=hidden name="update" id="update" value="1" required>
-                    <label for="OptionID" style="display:none">OptionID</label>
-                    <input type="text" class="form-control dialoginput" id="OptionID" name="optionID"
+                    <label for="VerboseFactID" style="display:none">VerboseFactID</label>
+                    <input type="text" class="form-control dialoginput" id="VerboseFactID" name="optionID"
                            style="display:none">
                     <label for="Content">Content</label>
                     <input type="text" class="form-control dialoginput" id="Content" name="content"
@@ -235,14 +207,14 @@ db_close($conn);
     //DO NOT put them in $(document).ready() since the table has multi pages
     var dialogInputArr = $('.dialoginput');
     $('.glyphicon-plus').on('click', function () {
-        $('#dialogTitle').text("Add Option");
+        $('#dialogTitle').text("Add Verbose Fact");
         $('#update').val(1);
         for (i = 0; i < dialogInputArr.length - 1; i++) {
             dialogInputArr.eq(i).val('');
         }
     });
     $('td > .glyphicon-edit').on('click', function () {
-        $('#dialogTitle').text("Edit Option");
+        $('#dialogTitle').text("Edit Verbose Fact");
         $('#update').val(0);
         for (i = 0; i < dialogInputArr.length - 1; i++) {
             dialogInputArr.eq(i).val($(this).parent().parent().children('td').eq(i).text().trim());
@@ -271,15 +243,6 @@ db_close($conn);
             "aoColumnDefs": [
                 {"bSearchable": false, "aTargets": [0]}
             ]
-        })
-        $('#metadata-save').on('click', function () {
-            $('#metadataUpdate').val(0);
-            $('#metadata-submission').validate();
-            $('#metadata-submission').submit();
-        });
-        $('#metadata-remove').on('click', function () {
-            $('#metadataUpdate').val(-1);
-            $('#metadata-submission').submit();
         });
         showNoCorrectChoiceReminder();
         $("#CorrectChoice").change(function () {
@@ -296,6 +259,7 @@ db_close($conn);
     }
 
 </script>
+<script src="researcher-tts.js"></script>
 </body>
 
 </html>

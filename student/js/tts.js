@@ -12,7 +12,7 @@ $(document).ready(function () {
         );
 
         //remove old tts if exists
-        $(this).children().filter("audio").each(function () {
+        $(document).find("audio").each(function () {
             this.pause();
             $(this).remove();
         });
