@@ -84,21 +84,21 @@ CREATE TABLE IF NOT EXISTS `Researcher` (
 )  ENGINE=INNODB;
 
 CREATE TABLE IF NOT EXISTS `Snap_Fact` (
-    FactID MEDIUMINT AUTO_INCREMENT,
+    SnapFactID MEDIUMINT AUTO_INCREMENT,
     Content TEXT,
     TopicID MEDIUMINT,
-    CONSTRAINT Fact_FactID_PK PRIMARY KEY (FactID),
+    CONSTRAINT Fact_SnapFactID_PK PRIMARY KEY (SnapFactID),
     CONSTRAINT Fact_TopicID_FK FOREIGN KEY (TopicID)
         REFERENCES Topic (TopicID)
         ON DELETE CASCADE ON UPDATE CASCADE
 )  ENGINE=INNODB;
 
 CREATE TABLE IF NOT EXISTS `Verbose_Fact`(
-    SubFactID MEDIUMINT AUTO_INCREMENT,
-    SubTitle TEXT,
-    SubContent TEXT,
+    VerboseFactID MEDIUMINT AUTO_INCREMENT,
+    Title TEXT,
+    Content TEXT,
     TopicID MEDIUMINT NOT NULL,
-    CONSTRAINT SubFact_SubFactID_PK PRIMARY KEY (SubFactID),
+    CONSTRAINT SubFact_VerboseFactID_PK PRIMARY KEY (VerboseFactID),
     CONSTRAINT SubFact_Topic_FK FOREIGN KEY (TopicID)
         REFERENCES Topic (TopicID)
         ON DELETE CASCADE ON UPDATE CASCADE
@@ -690,12 +690,12 @@ INSERT INTO `isnap2changedb`.`Snap_Fact` (`Content`, `TopicID`) VALUES ('People 
 INSERT INTO `isnap2changedb`.`Snap_Fact` (`Content`, `TopicID`) VALUES ('Supportive environments and communities may help people to be more physically active.', '4');
 
 # [Example] insert verbose facts with sub paddings
-INSERT IGNORE INTO `verbose_fact`(SubTitle, SubContent, TopicID) VALUES("Short Term Effects of Smoking",'Short Term Effects of Smoking Content...',1);
-INSERT IGNORE INTO `verbose_fact`(SubTitle, SubContent, TopicID) VALUES("Emphysema",'Emphysema is a long-term, progressive disease of the lungs that primarily causes shortness of breath due to over-inflation of the alveoli (air sacs in the lung). In people with emphysema, the lung tissue involved in exchange of gases (oxygen and carbon dioxide) is impaired or destroyed. Emphysema is included in a group of diseases called chronic obstructive pulmonary disease or COPD (pulmonary refers to the lungs).
+INSERT IGNORE INTO `verbose_fact`(Title, Content, TopicID) VALUES("Short Term Effects of Smoking",'Short Term Effects of Smoking Content...',1);
+INSERT IGNORE INTO `verbose_fact`(Title, Content, TopicID) VALUES("Emphysema",'Emphysema is a long-term, progressive disease of the lungs that primarily causes shortness of breath due to over-inflation of the alveoli (air sacs in the lung). In people with emphysema, the lung tissue involved in exchange of gases (oxygen and carbon dioxide) is impaired or destroyed. Emphysema is included in a group of diseases called chronic obstructive pulmonary disease or COPD (pulmonary refers to the lungs).
 Emphysema is called an obstructive lung disease because airflow on exhalation is slowed or stopped because over-inflated alveoli do not exchange gases when a person breaths due to little or no movement of gases out of the alveoli.
 Emphysema changes the anatomy of the lung in several important ways. This is due to in part to the destruction of lung tissue around smaller airways. This tissue normally holds these small airways, called bronchioles, open, allowing air to leave the lungs on exhalation. When this tissue is damaged, these airways collapse, making it difficult for the lungs to empty and the air (gases) becomes trapped in the alveoli.
 Normal lung tissue looks like a new sponge. Emphysematous lung looks like an old used sponge, with large holes and a dramatic loss of “springy-ness” or elasticity. When the lung is stretched during inflation (inhalation), the nature of the stretched tissue wants to relax to its resting state. In emphysema, this elastic function is impaired, resulting in air trapping in the lungs. Emphysema destroys this spongy tissue of the lung and also severely affects the small blood vessels (capillaries of the lung) and airways that run throughout the lung. Thus, not only is airflow affected but so is blood flow. This has dramatic impact on the ability for the lung not only to empty its air sacs called alveoli (pleural for alveolus) but also for blood to flow through the lungs to receive oxygen.',1);
-INSERT IGNORE INTO `verbose_fact`(SubTitle, SubContent, TopicID) VALUES("Long Term Effects of Smoking",'Long Term Effects of Smoking Content...',1);
+INSERT IGNORE INTO `verbose_fact`(Title, Content, TopicID) VALUES("Long Term Effects of Smoking",'Long Term Effects of Smoking Content...',1);
 
 # [Example] insert a poster task into Quiz
 INSERT INTO `isnap2changedb`.`quiz` (`Week`, `QuizType`, `TopicID`) VALUES ('2', 'Poster', '3');

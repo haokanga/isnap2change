@@ -4,7 +4,7 @@ require_once("../mysql-lib.php");
 require_once("../debug.php");
 require_once("researcher-validation.php");
 $pageName = "verbose-fact-editor";
-$columnName = array('SubFactID', 'SubTitle', 'SubContent', 'Edit');
+$columnName = array('VerboseFactID', 'Title', 'Content', 'Edit');
 
 try {
     $conn = db_connect();
@@ -13,17 +13,17 @@ try {
             $update = $_POST['update'];
             if ($update == 1) {
                 $topicID = $_POST['topicID'];
-                $subTitle = $_POST['subTitle'];
-                $subContent = $_POST['subContent'];
-                createSubFact($conn, $topicID, $subTitle, $subContent);
+                $title = $_POST['title'];
+                $content = $_POST['content'];
+                createVerboseFact($conn, $topicID, $title, $content);
             } else if ($update == 0) {
-                $verboseSubFactID = $_POST['subFactID'];
-                $subTitle = $_POST['subTitle'];
-                $subContent = $_POST['subContent'];
-                updateSubFact($conn, $verboseSubFactID, $subTitle, $subContent);
+                $verboseFactID = $_POST['subFactID'];
+                $title = $_POST['title'];
+                $content = $_POST['content'];
+                updateVerboseFact($conn, $verboseFactID, $title, $content);
             } else if ($update == -1) {
-                $verboseSubFactID = $_POST['subFactID'];
-                deleteSubFact($conn, $verboseSubFactID);
+                $verboseFactID = $_POST['subFactID'];
+                deleteVerboseFact($conn, $verboseFactID);
             }
         }
     }
@@ -36,7 +36,6 @@ try {
         $topicID = $_GET['topicID'];
         $topicName = getTopic($conn, $topicID)->TopicName;
         $verboseFactResult = getVerboseFact($conn, $topicID);
-        $verboseSubFactResult = getVerboseSubFacts($conn, $topicID);
         $phpSelf = $pageName . '.php?topicID=' . $topicID;
     }
 } catch (Exception $e) {
@@ -90,7 +89,7 @@ db_close($conn);
                             <br>
                             <label for="verboseFacts">Verbose Facts</label>
                             <input type="text" class="form-control" id="verboseFacts" name="verboseFacts"
-                                   value="<?php echo $verboseFactResult->SubFacts; ?>" disabled>
+                                   value="<?php echo count($verboseFactResult); ?>" disabled>
                             <br>
                         </form>
                         <!--No Verbose Fact Reminder-->
@@ -116,7 +115,7 @@ db_close($conn);
                             <table class="table table-striped table-bordered table-hover" id="datatables">
                                 <?php require_once('table-head.php'); ?>
                                 <tbody>
-                                <?php for ($i = 0; $i < count($verboseSubFactResult); $i++) { ?>
+                                <?php for ($i = 0; $i < count($verboseFactResult); $i++) { ?>
                                     <tr class="<?php if ($i % 2 == 0) {
                                         echo "odd";
                                     } else {
@@ -128,7 +127,7 @@ db_close($conn);
                                             } ?>>
                                                 <?php
                                                 if ($j != count($columnName) - 1)
-                                                    echo $verboseSubFactResult[$i]->$columnName[$j];
+                                                    echo $verboseFactResult[$i]->$columnName[$j];
                                                 else { ?>
                                                     <span class="glyphicon glyphicon-remove pull-right"
                                                           aria-hidden="true"></span>
@@ -169,8 +168,8 @@ db_close($conn);
 <!-- Modal -->
 <div class="modal fade" id="dialog" role="dialog">
     <div class="modal-dialog">
-        <!-- Modal subTitle-->
-        <div class="modal-subTitle">
+        <!-- Modal title-->
+        <div class="modal-title">
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal">&times;</button>
                 <h4 class="modal-title" id="dialogTitle">Edit VerboseFact</h4>
@@ -181,13 +180,13 @@ db_close($conn);
                     <label for="subFactID" style="display:none">subFactID</label>
                     <input type="text" class="form-control dialoginput" id="subFactID" name="subFactID"
                            style="display:none">
-                    <label for="subTitle">SubTitle</label>
-                    <input type="text" class="form-control dialoginput" id="subTitle" name="subTitle"
-                           placeholder="Input SubTitle" required>
+                    <label for="title">Title</label>
+                    <input type="text" class="form-control dialoginput" id="title" name="title"
+                           placeholder="Input Title" required>
                     <br>
-                    <label for="subContent">SubContent</label>
-                    <input type="text" class="form-control dialoginput" id="subContent" name="subContent"
-                           placeholder="Input SubContent" required>
+                    <label for="content">Content</label>
+                    <input type="text" class="form-control dialoginput" id="content" name="content"
+                           placeholder="Input Content" required>
                     <br>
                     <label for="topicID" style="display:none">topicID</label>
                     <input type="text" class="form-control dialoginput" id="topicID" name="topicID" style="display:none"

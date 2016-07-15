@@ -544,155 +544,85 @@ function getTopics(PDO $conn)
 
 /* Topic */
 
-/* Fact */
+/* SnapFact */
 function createSnapFact(PDO $conn, $topicID, $content)
 {
-    $updateSql = "INSERT INTO Fact(Content, TopicID)
+    $updateSql = "INSERT INTO Snap_Fact(Content, TopicID)
              VALUES (?,?)";
     $updateSql = $conn->prepare($updateSql);
     $updateSql->execute(array($content, $topicID));
     return $conn->lastInsertId();
 }
 
-function updateSnapFact(PDO $conn, $factID, $topicID, $content)
+function updateSnapFact(PDO $conn, $snapFactID, $topicID, $content)
 {
-    $updateSql = "UPDATE Fact 
+    $updateSql = "UPDATE Snap_Fact 
                 SET Content = ?, TopicID = ?
-                WHERE FactID = ?";
+                WHERE SnapFactID = ?";
     $updateSql = $conn->prepare($updateSql);
-    $updateSql->execute(array($content, $topicID, $factID));
+    $updateSql->execute(array($content, $topicID, $snapFactID));
 }
 
-function deleteSnapFact(PDO $conn, $factID)
+function deleteSnapFact(PDO $conn, $snapFactID)
 {
-    deleteRecord($conn, $factID, "Fact");
+    deleteRecord($conn, $snapFactID, "Snap_Fact");
 }
 
-function getSnapFact(PDO $conn, $factID)
+function getSnapFact(PDO $conn, $snapFactID)
 {
-    return getRecord($conn, $factID, "Fact");
+    return getRecord($conn, $snapFactID, "Fact");
 }
 
 function getSnapFacts(PDO $conn)
 {
-    $factSql = "SELECT * FROM Fact 
-                NATURAL JOIN Topic
-                WHERE SnapFact = 1";
+    $factSql = "SELECT * FROM Snap_Fact 
+                NATURAL JOIN Topic";
     $factQuery = $conn->prepare($factSql);
     $factQuery->execute();
     $factResult = $factQuery->fetchAll(PDO::FETCH_OBJ);
     return $factResult;
 }
 
+/* SnapFact */
 
-function createVerboseFact(PDO $conn, $topicID)
+/* VerboseFact */
+function createVerboseFact(PDO $conn, $topicID, $title, $content)
 {
-    $updateSql = "INSERT INTO Fact(TopicID, SnapFact)
-             VALUES (?,?)";
+    $updateSql = "INSERT INTO Verbose_Fact(Title, Content, TopicID)
+             VALUES (?,?,?)";
     $updateSql = $conn->prepare($updateSql);
-    $updateSql->execute(array($topicID, 0));
+    $updateSql->execute(array(htmlspecialchars($title), htmlspecialchars($content), $topicID));
     return $conn->lastInsertId();
+}
+
+function updateVerboseFact(PDO $conn, $verboseFactID, $title, $content)
+{
+    $updateSql = "UPDATE Verbose_Fact 
+                SET Title = ?, Content = ?
+                WHERE VerboseFactID = ?";
+    $updateSql = $conn->prepare($updateSql);
+    $updateSql->execute(array(htmlspecialchars($title), htmlspecialchars($content), $verboseFactID));
+}
+
+function deleteVerboseFact(PDO $conn, $verboseFactID)
+{
+    $updateSql = "DELETE FROM Verbose_Fact WHERE VerboseFactID = ?";
+    $updateSql = $conn->prepare($updateSql);
+    $updateSql->execute(array($verboseFactID));
+}
+
+function getVerboseFact(PDO $conn, $verboseFactID)
+{
+    return getRecords($conn, $verboseFactID, "Verbose_Fact");
 }
 
 function getVerboseFacts(PDO $conn)
 {
-    //get verbose fact for all the topics (TOPIC.Introduction excluded)
-    $factSql = "SELECT * FROM Topic 
-                LEFT JOIN (
-                  SELECT * FROM Fact 
-                  LEFT JOIN SubFact USING (FactID) 
-                  WHERE SnapFact = 0) AS VerboseFacts 
-                USING (TopicID) WHERE TopicName != 'Introduction'";
-    $factQuery = $conn->prepare($factSql);
-    $factQuery->execute();
-    $factResult = $factQuery->fetchAll(PDO::FETCH_OBJ);
-    return $factResult;
+    return getRecords($conn, "Verbose_Fact", array("Topic"));
 }
 
-function getVerboseFact(PDO $conn, $topicID)
-{
-    $tableSql = "SELECT COUNT(*)
-				 FROM Fact
-				 WHERE SnapFact = 0 AND TopicID = ?";
-    $tableQuery = $conn->prepare($tableSql);
-    $tableQuery->execute(array($topicID));
-    if ($tableQuery->fetchColumn() == 0) {
-        createVerboseFact($conn, $topicID);
-    }
-    $tableSql = "SELECT TopicID, TopicName, COUNT(*) AS SubFacts
-				 FROM Fact NATURAL JOIN Topic NATURAL JOIN SubFact
-				 WHERE SnapFact = 0 AND TopicID = ?";
-    $tableQuery = $conn->prepare($tableSql);
-    $tableQuery->execute(array($topicID));
-    $tableResult = $tableQuery->fetch(PDO::FETCH_OBJ);
-    return $tableResult;
-}
 
-function getVerboseSubFacts(PDO $conn, $topicID)
-{
-    $tableSql = "SELECT COUNT(*)
-				 FROM Fact
-				 WHERE SnapFact = 0 AND TopicID = ?";
-    $tableQuery = $conn->prepare($tableSql);
-    $tableQuery->execute(array($topicID));
-    if ($tableQuery->fetchColumn() == 0) {
-        createVerboseFact($conn, $topicID);
-    }
-    $tableSql = "SELECT *
-				 FROM Fact NATURAL JOIN SubFact
-				 WHERE SnapFact = 0 AND TopicID = ?";
-    $tableQuery = $conn->prepare($tableSql);
-    $tableQuery->execute(array($topicID));
-    $tableResult = $tableQuery->fetchAll(PDO::FETCH_OBJ);
-    return $tableResult;
-}
-
-function getFacts(PDO $conn)
-{
-    return getRecords($conn, "Fact", array("Topic", "SubFact"));
-}
-
-/* Fact */
-
-/* SubFact */
-function createSubFact(PDO $conn, $topicID, $subTitle, $subContent)
-{
-
-
-    $updateSql = "INSERT INTO SubFact(SubTitle, SubContent, FactID)
-             VALUES (?,?,?)";
-    $updateSql = $conn->prepare($updateSql);
-    $updateSql->execute(array($subTitle, htmlspecialchars($subContent), getVerboseFact($conn, $topicID)->TopicID));
-    return $conn->lastInsertId();
-}
-
-function updateSubFact(PDO $conn, $optionID, $subTitle, $subContent)
-{
-    $updateSql = "UPDATE SubFact 
-                SET SubTitle = ?, SubContent = ?
-                WHERE SubFactID = ?";
-    $updateSql = $conn->prepare($updateSql);
-    $updateSql->execute(array($subTitle, htmlspecialchars($subContent), $optionID));
-}
-
-function deleteSubFact(PDO $conn, $optionID)
-{
-    $updateSql = "DELETE FROM SubFact WHERE SubFactID = ?";
-    $updateSql = $conn->prepare($updateSql);
-    $updateSql->execute(array($optionID));
-}
-
-function getSubFacts(PDO $conn, $topicID)
-{
-    $optionSql = "SELECT *
-                   FROM Fact NATURAL JOIN SubFact WHERE FactID = ?";
-    $optionQuery = $conn->prepare($optionSql);
-    $optionQuery->execute(array(getVerboseFact($conn, $topicID)->TopicID));
-    $optionResult = $optionQuery->fetchAll(PDO::FETCH_OBJ);
-    return $optionResult;
-}
-
-/* SubFact */
+/* VerboseFact */
 
 
 /* MCQ */
@@ -1564,17 +1494,27 @@ function updateStudentGameScores(PDO $conn, $gameID, $studentID, $score)
 /* Game */
 
 /* Helper Function */
+function getTablePK($tableName)
+{
+    $tablePK = $tableName . "ID";
+    if ($tableName == "Learning_Material") $tablePK = "QuizID";
+    else if ($tableName == "Snap_Fact") $tablePK = "SnapFactID";
+    else if ($tableName == "Verbose_Fact") $tablePK = "VerboseFactID";
+    return $tablePK;
+}
+
+
 function deleteRecord(PDO $conn, $recordID, $tableName)
 {
-    $updateSql = "DELETE FROM $tableName WHERE " . $tableName . "ID = ?";
+    $tablePK = getTablePK($tableName);
+    $updateSql = "DELETE FROM $tableName WHERE $tablePK = ?";
     $updateSql = $conn->prepare($updateSql);
     $updateSql->execute(array($recordID));
 }
 
 function getRecord(PDO $conn, $recordID, $tableName, array $joinTables = null)
 {
-    $tablePK = $tableName . "ID";
-    if ($tableName == "Learning_Material") $tablePK = "QuizID";
+    $tablePK = getTablePK($tableName);
 
     $tableSql = "SELECT COUNT(*)
 				 FROM $tableName

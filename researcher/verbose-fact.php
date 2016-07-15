@@ -9,33 +9,6 @@ $columnName = array('FactID', 'TopicName', 'SubTitle', 'SubContent', 'Edit');
 try {
     $conn = db_connect();
     if ($_SERVER["REQUEST_METHOD"] == "POST") {
-        if (isset($_POST['metadataUpdate'])) {
-            $metadataUpdate = $_POST['metadataUpdate'];
-            if ($metadataUpdate == 0) {
-                try {
-                    $quizID = $_POST['quizID'];
-                    $week = $_POST['week'];
-                    $topicName = $_POST['topicName'];
-                    $points = $_POST['points'];
-                    $questionnaires = $_POST['questionnaires'];
-                    $conn->beginTransaction();
-
-                    //insert and get topicID
-                    $topicID = getTopicByName($conn, $topicName)->TopicID;
-                    updateQuiz($conn, $quizID, $topicID, $week);
-                    updateMCQSection($conn, $quizID, $points, $questionnaires);
-
-                    $conn->commit();
-                } catch (Exception $e) {
-                    debug_err($pageName, $e);
-                    $conn->rollBack();
-                }
-            } else if ($metadataUpdate == -1) {
-                $quizID = $_POST['quizID'];
-                deleteQuiz($conn, $quizID);
-                header('Location: mcq.php');
-            }
-        }
         if (isset($_POST['update'])) {
             $update = $_POST['update'];
             if ($update == 1) {

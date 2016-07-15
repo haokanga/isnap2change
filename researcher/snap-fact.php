@@ -4,7 +4,7 @@ require_once("../mysql-lib.php");
 require_once("../debug.php");
 require_once("researcher-validation.php");
 $pageName = "snap-fact";
-$columnName = array('FactID', 'TopicName', 'Content', 'Edit');
+$columnName = array('SnapFactID', 'TopicName', 'Content', 'Edit');
 
 try {
     $conn = db_connect();
@@ -17,14 +17,14 @@ try {
                 $content = $_POST['content'];
                 createSnapFact($conn, $topicID, $content);
             } else if ($update == 0) {
-                $factID = $_POST['factID'];
+                $snapFactID = $_POST['snapFactID'];
                 $topicName = $_POST['topicName'];
                 $topicID = getTopicByName($conn, $topicName)->TopicID;
                 $content = $_POST['content'];
-                updateSnapFact($conn, $factID, $topicID, $content);
+                updateSnapFact($conn, $snapFactID, $topicID, $content);
             } else if ($update == -1) {
-                $factID = $_POST['factID'];
-                deleteSnapFact($conn, $factID);
+                $snapFactID = $_POST['snapFactID'];
+                deleteSnapFact($conn, $snapFactID);
             }
         }
     }
@@ -126,13 +126,13 @@ db_close($conn);
                 <form id="submission" method="post" action="<?php echo $_SERVER['PHP_SELF']; ?>">
                     <!--if 1, insert; else if 0 update; else if -1 delete;-->
                     <input type=hidden name="update" id="update" value="1">
-                    <label for="factID" style="display:none">FactID</label>
-                    <input type="text" class="form-control dialoginput" id="factID" name="factID"
+                    <label for="snapFactID" style="display:none">SnapFactID</label>
+                    <input type="text" class="form-control dialoginput" id="snapFactID" name="snapFactID"
                            style="display:none">
                     <br>
 
                     <label for='topicName'>TopicName</label>
-                    <select class="form-control dialoginput" id="TopicName" form="submission" name="topicName" required>
+                    <select class="form-control dialoginput" id="topicName" form="submission" name="topicName" required>
                         <option value="" disabled selected>Select Topic</option>
                         <?php for ($j = 0; $j < count($topicResult); $j++) { ?>
                             <option
@@ -165,7 +165,7 @@ db_close($conn);
         for (i = 0; i < dialogInputArr.length; i++) {
             dialogInputArr.eq(i).val($(this).parent().parent().children('td').eq(i).text().trim());
         }
-        //disable factID and Classes
+        //disable snapFactID and Classes
         dialogInputArr.eq(0).attr('disabled', 'disabled');
     });
     $('.glyphicon-plus').on('click', function () {
@@ -174,7 +174,7 @@ db_close($conn);
         for (i = 0; i < dialogInputArr.length; i++) {
             dialogInputArr.eq(i).val('');
         }
-        //disable factID and Classes
+        //disable snapFactID and Classes
         dialogInputArr.eq(0).attr('disabled', 'disabled');
     });
     $('.glyphicon-remove').on('click', function () {
@@ -189,7 +189,7 @@ db_close($conn);
     });
     $('#btnSave').on('click', function () {
         $('#submission').validate();
-        //enable factID
+        //enable snapFactID
         dialogInputArr.eq(0).prop('disabled', false);
         $('#submission').submit();
     });
