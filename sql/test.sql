@@ -115,6 +115,16 @@ SELECT * FROM Fact LEFT JOIN SubFact USING (FactID)
 SELECT * FROM Topic 
                 LEFT JOIN (SELECT * FROM Fact LEFT JOIN SubFact USING (FactID) WHERE SnapFact = 0) AS VerboseFacts USING (TopicID);
                 
-SELECT COUNT(*)
+SELECT *, COUNT(*) AS SubFacts
 				 FROM Fact NATURAL JOIN SubFact
 				 WHERE SnapFact = 0 AND TopicID = 1;
+                 
+SELECT * FROM Topic 
+                LEFT JOIN (
+                  SELECT * FROM Fact 
+                  LEFT JOIN SubFact USING (FactID) 
+                  WHERE SnapFact = 0) AS VerboseFacts 
+                USING (TopicID) WHERE TopicName != 'Introduction';                 
+SELECT COUNT(*)
+				 FROM Fact
+				 WHERE SnapFact = 0 AND TopicID = 3;             

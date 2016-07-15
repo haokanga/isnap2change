@@ -612,7 +612,7 @@ function getVerboseFacts(PDO $conn)
 function getVerboseFact(PDO $conn, $topicID)
 {
     $tableSql = "SELECT COUNT(*)
-				 FROM Fact NATURAL JOIN SubFact
+				 FROM Fact
 				 WHERE SnapFact = 0 AND TopicID = ?";
     $tableQuery = $conn->prepare($tableSql);
     $tableQuery->execute(array($topicID));
@@ -631,7 +631,7 @@ function getVerboseFact(PDO $conn, $topicID)
 function getVerboseSubFacts(PDO $conn, $topicID)
 {
     $tableSql = "SELECT COUNT(*)
-				 FROM Fact NATURAL JOIN SubFact
+				 FROM Fact
 				 WHERE SnapFact = 0 AND TopicID = ?";
     $tableQuery = $conn->prepare($tableSql);
     $tableQuery->execute(array($topicID));
@@ -653,6 +653,46 @@ function getFacts(PDO $conn)
 }
 
 /* Fact */
+
+/* SubFact */
+function createSubFact(PDO $conn, $topicID, $subTitle, $subContent)
+{
+
+
+    $updateSql = "INSERT INTO SubFact(SubTitle, SubContent, FactID)
+             VALUES (?,?,?)";
+    $updateSql = $conn->prepare($updateSql);
+    $updateSql->execute(array($subTitle, htmlspecialchars($subContent), getVerboseFact($conn, $topicID)->TopicID));
+    return $conn->lastInsertId();
+}
+
+function updateSubFact(PDO $conn, $optionID, $subTitle, $subContent)
+{
+    $updateSql = "UPDATE SubFact 
+                SET SubTitle = ?, SubContent = ?
+                WHERE SubFactID = ?";
+    $updateSql = $conn->prepare($updateSql);
+    $updateSql->execute(array($subTitle, htmlspecialchars($subContent), $optionID));
+}
+
+function deleteSubFact(PDO $conn, $optionID)
+{
+    $updateSql = "DELETE FROM SubFact WHERE SubFactID = ?";
+    $updateSql = $conn->prepare($updateSql);
+    $updateSql->execute(array($optionID));
+}
+
+function getSubFacts(PDO $conn, $topicID)
+{
+    $optionSql = "SELECT *
+                   FROM Fact NATURAL JOIN SubFact WHERE FactID = ?";
+    $optionQuery = $conn->prepare($optionSql);
+    $optionQuery->execute(array(getVerboseFact($conn, $topicID)->TopicID));
+    $optionResult = $optionQuery->fetchAll(PDO::FETCH_OBJ);
+    return $optionResult;
+}
+
+/* SubFact */
 
 
 /* MCQ */

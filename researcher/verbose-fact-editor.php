@@ -12,18 +12,18 @@ try {
         if (isset($_POST['update'])) {
             $update = $_POST['update'];
             if ($update == 1) {
-                $mcqID = $_POST['mcqID'];
-                $content = $_POST['content'];
-                $explanation = $_POST['explanation'];
-                createVerboseFact($conn, $mcqID, $content, $explanation);
+                $topicID = $_POST['topicID'];
+                $subTitle = $_POST['subTitle'];
+                $subContent = $_POST['subContent'];
+                createSubFact($conn, $topicID, $subTitle, $subContent);
             } else if ($update == 0) {
-                $verboseSubFactID = $_POST['optionID'];
-                $content = $_POST['content'];
-                $explanation = $_POST['explanation'];
-                updateVerboseFact($conn, $verboseSubFactID, $content, $explanation);
+                $verboseSubFactID = $_POST['subFactID'];
+                $subTitle = $_POST['subTitle'];
+                $subContent = $_POST['subContent'];
+                updateSubFact($conn, $verboseSubFactID, $subTitle, $subContent);
             } else if ($update == -1) {
-                $verboseSubFactID = $_POST['optionID'];
-                deleteVerboseFact($conn, $verboseSubFactID);
+                $verboseSubFactID = $_POST['subFactID'];
+                deleteSubFact($conn, $verboseSubFactID);
             }
         }
     }
@@ -169,18 +169,17 @@ db_close($conn);
 <!-- Modal -->
 <div class="modal fade" id="dialog" role="dialog">
     <div class="modal-dialog">
-        <!-- Modal content-->
-        <div class="modal-content">
+        <!-- Modal subTitle-->
+        <div class="modal-subTitle">
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal">&times;</button>
                 <h4 class="modal-title" id="dialogTitle">Edit VerboseFact</h4>
             </div>
             <div class="modal-body">
                 <form id="submission" method="post" action="<?php echo $phpSelf; ?>">
-                    <!--if 1, insert; else if -1 delete;-->
                     <input type=hidden name="update" id="update" value="1" required>
-                    <label for="VerboseFactID" style="display:none">VerboseFactID</label>
-                    <input type="text" class="form-control dialoginput" id="VerboseFactID" name="optionID"
+                    <label for="subFactID" style="display:none">subFactID</label>
+                    <input type="text" class="form-control dialoginput" id="subFactID" name="subFactID"
                            style="display:none">
                     <label for="subTitle">SubTitle</label>
                     <input type="text" class="form-control dialoginput" id="subTitle" name="subTitle"
@@ -190,8 +189,8 @@ db_close($conn);
                     <input type="text" class="form-control dialoginput" id="subContent" name="subContent"
                            placeholder="Input SubContent" required>
                     <br>
-                    <label for="MCQID" style="display:none">TopicID</label>
-                    <input type="text" class="form-control dialoginput" id="MCQID" name="mcqID" style="display:none"
+                    <label for="topicID" style="display:none">topicID</label>
+                    <input type="text" class="form-control dialoginput" id="topicID" name="topicID" style="display:none"
                            value="<?php echo $topicID; ?>" required>
                 </form>
             </div>
