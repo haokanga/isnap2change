@@ -98,8 +98,8 @@ CREATE TABLE IF NOT EXISTS `Verbose_Fact`(
     Title TEXT,
     Content TEXT,
     TopicID MEDIUMINT NOT NULL,
-    CONSTRAINT SubFact_VerboseFactID_PK PRIMARY KEY (VerboseFactID),
-    CONSTRAINT SubFact_Topic_FK FOREIGN KEY (TopicID)
+    CONSTRAINT Verbose_Fact_VerboseFactID_PK PRIMARY KEY (VerboseFactID),
+    CONSTRAINT Verbose_Fact_Topic_FK FOREIGN KEY (TopicID)
         REFERENCES Topic (TopicID)
         ON DELETE CASCADE ON UPDATE CASCADE
 )  ENGINE=INNODB;

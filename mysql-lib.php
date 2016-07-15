@@ -611,14 +611,38 @@ function deleteVerboseFact(PDO $conn, $verboseFactID)
     $updateSql->execute(array($verboseFactID));
 }
 
-function getVerboseFact(PDO $conn, $verboseFactID)
+function getVerboseFactsByTopic(PDO $conn, $topicID)
 {
-    return getRecords($conn, $verboseFactID, "Verbose_Fact");
+    $factSql = "SELECT * FROM Topic 
+                LEFT JOIN Verbose_Fact 
+                USING (TopicID) WHERE TopicID = ? ";
+    $factQuery = $conn->prepare($factSql);
+    $factQuery->execute(array($topicID));
+    $factResult = $factQuery->fetchAll(PDO::FETCH_OBJ);
+    return $factResult;
 }
+
+function getVerboseFactNumByTopic(PDO $conn, $topicID)
+{
+    $factSql = "SELECT COUNT(*) AS Count FROM Topic 
+                NATURAL JOIN Verbose_Fact 
+                WHERE TopicID = ? ";
+    $factQuery = $conn->prepare($factSql);
+    $factQuery->execute(array($topicID));
+    return $factQuery->fetchColumn();
+}
+
 
 function getVerboseFacts(PDO $conn)
 {
-    return getRecords($conn, "Verbose_Fact", array("Topic"));
+    //get verbose fact for all the topics (TOPIC.Introduction excluded)
+    $factSql = "SELECT * FROM Topic 
+                LEFT JOIN Verbose_Fact 
+                USING (TopicID) WHERE TopicName != 'Introduction'";
+    $factQuery = $conn->prepare($factSql);
+    $factQuery->execute();
+    $factResult = $factQuery->fetchAll(PDO::FETCH_OBJ);
+    return $factResult;
 }
 
 

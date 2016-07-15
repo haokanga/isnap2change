@@ -35,7 +35,7 @@ try {
     if (isset($_GET['topicID'])) {
         $topicID = $_GET['topicID'];
         $topicName = getTopic($conn, $topicID)->TopicName;
-        $verboseFactResult = getVerboseFact($conn, $topicID);
+        $verboseFactResult = getVerboseFactsByTopic($conn, $topicID);
         $phpSelf = $pageName . '.php?topicID=' . $topicID;
     }
 } catch (Exception $e) {
@@ -89,12 +89,12 @@ db_close($conn);
                             <br>
                             <label for="verboseFacts">Verbose Facts</label>
                             <input type="text" class="form-control" id="verboseFacts" name="verboseFacts"
-                                   value="<?php echo count($verboseFactResult); ?>" disabled>
+                                   value="<?php echo getVerboseFactNumByTopic($conn, $topicID); ?>" disabled>
                             <br>
                         </form>
                         <!--No Verbose Fact Reminder-->
-                        <div class="alert alert-danger" id="noCorrectChoiceReminder">
-                            <p><strong>Reminder</strong> : You have not You have not added any verbose fact for this
+                        <div class="alert alert-danger" id="noVerboseFactReminder">
+                            <p><strong>Reminder</strong> : You have not added any verbose fact for this
                                 topic!
                         </div>
                     </div>
@@ -168,8 +168,8 @@ db_close($conn);
 <!-- Modal -->
 <div class="modal fade" id="dialog" role="dialog">
     <div class="modal-dialog">
-        <!-- Modal title-->
-        <div class="modal-title">
+        <!-- Modal content-->
+        <div class="modal-content">
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal">&times;</button>
                 <h4 class="modal-title" id="dialogTitle">Edit VerboseFact</h4>
@@ -244,17 +244,17 @@ db_close($conn);
                 {"bSearchable": false, "aTargets": [0]}
             ]
         });
-        showNoCorrectChoiceReminder();
-        $("#CorrectChoice").change(function () {
-            showNoCorrectChoiceReminder();
+        showNoVerboseFactReminder();
+        $("#verboseFacts").change(function () {
+            showNoVerboseFactReminder();
         });
     });
 
-    function showNoCorrectChoiceReminder() {
-        if ($('#CorrectChoice').val() == '') {
-            $('#noCorrectChoiceReminder').show();
+    function showNoVerboseFactReminder() {
+        if ($('#verboseFacts').val() == 0) {
+            $('#noVerboseFactReminder').show();
         } else {
-            $('#noCorrectChoiceReminder').hide();
+            $('#noVerboseFactReminder').hide();
         }
     }
 
@@ -263,3 +263,4 @@ db_close($conn);
 </body>
 
 </html>
+

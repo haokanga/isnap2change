@@ -4,7 +4,7 @@ require_once("../mysql-lib.php");
 require_once("../debug.php");
 require_once("researcher-validation.php");
 $pageName = "verbose-fact";
-$columnName = array('FactID', 'TopicName', 'SubTitle', 'SubContent', 'Edit');
+$columnName = array('FactID', 'TopicName', 'Title', 'Content', 'Edit');
 
 try {
     $conn = db_connect();
@@ -62,7 +62,7 @@ db_close($conn);
                 <!-- Options -->
                 <div class="panel panel-default">
                     <div class="panel-heading">
-                        Verbose Fact and SubTitles
+                        Verbose Information Table
                     </div>
                     <!-- /.panel-heading -->
                     <div class="panel-body">
