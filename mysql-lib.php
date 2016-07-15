@@ -32,15 +32,6 @@ function db_connect()
     $username = "root";
     $password = ".kHdGCD2Un%P";
 
-    // read password file in server if exists
-    // every OS understands the forward slash / as a valid directory separator (including windows).
-    $file = __DIR__ . "/pwd";
-    if (file_exists($file)) {
-        $f = fopen($file, 'r');
-        $password = fread($f,filesize($file));
-        fclose($f);
-    }
-
     $conn = new PDO("mysql:host=$serverName; dbname=isnap2changedb; charset=utf8", $username, $password);
     // set the PDO error mode to exception
     $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
