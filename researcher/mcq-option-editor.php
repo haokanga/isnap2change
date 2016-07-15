@@ -161,6 +161,8 @@ db_close($conn);
                                                           aria-hidden="true"></span>
                                                     <span class="pull-right" aria-hidden="true">&nbsp;</span>
                                                     <span class="glyphicon glyphicon-edit pull-right"
+                                                          data-toggle="modal"
+                                                          data-target="#dialog"
                                                           aria-hidden="true"></span>
                                                 <?php } ?>
                                             </td>

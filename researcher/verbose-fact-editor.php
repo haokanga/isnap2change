@@ -134,6 +134,8 @@ db_close($conn);
                                                           aria-hidden="true"></span>
                                                     <span class="pull-right" aria-hidden="true">&nbsp;</span>
                                                     <span class="glyphicon glyphicon-edit pull-right"
+                                                          data-toggle="modal"
+                                                          data-target="#dialog"
                                                           aria-hidden="true"></span>
                                                 <?php } ?>
                                             </td>
@@ -180,17 +182,17 @@ db_close($conn);
                     <label for="VerboseFactID" style="display:none">VerboseFactID</label>
                     <input type="text" class="form-control dialoginput" id="VerboseFactID" name="optionID"
                            style="display:none">
-                    <label for="Content">Content</label>
-                    <input type="text" class="form-control dialoginput" id="Content" name="content"
-                           placeholder="Input Content" required>
+                    <label for="subTitle">SubTitle</label>
+                    <input type="text" class="form-control dialoginput" id="subTitle" name="subTitle"
+                           placeholder="Input SubTitle" required>
                     <br>
-                    <label for="Explanation">Explanation</label>
-                    <input type="text" class="form-control dialoginput" id="Explanation" name="explanation"
-                           placeholder="Input Explanation" required>
+                    <label for="subContent">SubContent</label>
+                    <input type="text" class="form-control dialoginput" id="subContent" name="subContent"
+                           placeholder="Input SubContent" required>
                     <br>
-                    <label for="MCQID" style="display:none">MCQID</label>
+                    <label for="MCQID" style="display:none">TopicID</label>
                     <input type="text" class="form-control dialoginput" id="MCQID" name="mcqID" style="display:none"
-                           value="<?php echo $mcqQuesResult->MCQID; ?>" required>
+                           value="<?php echo $topicID; ?>" required>
                 </form>
             </div>
             <div class="modal-footer">
