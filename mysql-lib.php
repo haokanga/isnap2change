@@ -385,6 +385,8 @@ function getStuWeekRecord(PDO $conn, $studentID, $week)
 /* Quiz */
 function createQuiz(PDO $conn, $topicID, $quizType, $week)
 {
+    if ($quizType == "Video" || $quizType == "Image")
+        $quizType = 'SAQ';
     $updateSql = "INSERT INTO Quiz(Week, QuizType, TopicID)
              VALUES (?,?,?)";
     $updateSql = $conn->prepare($updateSql);
@@ -505,7 +507,7 @@ function getQuizzesByWeek(PDO $conn, $week)
 function getQuizPoints(PDO $conn, $quizID)
 {
     $pointsBySection = array('MCQ', 'Matching', 'Poster', 'Misc');
-    $pointsByQuestion = array('SAQ');
+    $pointsByQuestion = array('SAQ', 'Video', 'Image');
     $points = 0;
 
     $quizTypeSql = "SELECT COUNT(*) FROM Quiz WHERE QuizID = ?";
@@ -946,6 +948,11 @@ function getVideoQuizzes(PDO $conn)
     return getSAQLikeQuizzes($conn, "Excluded = " . EXCLUDED_VIDEO);
 }
 
+function getImageQuizzes(PDO $conn)
+{
+    return getSAQLikeQuizzes($conn, "Excluded = " . EXCLUDED_IMAGE);
+}
+
 /* SAQ */
 
 /* Matching */
@@ -1100,13 +1107,13 @@ function getMaxMatchingOptionNum(PDO $conn, $quizID)
 function createLearningMaterial(PDO $conn, $quizID, $excluded)
 {
     switch ($excluded) {
-        case EMPTY_LEARNING_MATERIAL:
+        case EXCLUDED_TRUE:
             $content = EMPTY_LEARNING_MATERIAL;
             break;
-        case EMPTY_VIDEO:
+        case EXCLUDED_VIDEO:
             $content = EMPTY_VIDEO;
             break;
-        case EMPTY_IMAGE:
+        case EXCLUDED_IMAGE:
             $content = EMPTY_IMAGE;
             break;
         default:
