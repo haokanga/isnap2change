@@ -1,11 +1,12 @@
 <?php
 
-$userAdminPageList = array('School', 'Class', 'Student');
-$userAdminIconList = array('mortar-board', 'users', 'child');
-$contentAdminPageList = array('Week', 'Quiz', 'Snap Fact', 'Verbose Fact', 'MCQ', 'SAQ', 'Matching', 'Poster', 'Misc');
-$contentAdminIconList = array('calendar', 'book', 'lightbulb-o', 'folder-open', 'check', 'pencil', 'th-list', 'exclamation-triangle', 'exclamation-triangle');
-$gradingPageList = array('SAQ-Grading', 'Poster-Grading');
-$gradingIconList = array('check', 'exclamation-triangle');
+$userAdminPageArr = array('School', 'Class', 'Student');
+$userAdminIconArr = array('mortar-board', 'users', 'child');
+$contentAdminPageArr = array('Week', 'Quiz', 'Snap Fact', 'Verbose Fact', 'MCQ', 'SAQ', 'Matching', 'Poster', 'Video', 'Misc');
+$quizTypeArr = array('Matching', 'Poster', 'Media', 'Misc');
+$contentAdminIconArr = array('calendar', 'book', 'lightbulb-o', 'folder-open', 'check', 'pencil', 'th-list', 'exclamation-triangle', 'video-camera', 'exclamation-triangle');
+$gradingPageArr = array('SAQ-Grading', 'Poster-Grading');
+$gradingIconArr = array('check', 'exclamation-triangle');
 
 ?>
 
@@ -242,10 +243,10 @@ $gradingIconList = array('check', 'exclamation-triangle');
                             class="fa fa-fw fa-caret-down"></i></a>
                     <ul id="schoolclass" class="collapse in nav nav-second-level" aria-expanded="true">
 
-                        <?php for ($i = 0; $i < count($userAdminPageList); $i++) { ?>
+                        <?php for ($i = 0; $i < count($userAdminPageArr); $i++) { ?>
                             <li>
-                                <a href="<?php echo strtolower($userAdminPageList[$i]); ?>.php"><i
-                                        class="fa fa-fw fa-<?php echo $userAdminIconList[$i]; ?>"></i>&nbsp;<?php echo $userAdminPageList[$i]; ?>
+                                <a href="<?php echo strtolower($userAdminPageArr[$i]); ?>.php"><i
+                                        class="fa fa-fw fa-<?php echo $userAdminIconArr[$i]; ?>"></i>&nbsp;<?php echo $userAdminPageArr[$i]; ?>
                                     Overview</a>
                             </li>
                         <?php } ?>
@@ -257,11 +258,13 @@ $gradingIconList = array('check', 'exclamation-triangle');
                        aria-expanded="true"><i class="fa fa-fw fa-wrench"></i> Content Administration <i
                             class="fa fa-fw fa-caret-down"></i></a>
                     <ul id="contenteditor" class="collapse in nav nav-second-level" aria-expanded="true">
-                        <?php for ($i = 0; $i < count($contentAdminPageList); $i++) { ?>
+                        <?php for ($i = 0; $i < count($contentAdminPageArr); $i++) { ?>
                             <li>
-                                <a href="<?php echo str_replace(" ", "-", strtolower($contentAdminPageList[$i])); ?>.php"><i
-                                        class="fa fa-fw fa-<?php echo $contentAdminIconList[$i]; ?>"></i>&nbsp;<?php echo $contentAdminPageList[$i]; ?>
-                                    Overview</a>
+                                <a href="<?php echo str_replace(" ", "-", strtolower($contentAdminPageArr[$i])); ?>.php">
+                                    <!--overview icon-->
+                                    <i class="fa fa-fw fa-<?php echo $contentAdminIconArr[$i]; ?>"></i>
+                                    <!--overview name-->
+                                    &nbsp;<?php echo $contentAdminPageArr[$i]; if(in_array( $contentAdminPageArr[$i], $quizTypeArr) ) echo " Quiz"?> Overview</a>
                             </li>
                         <?php } ?>
                     </ul>
@@ -272,10 +275,10 @@ $gradingIconList = array('check', 'exclamation-triangle');
                        aria-expanded="true"><i class="fa fa-fw fa-comment"></i> Grading & Feedback <i
                             class="fa fa-fw fa-caret-down"></i></a>
                     <ul id="contenteditor" class="collapse in nav nav-second-level" aria-expanded="true">
-                        <?php for ($i = 0; $i < count($gradingPageList); $i++) { ?>
+                        <?php for ($i = 0; $i < count($gradingPageArr); $i++) { ?>
                             <li>
-                                <a href="<?php echo strtolower($gradingPageList[$i]); ?>.php"><i
-                                        class="fa fa-fw fa-<?php echo $gradingIconList[$i]; ?>"></i>&nbsp;<?php echo $gradingPageList[$i]; ?>
+                                <a href="<?php echo strtolower($gradingPageArr[$i]); ?>.php"><i
+                                        class="fa fa-fw fa-<?php echo $gradingIconArr[$i]; ?>"></i>&nbsp;<?php echo $gradingPageArr[$i]; ?>
                                 </a>
                             </li>
                         <?php } ?>

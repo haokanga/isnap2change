@@ -441,6 +441,7 @@ function getQuizNum(PDO $conn)
 
 function getQuizType(PDO $conn, $quizID)
 {
+    // if quiz non-exist
     $quizTypeSql = "SELECT COUNT(*)
                         FROM Quiz
                         WHERE QuizID = ?";
@@ -450,15 +451,19 @@ function getQuizType(PDO $conn, $quizID)
         throw new Exception("Failed to get quiz type");
     }
 
-    $quizTypeSql = "SELECT QuizType 
-                        FROM   Quiz
+    $quizTypeSql = "SELECT * 
+                        FROM   Quiz LEFT JOIN Learning_Material USING (QuizID)
                         WHERE  QuizID = ?";
 
     $quizTypeQuery = $conn->prepare($quizTypeSql);
     $quizTypeQuery->execute(array($quizID));
     $quizTypeQueryRes = $quizTypeQuery->fetch(PDO::FETCH_OBJ);
 
-    if ($quizTypeQueryRes->QuizType == "Misc") {
+    //deal with video quiz
+    if ($quizTypeQueryRes->Excluded == -1) {
+        return "Video";
+    } // deal with misc quiz
+    else if ($quizTypeQueryRes->QuizType == "Misc") {
         return getMiscQuizType($conn, $quizID);
     } else {
         return $quizTypeQueryRes->QuizType;
@@ -837,7 +842,7 @@ function getMaxOptionNum(PDO $conn, $quizID)
 /* Option */
 
 /* SAQ */
-function createSAQSection(PDO $conn, $quizID)
+function createSAQLikeSection(PDO $conn, $quizID)
 {
     $updateSql = "INSERT INTO SAQ_Section(QuizID)
                     VALUES (?)";
@@ -845,7 +850,7 @@ function createSAQSection(PDO $conn, $quizID)
     $updateSql->execute(array($quizID));
 }
 
-function createSAQQuestion(PDO $conn, $quizID, $points, $question)
+function createSAQLikeQuestion(PDO $conn, $quizID, $points, $question)
 {
     $updateSql = "INSERT INTO SAQ_Question(Question, Points, QuizID)
                     VALUES (?,?,?)";
@@ -854,7 +859,7 @@ function createSAQQuestion(PDO $conn, $quizID, $points, $question)
     return $conn->lastInsertId();
 }
 
-function updateSAQQuestion(PDO $conn, $saqID, $points, $question)
+function updateSAQLikeQuestion(PDO $conn, $saqID, $points, $question)
 {
     $updateSql = "UPDATE SAQ_Question
                     SET Question = ?, Points = ?
@@ -863,7 +868,7 @@ function updateSAQQuestion(PDO $conn, $saqID, $points, $question)
     $updateSql->execute(array(htmlspecialchars($question), $points, $saqID));
 }
 
-function deleteSAQQuestion(PDO $conn, $saqID)
+function deleteSAQLikeQuestion(PDO $conn, $saqID)
 {
     $updateSql = "DELETE FROM SAQ_Question WHERE SAQID = ?";
     $updateSql = $conn->prepare($updateSql);
@@ -879,7 +884,7 @@ function getSAQQuestion(PDO $conn, $saqID)
     return $saqQuesResult;
 }
 
-function getSAQQuestions(PDO $conn, $quizID)
+function getSAQLikeQuestions(PDO $conn, $quizID)
 {
     $saqQuesSql = "SELECT *
                     FROM SAQ_Section NATURAL JOIN SAQ_Question
@@ -901,14 +906,24 @@ function getSAQQuiz(PDO $conn, $quizID)
     return $quizResult;
 }
 
-function getSAQQuizzes(PDO $conn)
+function getSAQLikeQuizzes(PDO $conn, $typeIndicator)
 {
     $quizSql = "SELECT QuizID, TopicID, Week, QuizType, TopicName, SAQID, SUM(Points) AS Points, COUNT(SAQID) AS Questions
-                   FROM Quiz NATURAL JOIN Topic NATURAL JOIN SAQ_Section LEFT JOIN SAQ_Question USING (QuizID) WHERE QuizType = 'SAQ' GROUP BY QuizID";
+                   FROM Quiz NATURAL JOIN Topic NATURAL JOIN Learning_Material NATURAL JOIN SAQ_Section LEFT JOIN SAQ_Question USING (QuizID) WHERE QuizType = 'SAQ' AND $typeIndicator GROUP BY QuizID";
     $quizQuery = $conn->prepare($quizSql);
     $quizQuery->execute();
     $quizResult = $quizQuery->fetchAll(PDO::FETCH_OBJ);
     return $quizResult;
+}
+
+function getSAQQuizzes(PDO $conn)
+{
+    return getSAQLikeQuizzes($conn, "Excluded != -1");
+}
+
+function getVideoQuizzes(PDO $conn)
+{
+    return getSAQLikeQuizzes($conn, "Excluded = -1");
 }
 
 /* SAQ */
@@ -1069,10 +1084,28 @@ function createEmptyLearningMaterial(PDO $conn, $quizID)
     $updateSql->execute(array($content, $quizID, 1));
 }
 
+function createVideoLearningMaterial(PDO $conn, $quizID)
+{
+    $content = '<p>Video for this quiz has not been added.</p>';
+    $updateSql = "INSERT INTO Learning_Material(Content,QuizID, Excluded) VALUES (?,?,?)";
+    $updateSql = $conn->prepare($updateSql);
+    $updateSql->execute(array($content, $quizID, -1));
+}
+
 function updateLearningMaterial(PDO $conn, $quizID, $content)
 {
+    // it is video quiz, retain excluded flag
+    if (getLearningMaterial($conn, $quizID)->Excluded == -1) {
+        $excluded = -1;
+    }
+    // the learning material is updated and should not be excluded anymore
+    else {
+        $excluded = 0;
+    }
+
+
     $updateSql = "UPDATE Learning_Material 
-            SET Content = ?
+            SET Content = ? AND Excluded = $excluded
             WHERE QuizID = ?";
     $updateSql = $conn->prepare($updateSql);
     $updateSql->execute(array(htmlspecialchars($content), $quizID));
@@ -1367,7 +1400,7 @@ function deleteSAQSubmission(PDO $conn, $quizID, $studentID, $pageName)
         $conn->beginTransaction();
 
         deleteQuizRecord($conn, $quizID, $studentID);
-        $saqResult = getSAQQuestions($conn, $quizID);
+        $saqResult = getSAQLikeQuestions($conn, $quizID);
         for ($saqIndex = 0; $saqIndex < count($saqResult); $saqIndex++) {
             $saqID = $saqResult[$saqIndex]->SAQID;
             deleteSAQQuestionRecord($conn, $saqID, $studentID);
@@ -1602,7 +1635,7 @@ function generateRandomSAQSubmissions(PDO $conn)
     $studentResult = getStudents($conn);
     for ($quizIndex = 0; $quizIndex < count($quizResult); $quizIndex++) {
         $quizID = $quizResult[$quizIndex]->QuizID;
-        $saqResult = getSAQQuestions($conn, $quizID);
+        $saqResult = getSAQLikeQuestions($conn, $quizID);
         for ($studentIndex = 0; $studentIndex < count($studentResult); $studentIndex++) {
             $studentID = $studentResult[$studentIndex]->StudentID;
             if ($studentID >= 3) {

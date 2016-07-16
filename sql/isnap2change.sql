@@ -137,7 +137,7 @@ CREATE TABLE IF NOT EXISTS `Quiz_Record` (
 CREATE TABLE IF NOT EXISTS `Learning_Material` (
     QuizID MEDIUMINT,
     Content LONGTEXT,
-    Excluded BOOLEAN DEFAULT 0,
+    Excluded MEDIUMINT DEFAULT 0,
     CONSTRAINT Learning_Material_QuizID_PK PRIMARY KEY (QuizID),
     CONSTRAINT Learning_Material_QuizID_FK FOREIGN KEY (QuizID)
         REFERENCES Quiz (QuizID)
@@ -201,6 +201,8 @@ CREATE TABLE IF NOT EXISTS `MCQ_Question_Record` (
 
 CREATE TABLE IF NOT EXISTS `SAQ_Section` (
     QuizID MEDIUMINT,
+    VideoTitle TEXT,    
+    VideoSource TEXT,
     CONSTRAINT SAQ_Section_QuizID_PK PRIMARY KEY (QuizID),
     CONSTRAINT SAQ_Section_QuizID_FK FOREIGN KEY (QuizID)
         REFERENCES Quiz (QuizID)
@@ -531,10 +533,10 @@ INSERT IGNORE INTO Quiz_Record(QuizID,StudentID) VALUES(2,4);
 INSERT IGNORE INTO Quiz_Record(QuizID,StudentID) VALUES(2,5);
 INSERT IGNORE INTO Quiz_Record(QuizID,StudentID) VALUES(2,6);
 
-# [Formal] insert SAQ section with questions
+# [Sample] insert SAQ section with questions
 INSERT IGNORE INTO Quiz(Week,QuizType,TopicID) VALUES(1,'SAQ',1);
 SET @QUIZ_LAST_INSERT_ID = LAST_INSERT_ID();
-INSERT IGNORE INTO SAQ_Section(QuizID) VALUES(@QUIZ_LAST_INSERT_ID);
+INSERT IGNORE INTO SAQ_Section(QuizID, VideoTitle, VideoSource) VALUES(@QUIZ_LAST_INSERT_ID, 'It is a trap!', 'The Truth Site');
 INSERT IGNORE INTO SAQ_Question(Question, Points, QuizID) VALUES('Based on the video, list 3 problems or challenges that these teenagers face as a result of their smoking?', 10, @QUIZ_LAST_INSERT_ID);
 INSERT IGNORE INTO SAQ_Question(Question, Points, QuizID) VALUES('List 1 strategy that you could use to help convince a peer to stop smoking?', 10, @QUIZ_LAST_INSERT_ID);
 INSERT IGNORE INTO SAQ_Question(Question, Points, QuizID) VALUES('List 3 the different ways that you have seen anti-smoking messages presented to the public. With each suggest if you think they have been ‘effective’ or ‘not effective’. Eg. Poster-Effective.', 20, @QUIZ_LAST_INSERT_ID);
@@ -620,23 +622,29 @@ INSERT IGNORE INTO `Matching_Option`(Content, MatchingID) VALUES('Rice', @MATCHI
 
 
 
-# [Formal] Learning_Material
+# [Example] Learning_Material
 INSERT IGNORE INTO Learning_Material(Content,QuizID) VALUES('<p>Eating a balanced diet is vital for your health and wellbeing. The food we eat is responsible for providing us with the energy to do all the tasks of daily life. For optimum performance and growth a balance of protein, essential fats, vitamins and minerals are required. We need a wide variety of different foods to provide the right amounts of nutrients for good health. The different types of food and how much of it you should be aiming to eat is demonstrated on the pyramid below. (my own words)</p>
 <p><img style="display: block; margin-left: auto; margin-right: auto;" src="https://cmudream.files.wordpress.com/2016/05/0.jpg" alt="" width="632" height="884" /></p>
 <p>There are three main layers of the food pyramid. The bottom layer is the most important one for your daily intake of food. It contains vegetables, fruits, grains and legumes. You should be having most of your daily food from this layer. These foods are all derived or grow on plants and contain important nutrients such as vitamins, minerals and antioxidants. They are also responsible for being the main contributor of carbohydrates and fibre to our diet.<br />The middle layer is comprised of dairy based products such as milk, yoghurt, cheese. These are essential to providing our bodies with calcium and protein and important vitamins and minerals.<br />They layer also contains lean meat, poultry, fish, eggs, nuts, seeds, legumes. These foods are our main source of protein and are also responsible for providing other nutrients to us including iodine, iron, zinc, B12 vitamins and healthy fats.<br />The top layer, which is the smallest layer, is the layer you should me eating the least off. This layer is made up of food which has unsaturated fats such as sugar, butter, margarine and oils; small amounts of these unsaturated fats are needed for healthy brain and hear function.<br />(my own words)<br />Source: The Healthy Living Pyramid. Nutrition Australia. [Accessed 28/04/2016 http://www.nutritionaustralia.org/national/resource/healthy-living-pyramid]</p>',1);
-INSERT IGNORE INTO Learning_Material(Content,QuizID, Excluded) VALUES('https://www.youtube.com/watch?v=1ey0EDVjyeY&index=89&list=PLIGEVr8ox1oGsi-XcwSjudMi_uCPxGzSs',2,1);
 INSERT IGNORE INTO Learning_Material(Content,QuizID) VALUES('
-<p>Learning materials for week 3.</p>',3);
+<p>Learning materials for week 1...</p>',2);
 INSERT IGNORE INTO Learning_Material(Content,QuizID) VALUES('
 <p>Learning materials for this quiz has not been added.</p>',4);
-INSERT IGNORE INTO Learning_Material(Content,QuizID) VALUES('
-<p>Learning materials for this quiz has not been added.</p>',5);
+
 INSERT IGNORE INTO Learning_Material(Content,QuizID) VALUES('
 <p>Learning materials for this quiz has not been added.</p>',6);
 INSERT IGNORE INTO Learning_Material(Content,QuizID) VALUES('
 <p>Nutrition: All over the world people suffer from illnesses that are caused by eating the wrong food or not having enough to eat. In developing countries deficiency diseases arise when people do not get the right nutrients. Conversely, overconsumption of foods rich in fat and cholesterols can lead to heart diseases, obesity, strokes and cancer. (Own words)</p>',7);
 INSERT IGNORE INTO Learning_Material(Content,QuizID) VALUES('
 <p>Learning materials for this quiz has not been added.</p>',8);
+
+# [Example] Learning_Material (Excluded)
+INSERT IGNORE INTO Learning_Material(Content,QuizID, Excluded) VALUES('
+<p>Learning materials for this quiz has not been added.</p>',5,1);
+
+# [Example] Learning_Material (for Video Quiz)
+
+INSERT IGNORE INTO Learning_Material(Content,QuizID, Excluded) VALUES('https://www.youtube.com/watch?v=1ey0EDVjyeY&index=89&list=PLIGEVr8ox1oGsi-XcwSjudMi_uCPxGzSs',3,-1);
 
 # [Formal] Games
 INSERT IGNORE INTO Game(Description,Levels) VALUES('Fruit Ninja',5);

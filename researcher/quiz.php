@@ -10,7 +10,7 @@ require_once("researcher-validation.php");
 $pageName = "quiz";
 $columnName = array('QuizID', 'Week', 'QuizType', 'TopicName', 'Points');
 // list all editable quiz types    
-$editableQuizTypeArr = array('MCQ', 'SAQ', 'Matching', 'Poster');
+$editableQuizTypeArr = array('MCQ', 'SAQ', 'Matching', 'Poster', 'Video');
 
 try {
     $conn = db_connect();
@@ -38,7 +38,7 @@ try {
                             createMCQSection($conn, $quizID, $points, $questionnaires);
                             break;
                         case "SAQ":
-                            createSAQSection($conn, $quizID);
+                            createSAQLikeSection($conn, $quizID);
                             break;
                         case "Matching":
                             createMatchingSection($conn, $quizID, $description, $points);

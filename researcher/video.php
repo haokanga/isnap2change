@@ -1,13 +1,11 @@
 <?php
-
 session_start();
 require_once("../mysql-lib.php");
 require_once("../debug.php");
 require_once("researcher-validation.php");
-$pageName = "quiz";
-$columnName = array('QuizID', 'Week', 'QuizType', 'TopicName', 'Points');
-// list all editable quiz types    
-$editableQuizTypeArr = array('MCQ', 'SAQ', 'Matching', 'Poster');
+$pageName = "video";
+$pageNameForView = "Video Quiz";
+$columnName = array('QuizID', 'Week', 'TopicName', 'Points', 'Questions');
 
 try {
     $conn = db_connect();
@@ -17,37 +15,15 @@ try {
             if ($update == 1) {
                 try {
                     $week = $_POST['week'];
-                    $quizType = $_POST['quizType'];
+                    $quizType = 'SAQ';
                     $topicName = $_POST['topicName'];
-
                     $conn->beginTransaction();
 
                     //insert and get topicID
                     $topicID = getTopicByName($conn, $topicName)->TopicID;
                     $quizID = createQuiz($conn, $topicID, $quizType, $week);
-
-                    $points = 0;
-                    $questionnaires = 0;
-                    $description = '';
-                    $question = '';
-                    switch ($quizType) {
-                        case "MCQ":
-                            createMCQSection($conn, $quizID, $points, $questionnaires);
-                            break;
-                        case "SAQ":
-                            createSAQLikeSection($conn, $quizID);
-                            break;
-                        case "Matching":
-                            createMatchingSection($conn, $quizID, $description, $points);
-                            break;
-                        case "Poster":
-                            createPosterSection($conn, $quizID, $question, $points);
-                            break;
-                        default:
-                            throw new Exception("Unexpected Quiz Type. QuizID: " . $quizID);
-                            break;
-                    }
-                    createEmptyLearningMaterial($conn, $quizID);
+                    createSAQLikeSection($conn, $quizID);
+                    createVideoLearningMaterial($conn, $quizID);
 
                     $conn->commit();
                 } catch (Exception $e) {
@@ -64,18 +40,12 @@ try {
     debug_err($pageName, $e);
 }
 
-
 try {
-    if (isset($_GET['week'])) {
-        $quizResult = getQuizzesByWeek($conn, $_GET['week']);
-    } else {
-        $quizResult = getQuizzes($conn);
-    }
+    $quizResult = getVideoQuizzes($conn);
     $topicResult = getTopics($conn);
 } catch (Exception $e) {
     debug_err($pageName, $e);
 }
-
 db_close($conn);
 
 ?>
@@ -88,20 +58,13 @@ db_close($conn);
 <body>
 
 <div id="wrapper">
+    <!-- Navigation Layout-->
     <?php require_once('navigation.php'); ?>
+
     <div id="page-wrapper">
         <div class="row">
             <div class="col-lg-12">
-                <h1 class="page-header">Misc Quiz Overview
-                    <?php if (isset($_GET['week'])) { ?>
-                        <div class="alert alert-info alert-dismissable" style="display: inline-block;">
-                            <button type="button" class="close" data-dismiss="alert" aria-hidden="true"
-                                    onclick="location.href='quiz.php';">×
-                            </button>
-                            <i class="fa fa-info-circle"></i> <?php echo 'Week ' . $_GET['week']; ?>
-                        </div>
-                    <?php } ?>
-                </h1>
+                <h1 class="page-header"><?php echo $pageNameForView; ?> Overview</h1>
             </div>
             <!-- /.col-lg-12 -->
         </div>
@@ -110,9 +73,9 @@ db_close($conn);
             <div class="col-lg-12">
                 <div class="panel panel-default">
                     <div class="panel-heading">
-                        Misc Quiz Information Table <span class="glyphicon glyphicon-plus pull-right"
-                                                          data-toggle="modal"
-                                                          data-target="#dialog"></span>
+                        <?php echo $pageNameForView; ?> Information Table <span
+                            class="glyphicon glyphicon-plus pull-right"
+                            data-toggle="modal" data-target="#dialog"></span>
                     </div>
                     <!-- /.panel-heading -->
                     <div class="panel-body">
@@ -120,42 +83,37 @@ db_close($conn);
                             <table class="table table-striped table-bordered table-hover" id="datatables">
                                 <?php require_once('table-head.php'); ?>
                                 <tbody>
-                                <?php for ($i = 0; $i < count($quizResult); $i++) {
-                                    $quizID = $quizResult[$i]->QuizID;
-                                    $quizType = getQuizType($conn, $quizID);
-                                    $points = getQuizPoints($conn, $quizID);
-                                    if (!in_array($quizType, $editableQuizTypeArr)) {
-                                        ?>
-                                        <tr class="<?php if ($i % 2 == 0) {
-                                            echo "odd";
-                                        } else {
-                                            echo "even";
-                                        } ?>">
-                                            <td style="display:none"><?php echo $quizID ?></td>
-                                            <td><?php echo $quizResult[$i]->Week ?></td>
-                                            <td><?php echo $quizType ?></td>
-                                            <td><?php echo $quizResult[$i]->TopicName ?></td>
-                                            <td><?php echo $points ?>
-                                                <span class="glyphicon glyphicon-remove pull-right"
-                                                      aria-hidden="true"></span>
-                                                <span class="pull-right" aria-hidden="true">&nbsp;</span>
-                                                <span class="glyphicon glyphicon-edit pull-right"
-                                                      data-toggle="modal"
-                                                      data-target="#dialog" aria-hidden="true"></span>
-
+                                <?php for ($i = 0; $i < count($quizResult); $i++) { ?>
+                                    <tr class="<?php if ($i % 2 == 0) {
+                                        echo "odd";
+                                    } else {
+                                        echo "even";
+                                    } ?>">
+                                        <?php for ($j = 0; $j < count($columnName); $j++) { ?>
+                                            <td <?php if ($j == 0) {
+                                                echo 'style="display:none"';
+                                            } ?>>
+                                                <?php if (strlen($quizResult[$i]->$columnName[$j]) > 0) echo $quizResult[$i]->$columnName[$j]; else echo 0; ?>
+                                                <?php if ($j == count($columnName) - 1) { ?>
+                                                    <span class="glyphicon glyphicon-remove pull-right"
+                                                          aria-hidden="true"></span>
+                                                    <span class="pull-right" aria-hidden="true">&nbsp;</span>
+                                                    <a href="video-editor.php?quizID=<?php echo $quizResult[$i]->QuizID ?>">
+                                                        <span class="glyphicon glyphicon-edit pull-right"
+                                                              aria-hidden="true"></span></a>
+                                                <?php } ?>
                                             </td>
-                                        </tr>
-                                    <?php }
-                                } ?>
+                                        <?php } ?>
+                                    </tr>
+                                <?php } ?>
                                 </tbody>
                             </table>
                         </div>
                         <!-- /.table-responsive -->
                         <div class="well row">
-                            <h4>Quiz Overview Notification</h4>
+                            <h4><?php echo $pageNameForView; ?> Overview Notification</h4>
                             <div class="alert alert-info">
-                                <p>View misc quizzes by filtering or searching. You can put them to certain weeks and assign points to them.
-                                </p>
+                                <p>View quizzes by filtering or searching. You can create/update/delete any quiz.</p>
                             </div>
                             <div class="alert alert-danger">
                                 <p><strong>Warning</strong> : If you remove one quiz. All the <strong>questions and
@@ -172,8 +130,10 @@ db_close($conn);
             <!-- /.col-lg-12 -->
         </div>
         <!-- /.row -->
+
     </div>
     <!-- /#page-wrapper -->
+
 </div>
 <!-- /#wrapper -->
 <!-- Modal -->
@@ -183,30 +143,17 @@ db_close($conn);
         <div class="modal-content">
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal">&times;</button>
-                <h4 class="modal-title" id="dialogTitle"></h4>
+                <h4 class="modal-title" id="dialogTitle">Edit Quiz</h4>
             </div>
             <div class="modal-body">
-                <form id="submission" method="post"
-                      action="<?php if (isset($_GET['week'])) echo $_SERVER['PHP_SELF'] . '?week=' . $_GET['week']; else echo $_SERVER['PHP_SELF']; ?>">
+                <form id="submission" method="post" action="<?php echo $_SERVER['PHP_SELF']; ?>">
                     <!--if 1, insert; else if -1 delete;-->
                     <input type=hidden name="update" id="update" value="1" required>
                     <label for="QuizID" style="display:none">QuizID</label>
                     <input type="text" class="form-control dialoginput" id="QuizID" name="quizID" style="display:none">
                     <label for="Week">Week</label>
                     <input type="text" class="form-control dialoginput" id="Week" name="week"
-                           placeholder="Input Week Number" <?php if (isset($_GET['week'])) {
-                        $w = $_GET['week'];
-                        echo "value='" . $w . "'";
-                    } ?> required>
-                    <br>
-                    <label for='QuizType'>QuizType</label>
-                    <select class="form-control dialoginput" id="QuizType" form="submission" name="quizType" required>
-                        <option value="" disabled selected>Select Quiz Type</option>
-                        <?php for ($i = 0; $i < count($editableQuizTypeArr); $i++) { ?>
-                            <option
-                                value="<?php echo $editableQuizTypeArr[$i] ?>"><?php echo $editableQuizTypeArr[$i] ?></option>
-                        <?php } ?>
-                    </select>
+                           placeholder="Input Week Number" required>
                     <br>
                     <label for='TopicName'>TopicName</label>
                     <select class="form-control dialoginput" id="TopicName" form="submission" name="topicName" required>
@@ -226,33 +173,17 @@ db_close($conn);
         </div>
     </div>
 </div>
-<input type=hidden name="keyword" id="keyword" value="<?php if (isset($_GET['week'])) {
-    echo $_GET['week'];
-} ?>">
 <!-- SB Admin Library -->
 <?php require_once('sb-admin-lib.php'); ?>
 <!-- Page-Level Scripts -->
 <script>
     //DO NOT put them in $(document).ready() since the table has multi pages
     var dialogInputArr = $('.dialoginput');
-    $('td > .glyphicon-edit').on('click', function () {
-        $('#dialogTitle').text("Edit Misc Quiz");
-        $('#update').val(0);
-        for (i = 0; i < dialogInputArr.length; i++) {
-            dialogInputArr.eq(i).val($(this).parent().parent().children('td').eq(i).text().trim());
-        }
-    });
     $('.glyphicon-plus').on('click', function () {
-        $('#dialogTitle').text("Add Misc Quiz");
+        $('#dialogTitle').text("Add <?php echo $pageNameForView; ?>");
         $('#update').val(1);
         for (i = 0; i < dialogInputArr.length; i++) {
-            if (i != 1) {
-                dialogInputArr.eq(i).val('');
-            } else {
-                <?php if(!isset($_GET['week'])){?>
-                dialogInputArr.eq(i).val('');
-                <?php } ?>
-            }
+            dialogInputArr.eq(i).val('');
         }
     });
     $('.glyphicon-remove').on('click', function () {
@@ -279,19 +210,12 @@ db_close($conn);
     $(document).ready(function () {
         var table = $('#datatables').DataTable({
             responsive: true,
-            "initComplete": function (settings, json) {
-                $('.input-sm').eq(1).val($("#keyword").val().trim());
-            },
             "order": [[1, "asc"]],
             "pageLength": 50,
             "aoColumnDefs": [
                 {"bSearchable": false, "aTargets": [0]}
             ]
         })
-        //search keyword, exact match
-        table.search(
-            $("#keyword").val().trim(), true, false, true
-        ).draw();
     });
 </script>
 </body>

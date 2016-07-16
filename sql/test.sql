@@ -128,3 +128,9 @@ SELECT * FROM Topic
 SELECT COUNT(*)
 				 FROM Fact
 				 WHERE SnapFact = 0 AND TopicID = 3;             
+SELECT * 
+                        FROM   Quiz LEFT JOIN Learning_Material USING (QuizID);
+
+                 
+                 
+                 

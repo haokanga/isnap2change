@@ -3,8 +3,8 @@ session_start();
 require_once("../mysql-lib.php");
 require_once("../debug.php");
 require_once("researcher-validation.php");
-$pageName = "saq-editor";
-$pageNameForView = "Short Answer Quiz";
+$pageName = "video-editor";
+$pageNameForView = "Video Quiz";
 $columnName = array('SAQID', 'Question', 'Points', 'Edit');
 
 try {
