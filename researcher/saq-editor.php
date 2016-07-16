@@ -4,6 +4,7 @@ require_once("../mysql-lib.php");
 require_once("../debug.php");
 require_once("researcher-validation.php");
 $pageName = "saq-editor";
+$parentPage = 'Location: saq.php';
 $pageNameForView = "Short Answer Quiz";
 $columnName = array('SAQID', 'Question', 'Points', 'Edit');
 
@@ -18,8 +19,7 @@ try {
                     $week = $_POST['week'];
                     $topicName = $_POST['topicName'];
                     $conn->beginTransaction();
-
-                    //insert and get topicID
+                    
                     $topicID = getTopicByName($conn, $topicName)->TopicID;
                     updateQuiz($conn, $quizID, $topicID, $week);
 
@@ -31,7 +31,7 @@ try {
             } else if ($metadataUpdate == -1) {
                 $quizID = $_POST['quizID'];
                 deleteQuiz($conn, $quizID);
-                header('Location: saq.php');
+                header($parentPage);
             }
         }
         if (isset($_POST['update'])) {

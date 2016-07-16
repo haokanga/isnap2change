@@ -4,6 +4,7 @@ require_once("../mysql-lib.php");
 require_once("../debug.php");
 require_once("researcher-validation.php");
 $pageName = "mcq-editor";
+$parentPage = 'Location: mcq.php';
 $columnName = array('MCQID', 'Question', 'Option', 'Explanation', 'Edit');
 
 try {
@@ -19,8 +20,7 @@ try {
                     $points = $_POST['points'];
                     $questionnaires = $_POST['questionnaires'];
                     $conn->beginTransaction();
-
-                    //insert and get topicID
+                    
                     $topicID = getTopicByName($conn, $topicName)->TopicID;
                     updateQuiz($conn, $quizID, $topicID, $week);
                     updateMCQSection($conn, $quizID, $points, $questionnaires);
@@ -33,7 +33,7 @@ try {
             } else if ($metadataUpdate == -1) {
                 $quizID = $_POST['quizID'];
                 deleteQuiz($conn, $quizID);
-                header('Location: mcq.php');
+                header($parentPage);
             }
         }
         if (isset($_POST['update'])) {

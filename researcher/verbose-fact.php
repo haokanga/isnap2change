@@ -8,25 +8,6 @@ $columnName = array('FactID', 'TopicName', 'Title', 'Content', 'Edit');
 
 try {
     $conn = db_connect();
-    if ($_SERVER["REQUEST_METHOD"] == "POST") {
-        if (isset($_POST['update'])) {
-            $update = $_POST['update'];
-            if ($update == 1) {
-                $quizID = $_POST['quizID'];
-                $question = $_POST['question'];
-                $mcqID = createMCQQuestion($conn, $quizID, $question);
-                header('Location: mcq-option-editor.php?quizID=' . $quizID . '&mcqID=' . $mcqID);
-            } else if ($update == -1) {
-                $mcqID = $_POST['mcqID'];
-                deleteMCQQuestion($conn, $mcqID);
-            }
-        }
-    }
-} catch (Exception $e) {
-    debug_err($pageName, $e);
-}
-
-try {
     $topicResult = getTopics($conn);
     $verboseFactResult = getVerboseFacts($conn);
     $phpSelf = $pageName;
@@ -105,7 +86,7 @@ db_close($conn);
                                                         <p>
                                                             <?php echo mb_strcut($content, 0, OMIT_LEN) . "..."; ?></p>
                                                         <a href="#<?php echo $collapseTextID; ?>"
-                                                               class="btn btn-info" data-toggle="collapse">Show Full
+                                                           class="btn btn-info" data-toggle="collapse">Show Full
                                                             Paragraph</a>
                                                         <div id="<?php echo $collapseTextID; ?>" class="collapse">
                                                             <?php echo $content; ?>
@@ -136,7 +117,8 @@ db_close($conn);
                                     edit the facts in one topic by clicking the edit button.</p>
                             </div>
                             <div class="alert alert-info">
-                                <p>For long paragraphs, it will only show part of content to make this table clean, if you want to view full paragraph, you can click the buttons in the cells.</p>
+                                <p>For long paragraphs, it will only show part of content to make this table clean, if
+                                    you want to view full paragraph, you can click the buttons in the cells.</p>
                             </div>
                         </div>
                     </div>

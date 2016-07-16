@@ -22,6 +22,17 @@ misc
 
 */
 
+
+/* const */
+define("EMPTY_LEARNING_MATERIAL", "<p>Learning material for this quiz has not been added.</p>");
+define("EMPTY_VIDEO", "<p>Video for this quiz has not been added.</p>");
+define("EMPTY_IMAGE", "<p>Image for this quiz has not been added.</p>");
+define("EXCLUDED_TRUE", 1);
+define("EXCLUDED_FALSE", 0);
+define("EXCLUDED_VIDEO", -1);
+define("EXCLUDED_IMAGE", -2);
+/* const */
+
 /* db connection*/
 function db_connect()
 {
@@ -459,11 +470,11 @@ function getQuizType(PDO $conn, $quizID)
     $quizTypeQuery->execute(array($quizID));
     $quizTypeQueryRes = $quizTypeQuery->fetch(PDO::FETCH_OBJ);
 
-    //deal with video quiz
-    if ($quizTypeQueryRes->Excluded == -1) {
+    if ($quizTypeQueryRes->Excluded == EXCLUDED_VIDEO) {
         return "Video";
-    } // deal with misc quiz
-    else if ($quizTypeQueryRes->QuizType == "Misc") {
+    } else if ($quizTypeQueryRes->Excluded == EXCLUDED_IMAGE) {
+        return "Image";
+    } else if ($quizTypeQueryRes->QuizType == "Misc") {
         return getMiscQuizType($conn, $quizID);
     } else {
         return $quizTypeQueryRes->QuizType;
@@ -859,6 +870,15 @@ function createSAQLikeQuestion(PDO $conn, $quizID, $points, $question)
     return $conn->lastInsertId();
 }
 
+function updateSAQLikeSection(PDO $conn, $quizID, $mediaSource, $mediaTitle)
+{
+    $updateSql = "UPDATE SAQ_Section
+                    SET MediaTitle = ?, MediaSource = ?
+                    WHERE QuizID = ?";
+    $updateSql = $conn->prepare($updateSql);
+    $updateSql->execute(array(htmlspecialchars($mediaTitle), htmlspecialchars($mediaSource), $quizID));
+}
+
 function updateSAQLikeQuestion(PDO $conn, $saqID, $points, $question)
 {
     $updateSql = "UPDATE SAQ_Question
@@ -898,7 +918,7 @@ function getSAQLikeQuestions(PDO $conn, $quizID)
 
 function getSAQQuiz(PDO $conn, $quizID)
 {
-    $quizSql = "SELECT QuizID, TopicID, Week, QuizType, TopicName, SAQID, SUM(Points) AS Points, COUNT(SAQID) AS Questions
+    $quizSql = "SELECT *, SUM(Points) AS Points, COUNT(SAQID) AS Questions
                    FROM Quiz NATURAL JOIN Topic NATURAL JOIN SAQ_Section LEFT JOIN SAQ_Question USING (QuizID) WHERE QuizID = ? GROUP BY QuizID";
     $quizQuery = $conn->prepare($quizSql);
     $quizQuery->execute(array($quizID));
@@ -918,12 +938,12 @@ function getSAQLikeQuizzes(PDO $conn, $typeIndicator)
 
 function getSAQQuizzes(PDO $conn)
 {
-    return getSAQLikeQuizzes($conn, "Excluded != -1");
+    return getSAQLikeQuizzes($conn, "Excluded != " . EXCLUDED_VIDEO);
 }
 
 function getVideoQuizzes(PDO $conn)
 {
-    return getSAQLikeQuizzes($conn, "Excluded = -1");
+    return getSAQLikeQuizzes($conn, "Excluded = " . EXCLUDED_VIDEO);
 }
 
 /* SAQ */
@@ -1076,39 +1096,62 @@ function getMaxMatchingOptionNum(PDO $conn, $quizID)
 /* Matching_Option */
 
 /* Learning_Material */
+
+function createLearningMaterial(PDO $conn, $quizID, $excluded)
+{
+    switch ($excluded) {
+        case EMPTY_LEARNING_MATERIAL:
+            $content = EMPTY_LEARNING_MATERIAL;
+            break;
+        case EMPTY_VIDEO:
+            $content = EMPTY_VIDEO;
+            break;
+        case EMPTY_IMAGE:
+            $content = EMPTY_IMAGE;
+            break;
+        default:
+            throw new Exception("Unexpected Excluded Value.");
+    }
+    $updateSql = "INSERT INTO Learning_Material(Content, QuizID, Excluded) VALUES (?,?,?)";
+    $updateSql = $conn->prepare($updateSql);
+    $updateSql->execute(array($content, $quizID, $excluded));
+}
+
 function createEmptyLearningMaterial(PDO $conn, $quizID)
 {
-    $content = '<p>Learning materials for this quiz has not been added.</p>';
-    $updateSql = "INSERT INTO Learning_Material(Content,QuizID, Excluded) VALUES (?,?,?)";
-    $updateSql = $conn->prepare($updateSql);
-    $updateSql->execute(array($content, $quizID, 1));
+    createLearningMaterial($conn, $quizID, EXCLUDED_TRUE);
 }
 
 function createVideoLearningMaterial(PDO $conn, $quizID)
 {
-    $content = '<p>Video for this quiz has not been added.</p>';
-    $updateSql = "INSERT INTO Learning_Material(Content,QuizID, Excluded) VALUES (?,?,?)";
-    $updateSql = $conn->prepare($updateSql);
-    $updateSql->execute(array($content, $quizID, -1));
+    createLearningMaterial($conn, $quizID, EXCLUDED_VIDEO);
 }
+
+function createImageLearningMaterial(PDO $conn, $quizID)
+{
+    createLearningMaterial($conn, $quizID, EXCLUDED_IMAGE);
+}
+
 
 function updateLearningMaterial(PDO $conn, $quizID, $content)
 {
-    // it is video quiz, retain excluded flag
-    if (getLearningMaterial($conn, $quizID)->Excluded == -1) {
-        $excluded = -1;
-    }
-    // the learning material is updated and should not be excluded anymore
+    // it is video/image quiz, retain excluded flag
+    if (getLearningMaterial($conn, $quizID)->Excluded == EXCLUDED_VIDEO || getLearningMaterial($conn, $quizID)->Excluded == EXCLUDED_IMAGE) {
+        $excluded = getLearningMaterial($conn, $quizID)->Excluded;
+    } // the learning material is updated and should not be excluded anymore
+    else if (strcmp(htmlspecialchars($content), htmlspecialchars(EMPTY_LEARNING_MATERIAL)) !== 0) {
+        $excluded = EXCLUDED_FALSE;
+    } // the content is identical to default empty learning material and should be excluded
     else {
-        $excluded = 0;
+        $excluded = EXCLUDED_TRUE;
     }
 
 
     $updateSql = "UPDATE Learning_Material 
-            SET Content = ? AND Excluded = $excluded
+            SET Content = ?, Excluded = ?
             WHERE QuizID = ?";
     $updateSql = $conn->prepare($updateSql);
-    $updateSql->execute(array(htmlspecialchars($content), $quizID));
+    $updateSql->execute(array(htmlspecialchars($content), $excluded, $quizID));
 }
 
 function getLearningMaterial(PDO $conn, $quizID)
@@ -1118,13 +1161,13 @@ function getLearningMaterial(PDO $conn, $quizID)
 
 function getLearningMaterialByWeek(PDO $conn, $week)
 {
-    $learniningMaterialSql = "SELECT TopicName, QuizID, Content
+    $learningMaterialSql = "SELECT TopicName, QuizID, Content
                               FROM Quiz NATURAL JOIN Topic
                                         NATURAL JOIN Learning_Material
                               WHERE Week = ? AND Excluded = ?";
 
-    $learningMaterialQuery = $conn->prepare($learniningMaterialSql);
-    $learningMaterialQuery->execute(array($week, 0));
+    $learningMaterialQuery = $conn->prepare($learningMaterialSql);
+    $learningMaterialQuery->execute(array($week, EXCLUDED_FALSE));
     $learningMaterialResult = $learningMaterialQuery->fetchAll(PDO::FETCH_OBJ);
     return $learningMaterialResult;
 }
@@ -1439,7 +1482,7 @@ function getSAQSubmissions(PDO $conn)
 function getFactTopics(PDO $conn)
 {
     $topicSql = "SELECT DISTINCT TopicID
-				 FROM FACT;";
+				 FROM Snap_Fact ";
 
     $topicQuery = $conn->prepare($topicSql);
     $topicQuery->execute(array());
@@ -1451,7 +1494,7 @@ function getFactTopics(PDO $conn)
 function getFactsByTopicID(PDO $conn, $topicID)
 {
     $factSql = "SELECT *
-				FROM FACT NATURAL JOIN Topic
+				FROM Snap_Fact NATURAL JOIN Topic
 				WHERE TopicID = ?;";
 
     $factQuery = $conn->prepare($factSql);

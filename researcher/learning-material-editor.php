@@ -55,8 +55,15 @@ db_close($conn);
             image_advtab: true,
             browser_spellcheck: true,
             templates: [
-                //infograph list
-                {title: 'Infograph Demo', url: '../infograph/demo.html'}
+                /**
+                 * infograph list
+                 * Add new infograph:
+                 * 1.   put the file under /infograph
+                 * 2.   {title: '[TITLE]', url: '../infograph/[FILENAME].html'}
+                 * (remember to add comma after right bracket if needed to keep sane JSON format)
+                 */
+                {title: 'Infograph Demo', url: '../infograph/demo.html'},
+                {title: 'Yet Another Demo', url: '../infograph/yet-another-demo.html'}
             ],
             content_css: [
                 '//fonts.googleapis.com/css?family=Lato:300,300i,400,400i',

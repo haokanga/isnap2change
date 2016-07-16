@@ -20,7 +20,7 @@ try {
                 $mcqID = $_POST['mcqID'];
                 $quizID = getMCQQuestion($conn, $mcqID)->QuizID;
                 deleteMCQQuestion($conn, $mcqID);
-                header('Location: mcq-editor.php?quizID=' . $quizID);
+                header($parentPage);
             }
         }
         if (isset($_POST['update'])) {
@@ -52,6 +52,7 @@ try {
         $mcqQuesResult = getMCQQuestion($conn, $mcqID);
         $optionResult = getOptions($conn, $mcqID);
         $phpSelf = $pageName . '.php?quizID=' . $quizID . '&mcqID=' . $mcqID;
+        $parentPage = 'Location: mcq-editor.php?quizID=' . $quizID;
     }
 } catch (Exception $e) {
     debug_err($pageName, $e);

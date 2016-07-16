@@ -24,8 +24,7 @@ try {
                     $topicName = $_POST['topicName'];
 
                     $conn->beginTransaction();
-
-                    //insert and get topicID
+                    
                     $topicID = getTopicByName($conn, $topicName)->TopicID;
                     $quizID = createQuiz($conn, $topicID, $quizType, $week);
 
@@ -33,11 +32,15 @@ try {
                     $questionnaires = 0;
                     $description = '';
                     $question = '';
+
+                    //create quiz section
                     switch ($quizType) {
                         case "MCQ":
                             createMCQSection($conn, $quizID, $points, $questionnaires);
                             break;
                         case "SAQ":
+                        case "Video":
+                        case "Image":
                             createSAQLikeSection($conn, $quizID);
                             break;
                         case "Matching":
@@ -50,7 +53,13 @@ try {
                             throw new Exception("Unexpected Quiz Type. QuizID: " . $quizID);
                             break;
                     }
-                    createEmptyLearningMaterial($conn, $quizID);
+                    //create default learning material
+                    if ($quizType == "Video")
+                        createVideoLearningMaterial($conn, $quizID);
+                    else if ($quizType == "Image")
+                        createImageLearningMaterial($conn, $quizID);
+                    else
+                        createEmptyLearningMaterial($conn, $quizID);
 
                     $conn->commit();
                 } catch (Exception $e) {
@@ -156,7 +165,9 @@ db_close($conn);
                         <div class="well row">
                             <h4>Quiz Overview Notification</h4>
                             <div class="alert alert-info">
-                                <p>View quizzes by filtering or searching. You can create/update/delete any editable quiz. For fixed quiz, use <a href="misc.php"><b>Misc Quiz overview</b></a> instead. </p>
+                                <p>View quizzes by filtering or searching. You can create/update/delete any editable
+                                    quiz. For fixed quiz, use <a href="misc.php"><b>Misc Quiz overview</b></a> instead.
+                                </p>
                             </div>
                             <div class="alert alert-danger">
                                 <p><strong>Warning</strong> : If you remove one quiz. All the <strong>questions and

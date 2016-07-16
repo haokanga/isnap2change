@@ -4,6 +4,7 @@ require_once("../mysql-lib.php");
 require_once("../debug.php");
 require_once("researcher-validation.php");
 $pageName = "video-editor";
+$parentPage = 'Location: video.php';
 $pageNameForView = "Video Quiz";
 $columnName = array('SAQID', 'Question', 'Points', 'Edit');
 
@@ -17,11 +18,13 @@ try {
                     $quizID = $_POST['quizID'];
                     $week = $_POST['week'];
                     $topicName = $_POST['topicName'];
+                    $mediaTitle = $_POST['mediaTitle'];
+                    $mediaSource = $_POST['mediaSource'];
                     $conn->beginTransaction();
 
-                    //insert and get topicID
                     $topicID = getTopicByName($conn, $topicName)->TopicID;
                     updateQuiz($conn, $quizID, $topicID, $week);
+                    updateSAQLikeSection($conn, $quizID, $mediaSource, $mediaTitle);
 
                     $conn->commit();
                 } catch (Exception $e) {
@@ -31,7 +34,7 @@ try {
             } else if ($metadataUpdate == -1) {
                 $quizID = $_POST['quizID'];
                 deleteQuiz($conn, $quizID);
-                header('Location: saq.php');
+                header($parentPage);
             }
         }
         if (isset($_POST['update'])) {
@@ -122,6 +125,18 @@ db_close($conn);
                                 <?php } ?>
                             </select>
                             <br>
+
+                            <label for="mediaTitle">Video Title</label>
+                            <input type="text" class="form-control" id="mediaTitle" name="mediaTitle"
+                                   placeholder="Input Week Number" value="<?php echo $quizResult->MediaTitle; ?>"
+                                   required>
+                            <br>
+                            <label for="mediaSource">Video Source</label>
+                            <input type="text" class="form-control" id="mediaSource" name="mediaSource"
+                                   placeholder="Input Week Number" value="<?php echo $quizResult->MediaSource; ?>"
+                                   required>
+                            <br>
+
                             <label for="Points">Points</label>
                             <input type="text" class="form-control" id="Points" name="points" placeholder="Input Points"
                                    value="<?php echo $quizResult->Points; ?>" disabled>

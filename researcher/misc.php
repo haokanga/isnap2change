@@ -21,8 +21,7 @@ try {
                     $topicName = $_POST['topicName'];
 
                     $conn->beginTransaction();
-
-                    //insert and get topicID
+                    
                     $topicID = getTopicByName($conn, $topicName)->TopicID;
                     $quizID = createQuiz($conn, $topicID, $quizType, $week);
 

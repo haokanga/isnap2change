@@ -19,8 +19,7 @@ try {
                     $points = $_POST['points'];
                     $questionnaires = $_POST['questionnaires'];
                     $conn->beginTransaction();
-
-                    //insert and get topicID
+                    
                     $topicID = getTopicByName($conn, $topicName)->TopicID;
                     $quizID = createQuiz($conn, $topicID, $quizType, $week);
                     createMCQSection($conn, $quizID, $points, $questionnaires);

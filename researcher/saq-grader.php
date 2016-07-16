@@ -4,6 +4,7 @@ require_once("../mysql-lib.php");
 require_once("../debug.php");
 require_once("researcher-validation.php");
 $pageName = "saq-grader";
+$parentPage = 'Location: saq-grading.php';
 $columnName = array('QuizID', 'Week', 'TopicName', 'Points', 'Questions');
 
 if (isset($_GET['quizID']) && isset($_GET['studentID'])) {
@@ -21,7 +22,7 @@ try {
                 $feedback = $_POST['feedback'];
                 $grading = $_POST['grading'];
                 updateSAQSubmissionGrading($conn, $quizID, $saqID, $studentID, $feedback, $grading, $pageName);
-                header('Location: saq-grading.php');
+                header($parentPage);
             }
         }
     }

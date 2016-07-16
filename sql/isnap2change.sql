@@ -201,8 +201,8 @@ CREATE TABLE IF NOT EXISTS `MCQ_Question_Record` (
 
 CREATE TABLE IF NOT EXISTS `SAQ_Section` (
     QuizID MEDIUMINT,
-    VideoTitle TEXT,    
-    VideoSource TEXT,
+    MediaTitle TEXT,    
+    MediaSource TEXT,
     CONSTRAINT SAQ_Section_QuizID_PK PRIMARY KEY (QuizID),
     CONSTRAINT SAQ_Section_QuizID_FK FOREIGN KEY (QuizID)
         REFERENCES Quiz (QuizID)
@@ -536,7 +536,7 @@ INSERT IGNORE INTO Quiz_Record(QuizID,StudentID) VALUES(2,6);
 # [Sample] insert SAQ section with questions
 INSERT IGNORE INTO Quiz(Week,QuizType,TopicID) VALUES(1,'SAQ',1);
 SET @QUIZ_LAST_INSERT_ID = LAST_INSERT_ID();
-INSERT IGNORE INTO SAQ_Section(QuizID, VideoTitle, VideoSource) VALUES(@QUIZ_LAST_INSERT_ID, 'It is a trap!', 'The Truth Site');
+INSERT IGNORE INTO SAQ_Section(QuizID, MediaTitle, MediaSource) VALUES(@QUIZ_LAST_INSERT_ID, 'It is a trap!', 'The Truth Site');
 INSERT IGNORE INTO SAQ_Question(Question, Points, QuizID) VALUES('Based on the video, list 3 problems or challenges that these teenagers face as a result of their smoking?', 10, @QUIZ_LAST_INSERT_ID);
 INSERT IGNORE INTO SAQ_Question(Question, Points, QuizID) VALUES('List 1 strategy that you could use to help convince a peer to stop smoking?', 10, @QUIZ_LAST_INSERT_ID);
 INSERT IGNORE INTO SAQ_Question(Question, Points, QuizID) VALUES('List 3 the different ways that you have seen anti-smoking messages presented to the public. With each suggest if you think they have been ‘effective’ or ‘not effective’. Eg. Poster-Effective.', 20, @QUIZ_LAST_INSERT_ID);
@@ -629,18 +629,18 @@ INSERT IGNORE INTO Learning_Material(Content,QuizID) VALUES('<p>Eating a balance
 INSERT IGNORE INTO Learning_Material(Content,QuizID) VALUES('
 <p>Learning materials for week 1...</p>',2);
 INSERT IGNORE INTO Learning_Material(Content,QuizID) VALUES('
-<p>Learning materials for this quiz has not been added.</p>',4);
+<p>Learning material for this quiz has not been added.</p>',4);
 
 INSERT IGNORE INTO Learning_Material(Content,QuizID) VALUES('
-<p>Learning materials for this quiz has not been added.</p>',6);
+<p>Learning material for this quiz has not been added.</p>',6);
 INSERT IGNORE INTO Learning_Material(Content,QuizID) VALUES('
 <p>Nutrition: All over the world people suffer from illnesses that are caused by eating the wrong food or not having enough to eat. In developing countries deficiency diseases arise when people do not get the right nutrients. Conversely, overconsumption of foods rich in fat and cholesterols can lead to heart diseases, obesity, strokes and cancer. (Own words)</p>',7);
 INSERT IGNORE INTO Learning_Material(Content,QuizID) VALUES('
-<p>Learning materials for this quiz has not been added.</p>',8);
+<p>Learning material for this quiz has not been added.</p>',8);
 
 # [Example] Learning_Material (Excluded)
 INSERT IGNORE INTO Learning_Material(Content,QuizID, Excluded) VALUES('
-<p>Learning materials for this quiz has not been added.</p>',5,1);
+<p>Learning material for this quiz has not been added.</p>',5,1);
 
 # [Example] Learning_Material (for Video Quiz)
 
@@ -748,10 +748,10 @@ INSERT IGNORE INTO `MCQ_Option`(Content, Explanation, MCQID) VALUES('5', "Correc
 INSERT INTO `isnap2changedb`.`poster_section` (`QuizID`, `Points`) VALUES ('9', '20');
 
 # [Example] insert a learning material for a Poster task with QuizID = 9
-INSERT INTO `isnap2changedb`.`learning_material` (`Content`, `QuizID`) VALUES ('<p>Learning materials for this quiz has not been added.</p>', '9');
+INSERT INTO `isnap2changedb`.`learning_material` (`Content`, `QuizID`) VALUES ('<p>Learning material for this quiz has not been added.</p>', '9');
 
 # [Example] insert one more learning material
-INSERT INTO `isnap2changedb`.`learning_material` (`Content`, `QuizID`, Excluded) VALUES ('<p>Learning materials for this quiz has not been added.</p>', '10', 1);
+INSERT INTO `isnap2changedb`.`learning_material` (`Content`, `QuizID`, Excluded) VALUES ('<p>Learning material for this quiz has not been added.</p>', '10', 1);
 
 # [Example] change a class's (classID = 1) unlocked progress to 3
 UPDATE `isnap2changedb`.`class` SET `UnlockedProgress`='3' WHERE `ClassID`='1';

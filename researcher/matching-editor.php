@@ -4,6 +4,7 @@ require_once("../mysql-lib.php");
 require_once("../debug.php");
 require_once("researcher-validation.php");
 $pageName = "matching-editor";
+$parentPage = 'Location: matching.php';
 $columnName = array('QuizID', 'Week', 'TopicName', 'Description', 'MultipleChoice', 'Points');
 $matchingQuesColName = array('MatchingID', 'Question', 'OptionID', 'Content');
 $matchingQuesVisualName = array('MatchingID', 'Terminology/Bucket', 'OptionID', 'Explanation/Item');
@@ -21,8 +22,7 @@ try {
                     $description = $_POST['description'];
                     $points = $_POST['points'];
                     $conn->beginTransaction();
-
-                    //insert and get topicID
+                    
                     $topicID = getTopicByName($conn, $topicName)->TopicID;
                     updateQuiz($conn, $quizID, $topicID, $week);
                     updateMatchingSection($conn, $quizID, $description, $points);
@@ -35,7 +35,7 @@ try {
             } else if ($metadataUpdate == -1) {
                 $quizID = $_POST['quizID'];
                 deleteQuiz($conn, $quizID);
-                header('Location: matching.php');
+                header($parentPage);
             }
         }
         if (isset($_POST['bucketUpdate'])) {

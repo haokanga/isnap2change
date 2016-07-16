@@ -19,8 +19,7 @@ try {
                     $description = $_POST['description'];
                     $points = $_POST['points'];
                     $conn->beginTransaction();
-
-                    //insert and get topicID
+                    
                     $topicID = getTopicByName($conn, $topicName)->TopicID;
                     $quizID = createQuiz($conn, $topicID, $quizType, $week);
                     createMatchingSection($conn, $quizID, $description, $points);

@@ -23,16 +23,17 @@ function debug_err($pageName, $e)
         // duplicate entry
         if ($e->errorInfo[1] == 1062) {
             debug_alert("Duplicate names are not allowed!");
-        } // unclassfied error occurred
+        } // unclassfied PDO exception
         else {
             //debug_alert("Unexpected MySQL Error occurred in ".$pageName.". Contact with developers.");
             //sql insert..
             //Logger.write($pagename, $getMessage);
             //debug_alert($e->getMessage());
-            //echo $e->getMessage();
-            //echo "The exception was created on line: " . $e->getLine();
+            echo $e->getMessage();
+            echo "The exception was created on line: " . $e->getLine();
         }
-    } else {
+    } // custom exception
+    else {
         echo $e->getMessage();
     }
 }

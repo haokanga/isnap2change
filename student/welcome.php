@@ -380,7 +380,7 @@
                             <div style="color:rgb(219,27,27); border: 0px solid rgb(219,27,27); border-bottom-color: rgb(219,27,27); border-bottom-width: 2px; font-size:3vh; width: 100%;margin-bottom: 20pt;padding-bottom:10pt;"> <?php ;
                             break;
                     }
-                        echo strtoupper($factRes[$i]->TopicName)." FACT #".$factRes[$i]->FactID; ?>
+                        echo strtoupper($factRes[$i]->TopicName)." FACT #".$factRes[$i]->SnapFactID; ?>
                     </div>
 
                             <span class="fact"><?php echo $factRes[$i]->Content; ?></span>
