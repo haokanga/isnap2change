@@ -2,8 +2,8 @@
 session_start();
 require_once("../mysql-lib.php");
 require_once("../debug.php");
-require_once("researcher-validation.php");
-$pageName = "snap-fact";
+require_once("researcher-lib.php");
+
 $columnName = array('SnapFactID', 'TopicName', 'Content', 'Edit');
 
 try {

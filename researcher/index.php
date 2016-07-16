@@ -2,7 +2,7 @@
 session_start();
 require_once("../mysql-lib.php");
 require_once("../debug.php");
-require_once("researcher-validation.php");
+require_once("researcher-lib.php");
 $conn = db_connect();
 
 db_close($conn);

@@ -6,8 +6,7 @@
 session_start();
 require_once("../mysql-lib.php");
 require_once("../debug.php");
-require_once("researcher-validation.php");
-$pageName = "quiz";
+require_once("researcher-lib.php");
 $columnName = array('QuizID', 'Week', 'QuizType', 'TopicName', 'Points');
 // list all editable quiz types    
 $editableQuizTypeArr = array('MCQ', 'SAQ', 'Matching', 'Poster', 'Video', 'Image');
@@ -51,7 +50,6 @@ try {
                             break;
                         default:
                             throw new Exception("Unexpected Quiz Type. QuizID: " . $quizID);
-                            break;
                     }
                     //create default learning material
                     if ($quizType == "Video")
@@ -162,20 +160,7 @@ db_close($conn);
                             </table>
                         </div>
                         <!-- /.table-responsive -->
-                        <div class="well row">
-                            <h4>Quiz Overview Notification</h4>
-                            <div class="alert alert-info">
-                                <p>View quizzes by filtering or searching. You can create/update/delete any editable
-                                    quiz. For fixed quiz, use <a href="misc.php"><b>Misc Quiz overview</b></a> instead.
-                                </p>
-                            </div>
-                            <div class="alert alert-danger">
-                                <p><strong>Warning</strong> : If you remove one quiz. All the <strong>questions and
-                                        submission</strong> of this quiz will also get deleted (not recoverable).</p> It
-                                includes <strong>learning material, questions and options, their submissions and your
-                                    grading/feedback</strong>, not only the quiz itself.
-                            </div>
-                        </div>
+                        <?php require_once('quiz-overview-notification.php'); ?>
                     </div>
                     <!-- /.panel-body -->
                 </div>

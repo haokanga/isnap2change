@@ -2,14 +2,7 @@
 session_start();
 require_once("../mysql-lib.php");
 require_once("../debug.php");
-require_once("researcher-validation.php");
-
-$pageName = SAQ_LIKE_QUIZ_TYPE;
-if (SAQ_LIKE_QUIZ_TYPE == 'saq')
-    $pageNameForView = 'Short Answer Quiz';
-else
-    $pageNameForView = ucfirst(SAQ_LIKE_QUIZ_TYPE) . ' Quiz';
-
+require_once("researcher-lib.php");
 $columnName = array('QuizID', 'Week', 'TopicName', 'Points', 'Questions');
 
 try {
@@ -77,7 +70,6 @@ db_close($conn);
 <div id="wrapper">
     <!-- Navigation Layout-->
     <?php require_once('navigation.php'); ?>
-
     <div id="page-wrapper">
         <div class="row">
             <div class="col-lg-12">
@@ -127,18 +119,7 @@ db_close($conn);
                             </table>
                         </div>
                         <!-- /.table-responsive -->
-                        <div class="well row">
-                            <h4><?php echo $pageNameForView; ?> Overview Notification</h4>
-                            <div class="alert alert-info">
-                                <p>View quizzes by filtering or searching. You can create/update/delete any quiz.</p>
-                            </div>
-                            <div class="alert alert-danger">
-                                <p><strong>Warning</strong> : If you remove one quiz. All the <strong>questions and
-                                        submission</strong> of this quiz will also get deleted (not recoverable).</p> It
-                                includes <strong>learning material, questions and options, their submissions and your
-                                    grading/feedback</strong>, not only the quiz itself.
-                            </div>
-                        </div>
+                        <?php require_once('quiz-overview-notification.php'); ?>
                     </div>
                     <!-- /.panel-body -->
                 </div>

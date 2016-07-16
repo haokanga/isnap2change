@@ -2,13 +2,8 @@
 session_start();
 require_once("../mysql-lib.php");
 require_once("../debug.php");
-require_once("researcher-validation.php");
-$pageName = SAQ_LIKE_QUIZ_TYPE . "-editor";
+require_once("researcher-lib.php");
 $parentPage = 'Location: ' . SAQ_LIKE_QUIZ_TYPE . '.php';
-if (SAQ_LIKE_QUIZ_TYPE == 'saq')
-    $pageNameForView = 'Short Answer Quiz';
-else
-    $pageNameForView = ucfirst(SAQ_LIKE_QUIZ_TYPE) . ' Quiz';
 $columnName = array('SAQID', 'Question', 'Points', 'Edit');
 
 try {

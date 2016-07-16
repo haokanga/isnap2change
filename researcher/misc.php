@@ -3,8 +3,7 @@
 session_start();
 require_once("../mysql-lib.php");
 require_once("../debug.php");
-require_once("researcher-validation.php");
-$pageName = "quiz";
+require_once("researcher-lib.php");
 $columnName = array('QuizID', 'Week', 'QuizType', 'TopicName', 'Points');
 // list all editable quiz types    
 $editableQuizTypeArr = array('MCQ', 'SAQ', 'Matching', 'Poster');

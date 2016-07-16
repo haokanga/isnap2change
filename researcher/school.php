@@ -2,8 +2,7 @@
 session_start();
 require_once("../mysql-lib.php");
 require_once("../debug.php");
-require_once("researcher-validation.php");
-$pageName = "school";
+require_once("researcher-lib.php");
 
 //if insert/update/remove school
 try {

@@ -1,15 +1,3 @@
-<?php
-
-$userAdminPageArr = array('School', 'Class', 'Student');
-$userAdminIconArr = array('mortar-board', 'users', 'child');
-$contentAdminPageArr = array('Week', 'Quiz', 'Snap Fact', 'Verbose Fact', 'MCQ', 'SAQ', 'Matching', 'Poster', 'Video', 'Image', 'Misc');
-$quizTypeArr = array('Matching', 'Poster', 'Video', 'Image', 'Misc');
-$contentAdminIconArr = array('calendar', 'book', 'lightbulb-o', 'folder-open', 'check', 'pencil', 'th-list', 'exclamation-triangle', 'video-camera', 'picture-o',  'exclamation-triangle');
-$gradingPageArr = array('SAQ-Grading', 'Poster-Grading');
-$gradingIconArr = array('check', 'exclamation-triangle');
-
-?>
-
 <!-- Navigation -->
 <nav class="navbar navbar-default navbar-static-top" role="navigation" style="margin-bottom: 0">
     <div class="navbar-header">

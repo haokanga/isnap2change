@@ -2,8 +2,7 @@
 session_start();
 require_once("../mysql-lib.php");
 require_once("../debug.php");
-require_once("researcher-validation.php");
-$pageName = "matching-editor";
+require_once("researcher-lib.php");
 $parentPage = 'Location: matching.php';
 $columnName = array('QuizID', 'Week', 'TopicName', 'Description', 'MultipleChoice', 'Points');
 $matchingQuesColName = array('MatchingID', 'Question', 'OptionID', 'Content');

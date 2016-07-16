@@ -2,8 +2,7 @@
 session_start();
 require_once("../mysql-lib.php");
 require_once("../debug.php");
-require_once("researcher-validation.php");
-$pageName = "student";
+require_once("researcher-lib.php");
 $columnName = array('StudentID', 'ClassName', 'Username', 'FirstName', 'LastName', 'Email', 'Gender', 'DOB', 'Score', 'SubmissionDate');
 
 try {

@@ -2,8 +2,7 @@
 session_start();
 require_once("../mysql-lib.php");
 require_once("../debug.php");
-require_once("researcher-validation.php");
-$pageName = "mcq-editor";
+require_once("researcher-lib.php");
 $parentPage = 'Location: mcq.php';
 $columnName = array('MCQID', 'Question', 'Option', 'Explanation', 'Edit');
 
