@@ -144,6 +144,13 @@ db_close($conn);
                                        value="<?php echo $quizResult->MediaSource; ?>"
                                        required>
                                 <br>
+                                <?php if (strlen($quizResult->MediaTitle) == 0 || strlen($quizResult->MediaSource) == 0) { ?>
+                                    <div class="alert alert-danger">
+                                        <p><strong>Reminder</strong> : You have not
+                                            added <?php echo SAQ_LIKE_QUIZ_TYPE ?> title
+                                            or <?php echo SAQ_LIKE_QUIZ_TYPE ?> source!
+                                    </div>
+                                <?php } ?>
                             <?php } ?>
 
                             <label for="Points">Points</label>

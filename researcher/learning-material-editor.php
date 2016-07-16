@@ -29,7 +29,6 @@ try {
     debug_err($pageName, $e);
 }
 
-db_close($conn);
 ?>
 
 <!DOCTYPE html>
@@ -83,5 +82,18 @@ db_close($conn);
     <input type="submit" name='submitbutton' value="Save" class='submit'/> <span
         class="glyphicon glyphicon-info-sign"></span><b> Ctrl + S</b><br>
 </form>
+
+<?php
+$quizType = getQuizType($conn, $quizID);
+if ($quizType == "Video" || $quizType == "Image") { ?>
+    <div class="alert alert-info">
+        <p><strong>Reminder</strong> : This is <?php echo strtolower($quizType); ?> quiz. You should only insert one
+            <?php echo strtolower($quizType); ?> by "Insert/edit <?php echo strtolower($quizType); ?>" button, other
+            content is not expected.
+    </div>
+<?php }
+db_close($conn);
+?>
+
 </body>
 </html>

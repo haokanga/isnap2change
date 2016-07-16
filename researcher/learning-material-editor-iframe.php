@@ -6,10 +6,6 @@
     <!-- /.panel-heading -->
     <div class="panel-body">
         <div class="heading" style="color: black; max-height:10vh; text-align:center; border-bottom: 1px solid #eee;">
-            <!-- Topic -->
-            <h1 style='padding: 0px;'>
-                <i>    <?php echo $materialRes->TopicName; ?> </i>
-            </h1>
         </div>
         <iframe id="learning-material-editor" src="learning-material-editor.php?quizID=<?php echo $quizID; ?>"
                 scrolling="no" frameborder="0" allowtransparency="true" allowfullscreen="true"
