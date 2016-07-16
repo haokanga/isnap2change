@@ -3,7 +3,6 @@ session_start();
 require_once("../mysql-lib.php");
 require_once("../debug.php");
 require_once("researcher-lib.php");
-$parentPage = 'Location: saq-grading.php';
 $columnName = array('QuizID', 'Week', 'TopicName', 'Points', 'Questions');
 
 if (isset($_GET['quizID']) && isset($_GET['studentID'])) {
@@ -21,6 +20,7 @@ try {
                 $feedback = $_POST['feedback'];
                 $grading = $_POST['grading'];
                 updateSAQSubmissionGrading($conn, $quizID, $saqID, $studentID, $feedback, $grading, $pageName);
+                $parentPage = 'Location: ' . strtolower(getQuizType($conn, $quizID)) . '-grading.php';
                 header($parentPage);
             }
         }
@@ -31,6 +31,7 @@ try {
 
 try {
     $saqSubmissionResult = getSAQSubmission($conn, $quizID, $studentID);
+    $materialRes = getLearningMaterial($conn, $quizID);
     $phpSelf = $pageName . '.php?quizID=' . $quizID . '&studentID=' . $studentID;
 } catch (Exception $e) {
     debug_err($pageName, $e);
@@ -68,6 +69,10 @@ db_close($conn);
                     </div>
                     <!-- /.panel-heading -->
                     <div class="panel-body">
+
+                        <?php require_once('learning-material.php'); ?>
+
+                        <!-- Grader -->
                         <form id="submission" method="post" action="<?php echo $phpSelf ?>">
                             <input type=hidden name="update" id="update" value="0" required>
                             <?php for ($i = 0; $i < count($saqSubmissionResult); $i++) {

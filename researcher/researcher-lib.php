@@ -27,6 +27,7 @@ $gradingIconArr = array('check', 'check', 'check', 'exclamation-triangle');
 // get page name
 $pageName = basename($_SERVER['SCRIPT_FILENAME'], '.php');
 
+// deal with saq-like pages
 if (in_array($pageName, array('saq', 'saq-editor', 'video', 'video-editor', 'image', 'image-editor'
 )))
     define('SAQ_LIKE_QUIZ_TYPE', explode('-', $pageName, 2)[0]);
