@@ -940,7 +940,7 @@ function getSAQLikeQuizzes(PDO $conn, $typeIndicator)
 
 function getSAQQuizzes(PDO $conn)
 {
-    return getSAQLikeQuizzes($conn, "Excluded != " . EXCLUDED_VIDEO);
+    return getSAQLikeQuizzes($conn, "Excluded != " . EXCLUDED_VIDEO . " AND Excluded != " . EXCLUDED_IMAGE);
 }
 
 function getVideoQuizzes(PDO $conn)
@@ -1472,13 +1472,29 @@ function getSAQSubmission(PDO $conn, $quizID, $studentID)
     return $quizResult;
 }
 
-function getSAQSubmissions(PDO $conn)
+
+function getSAQLikeSubmissions(PDO $conn, $typeIndicator)
 {
-    $quizSql = "SELECT * FROM Quiz_Record NATURAL JOIN Quiz NATURAL JOIN Student NATURAL JOIN Class NATURAL JOIN Topic WHERE QuizType = 'SAQ' AND (`Status` = 'UNGRADED' OR `Status` = 'GRADED')";
+    $quizSql = "SELECT * FROM Quiz_Record NATURAL JOIN Quiz NATURAL JOIN Learning_Material NATURAL JOIN Student NATURAL JOIN Class NATURAL JOIN Topic WHERE QuizType = 'SAQ' AND (`Status` = 'UNGRADED' OR `Status` = 'GRADED') AND $typeIndicator ";
     $quizQuery = $conn->prepare($quizSql);
     $quizQuery->execute();
     $quizResult = $quizQuery->fetchAll(PDO::FETCH_OBJ);
     return $quizResult;
+}
+
+function getSAQSubmissions(PDO $conn)
+{
+    return getSAQLikeSubmissions($conn, "Excluded != " . EXCLUDED_VIDEO . " AND Excluded != " . EXCLUDED_IMAGE);
+}
+
+function getVideoSubmissions(PDO $conn)
+{
+    return getSAQLikeSubmissions($conn, "Excluded = " . EXCLUDED_VIDEO);
+}
+
+function getImageSubmissions(PDO $conn)
+{
+    return getSAQLikeSubmissions($conn, "Excluded = " . EXCLUDED_IMAGE);
 }
 
 /* SAQ-Grading */

@@ -57,7 +57,7 @@ db_close($conn);
     <div id="page-wrapper">
         <div class="row">
             <div class="col-lg-12">
-                <h1 class="page-header">SnapFact Overview</h1>
+                <h1 class="page-header"><?php echo $pageNameForView; ?> Overview</h1>
             </div>
             <!-- /.col-lg-12 -->
         </div>
@@ -66,7 +66,7 @@ db_close($conn);
             <div class="col-lg-12">
                 <div class="panel panel-default">
                     <div class="panel-heading">
-                        SnapFact Information Table <span class="glyphicon glyphicon-plus pull-right" data-toggle="modal"
+                        <?php echo $pageNameForView; ?> Information Table <span class="glyphicon glyphicon-plus pull-right" data-toggle="modal"
                                                          data-target="#dialog"></span>
                     </div>
                     <!-- /.panel-heading -->
@@ -92,13 +92,6 @@ db_close($conn);
                             </table>
                         </div>
                         <!-- /.table-responsive -->
-                        <div class="well row">
-                            <h4>SnapFact Overview Notification</h4>
-                            <div class="alert alert-info">
-                                <p>View snap facts by filtering or searching. You can create/update/delete any snap
-                                    fact.</p>
-                            </div>
-                        </div>
                     </div>
                     <!-- /.panel-body -->
                 </div>
@@ -160,21 +153,19 @@ db_close($conn);
     //DO NOT put them in $(document).ready() since the table has multi pages
     var dialogInputArr = $('.dialoginput');
     $('.glyphicon-edit').on('click', function () {
-        $('#dialogTitle').text("Edit <?php echo $pageName ?>");
+        $('#dialogTitle').text("Edit <?php echo $pageNameForView ?>");
         $('#update').val(0);
         for (i = 0; i < dialogInputArr.length; i++) {
             dialogInputArr.eq(i).val($(this).parent().parent().children('td').eq(i).text().trim());
         }
-        //disable snapFactID and Classes
         dialogInputArr.eq(0).attr('disabled', 'disabled');
     });
     $('.glyphicon-plus').on('click', function () {
-        $('#dialogTitle').text("Add <?php echo $pageName ?>");
+        $('#dialogTitle').text("Add <?php echo $pageNameForView ?>");
         $('#update').val(1);
         for (i = 0; i < dialogInputArr.length; i++) {
             dialogInputArr.eq(i).val('');
         }
-        //disable snapFactID and Classes
         dialogInputArr.eq(0).attr('disabled', 'disabled');
     });
     $('.glyphicon-remove').on('click', function () {
@@ -189,7 +180,6 @@ db_close($conn);
     });
     $('#btnSave').on('click', function () {
         $('#submission').validate();
-        //enable snapFactID
         dialogInputArr.eq(0).prop('disabled', false);
         $('#submission').submit();
     });
