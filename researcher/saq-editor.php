@@ -40,15 +40,15 @@ try {
                 $quizID = $_POST['quizID'];
                 $points = $_POST['points'];
                 $question = $_POST['question'];
-                createSAQLikeQuestion($conn, $quizID, $points, $question);
+                createSAQQuestion($conn, $quizID, $points, $question);
             } else if ($update == 0) {
                 $saqID = $_POST['saqID'];
                 $points = $_POST['points'];
                 $question = $_POST['question'];
-                updateSAQLikeQuestion($conn, $saqID, $points, $question);
+                updateSAQQuestion($conn, $saqID, $points, $question);
             } else if ($update == -1) {
                 $saqID = $_POST['saqID'];
-                deleteSAQLikeQuestion($conn, $saqID);
+                deleteSAQQuestion($conn, $saqID);
             }
         }
     }
@@ -62,7 +62,7 @@ try {
         $quizResult = getSAQQuiz($conn, $quizID);
         $topicResult = getTopics($conn);
         $materialRes = getLearningMaterial($conn, $quizID);
-        $saqQuesResult = getSAQLikeQuestions($conn, $quizID);
+        $saqQuesResult = getSAQQuestions($conn, $quizID);
         $phpSelf = $pageName . '.php?quizID=' . $quizID;
     }
 } catch (Exception $e) {

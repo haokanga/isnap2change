@@ -863,7 +863,7 @@ function createSAQLikeSection(PDO $conn, $quizID)
     $updateSql->execute(array($quizID));
 }
 
-function createSAQLikeQuestion(PDO $conn, $quizID, $points, $question)
+function createSAQQuestion(PDO $conn, $quizID, $points, $question)
 {
     $updateSql = "INSERT INTO SAQ_Question(Question, Points, QuizID)
                     VALUES (?,?,?)";
@@ -881,7 +881,7 @@ function updateSAQLikeSection(PDO $conn, $quizID, $mediaSource, $mediaTitle)
     $updateSql->execute(array(htmlspecialchars($mediaTitle), htmlspecialchars($mediaSource), $quizID));
 }
 
-function updateSAQLikeQuestion(PDO $conn, $saqID, $points, $question)
+function updateSAQQuestion(PDO $conn, $saqID, $points, $question)
 {
     $updateSql = "UPDATE SAQ_Question
                     SET Question = ?, Points = ?
@@ -890,7 +890,7 @@ function updateSAQLikeQuestion(PDO $conn, $saqID, $points, $question)
     $updateSql->execute(array(htmlspecialchars($question), $points, $saqID));
 }
 
-function deleteSAQLikeQuestion(PDO $conn, $saqID)
+function deleteSAQQuestion(PDO $conn, $saqID)
 {
     $updateSql = "DELETE FROM SAQ_Question WHERE SAQID = ?";
     $updateSql = $conn->prepare($updateSql);
@@ -906,7 +906,7 @@ function getSAQQuestion(PDO $conn, $saqID)
     return $saqQuesResult;
 }
 
-function getSAQLikeQuestions(PDO $conn, $quizID)
+function getSAQQuestions(PDO $conn, $quizID)
 {
     $saqQuesSql = "SELECT *
                     FROM SAQ_Section NATURAL JOIN SAQ_Question
@@ -1450,7 +1450,7 @@ function deleteSAQSubmission(PDO $conn, $quizID, $studentID, $pageName)
         $conn->beginTransaction();
 
         deleteQuizRecord($conn, $quizID, $studentID);
-        $saqResult = getSAQLikeQuestions($conn, $quizID);
+        $saqResult = getSAQQuestions($conn, $quizID);
         for ($saqIndex = 0; $saqIndex < count($saqResult); $saqIndex++) {
             $saqID = $saqResult[$saqIndex]->SAQID;
             deleteSAQQuestionRecord($conn, $saqID, $studentID);
@@ -1685,7 +1685,7 @@ function generateRandomSAQSubmissions(PDO $conn)
     $studentResult = getStudents($conn);
     for ($quizIndex = 0; $quizIndex < count($quizResult); $quizIndex++) {
         $quizID = $quizResult[$quizIndex]->QuizID;
-        $saqResult = getSAQLikeQuestions($conn, $quizID);
+        $saqResult = getSAQQuestions($conn, $quizID);
         for ($studentIndex = 0; $studentIndex < count($studentResult); $studentIndex++) {
             $studentID = $studentResult[$studentIndex]->StudentID;
             if ($studentID >= 3) {

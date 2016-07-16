@@ -29,7 +29,7 @@
         $materialRes = getLearningMaterial($conn, $quizID);    
         
         // get saq questions;
-        $saqResult = getSAQLikeQuestions($conn, $quizID);
+        $saqResult = getSAQQuestions($conn, $quizID);
         
         //if answered
         if($status != "UNANSWERED"){
