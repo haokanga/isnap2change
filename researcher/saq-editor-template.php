@@ -5,7 +5,10 @@ require_once("../debug.php");
 require_once("researcher-validation.php");
 $pageName = SAQ_LIKE_QUIZ_TYPE . "-editor";
 $parentPage = 'Location: ' . SAQ_LIKE_QUIZ_TYPE . '.php';
-$pageNameForView = ucfirst(SAQ_LIKE_QUIZ_TYPE) . " Quiz";
+if (SAQ_LIKE_QUIZ_TYPE == 'saq')
+    $pageNameForView = 'Short Answer Quiz';
+else
+    $pageNameForView = ucfirst(SAQ_LIKE_QUIZ_TYPE) . ' Quiz';
 $columnName = array('SAQID', 'Question', 'Points', 'Edit');
 
 try {
@@ -18,13 +21,16 @@ try {
                     $quizID = $_POST['quizID'];
                     $week = $_POST['week'];
                     $topicName = $_POST['topicName'];
-                    $mediaTitle = $_POST['mediaTitle'];
-                    $mediaSource = $_POST['mediaSource'];
                     $conn->beginTransaction();
 
                     $topicID = getTopicByName($conn, $topicName)->TopicID;
                     updateQuiz($conn, $quizID, $topicID, $week);
-                    updateSAQLikeSection($conn, $quizID, $mediaSource, $mediaTitle);
+
+                    if (isset($_POST['mediaTitle']) && isset($_POST['mediaSource'])) {
+                        $mediaTitle = $_POST['mediaTitle'];
+                        $mediaSource = $_POST['mediaSource'];
+                        updateSAQLikeSection($conn, $quizID, $mediaSource, $mediaTitle);
+                    }
 
                     $conn->commit();
                 } catch (Exception $e) {
@@ -125,17 +131,20 @@ db_close($conn);
                                 <?php } ?>
                             </select>
                             <br>
-
-                            <label for="mediaTitle"><?php echo ucfirst(SAQ_LIKE_QUIZ_TYPE) ?> Title</label>
-                            <input type="text" class="form-control" id="mediaTitle" name="mediaTitle"
-                                   placeholder="Input <?php echo ucfirst(SAQ_LIKE_QUIZ_TYPE) ?> Title" value="<?php echo $quizResult->MediaTitle; ?>"
-                                   required>
-                            <br>
-                            <label for="mediaSource"><?php echo ucfirst(SAQ_LIKE_QUIZ_TYPE) ?> Source</label>
-                            <input type="text" class="form-control" id="mediaSource" name="mediaSource"
-                                   placeholder="Input <?php echo ucfirst(SAQ_LIKE_QUIZ_TYPE) ?> Source" value="<?php echo $quizResult->MediaSource; ?>"
-                                   required>
-                            <br>
+                            <?php if (SAQ_LIKE_QUIZ_TYPE != 'saq') { ?>
+                                <label for="mediaTitle"><?php echo ucfirst(SAQ_LIKE_QUIZ_TYPE) ?> Title</label>
+                                <input type="text" class="form-control" id="mediaTitle" name="mediaTitle"
+                                       placeholder="Input <?php echo ucfirst(SAQ_LIKE_QUIZ_TYPE) ?> Title"
+                                       value="<?php echo $quizResult->MediaTitle; ?>"
+                                       required>
+                                <br>
+                                <label for="mediaSource"><?php echo ucfirst(SAQ_LIKE_QUIZ_TYPE) ?> Source</label>
+                                <input type="text" class="form-control" id="mediaSource" name="mediaSource"
+                                       placeholder="Input <?php echo ucfirst(SAQ_LIKE_QUIZ_TYPE) ?> Source"
+                                       value="<?php echo $quizResult->MediaSource; ?>"
+                                       required>
+                                <br>
+                            <?php } ?>
 
                             <label for="Points">Points</label>
                             <input type="text" class="form-control" id="Points" name="points" placeholder="0"

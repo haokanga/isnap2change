@@ -5,7 +5,10 @@ require_once("../debug.php");
 require_once("researcher-validation.php");
 
 $pageName = SAQ_LIKE_QUIZ_TYPE;
-$pageNameForView = ucfirst(SAQ_LIKE_QUIZ_TYPE) . ' Quiz';
+if (SAQ_LIKE_QUIZ_TYPE == 'saq')
+    $pageNameForView = 'Short Answer Quiz';
+else
+    $pageNameForView = ucfirst(SAQ_LIKE_QUIZ_TYPE) . ' Quiz';
 
 $columnName = array('QuizID', 'Week', 'TopicName', 'Points', 'Questions');
 
@@ -25,7 +28,9 @@ try {
                     $quizID = createQuiz($conn, $topicID, $quizType, $week);
                     createSAQLikeSection($conn, $quizID);
 
-                    if (SAQ_LIKE_QUIZ_TYPE == 'video') {
+                    if (SAQ_LIKE_QUIZ_TYPE == 'saq') {
+                        createEmptyLearningMaterial($conn, $quizID);
+                    } else if (SAQ_LIKE_QUIZ_TYPE == 'video') {
                         createVideoLearningMaterial($conn, $quizID);
                     } else if (SAQ_LIKE_QUIZ_TYPE == 'image') {
                         createImageLearningMaterial($conn, $quizID);
@@ -47,7 +52,9 @@ try {
 }
 
 try {
-    if (SAQ_LIKE_QUIZ_TYPE == 'video') {
+    if (SAQ_LIKE_QUIZ_TYPE == 'saq') {
+        $quizResult = getSAQQuizzes($conn);
+    } else if (SAQ_LIKE_QUIZ_TYPE == 'video') {
         $quizResult = getVideoQuizzes($conn);
     } else if (SAQ_LIKE_QUIZ_TYPE == 'image') {
         $quizResult = getImageQuizzes($conn);
