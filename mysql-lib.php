@@ -1632,12 +1632,13 @@ function updateStudentGameScores(PDO $conn, $gameID, $studentID, $score)
 /* Log */
 function createLog(PDO $conn, $logArr)
 {
-    $updateSql = "INSERT INTO Log( PageName, RequestMethod, RequestParameters, SessionDump, ExceptionMessage, ExceptionTrace)
+    $updateSql = "INSERT INTO Log( ExceptionMessage, ExceptionTrace, PageName, RequestMethod, RequestParameters, SessionDump)
          VALUES (?,?,?,?,?,?)";
     $updateSql = $conn->prepare($updateSql);
     $updateSql->execute(array_map("htmlspecialchars", $logArr));
     return $conn->lastInsertId();
 }
+
 
 function updateLog(PDO $conn, $logID, $userFeedback)
 {

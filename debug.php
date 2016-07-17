@@ -35,14 +35,24 @@ function debug_err($pageName, Exception $e)
 
 function handle_exception(Exception $e)
 {
-    $bugReportPage = "Location: bug-report.php";
-
     if ($GLOBALS['DEBUG_MODE']) {
         echo $e->getMessage();
         echo "The exception was created on line: " . $e->getLine();
         echo "View Log Database to check this bug.";
     }
     logger_write($e);
+    //redirectToBugReportPage();
+}
+
+function redirectToBugReportPage()
+{
+    $bugReportPage = "Location: " . realpath(__DIR__ . "/bug-report.php");
+
+    $result = parse_url($_SERVER['REQUEST_URI']);
+    var_dump($result);
+    echo $bugReportPage;
+    echo $_SERVER['DOCUMENT_ROOT'];
+    // jump to bug-report page
     header($bugReportPage);
 }
 
