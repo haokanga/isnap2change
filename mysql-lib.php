@@ -34,16 +34,18 @@ define("EXCLUDED_IMAGE", -2);
 /* const */
 
 /* db connection*/
-function db_connect()
+function db_connect($logger = null)
 {
-
     $conn = null;
 
     $serverName = "localhost";
     $username = "root";
     $password = ".kHdGCD2Un%P";
-
-    $conn = new PDO("mysql:host=$serverName; dbname=isnap2changedb; charset=utf8", $username, $password);
+    if ($logger == null) {
+        $conn = new PDO("mysql:host=$serverName; dbname=isnap2changedb; charset=utf8", $username, $password);
+    } else {
+        $conn = new PDO("mysql:host=$serverName; dbname=$logger; charset=utf8", $username, $password);
+    }
     // set the PDO error mode to exception
     $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
@@ -1328,7 +1330,8 @@ function updatePosterSubmission(PDO $conn, $quizID, $studentID, $zwibblerDoc, $i
     $posterRecordSubmittedQuery->execute(array($quizID, $studentID, $zwibblerDoc, $imageUrl, $zwibblerDoc, $imageUrl));
 }
 
-function getPosterDraft(PDO $conn, $quizID, $studentID)
+// getPosterRecord for both draft and submission
+function getPosterRecord(PDO $conn, $quizID, $studentID)
 {
     $posterSql = "SELECT COUNT(*)
 					  FROM   Poster_Record
@@ -1340,7 +1343,7 @@ function getPosterDraft(PDO $conn, $quizID, $studentID)
         throw new Exception("Failed to get saved poster");
     }
 
-    $posterSql = "SELECT ZwibblerDoc
+    $posterSql = "SELECT *
 					  FROM   Poster_Record
 					  WHERE  StudentID=? AND QuizID=?";
     $posterQuery = $conn->prepare($posterSql);
@@ -1349,6 +1352,25 @@ function getPosterDraft(PDO $conn, $quizID, $studentID)
 
     return $posterRes;
 }
+
+
+function getPosterRecordsByQuiz(PDO $conn, $quizID)
+{
+    $posterSql = "SELECT *
+				FROM   Poster_Record
+				WHERE QuizID = ?";
+    $posterQuery = $conn->prepare($posterSql);
+    $posterQuery->execute(array($quizID));
+    $posterRes = $posterQuery->fetchAll(PDO::FETCH_OBJ);
+
+    return $posterRes;
+}
+
+function getPosterRecords(PDO $conn)
+{
+    return getRecords($conn, "Poster_Record");
+}
+
 
 /* SAQ-Grading */
 function updateSAQQuestionRecord(PDO $conn, $saqID, $studentID, $answer)
@@ -1615,6 +1637,60 @@ function updateStudentGameScores(PDO $conn, $gameID, $studentID, $score)
 }
 
 /* Game */
+
+/* Log */
+function createLog(PDO $conn, $logArr)
+{
+    $updateSql = "INSERT INTO Log( PageName, RequestMethod, RequestParameters, SessionDump, ExceptionMessage, ExceptionTrace)
+         VALUES (?,?,?,?,?,?)";
+    $updateSql = $conn->prepare($updateSql);
+    $updateSql->execute(array_map("htmlspecialchars", $logArr));
+    return $conn->lastInsertId();
+}
+
+function updateLog(PDO $conn, $logID, $userFeedback)
+{
+    $updateSql = "UPDATE Log 
+            SET UserFeedback = ?
+            WHERE LogID = ?";
+    $updateSql = $conn->prepare($updateSql);
+    $updateSql->execute(array(htmlspecialchars($userFeedback), $logID));
+}
+
+function solveLog(PDO $conn, $logID)
+{
+    $updateSql = "UPDATE Log 
+            SET Solved = ?
+            WHERE LogID = ?";
+    $updateSql = $conn->prepare($updateSql);
+    $updateSql->execute(array(1, $logID));
+}
+
+function unsolveLog(PDO $conn, $logID)
+{
+    $updateSql = "UPDATE Log 
+            SET Solved = ?
+            WHERE LogID = ?";
+    $updateSql = $conn->prepare($updateSql);
+    $updateSql->execute(array(0, $logID));
+}
+
+function deleteLog(PDO $conn, $logID)
+{
+    deleteRecord($conn, $logID, "Log");
+}
+
+function getLog(PDO $conn, $logID)
+{
+    return getRecord($conn, $logID, "Log");
+}
+
+function getLogs(PDO $conn)
+{
+    return getRecords($conn, 'Log');
+}
+
+/* Log */
 
 /* Helper Function */
 function getTablePK($tableName)
