@@ -15,9 +15,9 @@ try {
                 $className = $_POST['className'];
                 $schoolName = $_POST['schoolName'];
                 $tokenString = $_POST['tokenString'];
+                $unlockedProgress = $_POST['unlockedProgress'];
                 $schoolID = getSchoolByName($conn, $schoolName)->SchoolID;
-                $classID = createClass($conn, $schoolID, $className);
-                updateToken($conn, $classID, $tokenString);
+                $classID = createClass($conn, $schoolID, $className, $tokenString, $unlockedProgress);
             } else if ($update == 0) {
                 $classID = $_POST['classID'];
                 $className = $_POST['className'];
@@ -26,8 +26,7 @@ try {
                 $unlockedProgress = $_POST['unlockedProgress'];
 
                 $schoolID = getSchoolByName($conn, $schoolName)->SchoolID;
-                updateClass($conn, $classID, $schoolID, $className, $unlockedProgress);
-                updateToken($conn, $classID, $tokenString);
+                updateClass($conn, $classID, $schoolID, $className, $tokenString, $unlockedProgress);
             } else if ($update == -1) {
                 $classID = $_POST['classID'];
                 deleteClass($conn, $classID);

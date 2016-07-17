@@ -22,7 +22,7 @@ function debug_err($pageName, Exception $e)
     if ($e instanceof PDOException) {
         // duplicate entry
         if ($e->errorInfo[1] == 1062) {
-            debug_alert("Duplicate names are not allowed!");
+            debug_alert($e->getMessage());
         } // unclassified PDO exception
         else {
             handle_exception($e);

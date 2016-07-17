@@ -107,22 +107,22 @@ function getSchools(PDO $conn)
 /* School */
 
 /* Class */
-function createClass(PDO $conn, $schoolID, $className)
+function createClass(PDO $conn, $schoolID, $className, $tokenString, $unlockedProgress)
 {
-    $updateSql = "INSERT INTO Class(ClassName, SchoolID)
-             VALUES (?,?)";
+    $updateSql = "INSERT INTO Class(ClassName, TokenString, UnlockedProgress, SchoolID)
+             VALUES (?,?,?,?)";
     $updateSql = $conn->prepare($updateSql);
-    $updateSql->execute(array(htmlspecialchars($className), $schoolID));
+    $updateSql->execute(array(htmlspecialchars($className), htmlspecialchars($tokenString), $unlockedProgress, $schoolID));
     return $conn->lastInsertId();
 }
 
-function updateClass(PDO $conn, $classID, $schoolID, $className, $unlockedProgress)
+function updateClass(PDO $conn, $classID, $schoolID, $className, $tokenString, $unlockedProgress)
 {
     $updateSql = "UPDATE Class 
-            SET ClassName = ?, SchoolID = ?, UnlockedProgress = ?
+            SET ClassName = ?, SchoolID = ?, TokenString = ?, UnlockedProgress = ?
             WHERE ClassID = ?";
     $updateSql = $conn->prepare($updateSql);
-    $updateSql->execute(array(htmlspecialchars($className), $schoolID, $unlockedProgress, $classID));
+    $updateSql->execute(array(htmlspecialchars($className), $schoolID, htmlspecialchars($tokenString), $unlockedProgress, $classID));
 }
 
 function deleteClass(PDO $conn, $classID)
@@ -175,15 +175,6 @@ function getStudentNum(PDO $conn)
 /* Class */
 
 /* Token */
-function updateToken(PDO $conn, $classID, $tokenString)
-{
-    $updateSql = "UPDATE Class 
-            SET TokenString = ?
-            WHERE ClassID = ?";
-    $updateSql = $conn->prepare($updateSql);
-    $updateSql->execute(array(htmlspecialchars($tokenString), $classID));
-}
-
 function getToken(PDO $conn, $token)
 {
     $tokenSql = "SELECT COUNT(*)
@@ -261,16 +252,16 @@ function getStudents(PDO $conn)
 
 function getStudentsRank(PDO $conn)
 {
-    $leaderboardSql = "SELECT Username, Score
+    $leaderBoardSql = "SELECT Username, Score
 					   FROM Student
 					   ORDER BY Score DESC, SubmissionTime 
 					   LIMIT 10;";
 
-    $leaderboardQuery = $conn->prepare($leaderboardSql);
-    $leaderboardQuery->execute(array());
-    $leaderboardRes = $leaderboardQuery->fetchAll(PDO::FETCH_OBJ);
+    $leaderBoardQuery = $conn->prepare($leaderBoardSql);
+    $leaderBoardQuery->execute(array());
+    $leaderBoardRes = $leaderBoardQuery->fetchAll(PDO::FETCH_OBJ);
 
-    return $leaderboardRes;
+    return $leaderBoardRes;
 }
 
 function resetPassword(PDO $conn, $studentID)
