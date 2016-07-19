@@ -594,6 +594,16 @@ function getSnapFacts(PDO $conn)
     return $factResult;
 }
 
+function getSnapFactsByTopic(PDO $conn, $topicID)
+{
+    $factSql = "SELECT * FROM Snap_Fact
+                NATURAL JOIN Topic 
+                WHERE TopicID = ?";
+    $factQuery = $conn->prepare($factSql);
+    $factQuery->execute(array($topicID));
+    $factResult = $factQuery->fetchAll(PDO::FETCH_OBJ);
+    return $factResult;
+}
 /* SnapFact */
 
 /* VerboseFact */
@@ -627,6 +637,17 @@ function getVerboseFactsByTopic(PDO $conn, $topicID)
     $factSql = "SELECT * FROM Topic 
                 LEFT JOIN Verbose_Fact 
                 USING (TopicID) WHERE TopicID = ? ";
+    $factQuery = $conn->prepare($factSql);
+    $factQuery->execute(array($topicID));
+    $factResult = $factQuery->fetchAll(PDO::FETCH_OBJ);
+    return $factResult;
+}
+
+function getVerboseFactsStuByTopic(PDO $conn, $topicID)
+{
+    $factSql = "SELECT * FROM Verbose_Fact
+                NATURAL JOIN Topic 
+                WHERE TopicID = ?";
     $factQuery = $conn->prepare($factSql);
     $factQuery->execute(array($topicID));
     $factResult = $factQuery->fetchAll(PDO::FETCH_OBJ);
