@@ -1,5 +1,23 @@
 #mysql -uroot -p.kHdGCD2Un%P
 #mysql -uroot -p.kHdGCD2Un%P < isnap2change.sql
+
+CREATE DATABASE IF NOT EXISTS log;
+USE log;
+CREATE TABLE IF NOT EXISTS `Log` (
+    LogID MEDIUMINT AUTO_INCREMENT,
+    PageName TEXT,
+    RequestMethod TEXT,
+    RequestParameters TEXT,
+    SessionDump TEXT,
+    ExceptionMessage LONGTEXT,
+    ExceptionTrace LONGTEXT,
+    UserFeedback TEXT,
+    Solved BOOLEAN DEFAULT 0,
+    LogTime TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    CONSTRAINT Log_LogID_PK PRIMARY KEY (LogID)
+)  ENGINE=INNODB;
+
+
 CREATE DATABASE IF NOT EXISTS isnap2changedb;
 USE isnap2changedb;
 
@@ -10,7 +28,8 @@ DROP TABLE IF EXISTS School;
 DROP TABLE IF EXISTS Class;
 DROP TABLE IF EXISTS Student;
 DROP TABLE IF EXISTS Researcher;
-DROP TABLE IF EXISTS Fact;
+DROP TABLE IF EXISTS Snap_Fact;
+DROP TABLE IF EXISTS Verbose_Fact;
 DROP TABLE IF EXISTS Topic;
 DROP TABLE IF EXISTS Learning_Material;
 DROP TABLE IF EXISTS Student_Week_Record;
@@ -44,9 +63,9 @@ CREATE TABLE IF NOT EXISTS `School` (
 
 CREATE TABLE IF NOT EXISTS `Class` (
     ClassID MEDIUMINT AUTO_INCREMENT,
-    ClassName VARCHAR(190) UNIQUE,
+    ClassName VARCHAR(190) NOT NULL UNIQUE,
     SchoolID MEDIUMINT NOT NULL,
-    TokenString TEXT NOT NULL,
+    TokenString VARCHAR(100) NOT NULL UNIQUE,
     # UnlockedProgress
     UnlockedProgress MEDIUMINT NOT NULL DEFAULT 10,
     CONSTRAINT Class_ClassID_PK PRIMARY KEY (ClassID),
@@ -82,12 +101,23 @@ CREATE TABLE IF NOT EXISTS `Researcher` (
     CONSTRAINT Researcher_ResearcherID_PK PRIMARY KEY (ResearcherID)
 )  ENGINE=INNODB;
 
-CREATE TABLE IF NOT EXISTS `Fact` (
-    FactID MEDIUMINT AUTO_INCREMENT,
+CREATE TABLE IF NOT EXISTS `Snap_Fact` (
+    SnapFactID MEDIUMINT AUTO_INCREMENT,
     Content TEXT,
     TopicID MEDIUMINT,
-    CONSTRAINT Fact_FactID_PK PRIMARY KEY (FactID),
+    CONSTRAINT Fact_SnapFactID_PK PRIMARY KEY (SnapFactID),
     CONSTRAINT Fact_TopicID_FK FOREIGN KEY (TopicID)
+        REFERENCES Topic (TopicID)
+        ON DELETE CASCADE ON UPDATE CASCADE
+)  ENGINE=INNODB;
+
+CREATE TABLE IF NOT EXISTS `Verbose_Fact`(
+    VerboseFactID MEDIUMINT AUTO_INCREMENT,
+    Title TEXT,
+    Content TEXT,
+    TopicID MEDIUMINT NOT NULL,
+    CONSTRAINT Verbose_Fact_VerboseFactID_PK PRIMARY KEY (VerboseFactID),
+    CONSTRAINT Verbose_Fact_Topic_FK FOREIGN KEY (TopicID)
         REFERENCES Topic (TopicID)
         ON DELETE CASCADE ON UPDATE CASCADE
 )  ENGINE=INNODB;
@@ -125,7 +155,7 @@ CREATE TABLE IF NOT EXISTS `Quiz_Record` (
 CREATE TABLE IF NOT EXISTS `Learning_Material` (
     QuizID MEDIUMINT,
     Content LONGTEXT,
-    Excluded BOOLEAN DEFAULT 0,
+    Excluded MEDIUMINT DEFAULT 0,
     CONSTRAINT Learning_Material_QuizID_PK PRIMARY KEY (QuizID),
     CONSTRAINT Learning_Material_QuizID_FK FOREIGN KEY (QuizID)
         REFERENCES Quiz (QuizID)
@@ -189,6 +219,8 @@ CREATE TABLE IF NOT EXISTS `MCQ_Question_Record` (
 
 CREATE TABLE IF NOT EXISTS `SAQ_Section` (
     QuizID MEDIUMINT,
+    MediaTitle TEXT,    
+    MediaSource TEXT,
     CONSTRAINT SAQ_Section_QuizID_PK PRIMARY KEY (QuizID),
     CONSTRAINT SAQ_Section_QuizID_FK FOREIGN KEY (QuizID)
         REFERENCES Quiz (QuizID)
@@ -519,10 +551,10 @@ INSERT IGNORE INTO Quiz_Record(QuizID,StudentID) VALUES(2,4);
 INSERT IGNORE INTO Quiz_Record(QuizID,StudentID) VALUES(2,5);
 INSERT IGNORE INTO Quiz_Record(QuizID,StudentID) VALUES(2,6);
 
-# [Formal] insert SAQ section with questions
+# [Sample] insert SAQ section with questions
 INSERT IGNORE INTO Quiz(Week,QuizType,TopicID) VALUES(1,'SAQ',1);
 SET @QUIZ_LAST_INSERT_ID = LAST_INSERT_ID();
-INSERT IGNORE INTO SAQ_Section(QuizID) VALUES(@QUIZ_LAST_INSERT_ID);
+INSERT IGNORE INTO SAQ_Section(QuizID, MediaTitle, MediaSource) VALUES(@QUIZ_LAST_INSERT_ID, 'It is a trap!', 'The Truth Site');
 INSERT IGNORE INTO SAQ_Question(Question, Points, QuizID) VALUES('Based on the video, list 3 problems or challenges that these teenagers face as a result of their smoking?', 10, @QUIZ_LAST_INSERT_ID);
 INSERT IGNORE INTO SAQ_Question(Question, Points, QuizID) VALUES('List 1 strategy that you could use to help convince a peer to stop smoking?', 10, @QUIZ_LAST_INSERT_ID);
 INSERT IGNORE INTO SAQ_Question(Question, Points, QuizID) VALUES('List 3 the different ways that you have seen anti-smoking messages presented to the public. With each suggest if you think they have been ‘effective’ or ‘not effective’. Eg. Poster-Effective.', 20, @QUIZ_LAST_INSERT_ID);
@@ -608,23 +640,29 @@ INSERT IGNORE INTO `Matching_Option`(Content, MatchingID) VALUES('Rice', @MATCHI
 
 
 
-# [Formal] Learning_Material
+# [Example] Learning_Material
 INSERT IGNORE INTO Learning_Material(Content,QuizID) VALUES('<p>Eating a balanced diet is vital for your health and wellbeing. The food we eat is responsible for providing us with the energy to do all the tasks of daily life. For optimum performance and growth a balance of protein, essential fats, vitamins and minerals are required. We need a wide variety of different foods to provide the right amounts of nutrients for good health. The different types of food and how much of it you should be aiming to eat is demonstrated on the pyramid below. (my own words)</p>
 <p><img style="display: block; margin-left: auto; margin-right: auto;" src="https://cmudream.files.wordpress.com/2016/05/0.jpg" alt="" width="632" height="884" /></p>
 <p>There are three main layers of the food pyramid. The bottom layer is the most important one for your daily intake of food. It contains vegetables, fruits, grains and legumes. You should be having most of your daily food from this layer. These foods are all derived or grow on plants and contain important nutrients such as vitamins, minerals and antioxidants. They are also responsible for being the main contributor of carbohydrates and fibre to our diet.<br />The middle layer is comprised of dairy based products such as milk, yoghurt, cheese. These are essential to providing our bodies with calcium and protein and important vitamins and minerals.<br />They layer also contains lean meat, poultry, fish, eggs, nuts, seeds, legumes. These foods are our main source of protein and are also responsible for providing other nutrients to us including iodine, iron, zinc, B12 vitamins and healthy fats.<br />The top layer, which is the smallest layer, is the layer you should me eating the least off. This layer is made up of food which has unsaturated fats such as sugar, butter, margarine and oils; small amounts of these unsaturated fats are needed for healthy brain and hear function.<br />(my own words)<br />Source: The Healthy Living Pyramid. Nutrition Australia. [Accessed 28/04/2016 http://www.nutritionaustralia.org/national/resource/healthy-living-pyramid]</p>',1);
-INSERT IGNORE INTO Learning_Material(Content,QuizID, Excluded) VALUES('https://www.youtube.com/watch?v=1ey0EDVjyeY&index=89&list=PLIGEVr8ox1oGsi-XcwSjudMi_uCPxGzSs',2,1);
 INSERT IGNORE INTO Learning_Material(Content,QuizID) VALUES('
-<p>Learning materials for week 3.</p>',3);
+<p>Learning materials for week 1...</p>',2);
 INSERT IGNORE INTO Learning_Material(Content,QuizID) VALUES('
-<p>Learning materials for this quiz has not been added.</p>',4);
+<p>Learning material for this quiz has not been added.</p>',4);
+
 INSERT IGNORE INTO Learning_Material(Content,QuizID) VALUES('
-<p>Learning materials for this quiz has not been added.</p>',5);
-INSERT IGNORE INTO Learning_Material(Content,QuizID) VALUES('
-<p>Learning materials for this quiz has not been added.</p>',6);
+<p>Learning material for this quiz has not been added.</p>',6);
 INSERT IGNORE INTO Learning_Material(Content,QuizID) VALUES('
 <p>Nutrition: All over the world people suffer from illnesses that are caused by eating the wrong food or not having enough to eat. In developing countries deficiency diseases arise when people do not get the right nutrients. Conversely, overconsumption of foods rich in fat and cholesterols can lead to heart diseases, obesity, strokes and cancer. (Own words)</p>',7);
 INSERT IGNORE INTO Learning_Material(Content,QuizID) VALUES('
-<p>Learning materials for this quiz has not been added.</p>',8);
+<p>Learning material for this quiz has not been added.</p>',8);
+
+# [Example] Learning_Material (Excluded)
+INSERT IGNORE INTO Learning_Material(Content,QuizID, Excluded) VALUES('
+<p>Learning material for this quiz has not been added.</p>',5,1);
+
+# [Example] Learning_Material (for Video Quiz)
+
+INSERT IGNORE INTO Learning_Material(Content,QuizID, Excluded) VALUES('&lt;p&gt;&lt;iframe src=&quot;//www.youtube.com/embed/UQ0hFLUiHTg?autoplay=1&amp;amp;start=60&amp;amp;end=70&amp;amp;rel=0&amp;quot;&quot; width=&quot;560&quot; height=&quot;314&quot; allowfullscreen=&quot;allowfullscreen&quot;&gt;&lt;/iframe&gt;&lt;/p&gt;',3,-1);
 
 # [Formal] Games
 INSERT IGNORE INTO Game(Description,Levels) VALUES('Fruit Ninja',5);
@@ -667,15 +705,23 @@ UPDATE `isnap2changedb`.`student` SET `SubmissionTime`='2016-06-01 14:49:43' WHE
 UPDATE `isnap2changedb`.`student` SET `SubmissionTime`='2016-06-07 14:48:43' WHERE `StudentID`='5';
 UPDATE `isnap2changedb`.`student` SET `SubmissionTime`='2016-06-11 14:48:43' WHERE `StudentID`='6';
 
-# [Example] insert facts
-INSERT INTO `isnap2changedb`.`fact` (`Content`, `TopicID`) VALUES ('Each day, more than 3,200 people under 18 smoke their first cigarette, and approximately 2,100 youth and young adults become daily smokers.', '1');
-INSERT INTO `isnap2changedb`.`fact` (`Content`, `TopicID`) VALUES ('Nearly 9 out of 10 lung cancers are caused by smoking. Smokers today are much more likely to develop lung cancer than smokers were in 1964.', '1');
-INSERT INTO `isnap2changedb`.`fact` (`Content`, `TopicID`) VALUES ('A large part of the population is Omega-3 deficient. Avoiding a deficiency in these essential fatty acids can help prevent many diseases.', '2');
-INSERT INTO `isnap2changedb`.`fact` (`Content`, `TopicID`) VALUES ('Trans Fats are chemically processed fats that cause all sorts of damage in the body. You should avoid them like the plague.', '2');
-INSERT INTO `isnap2changedb`.`fact` (`Content`, `TopicID`) VALUES ('Excessive alcohol use is responsible for 2.5 million years of potential life lost annually, or an average of about 30 years of potential life lost for each death', '3');
-INSERT INTO `isnap2changedb`.`fact` (`Content`, `TopicID`) VALUES ('Up to 40% of all hospital beds in the United States (except for those being used by maternity and intensive care patients) are being used to treat health conditions that are related to alcohol consumption', '3');
-INSERT INTO `isnap2changedb`.`fact` (`Content`, `TopicID`) VALUES ('People aged 18-64 years old should exercice at least 150 min per week at least, each of the session lasting 10 min as a minimum,', '4');
-INSERT INTO `isnap2changedb`.`fact` (`Content`, `TopicID`) VALUES ('Supportive environments and communities may help people to be more physically active.', '4');
+# [Example] insert snapfacts
+INSERT INTO `isnap2changedb`.`Snap_Fact` (`Content`, `TopicID`) VALUES ('Each day, more than 3,200 people under 18 smoke their first cigarette, and approximately 2,100 youth and young adults become daily smokers.', 1);
+INSERT INTO `isnap2changedb`.`Snap_Fact` (`Content`, `TopicID`) VALUES ('Nearly 9 out of 10 lung cancers are caused by smoking. Smokers today are much more likely to develop lung cancer than smokers were in 1964.', 1);
+INSERT INTO `isnap2changedb`.`Snap_Fact` (`Content`, `TopicID`) VALUES ('A large part of the population is Omega-3 deficient. Avoiding a deficiency in these essential fatty acids can help prevent many diseases.', 2);
+INSERT INTO `isnap2changedb`.`Snap_Fact` (`Content`, `TopicID`) VALUES ('Trans Fats are chemically processed fats that cause all sorts of damage in the body. You should avoid them like the plague.', 2);
+INSERT INTO `isnap2changedb`.`Snap_Fact` (`Content`, `TopicID`) VALUES ('Excessive alcohol use is responsible for 2.5 million years of potential life lost annually, or an average of about 30 years of potential life lost for each death', 3);
+INSERT INTO `isnap2changedb`.`Snap_Fact` (`Content`, `TopicID`) VALUES ('Up to 40% of all hospital beds in the United States (except for those being used by maternity and intensive care patients) are being used to treat health conditions that are related to alcohol consumption', 3);
+INSERT INTO `isnap2changedb`.`Snap_Fact` (`Content`, `TopicID`) VALUES ('People aged 18-64 years old should exercice at least 150 min per week at least, each of the session lasting 10 min as a minimum,', 4);
+INSERT INTO `isnap2changedb`.`Snap_Fact` (`Content`, `TopicID`) VALUES ('Supportive environments and communities may help people to be more physically active.', '4');
+
+# [Example] insert verbose facts with sub paddings
+INSERT IGNORE INTO `verbose_fact`(Title, Content, TopicID) VALUES("Short Term Effects of Smoking",'Short Term Effects of Smoking Content...',1);
+INSERT IGNORE INTO `verbose_fact`(Title, Content, TopicID) VALUES("Emphysema",'Emphysema is a long-term, progressive disease of the lungs that primarily causes shortness of breath due to over-inflation of the alveoli (air sacs in the lung). In people with emphysema, the lung tissue involved in exchange of gases (oxygen and carbon dioxide) is impaired or destroyed. Emphysema is included in a group of diseases called chronic obstructive pulmonary disease or COPD (pulmonary refers to the lungs).
+Emphysema is called an obstructive lung disease because airflow on exhalation is slowed or stopped because over-inflated alveoli do not exchange gases when a person breaths due to little or no movement of gases out of the alveoli.
+Emphysema changes the anatomy of the lung in several important ways. This is due to in part to the destruction of lung tissue around smaller airways. This tissue normally holds these small airways, called bronchioles, open, allowing air to leave the lungs on exhalation. When this tissue is damaged, these airways collapse, making it difficult for the lungs to empty and the air (gases) becomes trapped in the alveoli.
+Normal lung tissue looks like a new sponge. Emphysematous lung looks like an old used sponge, with large holes and a dramatic loss of “springy-ness” or elasticity. When the lung is stretched during inflation (inhalation), the nature of the stretched tissue wants to relax to its resting state. In emphysema, this elastic function is impaired, resulting in air trapping in the lungs. Emphysema destroys this spongy tissue of the lung and also severely affects the small blood vessels (capillaries of the lung) and airways that run throughout the lung. Thus, not only is airflow affected but so is blood flow. This has dramatic impact on the ability for the lung not only to empty its air sacs called alveoli (pleural for alveolus) but also for blood to flow through the lungs to receive oxygen.',1);
+INSERT IGNORE INTO `verbose_fact`(Title, Content, TopicID) VALUES("Long Term Effects of Smoking",'Long Term Effects of Smoking Content...',1);
 
 # [Example] insert a poster task into Quiz
 INSERT INTO `isnap2changedb`.`quiz` (`Week`, `QuizType`, `TopicID`) VALUES ('2', 'Poster', '3');
@@ -720,10 +766,10 @@ INSERT IGNORE INTO `MCQ_Option`(Content, Explanation, MCQID) VALUES('5', "Correc
 INSERT INTO `isnap2changedb`.`poster_section` (`QuizID`, `Points`) VALUES ('9', '20');
 
 # [Example] insert a learning material for a Poster task with QuizID = 9
-INSERT INTO `isnap2changedb`.`learning_material` (`Content`, `QuizID`) VALUES ('<p>Learning materials for this quiz has not been added.</p>', '9');
+INSERT INTO `isnap2changedb`.`learning_material` (`Content`, `QuizID`) VALUES ('<p>Learning material for this quiz has not been added.</p>', '9');
 
 # [Example] insert one more learning material
-INSERT INTO `isnap2changedb`.`learning_material` (`Content`, `QuizID`, Excluded) VALUES ('<p>Learning materials for this quiz has not been added.</p>', '10', 1);
+INSERT INTO `isnap2changedb`.`learning_material` (`Content`, `QuizID`, Excluded) VALUES ('<p>Learning material for this quiz has not been added.</p>', '10', 1);
 
 # [Example] change a class's (classID = 1) unlocked progress to 3
 UPDATE `isnap2changedb`.`class` SET `UnlockedProgress`='3' WHERE `ClassID`='1';

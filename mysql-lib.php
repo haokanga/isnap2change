@@ -22,17 +22,30 @@ misc
 
 */
 
-/* db connection*/
-function db_connect()
-{
 
+/* const */
+define("EMPTY_LEARNING_MATERIAL", "<p>Learning material for this quiz has not been added.</p>");
+define("EMPTY_VIDEO", "<p>Video for this quiz has not been added.</p>");
+define("EMPTY_IMAGE", "<p>Image for this quiz has not been added.</p>");
+define("EXCLUDED_TRUE", 1);
+define("EXCLUDED_FALSE", 0);
+define("EXCLUDED_VIDEO", -1);
+define("EXCLUDED_IMAGE", -2);
+/* const */
+
+/* db connection*/
+function db_connect($logger = null)
+{
     $conn = null;
 
     $serverName = "localhost";
     $username = "root";
     $password = ".kHdGCD2Un%P";
-
-    $conn = new PDO("mysql:host=$serverName; dbname=isnap2changedb; charset=utf8", $username, $password);
+    if ($logger == null) {
+        $conn = new PDO("mysql:host=$serverName; dbname=isnap2changedb; charset=utf8", $username, $password);
+    } else {
+        $conn = new PDO("mysql:host=$serverName; dbname=$logger; charset=utf8", $username, $password);
+    }
     // set the PDO error mode to exception
     $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
@@ -94,22 +107,22 @@ function getSchools(PDO $conn)
 /* School */
 
 /* Class */
-function createClass(PDO $conn, $schoolID, $className)
+function createClass(PDO $conn, $schoolID, $className, $tokenString, $unlockedProgress)
 {
-    $updateSql = "INSERT INTO Class(ClassName, SchoolID)
-             VALUES (?,?)";
+    $updateSql = "INSERT INTO Class(ClassName, TokenString, UnlockedProgress, SchoolID)
+             VALUES (?,?,?,?)";
     $updateSql = $conn->prepare($updateSql);
-    $updateSql->execute(array(htmlspecialchars($className), $schoolID));
+    $updateSql->execute(array(htmlspecialchars($className), htmlspecialchars($tokenString), $unlockedProgress, $schoolID));
     return $conn->lastInsertId();
 }
 
-function updateClass(PDO $conn, $classID, $schoolID, $className, $unlockedProgress)
+function updateClass(PDO $conn, $classID, $schoolID, $className, $tokenString, $unlockedProgress)
 {
     $updateSql = "UPDATE Class 
-            SET ClassName = ?, SchoolID = ?, UnlockedProgress = ?
+            SET ClassName = ?, SchoolID = ?, TokenString = ?, UnlockedProgress = ?
             WHERE ClassID = ?";
     $updateSql = $conn->prepare($updateSql);
-    $updateSql->execute(array(htmlspecialchars($className), $schoolID, $unlockedProgress, $classID));
+    $updateSql->execute(array(htmlspecialchars($className), $schoolID, htmlspecialchars($tokenString), $unlockedProgress, $classID));
 }
 
 function deleteClass(PDO $conn, $classID)
@@ -162,15 +175,6 @@ function getStudentNum(PDO $conn)
 /* Class */
 
 /* Token */
-function updateToken(PDO $conn, $classID, $tokenString)
-{
-    $updateSql = "UPDATE Class 
-            SET TokenString = ?
-            WHERE ClassID = ?";
-    $updateSql = $conn->prepare($updateSql);
-    $updateSql->execute(array(htmlspecialchars($tokenString), $classID));
-}
-
 function getToken(PDO $conn, $token)
 {
     $tokenSql = "SELECT COUNT(*)
@@ -248,16 +252,16 @@ function getStudents(PDO $conn)
 
 function getStudentsRank(PDO $conn)
 {
-    $leaderboardSql = "SELECT Username, Score
+    $leaderBoardSql = "SELECT Username, Score
 					   FROM Student
 					   ORDER BY Score DESC, SubmissionTime 
 					   LIMIT 10;";
 
-    $leaderboardQuery = $conn->prepare($leaderboardSql);
-    $leaderboardQuery->execute(array());
-    $leaderboardRes = $leaderboardQuery->fetchAll(PDO::FETCH_OBJ);
+    $leaderBoardQuery = $conn->prepare($leaderBoardSql);
+    $leaderBoardQuery->execute(array());
+    $leaderBoardRes = $leaderBoardQuery->fetchAll(PDO::FETCH_OBJ);
 
-    return $leaderboardRes;
+    return $leaderBoardRes;
 }
 
 function resetPassword(PDO $conn, $studentID)
@@ -321,25 +325,7 @@ function removeWeek(PDO $conn, $week)
 
 function getWeekByQuiz(PDO $conn, $quizID)
 {
-    $weekSql = "SELECT COUNT(*)
-                FROM Quiz
-                WHERE QuizID = ?";
-    $weekQuery = $conn->prepare($weekSql);
-    $weekQuery->execute(array($quizID));
-
-    if ($weekQuery->fetchColumn() != 1) {
-        throw new Exception("Failed to get week by quiz id");
-    }
-
-    $weekSql = "SELECT Week
-                FROM Quiz
-                WHERE QuizID = ?";
-    $weekQuery = $conn->prepare($weekSql);
-    $weekQuery->execute(array($quizID));
-    $weekRes = $weekQuery->fetch(PDO::FETCH_OBJ);
-    $week = $weekRes->Week;
-
-    return $week;
+    return getQuiz($conn, $quizID)->Week;
 }
 
 function getMaxWeek(PDO $conn)
@@ -392,6 +378,8 @@ function getStuWeekRecord(PDO $conn, $studentID, $week)
 /* Quiz */
 function createQuiz(PDO $conn, $topicID, $quizType, $week)
 {
+    if ($quizType == "Video" || $quizType == "Image")
+        $quizType = 'SAQ';
     $updateSql = "INSERT INTO Quiz(Week, QuizType, TopicID)
              VALUES (?,?,?)";
     $updateSql = $conn->prepare($updateSql);
@@ -459,6 +447,7 @@ function getQuizNum(PDO $conn)
 
 function getQuizType(PDO $conn, $quizID)
 {
+    // if quiz non-exist
     $quizTypeSql = "SELECT COUNT(*)
                         FROM Quiz
                         WHERE QuizID = ?";
@@ -468,20 +457,29 @@ function getQuizType(PDO $conn, $quizID)
         throw new Exception("Failed to get quiz type");
     }
 
-    $quizTypeSql = "SELECT QuizType 
-                        FROM   Quiz
+    $quizTypeSql = "SELECT * 
+                        FROM   Quiz LEFT JOIN Learning_Material USING (QuizID)
                         WHERE  QuizID = ?";
 
     $quizTypeQuery = $conn->prepare($quizTypeSql);
     $quizTypeQuery->execute(array($quizID));
     $quizTypeQueryRes = $quizTypeQuery->fetch(PDO::FETCH_OBJ);
 
-    if ($quizTypeQueryRes->QuizType == "Misc") {
+    if ($quizTypeQueryRes->Excluded == EXCLUDED_VIDEO) {
+        return "Video";
+    } else if ($quizTypeQueryRes->Excluded == EXCLUDED_IMAGE) {
+        return "Image";
+    } else if ($quizTypeQueryRes->QuizType == "Misc") {
         return getMiscQuizType($conn, $quizID);
     } else {
         return $quizTypeQueryRes->QuizType;
     }
 
+}
+
+function getQuiz(PDO $conn, $quizID)
+{
+    return getRecord($conn, $quizID, "Quiz");
 }
 
 function getQuizzes(PDO $conn)
@@ -502,7 +500,7 @@ function getQuizzesByWeek(PDO $conn, $week)
 function getQuizPoints(PDO $conn, $quizID)
 {
     $pointsBySection = array('MCQ', 'Matching', 'Poster', 'Misc');
-    $pointsByQuestion = array('SAQ');
+    $pointsByQuestion = array('SAQ', 'Video', 'Image');
     $points = 0;
 
     $quizTypeSql = "SELECT COUNT(*) FROM Quiz WHERE QuizID = ?";
@@ -532,6 +530,7 @@ function getQuizPoints(PDO $conn, $quizID)
 
     return $points;
 }
+
 /* Quiz */
 
 /* Topic */
@@ -555,6 +554,111 @@ function getTopics(PDO $conn)
 }
 
 /* Topic */
+
+/* SnapFact */
+function createSnapFact(PDO $conn, $topicID, $content)
+{
+    $updateSql = "INSERT INTO Snap_Fact(Content, TopicID)
+             VALUES (?,?)";
+    $updateSql = $conn->prepare($updateSql);
+    $updateSql->execute(array($content, $topicID));
+    return $conn->lastInsertId();
+}
+
+function updateSnapFact(PDO $conn, $snapFactID, $topicID, $content)
+{
+    $updateSql = "UPDATE Snap_Fact 
+                SET Content = ?, TopicID = ?
+                WHERE SnapFactID = ?";
+    $updateSql = $conn->prepare($updateSql);
+    $updateSql->execute(array($content, $topicID, $snapFactID));
+}
+
+function deleteSnapFact(PDO $conn, $snapFactID)
+{
+    deleteRecord($conn, $snapFactID, "Snap_Fact");
+}
+
+function getSnapFact(PDO $conn, $snapFactID)
+{
+    return getRecord($conn, $snapFactID, "Fact");
+}
+
+function getSnapFacts(PDO $conn)
+{
+    $factSql = "SELECT * FROM Snap_Fact 
+                NATURAL JOIN Topic";
+    $factQuery = $conn->prepare($factSql);
+    $factQuery->execute();
+    $factResult = $factQuery->fetchAll(PDO::FETCH_OBJ);
+    return $factResult;
+}
+
+/* SnapFact */
+
+/* VerboseFact */
+function createVerboseFact(PDO $conn, $topicID, $title, $content)
+{
+    $updateSql = "INSERT INTO Verbose_Fact(Title, Content, TopicID)
+             VALUES (?,?,?)";
+    $updateSql = $conn->prepare($updateSql);
+    $updateSql->execute(array(htmlspecialchars($title), htmlspecialchars($content), $topicID));
+    return $conn->lastInsertId();
+}
+
+function updateVerboseFact(PDO $conn, $verboseFactID, $title, $content)
+{
+    $updateSql = "UPDATE Verbose_Fact 
+                SET Title = ?, Content = ?
+                WHERE VerboseFactID = ?";
+    $updateSql = $conn->prepare($updateSql);
+    $updateSql->execute(array(htmlspecialchars($title), htmlspecialchars($content), $verboseFactID));
+}
+
+function deleteVerboseFact(PDO $conn, $verboseFactID)
+{
+    $updateSql = "DELETE FROM Verbose_Fact WHERE VerboseFactID = ?";
+    $updateSql = $conn->prepare($updateSql);
+    $updateSql->execute(array($verboseFactID));
+}
+
+function getVerboseFactsByTopic(PDO $conn, $topicID)
+{
+    $factSql = "SELECT * FROM Topic 
+                LEFT JOIN Verbose_Fact 
+                USING (TopicID) WHERE TopicID = ? ";
+    $factQuery = $conn->prepare($factSql);
+    $factQuery->execute(array($topicID));
+    $factResult = $factQuery->fetchAll(PDO::FETCH_OBJ);
+    return $factResult;
+}
+
+function getVerboseFactNumByTopic(PDO $conn, $topicID)
+{
+    $factSql = "SELECT COUNT(*) AS Count FROM Topic 
+                NATURAL JOIN Verbose_Fact 
+                WHERE TopicID = ? ";
+    $factQuery = $conn->prepare($factSql);
+    $factQuery->execute(array($topicID));
+    return $factQuery->fetchColumn();
+}
+
+
+function getVerboseFacts(PDO $conn)
+{
+    //get verbose fact for all the topics (TOPIC.Introduction excluded)
+    $factSql = "SELECT * FROM Topic 
+                LEFT JOIN Verbose_Fact 
+                USING (TopicID) WHERE TopicName != 'Introduction'";
+    $factQuery = $conn->prepare($factSql);
+    $factQuery->execute();
+    $factResult = $factQuery->fetchAll(PDO::FETCH_OBJ);
+    return $factResult;
+}
+
+
+/* VerboseFact */
+
 
 /* MCQ */
 function createMCQSection(PDO $conn, $quizID, $points, $questionnaires)
@@ -744,7 +848,7 @@ function getMaxOptionNum(PDO $conn, $quizID)
 /* Option */
 
 /* SAQ */
-function createSAQSection(PDO $conn, $quizID)
+function createSAQLikeSection(PDO $conn, $quizID)
 {
     $updateSql = "INSERT INTO SAQ_Section(QuizID)
                     VALUES (?)";
@@ -759,6 +863,15 @@ function createSAQQuestion(PDO $conn, $quizID, $points, $question)
     $updateSql = $conn->prepare($updateSql);
     $updateSql->execute(array(htmlspecialchars($question), $points, $quizID));
     return $conn->lastInsertId();
+}
+
+function updateSAQLikeSection(PDO $conn, $quizID, $mediaSource, $mediaTitle)
+{
+    $updateSql = "UPDATE SAQ_Section
+                    SET MediaTitle = ?, MediaSource = ?
+                    WHERE QuizID = ?";
+    $updateSql = $conn->prepare($updateSql);
+    $updateSql->execute(array(htmlspecialchars($mediaTitle), htmlspecialchars($mediaSource), $quizID));
 }
 
 function updateSAQQuestion(PDO $conn, $saqID, $points, $question)
@@ -800,7 +913,7 @@ function getSAQQuestions(PDO $conn, $quizID)
 
 function getSAQQuiz(PDO $conn, $quizID)
 {
-    $quizSql = "SELECT QuizID, TopicID, Week, QuizType, TopicName, SAQID, SUM(Points) AS Points, COUNT(SAQID) AS Questions
+    $quizSql = "SELECT *, SUM(Points) AS Points, COUNT(SAQID) AS Questions
                    FROM Quiz NATURAL JOIN Topic NATURAL JOIN SAQ_Section LEFT JOIN SAQ_Question USING (QuizID) WHERE QuizID = ? GROUP BY QuizID";
     $quizQuery = $conn->prepare($quizSql);
     $quizQuery->execute(array($quizID));
@@ -808,14 +921,29 @@ function getSAQQuiz(PDO $conn, $quizID)
     return $quizResult;
 }
 
-function getSAQQuizzes(PDO $conn)
+function getSAQLikeQuizzes(PDO $conn, $typeIndicator)
 {
     $quizSql = "SELECT QuizID, TopicID, Week, QuizType, TopicName, SAQID, SUM(Points) AS Points, COUNT(SAQID) AS Questions
-                   FROM Quiz NATURAL JOIN Topic NATURAL JOIN SAQ_Section LEFT JOIN SAQ_Question USING (QuizID) WHERE QuizType = 'SAQ' GROUP BY QuizID";
+                   FROM Quiz NATURAL JOIN Topic NATURAL JOIN Learning_Material NATURAL JOIN SAQ_Section LEFT JOIN SAQ_Question USING (QuizID) WHERE QuizType = 'SAQ' AND $typeIndicator GROUP BY QuizID";
     $quizQuery = $conn->prepare($quizSql);
     $quizQuery->execute();
     $quizResult = $quizQuery->fetchAll(PDO::FETCH_OBJ);
     return $quizResult;
+}
+
+function getSAQQuizzes(PDO $conn)
+{
+    return getSAQLikeQuizzes($conn, "Excluded != " . EXCLUDED_VIDEO . " AND Excluded != " . EXCLUDED_IMAGE);
+}
+
+function getVideoQuizzes(PDO $conn)
+{
+    return getSAQLikeQuizzes($conn, "Excluded = " . EXCLUDED_VIDEO);
+}
+
+function getImageQuizzes(PDO $conn)
+{
+    return getSAQLikeQuizzes($conn, "Excluded = " . EXCLUDED_IMAGE);
 }
 
 /* SAQ */
@@ -968,21 +1096,62 @@ function getMaxMatchingOptionNum(PDO $conn, $quizID)
 /* Matching_Option */
 
 /* Learning_Material */
+
+function createLearningMaterial(PDO $conn, $quizID, $excluded)
+{
+    switch ($excluded) {
+        case EXCLUDED_TRUE:
+            $content = EMPTY_LEARNING_MATERIAL;
+            break;
+        case EXCLUDED_VIDEO:
+            $content = EMPTY_VIDEO;
+            break;
+        case EXCLUDED_IMAGE:
+            $content = EMPTY_IMAGE;
+            break;
+        default:
+            throw new Exception("Unexpected Excluded Value.");
+    }
+    $updateSql = "INSERT INTO Learning_Material(Content, QuizID, Excluded) VALUES (?,?,?)";
+    $updateSql = $conn->prepare($updateSql);
+    $updateSql->execute(array($content, $quizID, $excluded));
+}
+
 function createEmptyLearningMaterial(PDO $conn, $quizID)
 {
-    $content = '<p>Learning materials for this quiz has not been added.</p>';
-    $updateSql = "INSERT INTO Learning_Material(Content,QuizID, Excluded) VALUES (?,?,?)";
-    $updateSql = $conn->prepare($updateSql);
-    $updateSql->execute(array($content, $quizID, 1));
+    createLearningMaterial($conn, $quizID, EXCLUDED_TRUE);
 }
+
+function createVideoLearningMaterial(PDO $conn, $quizID)
+{
+    createLearningMaterial($conn, $quizID, EXCLUDED_VIDEO);
+}
+
+function createImageLearningMaterial(PDO $conn, $quizID)
+{
+    createLearningMaterial($conn, $quizID, EXCLUDED_IMAGE);
+}
+
 
 function updateLearningMaterial(PDO $conn, $quizID, $content)
 {
+    // it is video/image quiz, retain excluded flag
+    if (getLearningMaterial($conn, $quizID)->Excluded == EXCLUDED_VIDEO || getLearningMaterial($conn, $quizID)->Excluded == EXCLUDED_IMAGE) {
+        $excluded = getLearningMaterial($conn, $quizID)->Excluded;
+    } // the learning material is updated and should not be excluded anymore
+    else if (strcmp(htmlspecialchars($content), htmlspecialchars(EMPTY_LEARNING_MATERIAL)) !== 0) {
+        $excluded = EXCLUDED_FALSE;
+    } // the content is identical to default empty learning material and should be excluded
+    else {
+        $excluded = EXCLUDED_TRUE;
+    }
+
+
     $updateSql = "UPDATE Learning_Material 
-            SET Content = ?
+            SET Content = ?, Excluded = ?
             WHERE QuizID = ?";
     $updateSql = $conn->prepare($updateSql);
-    $updateSql->execute(array(htmlspecialchars($content), $quizID));
+    $updateSql->execute(array(htmlspecialchars($content), $excluded, $quizID));
 }
 
 function getLearningMaterial(PDO $conn, $quizID)
@@ -992,16 +1161,17 @@ function getLearningMaterial(PDO $conn, $quizID)
 
 function getLearningMaterialByWeek(PDO $conn, $week)
 {
-    $learniningMaterialSql = "SELECT TopicName, QuizID, Content
+    $learningMaterialSql = "SELECT TopicName, QuizID, Content
                               FROM Quiz NATURAL JOIN Topic
                                         NATURAL JOIN Learning_Material
                               WHERE Week = ? AND Excluded = ?";
 
-    $learningMaterialQuery = $conn->prepare($learniningMaterialSql);
-    $learningMaterialQuery->execute(array($week, 0));
+    $learningMaterialQuery = $conn->prepare($learningMaterialSql);
+    $learningMaterialQuery->execute(array($week, EXCLUDED_FALSE));
     $learningMaterialResult = $learningMaterialQuery->fetchAll(PDO::FETCH_OBJ);
     return $learningMaterialResult;
 }
+
 /* Learning_Material */
 
 
@@ -1101,18 +1271,18 @@ function getQuizzesStatusByWeek(PDO $conn, $studentID, $week)
     $quizzesStatusQuery->execute(array($studentID, $week));
     $quizzesStatusRes = $quizzesStatusQuery->fetchAll(PDO::FETCH_OBJ);
 
-    for($i = 0; $i < count($quizzesStatusRes) ; $i++) {
+    for ($i = 0; $i < count($quizzesStatusRes); $i++) {
         $quizzesRes[$i]['QuizID'] = $quizzesStatusRes[$i]->QuizID;
         $quizzesRes[$i]['Status'] = $quizzesStatusRes[$i]->Status;
         $quizzesRes[$i]['TopicName'] = $quizzesStatusRes[$i]->TopicName;
 
-        if($quizzesStatusRes[$i]->QuizType == "Misc") {
-            switch(getMiscQuizType($conn, $quizzesStatusRes[$i]->QuizID)) {
+        if ($quizzesStatusRes[$i]->QuizType == "Misc") {
+            switch (getMiscQuizType($conn, $quizzesStatusRes[$i]->QuizID)) {
                 case "Calculator":
                     $quizzesRes[$i]['QuizType'] = "Calculator";
                     break;
                 case "DrinkingTool":
-                    $quizzesRes[$i]['QuizType']= "DrinkingTool";
+                    $quizzesRes[$i]['QuizType'] = "DrinkingTool";
                     break;
             }
         } else {
@@ -1151,7 +1321,8 @@ function updatePosterSubmission(PDO $conn, $quizID, $studentID, $zwibblerDoc, $i
     $posterRecordSubmittedQuery->execute(array($quizID, $studentID, $zwibblerDoc, $imageUrl, $zwibblerDoc, $imageUrl));
 }
 
-function getPosterDraft(PDO $conn, $quizID, $studentID)
+// getPosterRecord for both draft and submission
+function getPosterRecord(PDO $conn, $quizID, $studentID)
 {
     $posterSql = "SELECT COUNT(*)
 					  FROM   Poster_Record
@@ -1163,7 +1334,7 @@ function getPosterDraft(PDO $conn, $quizID, $studentID)
         throw new Exception("Failed to get saved poster");
     }
 
-    $posterSql = "SELECT ZwibblerDoc
+    $posterSql = "SELECT *
 					  FROM   Poster_Record
 					  WHERE  StudentID=? AND QuizID=?";
     $posterQuery = $conn->prepare($posterSql);
@@ -1172,6 +1343,25 @@ function getPosterDraft(PDO $conn, $quizID, $studentID)
 
     return $posterRes;
 }
+
+
+function getPosterRecordsByQuiz(PDO $conn, $quizID)
+{
+    $posterSql = "SELECT *
+				FROM   Poster_Record
+				WHERE QuizID = ?";
+    $posterQuery = $conn->prepare($posterSql);
+    $posterQuery->execute(array($quizID));
+    $posterRes = $posterQuery->fetchAll(PDO::FETCH_OBJ);
+
+    return $posterRes;
+}
+
+function getPosterRecords(PDO $conn)
+{
+    return getRecords($conn, "Poster_Record");
+}
+
 
 /* SAQ-Grading */
 function updateSAQQuestionRecord(PDO $conn, $saqID, $studentID, $answer)
@@ -1295,13 +1485,29 @@ function getSAQSubmission(PDO $conn, $quizID, $studentID)
     return $quizResult;
 }
 
-function getSAQSubmissions(PDO $conn)
+
+function getSAQLikeSubmissions(PDO $conn, $typeIndicator)
 {
-    $quizSql = "SELECT * FROM Quiz_Record NATURAL JOIN Quiz NATURAL JOIN Student NATURAL JOIN Class NATURAL JOIN Topic WHERE QuizType = 'SAQ' AND (`Status` = 'UNGRADED' OR `Status` = 'GRADED')";
+    $quizSql = "SELECT * FROM Quiz_Record NATURAL JOIN Quiz NATURAL JOIN Learning_Material NATURAL JOIN Student NATURAL JOIN Class NATURAL JOIN Topic WHERE QuizType = 'SAQ' AND (`Status` = 'UNGRADED' OR `Status` = 'GRADED') AND $typeIndicator ";
     $quizQuery = $conn->prepare($quizSql);
     $quizQuery->execute();
     $quizResult = $quizQuery->fetchAll(PDO::FETCH_OBJ);
     return $quizResult;
+}
+
+function getSAQSubmissions(PDO $conn)
+{
+    return getSAQLikeSubmissions($conn, "Excluded != " . EXCLUDED_VIDEO . " AND Excluded != " . EXCLUDED_IMAGE);
+}
+
+function getVideoSubmissions(PDO $conn)
+{
+    return getSAQLikeSubmissions($conn, "Excluded = " . EXCLUDED_VIDEO);
+}
+
+function getImageSubmissions(PDO $conn)
+{
+    return getSAQLikeSubmissions($conn, "Excluded = " . EXCLUDED_IMAGE);
 }
 
 /* SAQ-Grading */
@@ -1312,7 +1518,7 @@ function getSAQSubmissions(PDO $conn)
 function getFactTopics(PDO $conn)
 {
     $topicSql = "SELECT DISTINCT TopicID
-				 FROM FACT;";
+				 FROM Snap_Fact ";
 
     $topicQuery = $conn->prepare($topicSql);
     $topicQuery->execute(array());
@@ -1324,7 +1530,7 @@ function getFactTopics(PDO $conn)
 function getFactsByTopicID(PDO $conn, $topicID)
 {
     $factSql = "SELECT *
-				FROM FACT NATURAL JOIN Topic
+				FROM Snap_Fact NATURAL JOIN Topic
 				WHERE TopicID = ?;";
 
     $factQuery = $conn->prepare($factSql);
@@ -1423,18 +1629,82 @@ function updateStudentGameScores(PDO $conn, $gameID, $studentID, $score)
 
 /* Game */
 
+/* Log */
+function createLog(PDO $conn, $logArr)
+{
+    $updateSql = "INSERT INTO Log( PageName, RequestMethod, RequestParameters, SessionDump, ExceptionMessage, ExceptionTrace)
+         VALUES (?,?,?,?,?,?)";
+    $updateSql = $conn->prepare($updateSql);
+    $updateSql->execute(array_map("htmlspecialchars", $logArr));
+    return $conn->lastInsertId();
+}
+
+function updateLog(PDO $conn, $logID, $userFeedback)
+{
+    $updateSql = "UPDATE Log 
+            SET UserFeedback = ?
+            WHERE LogID = ?";
+    $updateSql = $conn->prepare($updateSql);
+    $updateSql->execute(array(htmlspecialchars($userFeedback), $logID));
+}
+
+function solveLog(PDO $conn, $logID)
+{
+    $updateSql = "UPDATE Log 
+            SET Solved = ?
+            WHERE LogID = ?";
+    $updateSql = $conn->prepare($updateSql);
+    $updateSql->execute(array(1, $logID));
+}
+
+function unsolveLog(PDO $conn, $logID)
+{
+    $updateSql = "UPDATE Log 
+            SET Solved = ?
+            WHERE LogID = ?";
+    $updateSql = $conn->prepare($updateSql);
+    $updateSql->execute(array(0, $logID));
+}
+
+function deleteLog(PDO $conn, $logID)
+{
+    deleteRecord($conn, $logID, "Log");
+}
+
+function getLog(PDO $conn, $logID)
+{
+    return getRecord($conn, $logID, "Log");
+}
+
+function getLogs(PDO $conn)
+{
+    return getRecords($conn, 'Log');
+}
+
+/* Log */
+
 /* Helper Function */
+function getTablePK($tableName)
+{
+    $tablePK = $tableName . "ID";
+    if ($tableName == "Learning_Material") $tablePK = "QuizID";
+    else if ($tableName == "Snap_Fact") $tablePK = "SnapFactID";
+    else if ($tableName == "Verbose_Fact") $tablePK = "VerboseFactID";
+    return $tablePK;
+}
+
+
 function deleteRecord(PDO $conn, $recordID, $tableName)
 {
-    $updateSql = "DELETE FROM $tableName WHERE " . $tableName . "ID = ?";
+    $tablePK = getTablePK($tableName);
+    $updateSql = "DELETE FROM $tableName WHERE $tablePK = ?";
     $updateSql = $conn->prepare($updateSql);
     $updateSql->execute(array($recordID));
 }
 
 function getRecord(PDO $conn, $recordID, $tableName, array $joinTables = null)
 {
-    $tablePK = $tableName . "ID";
-    if ($tableName == "Learning_Material") $tablePK = "QuizID";
+    $tablePK = getTablePK($tableName);
 
     $tableSql = "SELECT COUNT(*)
 				 FROM $tableName
@@ -1470,6 +1740,12 @@ function getRecords(PDO $conn, $tableName, array $joinTables = null)
     $tableQuery->execute();
     $tableResult = $tableQuery->fetchAll(PDO::FETCH_OBJ);
     return $tableResult;
+}
+
+function encodeURIComponent($str)
+{
+    $revert = array('%21' => '!', '%2A' => '*', '%27' => "'", '%28' => '(', '%29' => ')');
+    return strtr(rawurlencode($str), $revert);
 }
 
 /* Helper Function */

@@ -104,7 +104,7 @@ echo 'UNIT TEST<br>';
 echo '###########################<br>';
 echo 'createClass(\$conn, \$schoolID, \$className)<br>';
 for($i=-1;$i<10;$i++){
-    echo "createClass(\$conn, \$schoolID, \$className)".createClass($conn, 1, generateRandomString())."<br>";
+    echo "createClass(\$conn, \$schoolID, \$className)".createClass($conn, 1, generateRandomString(), 0)."<br>";
 }
 */
 echo '###########################<br>';

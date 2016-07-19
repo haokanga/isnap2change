@@ -2,8 +2,8 @@
 session_start();
 require_once("../mysql-lib.php");
 require_once("../debug.php");
-require_once("researcher-validation.php");
-$pageName = "mcq-editor";
+require_once("researcher-lib.php");
+$parentPage = 'Location: mcq.php';
 $columnName = array('MCQID', 'Question', 'Option', 'Explanation', 'Edit');
 
 try {
@@ -19,9 +19,8 @@ try {
                     $points = $_POST['points'];
                     $questionnaires = $_POST['questionnaires'];
                     $conn->beginTransaction();
-
-                    $topicResult = getTopicByName($conn, $topicName);
-                    $topicID = $topicResult->TopicID;
+                    
+                    $topicID = getTopicByName($conn, $topicName)->TopicID;
                     updateQuiz($conn, $quizID, $topicID, $week);
                     updateMCQSection($conn, $quizID, $points, $questionnaires);
 
@@ -33,7 +32,7 @@ try {
             } else if ($metadataUpdate == -1) {
                 $quizID = $_POST['quizID'];
                 deleteQuiz($conn, $quizID);
-                header('Location: mcq.php');
+                header($parentPage);
             }
         }
         if (isset($_POST['update'])) {
@@ -72,15 +71,13 @@ db_close($conn);
 <!DOCTYPE html>
 <html lang="en">
 
-<head>
-    <!-- Header Library -->
-    <?php require_once('header-lib.php'); ?>
-</head>
+<!-- Header Library -->
+<?php require_once('header-lib.php'); ?>
 
 <body>
 
 <div id="wrapper">
-
+    <!-- Navigation Layout-->
     <?php require_once('navigation.php'); ?>
 
     <div id="page-wrapper">
@@ -167,7 +164,9 @@ db_close($conn);
                                         echo "even";
                                     } ?>">
                                         <td style="display:none"><?php echo $mcqQuesResult[$i]->$columnName[0]; ?></td>
-                                        <td><?php echo $mcqQuesResult[$i]->$columnName[1] ?></td>
+                                        <!--Question-->
+                                        <td><?php echo $mcqQuesResult[$i]->$columnName[1]?>
+                                        </td>
                                         <td class="<?php if ($mcqQuesResult[$i]->Content == $mcqQuesResult[$i]->CorrectChoice && strlen($mcqQuesResult[$i]->Content) > 0) {
                                             echo 'bg-success';
                                         } else {
@@ -181,8 +180,7 @@ db_close($conn);
                                                   aria-hidden="true"></span>
                                             <span class="pull-right" aria-hidden="true">&nbsp;</span>
                                             <a href="mcq-option-editor.php?quizID=<?php echo $quizID ?>&mcqID=<?php echo $mcqQuesResult[$i]->$columnName[0]; ?>">
-                                                <span class="glyphicon glyphicon-edit pull-right" data-toggle="modal"
-                                                      data-target="#dialog" aria-hidden="true"></span></a>
+                                                <span class="glyphicon glyphicon-edit pull-right" aria-hidden="true"></span></a>
                                         </td>
                                     </tr>
                                 <?php } ?>
@@ -258,6 +256,7 @@ db_close($conn);
             dialogInputArr.eq(i).val('');
         }
     });
+
     $('div > .glyphicon-remove').on('click', function () {
         if (confirm('[WARNING] Are you sure to remove this quiz? If you remove one quiz. All the questions and submission of this quiz will also get deleted (not recoverable). It includes learning material, questions and options, their submissions and your grading/feedback, not only the quiz itself.')) {
             $('#metadataUpdate').val(-1);
@@ -304,6 +303,7 @@ db_close($conn);
         });
     });
 </script>
+<script src="researcher-tts.js"></script>
 </body>
 
 </html>

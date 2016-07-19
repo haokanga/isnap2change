@@ -2,8 +2,7 @@
 session_start();
 require_once("../mysql-lib.php");
 require_once("../debug.php");
-require_once("researcher-validation.php");
-$pageName = "mcq";
+require_once("researcher-lib.php");
 $columnName = array('QuizID', 'Week', 'TopicName', 'Points', 'Questionnaires', 'Questions');
 
 try {
@@ -20,9 +19,7 @@ try {
                     $questionnaires = $_POST['questionnaires'];
                     $conn->beginTransaction();
 
-                    //insert and get topicID
-                    $topicResult = getTopicByName($conn, $topicName);
-                    $topicID = $topicResult->TopicID;
+                    $topicID = getTopicByName($conn, $topicName)->TopicID;
                     $quizID = createQuiz($conn, $topicID, $quizType, $week);
                     createMCQSection($conn, $quizID, $points, $questionnaires);
                     createEmptyLearningMaterial($conn, $quizID);
@@ -54,21 +51,19 @@ db_close($conn);
 <!DOCTYPE html>
 <html lang="en">
 
-<head>
-    <!-- Header Library -->
-    <?php require_once('header-lib.php'); ?>
-</head>
+<!-- Header Library -->
+<?php require_once('header-lib.php'); ?>
 
 <body>
 
 <div id="wrapper">
-
+    <!-- Navigation Layout-->
     <?php require_once('navigation.php'); ?>
 
     <div id="page-wrapper">
         <div class="row">
             <div class="col-lg-12">
-                <h1 class="page-header">Multiple Choice Quiz Overview</h1>
+                <h1 class="page-header"><?php echo $pageNameForView; ?> Overview</h1>
             </div>
             <!-- /.col-lg-12 -->
         </div>
@@ -77,8 +72,9 @@ db_close($conn);
             <div class="col-lg-12">
                 <div class="panel panel-default">
                     <div class="panel-heading">
-                        Multiple Choice Quiz Information Table <span class="glyphicon glyphicon-plus pull-right"
-                                                                     data-toggle="modal" data-target="#dialog"></span>
+                        <?php echo $pageNameForView; ?> Information Table <span
+                            class="glyphicon glyphicon-plus pull-right"
+                            data-toggle="modal" data-target="#dialog"></span>
                     </div>
                     <!-- /.panel-heading -->
                     <div class="panel-body">
@@ -120,18 +116,7 @@ db_close($conn);
                             </table>
                         </div>
                         <!-- /.table-responsive -->
-                        <div class="well row">
-                            <h4>Multiple Choice Quiz Overview Notification</h4>
-                            <div class="alert alert-info">
-                                <p>View quizzes by filtering or searching. You can create/update/delete any quiz.</p>
-                            </div>
-                            <div class="alert alert-danger">
-                                <p><strong>Warning</strong> : If you remove one quiz. All the <strong>questions and
-                                        submission</strong> of this quiz will also get deleted (not recoverable).</p> It
-                                includes <strong>learning material, questions and options, their submissions and your
-                                    grading/feedback</strong>, not only the quiz itself.
-                            </div>
-                        </div>
+                        <?php require_once('quiz-overview-notification.php'); ?>
                     </div>
                     <!-- /.panel-body -->
                 </div>
@@ -197,7 +182,7 @@ db_close($conn);
     //DO NOT put them in $(document).ready() since the table has multi pages
     var dialogInputArr = $('.dialoginput');
     $('.glyphicon-plus').on('click', function () {
-        $('#dialogTitle').text("Add MCQ");
+        $('#dialogTitle').text("Add <?php echo $pageNameForView; ?>");
         $('#update').val(1);
         for (i = 0; i < dialogInputArr.length; i++) {
             dialogInputArr.eq(i).val('');

@@ -6,11 +6,10 @@
 session_start();
 require_once("../mysql-lib.php");
 require_once("../debug.php");
-require_once("researcher-validation.php");
-$pageName = "quiz";
+require_once("researcher-lib.php");
 $columnName = array('QuizID', 'Week', 'QuizType', 'TopicName', 'Points');
 // list all editable quiz types    
-$editableQuizTypeArr = array('MCQ', 'SAQ', 'Matching', 'Poster');
+$editableQuizTypeArr = array('MCQ', 'SAQ', 'Matching', 'Poster', 'Video', 'Image');
 
 try {
     $conn = db_connect();
@@ -24,22 +23,24 @@ try {
                     $topicName = $_POST['topicName'];
 
                     $conn->beginTransaction();
-
-                    //insert and get topicID
-                    $topicResult = getTopicByName($conn, $topicName);
-                    $topicID = $topicResult->TopicID;
+                    
+                    $topicID = getTopicByName($conn, $topicName)->TopicID;
                     $quizID = createQuiz($conn, $topicID, $quizType, $week);
 
                     $points = 0;
                     $questionnaires = 0;
                     $description = '';
                     $question = '';
+
+                    //create quiz section
                     switch ($quizType) {
                         case "MCQ":
                             createMCQSection($conn, $quizID, $points, $questionnaires);
                             break;
                         case "SAQ":
-                            createSAQSection($conn, $quizID);
+                        case "Video":
+                        case "Image":
+                            createSAQLikeSection($conn, $quizID);
                             break;
                         case "Matching":
                             createMatchingSection($conn, $quizID, $description, $points);
@@ -49,9 +50,14 @@ try {
                             break;
                         default:
                             throw new Exception("Unexpected Quiz Type. QuizID: " . $quizID);
-                            break;
                     }
-                    createEmptyLearningMaterial($conn, $quizID);
+                    //create default learning material
+                    if ($quizType == "Video")
+                        createVideoLearningMaterial($conn, $quizID);
+                    else if ($quizType == "Image")
+                        createImageLearningMaterial($conn, $quizID);
+                    else
+                        createEmptyLearningMaterial($conn, $quizID);
 
                     $conn->commit();
                 } catch (Exception $e) {
@@ -86,10 +92,8 @@ db_close($conn);
 <!DOCTYPE html>
 <html lang="en">
 
-<head>
-    <!-- Header Library -->
-    <?php require_once('header-lib.php'); ?>
-</head>
+<!-- Header Library -->
+<?php require_once('header-lib.php'); ?>
 
 <body>
 
@@ -156,18 +160,7 @@ db_close($conn);
                             </table>
                         </div>
                         <!-- /.table-responsive -->
-                        <div class="well row">
-                            <h4>Quiz Overview Notification</h4>
-                            <div class="alert alert-info">
-                                <p>View quizzes by filtering or searching. You can create/update/delete any editable quiz. For fixed quiz, use <a href="fixed-quiz.php">fixed quiz overview</a> instead. </p>
-                            </div>
-                            <div class="alert alert-danger">
-                                <p><strong>Warning</strong> : If you remove one quiz. All the <strong>questions and
-                                        submission</strong> of this quiz will also get deleted (not recoverable).</p> It
-                                includes <strong>learning material, questions and options, their submissions and your
-                                    grading/feedback</strong>, not only the quiz itself.
-                            </div>
-                        </div>
+                        <?php require_once('quiz-overview-notification.php'); ?>
                     </div>
                     <!-- /.panel-body -->
                 </div>

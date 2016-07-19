@@ -2,7 +2,7 @@
 session_start();
 require_once("../mysql-lib.php");
 require_once("../debug.php");
-require_once("researcher-validation.php");
+require_once("researcher-lib.php");
 $conn = db_connect();
 
 db_close($conn);
@@ -11,15 +11,13 @@ db_close($conn);
 <!DOCTYPE html>
 <html lang="en">
 
-<head>
-    <!-- Header Library -->
-    <?php require_once('header-lib.php'); ?>
-</head>
+<!-- Header Library -->
+<?php require_once('header-lib.php'); ?>
 
 <body>
 
 <div id="wrapper">
-
+    <!-- Navigation Layout-->
     <?php require_once('navigation.php'); ?>
 
     <div id="page-wrapper">

@@ -2,8 +2,7 @@
 session_start();
 require_once("../mysql-lib.php");
 require_once("../debug.php");
-require_once("researcher-validation.php");
-$pageName = "learning-material-editor";
+require_once("researcher-lib.php");
 
 try {
     $conn = db_connect();
@@ -29,7 +28,6 @@ try {
     debug_err($pageName, $e);
 }
 
-db_close($conn);
 ?>
 
 <!DOCTYPE html>
@@ -55,8 +53,15 @@ db_close($conn);
             image_advtab: true,
             browser_spellcheck: true,
             templates: [
-                //infograph list
-                {title: 'Infograph Demo', url: '../infograph/demo.html'}
+                /**
+                 * infograph list
+                 * Add new infograph:
+                 * 1.   put the file under /infograph
+                 * 2.   {title: '[TITLE]', url: '../infograph/[FILENAME].html'}
+                 * (remember to add comma after right bracket if needed to keep sane JSON format)
+                 */
+                {title: 'Infograph Demo', url: '../infograph/demo.html'},
+                {title: 'Yet Another Demo', url: '../infograph/yet-another-demo.html'}
             ],
             content_css: [
                 '//fonts.googleapis.com/css?family=Lato:300,300i,400,400i',
@@ -76,5 +81,18 @@ db_close($conn);
     <input type="submit" name='submitbutton' value="Save" class='submit'/> <span
         class="glyphicon glyphicon-info-sign"></span><b> Ctrl + S</b><br>
 </form>
+
+<?php
+$quizType = getQuizType($conn, $quizID);
+if ($quizType == "Video" || $quizType == "Image") { ?>
+    <div class="alert alert-info">
+        <p><strong>Reminder</strong> : This is <?php echo strtolower($quizType); ?> quiz. You should only insert one
+            <?php echo strtolower($quizType); ?> by "Insert/edit <?php echo strtolower($quizType); ?>" button, other
+            content is not expected.
+    </div>
+<?php }
+db_close($conn);
+?>
+
 </body>
 </html>

@@ -2,8 +2,7 @@
 session_start();
 require_once("../mysql-lib.php");
 require_once("../debug.php");
-require_once("researcher-validation.php");
-$pageName = "class";
+require_once("researcher-lib.php");
 $columnName = array('ClassID', 'ClassName', 'SchoolName', 'TokenString', 'EnrolledStudents', 'UnlockedProgress');
 
 //if insert/update/remove class
@@ -16,9 +15,9 @@ try {
                 $className = $_POST['className'];
                 $schoolName = $_POST['schoolName'];
                 $tokenString = $_POST['tokenString'];
+                $unlockedProgress = $_POST['unlockedProgress'];
                 $schoolID = getSchoolByName($conn, $schoolName)->SchoolID;
-                $classID = createClass($conn, $schoolID, $className);
-                updateToken($conn, $classID, $tokenString);
+                $classID = createClass($conn, $schoolID, $className, $tokenString, $unlockedProgress);
             } else if ($update == 0) {
                 $classID = $_POST['classID'];
                 $className = $_POST['className'];
@@ -27,8 +26,7 @@ try {
                 $unlockedProgress = $_POST['unlockedProgress'];
 
                 $schoolID = getSchoolByName($conn, $schoolName)->SchoolID;
-                updateClass($conn, $classID, $schoolID, $className, $unlockedProgress);
-                updateToken($conn, $classID, $tokenString);
+                updateClass($conn, $classID, $schoolID, $className, $tokenString, $unlockedProgress);
             } else if ($update == -1) {
                 $classID = $_POST['classID'];
                 deleteClass($conn, $classID);
@@ -53,15 +51,13 @@ db_close($conn);
 <!DOCTYPE html>
 <html lang="en">
 
-<head>
-    <!-- Header Library -->
-    <?php require_once('header-lib.php'); ?>
-</head>
+<!-- Header Library -->
+<?php require_once('header-lib.php'); ?>
 
 <body>
 
 <div id="wrapper">
-
+    <!-- Navigation Layout-->
     <?php require_once('navigation.php'); ?>
 
     <div id="page-wrapper">

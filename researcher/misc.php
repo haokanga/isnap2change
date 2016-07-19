@@ -3,8 +3,7 @@
 session_start();
 require_once("../mysql-lib.php");
 require_once("../debug.php");
-require_once("researcher-validation.php");
-$pageName = "quiz";
+require_once("researcher-lib.php");
 $columnName = array('QuizID', 'Week', 'QuizType', 'TopicName', 'Points');
 // list all editable quiz types    
 $editableQuizTypeArr = array('MCQ', 'SAQ', 'Matching', 'Poster');
@@ -21,10 +20,8 @@ try {
                     $topicName = $_POST['topicName'];
 
                     $conn->beginTransaction();
-
-                    //insert and get topicID
-                    $topicResult = getTopicByName($conn, $topicName);
-                    $topicID = $topicResult->TopicID;
+                    
+                    $topicID = getTopicByName($conn, $topicName)->TopicID;
                     $quizID = createQuiz($conn, $topicID, $quizType, $week);
 
                     $points = 0;
@@ -36,7 +33,7 @@ try {
                             createMCQSection($conn, $quizID, $points, $questionnaires);
                             break;
                         case "SAQ":
-                            createSAQSection($conn, $quizID);
+                            createSAQLikeSection($conn, $quizID);
                             break;
                         case "Matching":
                             createMatchingSection($conn, $quizID, $description, $points);
@@ -83,10 +80,8 @@ db_close($conn);
 <!DOCTYPE html>
 <html lang="en">
 
-<head>
-    <!-- Header Library -->
-    <?php require_once('header-lib.php'); ?>
-</head>
+<!-- Header Library -->
+<?php require_once('header-lib.php'); ?>
 
 <body>
 
@@ -157,8 +152,7 @@ db_close($conn);
                         <div class="well row">
                             <h4>Quiz Overview Notification</h4>
                             <div class="alert alert-info">
-                                <p>View quizzes by filtering or searching. You can create/update/delete any editable
-                                    quiz. For fixed quiz, use <a href="fixed-quiz.php">fixed quiz overview</a> instead.
+                                <p>View misc quizzes by filtering or searching. You can put them to certain weeks and assign points to them.
                                 </p>
                             </div>
                             <div class="alert alert-danger">

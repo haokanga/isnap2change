@@ -2,8 +2,7 @@
 session_start();
 require_once("../mysql-lib.php");
 require_once("../debug.php");
-require_once("researcher-validation.php");
-$pageName = "school";
+require_once("researcher-lib.php");
 
 //if insert/update/remove school
 try {
@@ -44,15 +43,13 @@ db_close($conn);
 <!DOCTYPE html>
 <html lang="en">
 
-<head>
-    <!-- Header Library -->
-    <?php require_once('header-lib.php'); ?>
-</head>
+<!-- Header Library -->
+<?php require_once('header-lib.php'); ?>
 
 <body>
 
 <div id="wrapper">
-
+    <!-- Navigation Layout-->
     <?php require_once('navigation.php'); ?>
 
     <div id="page-wrapper">
@@ -219,7 +216,6 @@ db_close($conn);
         dialogInputArr.eq(0).prop('disabled', false);
         $('#submission').submit();
     });
-
 </script>
 </body>
 

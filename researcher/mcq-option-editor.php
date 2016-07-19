@@ -2,8 +2,7 @@
 session_start();
 require_once("../mysql-lib.php");
 require_once("../debug.php");
-require_once("researcher-validation.php");
-$pageName = "mcq-option-editor";
+require_once("researcher-lib.php");
 $columnName = array('OptionID', 'Content', 'Explanation', 'Edit');
 
 try {
@@ -20,7 +19,7 @@ try {
                 $mcqID = $_POST['mcqID'];
                 $quizID = getMCQQuestion($conn, $mcqID)->QuizID;
                 deleteMCQQuestion($conn, $mcqID);
-                header('Location: mcq-editor.php?quizID=' . $quizID);
+                header($parentPage);
             }
         }
         if (isset($_POST['update'])) {
@@ -52,6 +51,7 @@ try {
         $mcqQuesResult = getMCQQuestion($conn, $mcqID);
         $optionResult = getOptions($conn, $mcqID);
         $phpSelf = $pageName . '.php?quizID=' . $quizID . '&mcqID=' . $mcqID;
+        $parentPage = 'Location: mcq-editor.php?quizID=' . $quizID;
     }
 } catch (Exception $e) {
     debug_err($pageName, $e);
@@ -63,15 +63,13 @@ db_close($conn);
 <!DOCTYPE html>
 <html lang="en">
 
-<head>
-    <!-- Header Library -->
-    <?php require_once('header-lib.php'); ?>
-</head>
+<!-- Header Library -->
+<?php require_once('header-lib.php'); ?>
 
 <body>
 
 <div id="wrapper">
-
+    <!-- Navigation Layout-->
     <?php require_once('navigation.php'); ?>
 
     <div id="page-wrapper">
@@ -120,7 +118,7 @@ db_close($conn);
                             <br>
                         </form>
                         <!--No CorrectChoice Reminder-->
-                        <div class="alert alert-danger" id="noCorrectChoiceReminder">
+                        <div class="alert alert-danger" id="noCorrectChoiceReminder" hidden>
                             <p><strong>Reminder</strong> : You have not chosen any correct choice for this question!
                         </div>
                         <!--edit metadata-->
@@ -163,6 +161,8 @@ db_close($conn);
                                                           aria-hidden="true"></span>
                                                     <span class="pull-right" aria-hidden="true">&nbsp;</span>
                                                     <span class="glyphicon glyphicon-edit pull-right"
+                                                          data-toggle="modal"
+                                                          data-target="#dialog"
                                                           aria-hidden="true"></span>
                                                 <?php } ?>
                                             </td>

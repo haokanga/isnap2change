@@ -112,9 +112,14 @@
 					$("#button"+index).removeClass("highlight");
 					index++;
                     $("#panel"+index).removeClass("hidden");
+                    var t_height = ($('.content').outerHeight()-$("#panel"+index).outerHeight())/2;
+                    if(t_height >= 0)
+                    {
 					$("#panel"+index).css ({
-                     top: ($('.content').outerHeight()-$("#panel"+index).outerHeight())/2  
+                     top: t_height
                     });
+				}
+
 					$("#hiddenIndex").val(index);
 					$("#button"+index).addClass("highlight");
                 });
@@ -125,9 +130,13 @@
 					$("#button"+index).removeClass("highlight");
 					index--;
                     $("#panel"+index).removeClass("hidden");
+					var t_height = ($('.content').outerHeight()-$("#panel"+index).outerHeight())/2;
+                    if(t_height >= 0)
+                    {
 					$("#panel"+index).css ({
-                     top: ($('.content').outerHeight()-$("#panel"+index).outerHeight())/2  
+                     top: t_height
                     });
+				}
 					$("#hiddenIndex").val(index);					
 					$("#button"+index).addClass("highlight");
                 });
@@ -139,9 +148,13 @@
 					$("#button"+currentIndex).removeClass("highlight");
 					$("#panel"+currentIndex).addClass("hidden");
                     $("#panel"+index).removeClass("hidden");
+					var t_height = ($('.content').outerHeight()-$("#panel"+index).outerHeight())/2;
+                    if(t_height >= 0)
+                    {
 					$("#panel"+index).css ({
-                     top: ($('.content').outerHeight()-$("#panel"+index).outerHeight())/2  
+                     top: t_height
                     });
+				}
 					$("#hiddenIndex").val(index);
 
                 });
@@ -268,49 +281,89 @@
 			
         </script>
 		
-		<header class="navbar navbar-static-top bs-docs-nav">
-
-            <div class="navbar-header">
-                <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
-                </button>
-                <a class="navbar-brand" href="#">QUIZ</a>
-			</div>
-			<div class="nav navbar-nav navbar-btn navbar-right" style="margin-right:22px;">
-			
-				<?php
-						if($status == "GRADED"){ ?>
-						<form id="goBack" method=post action=weekly-task.php>
-							 <button type="button" onclick="return goBack()" class="btn btn-success">GO BACK</button>
-						</form>
-				<?php	}
-					
-						if($status == "UNANSWERED"){ ?>
-						<form id="goBack" method=post action=weekly-task.php>
-							<button id="back-btn" type="button" onclick="return submitQuiz(<?php echo $quizID; ?>, <?php echo $studentID; ?>);" class="btn btn-success">SUBMIT</button>
-						</form>
-				<?php	} ?>
-					
-			</div>
-			<div class="nav navbar-nav navbar-btn navbar-right" style="margin-right: 15px; font-size: x-large;">
-				<div id="clock">
-						<span class="timer"></span>
-				</div>
-			</div>
-        </header>
+		<nav class="navbar navbar-inverse navbar-static-top" id="nav">
+            <div class="container">
+                <!-- .btn-navbar is used as the toggle for collapsed navbar content -->
+                <a class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                    <span class="glyphicon glyphicon-bar"></span>
+                    <span class="glyphicon glyphicon-bar"></span>
+                    <span class="glyphicon glyphicon-bar"></span>
+                </a>
+                <div class="navbar-collapse collapse">
+                    <ul class="nav navbar-nav">
+                        <li class="active">
+                            <a class="navbar-brand" href="#">
+                                <img alt="Brand" src="css/image/Snap_Single_Wordform_White.png" style="height: 100%;">
+                            </a>
+                        </li>
+                        <li class="divider"></li>
+                        <li><a href="#">Snap Facts</a></li>
+                        <li><a href="#">Game Home</a></li>
+                        <li><a href="#">Resources</a></li>
+                    </ul>
+                    <ul class="nav pull-right navbar-nav">
+                        <li>
+                            <a href="#" data-toggle="modal" data-target="#myModal"><i class="glyphicon glyphicon-off"></i> LOGIN</a>
+                        </li>
+                    </ul>
+                </div>		
+            </div>
+        </nav>
 		
 		<div class="content"> 
 		<div class="col-md-1 sidebar" style="margin-top:8px; margin-bottom:8px;">
-
                 <ul class="list-group lg opt" style="max-height: 89vh; overflow-y: auto;">
-                    <li class="list-group-item" style="color:turquoise;">
-                        <button type="button" class="btn btn-default" id="button0" style="color:turquoise;font-weight: bold;" value="0">i</button>
-                    </li>
+                <li class="list-group-item">
+                    <button type="button" class="btn btn-default" id="button0" style=" border: none;
+                            background: none;
+                            cursor: pointer;" value="0">
+                        <img src="img/information_icon.png" style="width:48px; height: 48px;">
+                    </button>
+                </li>
+                <li class="list-group-item">
+							<button type="button" class="btn btn-default" id="button1" value="1" style=" border: none;
+                            background: none;
+                            cursor: pointer;">
+                             <img src="img/one_icon.png" style="width:48px; height: 48px;">                           	
+                            </button>
+						</li>
+
+						<li class="list-group-item">
+							<button type="button" class="btn btn-default" id="button2" value="2"style=" border: none;
+                            background: none;
+                            cursor: pointer;">
+                             <img src="img/two_icon.png" style="width:48px; height: 48px;">                           	
+                            </button>
+						</li>
+
+						<li class="list-group-item">
+							<button type="button" class="btn btn-default" id="button3" value="3"style=" border: none;
+                            background: none;
+                            cursor: pointer;">
+                             <img src="img/three_icon.png" style="width:48px; height: 48px;">                            	
+                            </button>
+						</li>
+
+						<li class="list-group-item">
+							<button type="button" class="btn btn-default" id="button4" value="4"style=" border: none;
+                            background: none;
+                            cursor: pointer;">
+                             <img src="img/four_icon.png" style="width:48px; height: 48px;">
+                            </button>
+						</li>
+
+						<li class="list-group-item">
+							<button type="button" class="btn btn-default" id="button5" value="5"style=" border: none;
+                            background: none;
+                            cursor: pointer;">
+                             <img src="img/five_icon.png" style="width:48px; height: 48px;">                           	
+                            </button>
+						</li>
+                    
 					
 			<?php 
 					for($i=0; $i<$quesNum; $i++) { ?>
-						<li class="list-group-item">
-							<button type="button" class="btn btn-default" id="button<?php echo $i+1;?>" value="<?php echo $i+1;?>"><?php echo $i+1;?></button>
-						</li>
+						
 						
 			<?php   } ?>
 					
@@ -321,23 +374,23 @@
             </div>
 
 		<div class="info hidden" style="padding-top:10px; padding-bottom:10px;" id="panel0">
-                <div class="panel panel-default">
-                    <div class="panel-body">
-                        <div class="myHeader" style="text-align:center;">
-                            <div class="page-header" style="color: black;">
-                                <h1> 
-                                    <i><?php echo $materialRes->TopicName; ?></i>
-                                </h1> 
-                            </div>
-                            <div class="para" style="padding-left:15px; padding-right:15px;">
-                                <div style="color:black; text-align:center;">
+		<div style="text-align: center; color: white;">
+		<h4>Read the following information about nutrition then answer the questions provided.</h4>
+		</div>
+                <div class="panel panel-default">               
+                    <div class="panel-body" style="overflow-y: scroll; border-radius: 20px;">                                                  
+                            <div class="para" style="padding-left:55px; padding-right:55px;">
+                                <div style="color:black; text-align:left;">
                                      <?php echo $materialRes->Content; ?>
                                 </div> 
                             </div>
                         </div>
                     </div>
+                    <div class="footer" style="display:flex;justify-content:center;align-items:center;width:100%;height:20%; margin-top: 4%;">              
+                        <img src="img/start_icon.png" style="height: 36px; width: 36px;">               
+                   </div> 
                 </div>
-        </div>
+        
 
 		<?php for($i=0; $i<count($mcqRes); $i++) {
 			
@@ -350,13 +403,13 @@
 					<div class="myques hidden" id="<?php echo "panel".$questionIndex;?>">
 	  <?php		} ?>
 					<div class="panel panel-default">
-                    <div class="panel-heading" style="font-size: xx-large; font-weight: 600; height:35%; text-align: center; justify-content:center; display:flex; align-items:center;">
+                    <div class="panel-heading" style="font-size: x-large; font-weight: 600; height:25%; margin-top:7%; text-align: left; vertical-align: center;">
                         <div class="ques" >
-                            <?php echo $questionIndex.". ".$mcqRes[$i]->Question; $questionIndex++; $MCQIDArray = $MCQIDArray.($mcqRes[$i]->MCQID).',';?>
+                            Q<?php echo $questionIndex.". ".$mcqRes[$i]->Question; $questionIndex++; $MCQIDArray = $MCQIDArray.($mcqRes[$i]->MCQID).',';?>
                         </div> 
                     </div>
                     <div class="panel-body">
-							<div class="options" style="color:white; width: 85%; margin-left:7.5%;">
+							<div class="options" style="color:black; width: 85%; margin-left:7.5%;">
 		<?php
 			} $lastMCQID = $currentMCQID;?>
 								
@@ -403,7 +456,7 @@
 										<button type="button" id="<?php echo $i?>" class="btn btn-default btn-lg btn-block" name="<?php echo $mcqRes[$i]->MCQID;?>" value="<?php echo $mcqRes[$i]->Content;?>">
 										<span class="glyphicon glyphicon-remove hidden"></span> 
 										<span class="glyphicon glyphicon-ok hidden"></span> 
-										<input type="radio" name="R_<?php echo $mcqRes[$i]->MCQID;?>" class="" id="radio_<?php echo $i?>"/><label><?php echo $mcqRes[$i]->Content;?></label></button>
+										<?php echo $mcqRes[$i]->Content;?></button>
 						<?php	} ?>
 								
 			
@@ -428,11 +481,13 @@
 					if($questionIndex!=2){ ?>
 					   
 							
-								<a class="btn btn-default last"  role="button" style="padding-top:8px; padding-bottom: 10px;"><span class="glyphicon glyphicon-chevron-left"></span></a>
+								<a class="btn btn-default last"  role="button" style="padding-top:8px; padding-bottom: 10px; border: none;
+                            background: none; cursor: pointer;""><img src="img/direction_icon.png" style="width:32px; height: 32px;"></a>
 							
 		<?php		} ?>
 							
-								<a class="btn btn-default next"  role="button" style="padding-top:8px; padding-bottom: 10px;"><span class="glyphicon glyphicon-chevron-right"></span></a>
+								<a class="btn btn-default next"  role="button" style="padding-top:8px; padding-bottom: 10px; border: none;
+                            background: none; cursor: pointer;"><img src="img/direction_icon.png" style="width:32px; height: 32px;"></a>
 							
 							</div>
 						</div>

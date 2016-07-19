@@ -110,3 +110,27 @@ SELECT * FROM SAQ_Question_Record WHERE SAQID = 1 AND StudentID  =3;
 UPDATE SAQ_Question_Record
                   SET Feedback = 'QUACK', Grading =  2
                   WHERE SAQID = 1 AND StudentID = 3;
+SELECT * FROM Fact LEFT JOIN SubFact USING (FactID)
+                WHERE SnapFact = 0;                  
+SELECT * FROM Topic 
+                LEFT JOIN (SELECT * FROM Fact LEFT JOIN SubFact USING (FactID) WHERE SnapFact = 0) AS VerboseFacts USING (TopicID);
+                
+SELECT *, COUNT(*) AS SubFacts
+				 FROM Fact NATURAL JOIN SubFact
+				 WHERE SnapFact = 0 AND TopicID = 1;
+                 
+SELECT * FROM Topic 
+                LEFT JOIN (
+                  SELECT * FROM Fact 
+                  LEFT JOIN SubFact USING (FactID) 
+                  WHERE SnapFact = 0) AS VerboseFacts 
+                USING (TopicID) WHERE TopicName != 'Introduction';                 
+SELECT COUNT(*)
+				 FROM Fact
+				 WHERE SnapFact = 0 AND TopicID = 3;             
+SELECT * 
+                        FROM   Quiz LEFT JOIN Learning_Material USING (QuizID);
+
+                 
+                 
+                 

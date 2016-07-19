@@ -1,14 +1,3 @@
-<?php
-
-$userAdminPageList = array('School', 'Class', 'Student');
-$userAdminIconList = array('mortar-board', 'users', 'child');
-$contentAdminPageList = array('Week', 'Quiz', 'Fact', 'MCQ', 'SAQ', 'Matching', 'Poster','Misc');
-$contentAdminIconList = array('calendar', 'book', 'exclamation-triangle', 'check', 'pencil', 'th-list', 'exclamation-triangle','exclamation-triangle');
-$gradingPageList = array('SAQ-Grading', 'Poster-Grading');
-$gradingIconList = array('check', 'exclamation-triangle');
-
-?>
-
 <!-- Navigation -->
 <nav class="navbar navbar-default navbar-static-top" role="navigation" style="margin-bottom: 0">
     <div class="navbar-header">
@@ -237,15 +226,15 @@ $gradingIconList = array('check', 'exclamation-triangle');
                     <a href="index.php"><i class="fa fa-desktop fa-fw"></i> Dashboard<span class="fa arrow"></span></a>
                 </li>
                 <li>
-                    <a href="javascript:;" data-toggle="collapse" data-target="#schoolclass" class=""
+                    <a href="javascript:;" data-toggle="collapse" data-target="#userAdmin" class=""
                        aria-expanded="true"><i class="fa fa-fw fa-wrench"></i> User Administration <i
                             class="fa fa-fw fa-caret-down"></i></a>
-                    <ul id="schoolclass" class="collapse in nav nav-second-level" aria-expanded="true">
+                    <ul id="userAdmin" class="collapse in nav nav-second-level" aria-expanded="true">
 
-                        <?php for ($i = 0; $i < count($userAdminPageList); $i++) { ?>
+                        <?php for ($i = 0; $i < count($userAdminPageArr); $i++) { ?>
                             <li>
-                                <a href="<?php echo strtolower($userAdminPageList[$i]); ?>.php"><i
-                                        class="fa fa-fw fa-<?php echo $userAdminIconList[$i]; ?>"></i>&nbsp;<?php echo $userAdminPageList[$i]; ?>
+                                <a href="<?php echo strtolower($userAdminPageArr[$i]); ?>.php"><i
+                                        class="fa fa-fw fa-<?php echo $userAdminIconArr[$i]; ?>"></i>&nbsp;<?php echo $userAdminPageArr[$i]; ?>
                                     Overview</a>
                             </li>
                         <?php } ?>
@@ -253,29 +242,32 @@ $gradingIconList = array('check', 'exclamation-triangle');
                     <!--/.nav-second-level -->
                 </li>
                 <li>
-                    <a href="javascript:;" data-toggle="collapse" data-target="#contenteditor" class=""
+                    <a href="javascript:;" data-toggle="collapse" data-target="#contentAdmin" class=""
                        aria-expanded="true"><i class="fa fa-fw fa-wrench"></i> Content Administration <i
                             class="fa fa-fw fa-caret-down"></i></a>
-                    <ul id="contenteditor" class="collapse in nav nav-second-level" aria-expanded="true">
-                        <?php for ($i = 0; $i < count($contentAdminPageList); $i++) { ?>
+                    <ul id="contentAdmin" class="collapse in nav nav-second-level" aria-expanded="true">
+                        <?php for ($i = 0; $i < count($contentAdminPageArr); $i++) { ?>
                             <li>
-                                <a href="<?php echo strtolower($contentAdminPageList[$i]); ?>.php"><i
-                                        class="fa fa-fw fa-<?php echo $contentAdminIconList[$i]; ?>"></i>&nbsp;<?php echo $contentAdminPageList[$i]; ?>
-                                    Overview</a>
+                                <a href="<?php echo str_replace(" ", "-", strtolower($contentAdminPageArr[$i])); ?>.php">
+                                    <!--overview icon-->
+                                    <i class="fa fa-fw fa-<?php echo $contentAdminIconArr[$i]; ?>"></i>
+                                    <!--overview name-->
+                                    &nbsp;<?php echo $contentAdminPageArr[$i];
+                                    if (in_array($contentAdminPageArr[$i], $quizTypeArr)) echo " Quiz" ?> Overview</a>
                             </li>
                         <?php } ?>
                     </ul>
                     <!--/.nav-second-level -->
                 </li>
                 <li>
-                    <a href="javascript:;" data-toggle="collapse" data-target="#contenteditor" class=""
+                    <a href="javascript:;" data-toggle="collapse" data-target="#gradingPage" class=""
                        aria-expanded="true"><i class="fa fa-fw fa-comment"></i> Grading & Feedback <i
                             class="fa fa-fw fa-caret-down"></i></a>
-                    <ul id="contenteditor" class="collapse in nav nav-second-level" aria-expanded="true">
-                        <?php for ($i = 0; $i < count($gradingPageList); $i++) { ?>
+                    <ul id="gradingPage" class="collapse in nav nav-second-level" aria-expanded="true">
+                        <?php for ($i = 0; $i < count($gradingPageArr); $i++) { ?>
                             <li>
-                                <a href="<?php echo strtolower($gradingPageList[$i]); ?>.php"><i
-                                        class="fa fa-fw fa-<?php echo $gradingIconList[$i]; ?>"></i>&nbsp;<?php echo $gradingPageList[$i]; ?>
+                                <a href="<?php echo str_replace(" ", "-", strtolower($gradingPageArr[$i])); ?>.php"><i
+                                        class="fa fa-fw fa-<?php echo $gradingIconArr[$i]; ?>"></i>&nbsp;<?php echo $gradingPageArr[$i]; ?>
                                 </a>
                             </li>
                         <?php } ?>
