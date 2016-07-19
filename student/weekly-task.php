@@ -6,8 +6,6 @@
     require_once("../debug.php");
     $pageName = "weekly-task";
 
-    $conn = null;
-
     if ($_SERVER["REQUEST_METHOD"] == "GET") {
         if(isset($_GET["week"])) {
             $week = $_GET["week"];
@@ -532,7 +530,7 @@
     <?php                break;
                     case "Poster":
                             if(isset($quizzesRes[$i]['Status'])) { ?>
-                               <a href="game-home.php">
+                               <a href="poster.php?quiz_id=<?php echo $quizzesRes[$i]['QuizID']?>">
     <?php                    } else { ?>
                                <a href="pre-task-material.php?quiz_id=<?php echo $quizzesRes[$i]['QuizID']?>">
     <?php                    } ?>
@@ -560,7 +558,7 @@
     <?php                       break;
                     case "DrinkingTool":
                             if(isset($quizzesRes[$i]['Status'])) { ?>
-                                <a href="game-home.php">
+                                <a href="standard-drinking-tool.php?quiz_id=<?php echo $quizzesRes[$i]['QuizID']?>">
     <?php                   } else { ?>
                                 <a href="pre-task-material.php?quiz_id=<?php echo $quizzesRes[$i]['QuizID']?>">
     <?php                   } ?>

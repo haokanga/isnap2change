@@ -727,6 +727,15 @@ INSERT INTO `isnap2changedb`.`learning_material` (`Content`, `QuizID`, Excluded)
 
 # [Example] change a class's (classID = 1) unlocked progress to 3
 UPDATE `isnap2changedb`.`class` SET `UnlockedProgress`='3' WHERE `ClassID`='1';
+
+# [Example] insert a standard drinking tool task into Quiz
+INSERT INTO `isnap2changedb`.`quiz` (`Week`, `QuizType`, `TopicID`) VALUES ('2', 'Misc', '3');
+
+# [Example] insert a learning material for a standard drinking tool task with QuizID = 11
+INSERT INTO `isnap2changedb`.`learning_material` (`Content`, `QuizID`) VALUES ('<p>Do you know what a standard drink is? (If no, go to the SNAP Facts page)</p><p>What is the standard amount of alcohol recommended by the National Health and Medical Research Council (NHMRC) to drink in a day? (You need to go to the iSNAPs facts page for this)</p><p>Alcoholic beverages are sold and served in many different sized containers. Different types of beverages contain different amounts of alcohol, and glass sizes are often not the same. A glass or container can hold more than one standard drink of alcohol. This can make it difficult to know how many standard drinks you consume.</p><p>Using standard drinks to measure your alcohol consumption is more accurate than counting the number of glasses or other containers you have consumed. If you are drinking packaged liquor the number of standard drinks should be written on the side of the beverage container.</p>', '11');
+
+# [Example] insert a standard drinking tool task into Misc Quiz
+INSERT INTO `isnap2changedb`.`misc_section` (`QuizID`, `QuizSubType`, `Points`) VALUES ('11', 'DrinkingTool', '30');
 /*
 #TEST
 

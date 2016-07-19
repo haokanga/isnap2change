@@ -237,10 +237,15 @@
                 <li class="nav-item"><a  class="nav-link" href="http://taobao.com">Snap Facts</a></li>
                 <li class="nav-item"><a  class="nav-link" href="http://taobao.com">Resources</a></li>
             </ul>
-            <a href="#" class="settings">
-                <span class="setting-icon"></span>
-                <span class="setting-text"><?php echo $studentUsername?></span>
-            </a>
+            <div class="settings">
+                <div class="setting-icon dropdown">
+                    <ul class="dropdown-menu">
+                        <li class="dropdown-item"><a href="settings.php">Setting</a></li>
+                        <li class="dropdown-item"><a href="logout.php">Logout</a></li>
+                    </ul>
+                </div>
+                <a class="setting-text"><?php echo $studentUsername?></a>
+            </div>
         </div>
     </div>
 

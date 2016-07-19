@@ -287,7 +287,6 @@
 						if($status == "UNANSWERED"){ ?>
 						<form id="goBack" method=post action=weekly-task.php>
 							<button id="back-btn" type="button" onclick="return submitQuiz(<?php echo $quizID; ?>, <?php echo $studentID; ?>);" class="btn btn-success">SUBMIT</button>
-
 						</form>
 				<?php	} ?>
 					
