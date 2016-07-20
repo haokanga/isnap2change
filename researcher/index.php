@@ -268,7 +268,7 @@ db_close($conn);
             "aoColumnDefs": [
                 {"bSearchable": false, "aTargets": [0]}
             ]
-        })
+        });
         //search keyword, exact match
         table.search(
             $("#keyword").val().trim(), true, false, true

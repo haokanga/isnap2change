@@ -41,7 +41,7 @@ function handle_exception(Exception $e)
         echo "View Log Database to check this bug.";
     }
     logger_write($e);
-    //redirectToBugReportPage();
+    redirectToBugReportPage();
 }
 
 function redirectToBugReportPage()

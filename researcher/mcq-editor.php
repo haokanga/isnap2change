@@ -284,7 +284,7 @@ db_close($conn);
             "aoColumnDefs": [
                 {"bSearchable": false, "aTargets": [0]}
             ]
-        })
+        });
         $('#metadata-save').on('click', function () {
             $('#metadataUpdate').val(0);
             $('#metadata-submission').validate({

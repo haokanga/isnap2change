@@ -5,12 +5,6 @@ session_start();
 require_once("../mysql-lib.php");
 require_once("../debug.php");
 
-
-echo '###########################<br>';
-echo 'UNIT TEST<br>';
-echo 'testAuthenticationFailure()<br>';
-echo '###########################<br>';
-
 try {
     db_close(testAuthenticationFailure());
 } catch (Exception $e) {
@@ -32,5 +26,11 @@ function testAuthenticationFailure()
 
     return $conn;
 }
+
+echo '###########################<br>';
+echo 'UNIT TEST<br>';
+echo 'testAuthenticationFailure()<br>';
+echo '###########################<br>';
+
 
 ?>

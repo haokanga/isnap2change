@@ -8,8 +8,6 @@ require_once("../mysql-lib.php");
 require_once("../debug.php");
 require_once("researcher-lib.php");
 $columnName = array('QuizID', 'Week', 'QuizType', 'TopicName', 'Points');
-// list all editable quiz types    
-$editableQuizTypeArr = array('MCQ', 'SAQ', 'Matching', 'Poster', 'Video', 'Image');
 
 try {
     $conn = db_connect();
@@ -280,7 +278,7 @@ db_close($conn);
             "aoColumnDefs": [
                 {"bSearchable": false, "aTargets": [0]}
             ]
-        })
+        });
         //search keyword, exact match
         table.search(
             $("#keyword").val().trim(), true, false, true

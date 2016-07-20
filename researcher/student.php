@@ -225,7 +225,7 @@ if (isset($_GET['classID'])) {
                 $('.input-sm').eq(1).val($("#keyword").val().trim());
             },
             "pageLength": 50
-        })
+        });
         //search keyword, exact match
         table.search(
             $("#keyword").val().trim(), true, false, true
