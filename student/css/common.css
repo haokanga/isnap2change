@@ -338,10 +338,33 @@ body {
 }
 .sitenav-progress a {
     background-image: url("../img/progress_icon.png");
-
 }
 .sitenav-reading-material a {
     background-image: url("../img/reading_material_icon.png");
+}
+.sitenav-facts-home a {
+    background-image: url("../img/snap_fact_circle_icon.png");
+}
+.sitenav-smoking a {
+    background-image: url("../img/smoking_icon.png");
+}
+.sitenav-nutrition a {
+    background-image: url("../img/nutrition_icon.png");
+}
+.sitenav-alcohol a {
+    background-image: url("../img/alcohol_icon.png");
+}
+.sitenav-physical a {
+    background-image: url("../img/physical_activity_icon.png");
+}
+.sitenav-health a {
+    background-image: url("../img/health_and_wellbeing_icon.png");
+}
+.sitenav-sexual a {
+    background-image: url("../img/sexual_health_icon.png");
+}
+.sitenav-drgus a {
+    background-image: url("../img/drugs_icon.png");
 }
 
 /**

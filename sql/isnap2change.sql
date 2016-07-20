@@ -131,7 +131,8 @@ CREATE TABLE IF NOT EXISTS `Topic` (
 CREATE TABLE IF NOT EXISTS `Quiz` (
     QuizID MEDIUMINT AUTO_INCREMENT,
     Week MEDIUMINT,
-    QuizType ENUM('SAQ', 'MCQ', 'Matching', 'Poster', 'Misc'),    
+    QuizType ENUM('SAQ', 'MCQ', 'Matching', 'Poster', 'Misc'), 
+	ExtraQuiz BOOLEAN DEFAULT 0,
     TopicID MEDIUMINT,
     CONSTRAINT Quiz_QuizID_PK PRIMARY KEY (QuizID),
     CONSTRAINT Quiz_TopicID_FK FOREIGN KEY (TopicID)
@@ -801,6 +802,11 @@ INSERT INTO `isnap2changedb`.`learning_material` (`Content`, `QuizID`) VALUES ('
 
 # [Example] insert a standard drinking tool task into Misc Quiz
 INSERT INTO `isnap2changedb`.`misc_section` (`QuizID`, `QuizSubType`, `Points`) VALUES ('11', 'DrinkingTool', '30');
+
+# [Example] set some quizzes as extra activities
+UPDATE `isnap2changedb`.`quiz` SET `ExtraQuiz`='1' WHERE `QuizID`='3';
+UPDATE `isnap2changedb`.`quiz` SET `ExtraQuiz`='1' WHERE `QuizID`='10';
+UPDATE `isnap2changedb`.`quiz` SET `ExtraQuiz`='1' WHERE `QuizID`='6';
 /*
 #TEST
 

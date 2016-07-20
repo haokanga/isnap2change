@@ -142,7 +142,6 @@
 <div class="page-wrapper">
     <div class="header-wrapper">
         <div class="header">
-            <a href="#" class="header-back-link"></a>
             <a class="home-link" href="#">SNAP</a>
             <ul class="nav-list">
                 <li class="nav-item"><a  class="nav-link" href="http://taobao.com">GAME HOME</a></li>
@@ -167,7 +166,7 @@
             <div class="snap-facts-header">
                 <a href="#" class="snap-facts-logo"></a>
                 <div class="snap-facts-desc p1">
-                    Snap is all baout providing information. <br/> Pick your category to start finding out more.
+                    Snap is all about providing information. <br/> Pick your category to start finding out more.
                 </div>
             </div>
 
@@ -179,7 +178,6 @@
                             <span class="snap-facts-item-name h4">Smoking</span>
                         </a>
                     </li>
-
                     <li class="snap-facts-item snap-facts-item-nutrition">
                         <a href="snap-facts-detail.php?topic_id=2" class="snap-facts-link">
                             <span class="snap-facts-item-logo image-icon-nutrition"></span>
@@ -216,9 +214,6 @@
                             <span class="snap-facts-item-name h4" >Drugs</span>
                         </a>
                     </li>
-
-
-
                 </ul>
             </div>
         </div>

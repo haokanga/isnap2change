@@ -78,23 +78,44 @@
         .facts-detail-smoking {
             color: #fcee2d;
         }
+        .facts-detail-smoking .item-trigger{
+            background-image: url("./img/drop_down_icon.png");
+        }
         .facts-detail-nutrition {
             color: #f7751e;
+        }
+        .facts-detail-nutrition .item-trigger{
+            background-image: url("./img/drop_down_orange_icon.png");
         }
         .facts-detail-alcohol {
             color: #AF24D1;
         }
+        .facts-detail-alcohol .item-trigger{
+            background-image: url("./img/drop_down_purple_icon.png");
+        }
         .facts-detail-physical-activity {
             color: #DB1B1B;
+        }
+        .facts-detail-physical-activity .item-trigger{
+            background-image: url("./img/drop_down_red_icon.png");
         }
         .facts-detail-drugs {
             color: #00f8cd;
         }
+        .facts-detail-drugs .item-trigger{
+            background-image: url("./img/drop_down_blue_icon.png");
+        }
         .facts-detail-sexual-health {
             color: #AF24D1;
         }
+        .facts-detail-sexual-health .item-trigger{
+            background-image: url("./img/drop_down_purple_icon.png");
+        }
         .facts-detail-health-and-wellbeing {
             color: #DB1B1B;
+        }
+        .facts-detail-health-and-wellbeing .item-trigger {
+            background-image: url("./img/drop_down_red_icon.png");
         }
         .facts-detail-header {
             max-width: 1000px;
@@ -114,20 +135,19 @@
 
         .facts-detail-item {
             border-bottom: 2px solid;
-            max-width: 1000px;
+            max-width: 800px;
             margin: 10px auto;
-            padding: 20px 0;
+            padding: 20px 10px;
         }
         .item-header {
             position: relative;
         }
         .item-trigger {
-            width: 0;
-            height: 0;
-            border: 14px solid transparent;
-            border-top-color: inherit;
+            width: 30px;
+            height: 30px;
+            background-size: 100% 100%;
             position: absolute;
-            top: 10px;
+            top: 5px;
             right: 20px;
             cursor: pointer;
         }
@@ -139,6 +159,7 @@
         .item-content {
             color: #fff;
             font-size: 20px;
+            margin-top: 10px;
         }
 
         .facts-detail-item-collapsable .item-content {
@@ -165,7 +186,6 @@
 <div class="page-wrapper">
     <div class="header-wrapper">
         <div class="header">
-            <a href="#" class="header-back-link"></a>
             <a class="home-link" href="#">SNAP</a>
             <ul class="nav-list">
                 <li class="nav-item"><a  class="nav-link" href="http://taobao.com">GAME HOME</a></li>
@@ -325,10 +345,14 @@ switch ($topicID) {
     </div>
 
     <ul class="sitenav">
-        <li class="sitenav-item sitenav-game-home"><a href="#"></a></li>
-        <li class="sitenav-item sitenav-achievement"><a href="#"></a></li>
-        <li class="sitenav-item sitenav-progress"><a href="#"></a></li>
-        <li class="sitenav-item sitenav-reading-material"><a href="#"></a></li>
+        <li class="sitenav-item sitenav-facts-home"><a href="#"></a></li>
+        <li class="sitenav-item sitenav-smoking"><a href="#"></a></li>
+        <li class="sitenav-item sitenav-nutrition"><a href="#"></a></li>
+        <li class="sitenav-item sitenav-alcohol"><a href="#"></a></li>
+        <li class="sitenav-item sitenav-physical"><a href="#"></a></li>
+        <li class="sitenav-item sitenav-health"><a href="#"></a></li>
+        <li class="sitenav-item sitenav-sexual"><a href="#"></a></li>
+        <li class="sitenav-item sitenav-drgus"><a href="#"></a></li>
     </ul>
 
 
@@ -348,15 +372,15 @@ switch ($topicID) {
 
 
 <script>
-    var $items = $('.facts-detail-item-collapsable')
+    var $items = $('.facts-detail-item-collapsable');
     $(document).on('click', '.item-trigger', function (e) {
-        var $item = $(e.currentTarget).closest('.facts-detail-item-collapsable')
-        var isOpen = $item.hasClass('item-open')
-        $items.removeClass('item-open')
+        var $item = $(e.currentTarget).closest('.facts-detail-item-collapsable');
+        var isOpen = $item.hasClass('item-open');
+        $items.removeClass('item-open');
         if (!isOpen) {
             $item.addClass('item-open')
         }
-    })
+    });
 
     var PanelCtrl = {
         init: function () {

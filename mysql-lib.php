@@ -1282,34 +1282,21 @@ function getQuizStatus(PDO $conn, $quizID, $studentID)
     }
 }
 
-function getQuizzesStatusByWeek(PDO $conn, $studentID, $week)
+function getQuizzesStatusByWeek(PDO $conn, $studentID, $week, $extraQuiz)
 {
     $quizzesRes = array();
 
     $quizzesStatusSql = "SELECT Quiz.QuizID, QuizType, `Status`, TopicName FROM Quiz LEFT JOIN (SELECT * FROM Quiz_Record WHERE StudentID = ?) Student_Quiz_Record ON Quiz.QuizID = Student_Quiz_Record.QuizID 
-                                                                          NATURAL JOIN Topic WHERE Week = ? ORDER BY Quiz.QuizID";
+                                                                          NATURAL JOIN Topic WHERE Week = ? AND ExtraQuiz = ? ORDER BY Quiz.QuizID";
     $quizzesStatusQuery = $conn->prepare($quizzesStatusSql);
-    $quizzesStatusQuery->execute(array($studentID, $week));
+    $quizzesStatusQuery->execute(array($studentID, $week, $extraQuiz));
     $quizzesStatusRes = $quizzesStatusQuery->fetchAll(PDO::FETCH_OBJ);
 
     for ($i = 0; $i < count($quizzesStatusRes); $i++) {
         $quizzesRes[$i]['QuizID'] = $quizzesStatusRes[$i]->QuizID;
         $quizzesRes[$i]['Status'] = $quizzesStatusRes[$i]->Status;
         $quizzesRes[$i]['TopicName'] = $quizzesStatusRes[$i]->TopicName;
-
-        if ($quizzesStatusRes[$i]->QuizType == "Misc") {
-            switch (getMiscQuizType($conn, $quizzesStatusRes[$i]->QuizID)) {
-                case "Calculator":
-                    $quizzesRes[$i]['QuizType'] = "Calculator";
-                    break;
-                case "DrinkingTool":
-                    $quizzesRes[$i]['QuizType'] = "DrinkingTool";
-                    break;
-            }
-        } else {
-            $quizzesRes[$i]['QuizType'] = $quizzesStatusRes[$i]->QuizType;
-        }
-
+        $quizzesRes[$i]['QuizType'] = getQuizType($conn, $quizzesStatusRes[$i]->QuizID);
         $quizzesRes[$i]['Points'] = getQuizPoints($conn, $quizzesStatusRes[$i]->QuizID);
     }
 

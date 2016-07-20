@@ -66,7 +66,7 @@
         .operation-game {
             color: #00f8cd;
         }
-        .operation-achievements {
+        .operation-extra-activities {
             color: #faf600;
         }
         .operation-progress {
@@ -274,7 +274,7 @@
                     </a>
                 </div>
 
-    <?php    } ?>
+<?php        } ?>
 
             </div>
         </div>
@@ -289,9 +289,9 @@
                             </a>
                         </div>
                         <div class="col-6">
-                            <a href="#" class="operation-item operation-achievements">
-                                <img src="./img/achievement_logo.png" alt="" class="operation-logo">
-                                <span>Achievements</span>
+                            <a href="#" class="operation-item operation-extra-activities">
+                                <img src="./img/extra_activites_icon.png" alt="" class="operation-logo">
+                                <span>Extra Activities</span>
                             </a>
                         </div>
                         <div class="col-6">
