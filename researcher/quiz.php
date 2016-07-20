@@ -1,8 +1,4 @@
 <?php
-/**
- * TODO:
- * edit quiz (jump to different editor)
- */
 session_start();
 require_once("../mysql-lib.php");
 require_once("../debug.php");
@@ -19,43 +15,55 @@ try {
                     $week = $_POST['week'];
                     $quizType = $_POST['quizType'];
                     $topicName = $_POST['topicName'];
+                    $topicID = getTopicByName($conn, $topicName)->TopicID;
 
                     $conn->beginTransaction();
-                    
-                    $topicID = getTopicByName($conn, $topicName)->TopicID;
-                    $quizID = createQuiz($conn, $topicID, $quizType, $week);
-
                     $points = 0;
-                    $questionnaires = 0;
-                    $description = '';
-                    $question = '';
-
-                    //create quiz section
-                    switch ($quizType) {
-                        case "MCQ":
-                            createMCQSection($conn, $quizID, $points, $questionnaires);
-                            break;
-                        case "SAQ":
-                        case "Video":
-                        case "Image":
-                            createSAQLikeSection($conn, $quizID);
-                            break;
-                        case "Matching":
-                            createMatchingSection($conn, $quizID, $description, $points);
-                            break;
-                        case "Poster":
-                            createPosterSection($conn, $quizID, $question, $points);
-                            break;
-                        default:
-                            throw new Exception("Unexpected Quiz Type. QuizID: " . $quizID);
+                    //if editable
+                    if (in_array($quizType, $editableQuizTypeArr)) {
+                        //create quiz section
+                        switch ($quizType) {
+                            case "MCQ":
+                                $quizID = createQuiz($conn, $topicID, $quizType, $week);
+                                $questionnaire = 0;
+                                createMCQSection($conn, $quizID, $points, $questionnaire);
+                                break;
+                            case "Questionnaire":
+                                $quizID = createQuiz($conn, $topicID, $quizType, $week);
+                                $questionnaire = 1;
+                                createMCQSection($conn, $quizID, $points, $questionnaire);
+                                break;
+                            case "SAQ":
+                            case "Video":
+                            case "Image":
+                                $quizID = createQuiz($conn, $topicID, $quizType, $week);
+                                createSAQLikeSection($conn, $quizID);
+                                break;
+                            case "Matching":
+                                $quizID = createQuiz($conn, $topicID, $quizType, $week);
+                                $description = '';
+                                createMatchingSection($conn, $quizID, $description, $points);
+                                break;
+                            case "Poster":
+                                $quizID = createQuiz($conn, $topicID, $quizType, $week);
+                                $question = '';
+                                createPosterSection($conn, $quizID, $question, $points);
+                                break;
+                            default:
+                                throw new Exception("Unexpected Quiz Type. QuizID: " . $quizID);
+                        }
+                        //create default learning material
+                        if ($quizType == "Video")
+                            createVideoLearningMaterial($conn, $quizID);
+                        else if ($quizType == "Image")
+                            createImageLearningMaterial($conn, $quizID);
+                        else
+                            createEmptyLearningMaterial($conn, $quizID);
+                    } //if misc
+                    else {
+                        $quizID = createQuiz($conn, $topicID, 'Misc', $week);
+                        createMiscSection($conn, $quizID, $quizType);
                     }
-                    //create default learning material
-                    if ($quizType == "Video")
-                        createVideoLearningMaterial($conn, $quizID);
-                    else if ($quizType == "Image")
-                        createImageLearningMaterial($conn, $quizID);
-                    else
-                        createEmptyLearningMaterial($conn, $quizID);
 
                     $conn->commit();
                 } catch (Exception $e) {
@@ -142,6 +150,7 @@ db_close($conn);
                                         <td><?php echo $quizType ?></td>
                                         <td><?php echo $quizResult[$i]->TopicName ?></td>
                                         <td><?php echo $points ?>
+                                            <!--if editable-->
                                             <?php if (in_array($quizType, $editableQuizTypeArr)) { ?>
                                                 <span class="glyphicon glyphicon-remove pull-right"
                                                       aria-hidden="true"></span>
@@ -197,10 +206,18 @@ db_close($conn);
                     <label for='QuizType'>QuizType</label>
                     <select class="form-control dialoginput" id="QuizType" form="submission" name="quizType" required>
                         <option value="" disabled selected>Select Quiz Type</option>
-                        <?php for ($i = 0; $i < count($editableQuizTypeArr); $i++) { ?>
-                            <option
-                                value="<?php echo $editableQuizTypeArr[$i] ?>"><?php echo $editableQuizTypeArr[$i] ?></option>
-                        <?php } ?>
+                        <optgroup label="Editable Quiz">
+                            <?php for ($i = 0; $i < count($editableQuizTypeArr); $i++) { ?>
+                                <option
+                                    value="<?php echo $editableQuizTypeArr[$i] ?>"><?php echo $editableQuizTypeArr[$i] ?></option>
+                            <?php } ?>
+                        </optgroup>
+                        <optgroup label="Misc Quiz">
+                            <?php for ($i = 0; $i < count($miscQuizTypeArr); $i++) { ?>
+                                <option
+                                    value="<?php echo $miscQuizTypeArr[$i] ?>"><?php echo $miscQuizTypeArr[$i] ?></option>
+                            <?php } ?>
+                        </optgroup>
                     </select>
                     <br>
                     <label for='TopicName'>TopicName</label>

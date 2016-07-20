@@ -1,4 +1,5 @@
 <?php
+require_once("../mysql-lib.php");
 require_once("../debug.php");
 
 /* Session */
@@ -16,6 +17,8 @@ if (isset($_SESSION['researcherID'])) {
 /* Session */
 
 /* Array Definition */
+
+// sidebar
 $userAdminPageArr = array('School', 'Class', 'Student');
 $userAdminIconArr = array('mortar-board', 'users', 'child');
 $contentAdminPageArr = array('Week', 'Quiz', 'Snap Fact', 'Verbose Fact', 'MCQ', 'SAQ', 'Matching', 'Poster', 'Video', 'Image', 'Misc');
@@ -23,7 +26,11 @@ $quizTypeArr = array('Matching', 'Poster', 'Video', 'Image', 'Misc');
 $contentAdminIconArr = array('calendar', 'book', 'lightbulb-o', 'folder-open', 'check', 'pencil', 'th-list', 'exclamation-triangle', 'video-camera', 'picture-o', 'exclamation-triangle');
 $gradingPageArr = array('SAQ Grading', 'Video Grading', 'Image Grading', 'Poster Grading');
 $gradingIconArr = array('check', 'check', 'check', 'exclamation-triangle');
-$editableQuizTypeArr = array('MCQ', 'SAQ', 'Matching', 'Poster', 'Video', 'Image');
+
+// php quiz type classification
+$editableQuizTypeArr = array('Questionnaire', 'MCQ', 'SAQ', 'Matching', 'Poster', 'Video', 'Image');
+$miscQuizTypeArr = array('DrinkingTool', 'Calculator');
+
 /* Array Definition */
 
 

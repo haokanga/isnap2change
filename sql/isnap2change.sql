@@ -176,7 +176,7 @@ CREATE TABLE IF NOT EXISTS `Student_Week_Record` (
 CREATE TABLE IF NOT EXISTS `MCQ_Section` (
     QuizID MEDIUMINT,
     Points MEDIUMINT DEFAULT 0,
-    Questionnaires BOOLEAN DEFAULT 0,
+    Questionnaire BOOLEAN DEFAULT 0,
     CONSTRAINT MCQ_Section_QuizID_PK PRIMARY KEY (QuizID),
     CONSTRAINT MCQ_Section_QuizID_FK FOREIGN KEY (QuizID)
         REFERENCES Quiz (QuizID)
@@ -441,7 +441,7 @@ INSERT IGNORE INTO Topic(TopicName) VALUES('Health and Wellbeing');
 # [Formal] insert MCQ section with multiple questions
 INSERT IGNORE INTO Quiz(Week,QuizType,TopicID) VALUES(1,'MCQ',2);
 SET @QUIZ_LAST_INSERT_ID = LAST_INSERT_ID();
-INSERT IGNORE INTO MCQ_Section(QuizID,Points,Questionnaires) VALUES(@QUIZ_LAST_INSERT_ID,30,0);
+INSERT IGNORE INTO MCQ_Section(QuizID,Points,Questionnaire) VALUES(@QUIZ_LAST_INSERT_ID,30,0);
 INSERT IGNORE INTO MCQ_Question(Question, CorrectChoice, QuizID) VALUES('Which of these breakfast foods will provide you with the most energy?', 'Whole grain cereal or oatmeal', @QUIZ_LAST_INSERT_ID);
 SET @MCQ_QUESTION_LAST_INSERT_ID = LAST_INSERT_ID();
 INSERT IGNORE INTO `MCQ_Option`(Content, Explanation, MCQID) VALUES('Candy bar', 'Candy bars will give you an instant burst of energy but will not last!', @MCQ_QUESTION_LAST_INSERT_ID);
@@ -501,7 +501,7 @@ INSERT IGNORE INTO `MCQ_Option`(Content, Explanation, MCQID) VALUES('Orange Juic
 
 INSERT IGNORE INTO Quiz(Week,QuizType,TopicID) VALUES(1,'MCQ',5);
 SET @QUIZ_LAST_INSERT_ID = LAST_INSERT_ID();
-INSERT IGNORE INTO MCQ_Section(QuizID,Points,Questionnaires) VALUES(@QUIZ_LAST_INSERT_ID,20,0);
+INSERT IGNORE INTO MCQ_Section(QuizID,Points,Questionnaire) VALUES(@QUIZ_LAST_INSERT_ID,20,0);
 INSERT IGNORE INTO MCQ_Question(Question, CorrectChoice, QuizID) VALUES('Alcohol has an immediate effect on the:', 'Brain', @QUIZ_LAST_INSERT_ID);
 SET @MCQ_QUESTION_LAST_INSERT_ID = LAST_INSERT_ID();
 INSERT IGNORE INTO `MCQ_Option`(Content, Explanation, MCQID) VALUES('Knees', "Wrong", @MCQ_QUESTION_LAST_INSERT_ID);
@@ -583,7 +583,7 @@ INSERT IGNORE INTO Misc_Section(QuizID, QuizSubType, Points) VALUES(@QUIZ_LAST_I
 
 INSERT IGNORE INTO Quiz(Week,QuizType,TopicID) VALUES(6,'MCQ',3);
 SET @QUIZ_LAST_INSERT_ID = LAST_INSERT_ID();
-INSERT IGNORE INTO MCQ_Section(QuizID,Points,Questionnaires) VALUES(@QUIZ_LAST_INSERT_ID,30,0);
+INSERT IGNORE INTO MCQ_Section(QuizID,Points,Questionnaire) VALUES(@QUIZ_LAST_INSERT_ID,30,0);
 # [Formal] Matching quesitons
 INSERT IGNORE INTO Quiz(Week,QuizType,TopicID) VALUES(6,'Matching',2);
 SET @QUIZ_LAST_INSERT_ID = LAST_INSERT_ID();
@@ -748,7 +748,7 @@ INSERT INTO `isnap2changedb`.`quiz` (`Week`, `QuizType`, `TopicID`) VALUES ('2',
 
 INSERT IGNORE INTO Quiz(Week,QuizType,TopicID) VALUES(1,'MCQ',5);
 SET @QUIZ_LAST_INSERT_ID = LAST_INSERT_ID();
-INSERT IGNORE INTO MCQ_Section(QuizID,Points,Questionnaires) VALUES(@QUIZ_LAST_INSERT_ID,20,0);
+INSERT IGNORE INTO MCQ_Section(QuizID,Points,Questionnaire) VALUES(@QUIZ_LAST_INSERT_ID,20,0);
 INSERT IGNORE INTO MCQ_Question(Question, CorrectChoice, QuizID) VALUES('0 option:', '0', @QUIZ_LAST_INSERT_ID);
 SET @MCQ_QUESTION_LAST_INSERT_ID = LAST_INSERT_ID();
 

@@ -464,17 +464,23 @@ function getQuizType(PDO $conn, $quizID)
     $quizTypeQuery = $conn->prepare($quizTypeSql);
     $quizTypeQuery->execute(array($quizID));
     $quizTypeQueryRes = $quizTypeQuery->fetch(PDO::FETCH_OBJ);
-
+    // video, image, saq
     if ($quizTypeQueryRes->Excluded == EXCLUDED_VIDEO) {
         return "Video";
     } else if ($quizTypeQueryRes->Excluded == EXCLUDED_IMAGE) {
         return "Image";
     } else if ($quizTypeQueryRes->QuizType == "Misc") {
         return getMiscQuizType($conn, $quizID);
-    } else {
-        return $quizTypeQueryRes->QuizType;
     }
 
+    // questionnaire
+    if ($quizTypeQueryRes->QuizType == 'MCQ') {
+        if (getMCQSection($conn, $quizID)->Questionnaire == 1) {
+            return "Questionnaire";
+        }
+    }
+
+    return $quizTypeQueryRes->QuizType;
 }
 
 function getQuiz(PDO $conn, $quizID)
@@ -604,6 +610,7 @@ function getSnapFactsByTopic(PDO $conn, $topicID)
     $factResult = $factQuery->fetchAll(PDO::FETCH_OBJ);
     return $factResult;
 }
+
 /* SnapFact */
 
 /* VerboseFact */
@@ -682,21 +689,21 @@ function getVerboseFacts(PDO $conn)
 
 
 /* MCQ */
-function createMCQSection(PDO $conn, $quizID, $points, $questionnaires)
+function createMCQSection(PDO $conn, $quizID, $points, $questionnaire)
 {
-    $updateSql = "INSERT INTO MCQ_Section(QuizID, Points, Questionnaires)
+    $updateSql = "INSERT INTO MCQ_Section(QuizID, Points, Questionnaire)
                     VALUES (?,?,?)";
     $updateSql = $conn->prepare($updateSql);
-    $updateSql->execute(array($quizID, $points, $questionnaires));
+    $updateSql->execute(array($quizID, $points, $questionnaire));
 }
 
-function updateMCQSection(PDO $conn, $quizID, $points, $questionnaires)
+function updateMCQSection(PDO $conn, $quizID, $points, $questionnaire)
 {
     $updateSql = "UPDATE MCQ_Section
-                    SET Points = ?, Questionnaires = ?
+                    SET Points = ?, Questionnaire = ?
                     WHERE QuizID = ?";
     $updateSql = $conn->prepare($updateSql);
-    $updateSql->execute(array($points, $questionnaires, $quizID));
+    $updateSql->execute(array($points, $questionnaire, $quizID));
 }
 
 function createMCQQuestion(PDO $conn, $quizID, $question)
@@ -723,6 +730,12 @@ function deleteMCQQuestion(PDO $conn, $mcqID)
     $updateSql = $conn->prepare($updateSql);
     $updateSql->execute(array($mcqID));
 }
+
+function getMCQSection(PDO $conn, $quizID)
+{
+    return getRecord($conn, $quizID, 'Quiz', array('MCQ_Section'));
+}
+
 
 function getMCQQuestion(PDO $conn, $mcqID)
 {
@@ -1551,6 +1564,17 @@ function getFactsByTopicID(PDO $conn, $topicID)
 /* Fact */
 
 /* Misc Quiz */
+
+function createMiscSection(PDO $conn, $quizID, $quizType)
+{
+    $updateSql = "INSERT INTO misc_section(QuizID, QuizSubType)
+         VALUES (?,?)";
+    $updateSql = $conn->prepare($updateSql);
+    $updateSql->execute(array($quizID, $quizType));
+    return $conn->lastInsertId();
+}
+
+
 function getMiscQuizType(PDO $conn, $quizID)
 {
     $miscQuizTypeSql = "SELECT COUNT(*) 

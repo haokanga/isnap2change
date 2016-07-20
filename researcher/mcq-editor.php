@@ -17,12 +17,12 @@ try {
                     $week = $_POST['week'];
                     $topicName = $_POST['topicName'];
                     $points = $_POST['points'];
-                    $questionnaires = $_POST['questionnaires'];
+                    $questionnaire = $_POST['questionnaire'];
                     $conn->beginTransaction();
                     
                     $topicID = getTopicByName($conn, $topicName)->TopicID;
                     updateQuiz($conn, $quizID, $topicID, $week);
-                    updateMCQSection($conn, $quizID, $points, $questionnaires);
+                    updateMCQSection($conn, $quizID, $points, $questionnaire);
 
                     $conn->commit();
                 } catch (Exception $e) {
@@ -122,11 +122,11 @@ db_close($conn);
                             <input type="text" class="form-control" id="Points" name="points" placeholder="Input Points"
                                    value="<?php echo $quizResult->Points; ?>" required>
                             <br>
-                            <label for="Questionnaires">Questionnaires</label>
-                            <input type="hidden" class="form-control" id="Questionnaires" name="questionnaires"
+                            <label for="Questionnaire">Questionnaire</label>
+                            <input type="hidden" class="form-control" id="Questionnaire" name="questionnaire"
                                    value="0">
-                            <input type="checkbox" class="form-control" id="Questionnaires" name="questionnaires"
-                                   value="1" <?php if ($quizResult->Questionnaires != 0) echo 'checked'; ?>>
+                            <input type="checkbox" class="form-control" id="Questionnaire" name="questionnaire"
+                                   value="1" <?php if ($quizResult->Questionnaire != 0) echo 'checked'; ?>>
                             <label for="Questions">Questions</label>
                             <input type="text" class="form-control" id="Questions" name="questions"
                                    value="<?php echo $quizResult->Questions; ?>" disabled>
