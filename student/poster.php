@@ -36,7 +36,7 @@
         $status = getQuizStatus($conn, $quizID, $studentID);
         //if quiz is answered, saved poster will be read from database.
         if($status != "UNANSWERED"){
-            $posterRes = getPosterDraft($conn, $quizID, $studentID);
+            $posterRes = getPosterRecord($conn, $quizID, $studentID);
         }
     }catch(Exception $e){
         if($conn != null){
@@ -416,8 +416,7 @@
     function uploadDone(status, result) {
         if (status === "ok") {
             if(result.message == "success"){
-                var prefix = "<?php echo 'http://'. $_SERVER['SERVER_NAME']?>";
-                var url = prefix + "/isnap2change/student/tmp_poster_img/" + result.fileid;
+                var url = <?php getURL("/tmp_poster_img/") ?> + result.fileid;
 
                 ctx.beginTransaction();
                 var nodeId = ctx.createNode("ImageNode", {

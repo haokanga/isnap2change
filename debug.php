@@ -46,14 +46,8 @@ function handle_exception(Exception $e)
 
 function redirectToBugReportPage()
 {
-    $bugReportPage = "Location: " . realpath(__DIR__ . "/bug-report.php");
-
-    $result = parse_url($_SERVER['REQUEST_URI']);
-    var_dump($result);
-    echo $bugReportPage;
-    echo $_SERVER['DOCUMENT_ROOT'];
-    // jump to bug-report page
-    header($bugReportPage);
+    $url = getBugReportURL();
+    header("Location: $url");
 }
 
 function logger_write(Exception $e)
@@ -76,5 +70,22 @@ function logger_write(Exception $e)
 
     return $bugID;
 }
+
+
+/* helper function*/
+
+function getBugReportURL()
+{
+    return getURL("/bug-report.php");
+}
+
+function getURL($pageName){
+    $debug_page_dir = __DIR__;
+    $host = $_SERVER['HTTP_HOST'];
+    $relative_dir = explode("htdocs", $debug_page_dir, 2)[1];
+    $url = "http://" . $host . $relative_dir . $pageName;
+    return $url;
+}
+/* helper function*/
 
 ?>
