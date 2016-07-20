@@ -17,7 +17,7 @@ function debug_alert($message)
     echo "<script language=\"javascript\">  alert(\"" . $message . "\"); </script>";
 }
 
-function debug_err($pageName, Exception $e)
+function debug_err($pageName = null, Exception $e)
 {
     if ($e instanceof PDOException) {
         // duplicate entry
