@@ -13,9 +13,11 @@ try {
             if ($update == 1) {
                 try {
                     $week = $_POST['week'];
-                    $quizType = 'SAQ';
+                    $quizType = 'Poster';
                     $topicName = $_POST['topicName'];
                     $conn->beginTransaction();
+                    $question = '';
+                    $points = 0;
 
                     $topicID = getTopicByName($conn, $topicName)->TopicID;
                     $quizID = createQuiz($conn, $topicID, $quizType, $week);
@@ -23,6 +25,8 @@ try {
                     createEmptyLearningMaterial($conn, $quizID);
 
                     $conn->commit();
+
+                    header('Location: poster-editor.php?quizID=' . $quizID);
                 } catch (Exception $e) {
                     debug_err($pageName, $e);
                     $conn->rollBack();
@@ -38,7 +42,7 @@ try {
 }
 
 try {
-    $quizResult = getMiscQuizzes($conn);
+    $quizResult = getPosterQuizzes($conn);
     $topicResult = getTopics($conn);
 } catch (Exception $e) {
     debug_err($pageName, $e);
@@ -96,10 +100,10 @@ db_close($conn);
                                                     <span class="glyphicon glyphicon-remove pull-right"
                                                           aria-hidden="true"></span>
                                                     <span class="pull-right" aria-hidden="true">&nbsp;</span>
+                                                    <a href="poster-editor.php?quizID=<?php echo $quizResult[$i]->QuizID ?>">
                                                     <span class="glyphicon glyphicon-edit pull-right"
-                                                          data-toggle="modal"
-                                                          data-target="#dialog"
                                                           aria-hidden="true"></span>
+                                                    </a>
                                                 <?php } ?>
                                             </td>
                                         <?php } ?>
@@ -195,7 +199,6 @@ db_close($conn);
         });
         $('#submission').submit();
     });
-
     $(document).ready(function () {
         var table = $('#datatables').DataTable({
             responsive: true,

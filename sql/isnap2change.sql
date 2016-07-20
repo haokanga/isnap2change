@@ -50,10 +50,12 @@ DROP TABLE IF EXISTS Poster_Record;
 DROP TABLE IF EXISTS Misc_Section;
 DROP TABLE IF EXISTS Game;
 DROP TABLE IF EXISTS Game_Record;
+/*
 DROP TABLE IF EXISTS Bonus;
 DROP TABLE IF EXISTS Bonus_Record;
 DROP TABLE IF EXISTS Bonus_Task;
 DROP TABLE IF EXISTS Bonus_Task_Record;
+*/
 
 CREATE TABLE IF NOT EXISTS `School` (
     SchoolID MEDIUMINT AUTO_INCREMENT,
@@ -105,8 +107,8 @@ CREATE TABLE IF NOT EXISTS `Snap_Fact` (
     SnapFactID MEDIUMINT AUTO_INCREMENT,
     Content TEXT,
     TopicID MEDIUMINT,
-    CONSTRAINT Fact_SnapFactID_PK PRIMARY KEY (SnapFactID),
-    CONSTRAINT Fact_TopicID_FK FOREIGN KEY (TopicID)
+    CONSTRAINT Snap_Fact_SnapFactID_PK PRIMARY KEY (SnapFactID),
+    CONSTRAINT Snap_Fact_TopicID_FK FOREIGN KEY (TopicID)
         REFERENCES Topic (TopicID)
         ON DELETE CASCADE ON UPDATE CASCADE
 )  ENGINE=INNODB;
@@ -344,6 +346,7 @@ CREATE TABLE IF NOT EXISTS `Game_Record` (
         ON DELETE CASCADE ON UPDATE CASCADE
 )  ENGINE=INNODB;
 
+/*
 CREATE TABLE IF NOT EXISTS `Bonus` (
     BonusID MEDIUMINT AUTO_INCREMENT,
     Week MEDIUMINT,
@@ -387,6 +390,8 @@ CREATE TABLE IF NOT EXISTS `Bonus_Task_Record` (
         REFERENCES Bonus_Task (BonusQuestionID)
         ON DELETE CASCADE ON UPDATE CASCADE
 )  ENGINE=INNODB;
+*/ 
+ 
  
 SET FOREIGN_KEY_CHECKS=1;
 
@@ -681,6 +686,7 @@ INSERT IGNORE INTO Game_Record(GameID,StudentID,`Level`,Score) VALUES(2,3,1,30);
 INSERT IGNORE INTO Game_Record(GameID,StudentID,`Level`,Score) VALUES(2,4,1,30);
 INSERT IGNORE INTO Game_Record(GameID,StudentID,`Level`,Score) VALUES(2,5,1,40);
 
+/*
 # [Example] add Bonus and tasks
 INSERT IGNORE INTO Bonus(Week) VALUES(1);
 SET @BONUS_LAST_INSERT_ID = LAST_INSERT_ID();
@@ -693,6 +699,7 @@ INSERT IGNORE INTO Bonus_Task(Question, Points, BonusID) VALUES('Attend a basket
 INSERT IGNORE INTO Bonus(Week) VALUES(3);
 SET @BONUS_LAST_INSERT_ID = LAST_INSERT_ID();
 INSERT IGNORE INTO Bonus_Task(Question, Points, BonusID) VALUES('Attend a football game', 10, @BONUS_LAST_INSERT_ID);
+*/
 
 # [Example] update Submission time
 UPDATE `isnap2changedb`.`student` SET `Score`='80' WHERE `StudentID`='10';

@@ -1392,6 +1392,11 @@ function getPosterRecords(PDO $conn)
     return getRecords($conn, "Poster_Record");
 }
 
+function getPosterQuiz(PDO $conn, $quizID)
+{
+    return getRecord($conn, $quizID, "Poster_Section", array("Quiz", "Topic"));
+}
+
 function getPosterQuizzes(PDO $conn)
 {
     return getRecords($conn, "Poster_Section", array("Quiz", "Topic"));
@@ -1620,6 +1625,11 @@ function getMiscQuizType(PDO $conn, $quizID)
     return $miscQuizTypeQueryRes->QuizSubType;
 }
 
+function getMiscQuiz(PDO $conn, $quizID)
+{
+    return getRecord($conn, $quizID, "Misc_Section", array("Quiz", "Topic"));
+}
+
 function getMiscQuizzes(PDO $conn)
 {
     return getRecords($conn, "Misc_Section", array("Quiz", "Topic"));
@@ -1746,19 +1756,24 @@ function getLogs(PDO $conn)
 /* Log */
 
 /* Helper Function */
-function getTablePK($tableName)
+function getTablePK(PDO $conn, $tableName)
 {
-    $tablePK = $tableName . "ID";
-    if ($tableName == "Learning_Material") $tablePK = "QuizID";
-    else if ($tableName == "Snap_Fact") $tablePK = "SnapFactID";
-    else if ($tableName == "Verbose_Fact") $tablePK = "VerboseFactID";
+    $tableSql = "SHOW KEYS FROM $tableName WHERE Key_name = 'PRIMARY'";
+    $tableQuery = $conn->prepare($tableSql);
+    $tableQuery->execute();
+    $tableResult = $tableQuery->fetchAll(PDO::FETCH_OBJ);
+    if (count($tableResult) != 1) {
+        throw new Exception("PK of $tableName is composed of more than one column.");
+    }
+
+    $tablePK = $tableResult[0]->Column_name;
     return $tablePK;
 }
 
 
 function deleteRecord(PDO $conn, $recordID, $tableName)
 {
-    $tablePK = getTablePK($tableName);
+    $tablePK = getTablePK($conn, $tableName);
     $updateSql = "DELETE FROM $tableName WHERE $tablePK = ?";
     $updateSql = $conn->prepare($updateSql);
     $updateSql->execute(array($recordID));
@@ -1766,7 +1781,11 @@ function deleteRecord(PDO $conn, $recordID, $tableName)
 
 function getRecord(PDO $conn, $recordID, $tableName, array $joinTables = null)
 {
-    $tablePK = getTablePK($tableName);
+    if (!is_numeric($recordID)) {
+        throw new Exception("RecordID is not numeric: $recordID");
+    }
+
+    $tablePK = getTablePK($conn, $tableName);
 
     $tableSql = "SELECT COUNT(*)
 				 FROM $tableName

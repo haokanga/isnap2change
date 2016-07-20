@@ -129,7 +129,7 @@ db_close($conn);
     <div id="page-wrapper">
         <div class="row">
             <div class="col-lg-12">
-                <h1 class="page-header">Quiz Overview
+                <h1 class="page-header"><?php echo $pageNameForView; ?> Overview
                     <?php if (isset($_GET['week'])) { ?>
                         <div class="alert alert-info alert-dismissable" style="display: inline-block;">
                             <button type="button" class="close" data-dismiss="alert" aria-hidden="true"
