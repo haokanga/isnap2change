@@ -6,8 +6,6 @@
     require_once("../debug.php");
     $pageName = "weekly-task";
 
-    $conn = null;
-
     if ($_SERVER["REQUEST_METHOD"] == "GET") {
         if(isset($_GET["week"])) {
             $week = $_GET["week"];
@@ -33,7 +31,7 @@
         $dueTime = getStuWeekRecord($conn, $studentID, $week);
 
         //get all quizzes by studentID and week
-        $quizzesRes = getQuizzesStatusByWeek($conn, $studentID, $week);
+        $quizzesRes = getQuizzesStatusByWeek($conn, $studentID, $week, 0);
 
     } catch(Exception $e) {
         if($conn != null) {
@@ -179,8 +177,49 @@
         .game-nav-item {
             width: 340px;
             margin: 20px auto;
+            position: relative;
         }
-
+        .game-nav-item-completed .game-nav-logo,
+        .game-nav-item-completed .game-nav-title,
+        .game-nav-item-completed .game-nav-divider,
+        .game-nav-item-completed .game-nav-desc {
+            opacity: 0.5;
+        }
+        .game-nav-item-completed .game-nav-status,
+        .game-nav-item-completed .game-nav-feedback {
+            display: block;
+        }
+        .game-nav-status {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            text-align: center;
+            color: #fff;
+            font-size: 70px;
+            display: none;
+        }
+        .game-nav-feedback {
+            position: absolute;
+            top: 80px;
+            left: 0;
+            right: 0;
+            text-align: center;
+            color: #fcee2d;
+            font-size: 20px;
+            display: none;
+        }
+        .game-nav-feedback-animate {
+            animation: fadein 2s ease-out infinite;
+        }
+        @keyframes fadein {
+            0% {
+                opacity: 0;
+            }
+            100% {
+                opacity: 1;
+            }
+        }
         .game-nav-logo {
             display: block;
             width: 128px;
@@ -225,7 +264,12 @@
         .game-standard-drinking-tool .game-nav-logo {
             background-image: url("./img/standard_drinking_tool_icon.png");
         }
-
+        .game-video {
+            color: #AF24D1;
+        }
+        .game-video .game-nav-logo {
+            background-image: url("./img/video_icon.png");
+        }
         .game-nav-title {
             font-size: 24px;
         }
@@ -481,102 +525,157 @@
             </div>
 
             <div class="game-nav">
-    <?php
+<?php
             for($i=0; $i<count($quizzesRes); $i++) { ?>
                 <div class="col-6">
-    <?php
-
+<?php
                 //list of question type
                 switch($quizzesRes[$i]['QuizType']){
                     case "MCQ":
                         if(isset($quizzesRes[$i]['Status'])) { ?>
                             <a href="game-home.php">
-    <?php               } else { ?>
+                                <div class="game-nav-item game-nav-item-completed game-multiple-choice-quiz" >
+<?php               } else { ?>
                             <a href="pre-task-material.php?quiz_id=<?php echo $quizzesRes[$i]['QuizID']?>">
-    <?php               } ?>
-                             <div class="game-nav-item game-multiple-choice-quiz">
-                                 <div class="game-nav-logo"></div>
-                                 <div class="game-nav-title">Multiple Choice Question</div>
-                                 <div class="game-nav-divider"></div>
-                                 <div class="game-nav-desc">Complete Multiple Choice Question on <?php echo $quizzesRes[$i]['TopicName']?> to receive <?php echo $quizzesRes[$i]['Points']?> points.</div>
-                             </div>
+                                <div class="game-nav-item game-multiple-choice-quiz">
+<?php               } ?>
+                                    <div class="game-nav-logo"></div>
+                                    <div class="game-nav-title">Multiple Choice Question</div>
+                                    <div class="game-nav-divider"></div>
+                                    <div class="game-nav-desc">Complete Multiple Choice Question on <?php echo $quizzesRes[$i]['TopicName']?> to receive <?php echo $quizzesRes[$i]['Points']?> points.</div>
+<?php                   if(isset($quizzesRes[$i]['Status'])) { ?>
+                                    <div class="game-nav-status">Completed</div>
+<?php                   } ?>
+                                </div>
                             </a>
-    <?php                break;
+<?php                   break;
                     case "SAQ":
                          if(isset($quizzesRes[$i]['Status'])) { ?>
                             <a href="game-home.php">
-    <?php                } else { ?>
+<?php                        if($quizzesRes[$i]['Status'] == "UNGRADED" || $quizzesRes[$i]['Status'] == "GRADED"){ ?>
+                                <div class="game-nav-item game-nav-item-completed game-short-answer-question">
+<?php                        } else { ?>
+                                <div class="game-nav-item game-short-answer-question">
+<?php                        }
+                        } else { ?>
                             <a href="pre-task-material.php?quiz_id=<?php echo $quizzesRes[$i]['QuizID']?>">
-     <?php               } ?>
-                              <div class="game-nav-item game-short-answer-question">
+                                <div class="game-nav-item game-short-answer-question">
+<?php                    } ?>
                                   <div class="game-nav-logo"></div>
                                   <div class="game-nav-title">Short Answer Question</div>
                                   <div class="game-nav-divider"></div>
                                   <div class="game-nav-desc">Complete Short Answer Question on <?php echo $quizzesRes[$i]['TopicName']?> to receive <?php echo $quizzesRes[$i]['Points']?> points.</div>
-                              </div>
+<?php                   if($quizzesRes[$i]['Status'] == "UNGRADED") { ?>
+                                  <div class="game-nav-status">Completed</div>
+<?php                   } else if($quizzesRes[$i]['Status'] == "GRADED") {?>
+                                  <div class="game-nav-status">Completed</div>
+                                  <div class="game-nav-feedback game-nav-feedback-animate">Teacher's Feedback Available</div>
+<?php                   } ?>
+                                </div>
                             </a>
-    <?php                break;
+<?php                     break;
                     case "Matching":
                           if(isset($quizzesRes[$i]['Status'])) { ?>
                             <a href="game-home.php">
-    <?php                 } else { ?>
+                                <div class="game-nav-item game-nav-item-completed game-matching">
+<?php                     } else { ?>
                             <a href="pre-task-material.php?quiz_id=<?php echo $quizzesRes[$i]['QuizID']?>">
-    <?php                 } ?>
                                 <div class="game-nav-item game-matching">
+<?php                     } ?>
                                     <div class="game-nav-logo"></div>
                                     <div class="game-nav-title">Matching</div>
                                     <div class="game-nav-divider"></div>
                                     <div class="game-nav-desc">Complete Matching on <?php echo $quizzesRes[$i]['TopicName']?> to receive <?php echo $quizzesRes[$i]['Points']?> points.</div>
+<?php                      if(isset($quizzesRes[$i]['Status'])) { ?>
+                                    <div class="game-nav-status">Completed</div>
+<?php                       } ?>
                                 </div>
                             </a>
-    <?php                break;
+<?php                      break;
                     case "Poster":
                             if(isset($quizzesRes[$i]['Status'])) { ?>
-                               <a href="game-home.php">
-    <?php                    } else { ?>
+                               <a href="poster.php?quiz_id=<?php echo $quizzesRes[$i]['QuizID']?>">
+<?php                           if($quizzesRes[$i]['Status'] == "UNGRADED" || $quizzesRes[$i]['Status'] == "GRADED"){ ?>
+                                    <div class="game-nav-item game-nav-item-completed game-poster">
+<?php                           } else { ?>
+                                   <div class="game-nav-item game-poster">
+<?php                           }
+                            } else { ?>
                                <a href="pre-task-material.php?quiz_id=<?php echo $quizzesRes[$i]['QuizID']?>">
-    <?php                    } ?>
+<?php                       } ?>
                                 <div class="game-nav-item game-poster">
                                     <div class="game-nav-logo"></div>
                                     <div class="game-nav-title">Poster</div>
                                     <div class="game-nav-divider"></div>
                                     <div class="game-nav-desc">Complete Poster on <?php echo $quizzesRes[$i]['TopicName']?> to receive <?php echo $quizzesRes[$i]['Points']?> points.</div>
+<?php                       if($quizzesRes[$i]['Status'] == "UNGRADED" || $quizzesRes[$i]['Status'] == "GRADED") { ?>
+                                    <div class="game-nav-status">Completed</div>
+<?php                       } ?>
                                 </div>
                                </a>
-    <?php                break;
+<?php                       break;
                     case "Calculator":
                             if(isset($quizzesRes[$i]['Status'])) { ?>
                                 <a href="cost-calculator.php?quiz_id=<?php echo $quizzesRes[$i]['QuizID']?>">
-    <?php                   } else { ?>
+                                    <div class="game-nav-item game-nav-item-completed game-cost-calculator">
+<?php                       } else { ?>
                                 <a href="pre-task-material.php?quiz_id=<?php echo $quizzesRes[$i]['QuizID']?>">
-    <?php                   } ?>
-                                <div class="game-nav-item game-cost-calculator">
-                                    <div class="game-nav-logo"></div>
-                                    <div class="game-nav-title">Cost Calculator</div>
-                                    <div class="game-nav-divider"></div>
-                                    <div class="game-nav-desc">Complete Cost Calculator on <?php echo $quizzesRes[$i]['TopicName']?> to receive <?php echo $quizzesRes[$i]['Points']?> points.</div>
-                                </div>
+                                    <div class="game-nav-item game-cost-calculator">
+<?php                       } ?>
+                                        <div class="game-nav-logo"></div>
+                                        <div class="game-nav-title">Cost Calculator</div>
+                                        <div class="game-nav-divider"></div>
+                                        <div class="game-nav-desc">Complete Cost Calculator on <?php echo $quizzesRes[$i]['TopicName']?> to receive <?php echo $quizzesRes[$i]['Points']?> points.</div>
+<?php                      if(isset($quizzesRes[$i]['Status'])) { ?>
+                                        <div class="game-nav-status">Completed</div>
+<?php                       } ?>
+                                    </div>
                                 </a>
-    <?php                       break;
+<?php                       break;
                     case "DrinkingTool":
                             if(isset($quizzesRes[$i]['Status'])) { ?>
-                                <a href="game-home.php">
-    <?php                   } else { ?>
+                                <a href="standard-drinking-tool.php?quiz_id=<?php echo $quizzesRes[$i]['QuizID']?>">
+                                    <div class="game-nav-item game-nav-item-completed game-standard-drinking-tool">
+<?php                       } else { ?>
                                 <a href="pre-task-material.php?quiz_id=<?php echo $quizzesRes[$i]['QuizID']?>">
-    <?php                   } ?>
-                                        <div class="game-nav-item game-standard-drinking-tool">
-                                            <div class="game-nav-logo"></div>
-                                            <div class="game-nav-title">Standard Drinking Tool</div>
-                                            <div class="game-nav-divider"></div>
-                                            <div class="game-nav-desc">Complete Standard Drinking Tool on <?php echo $quizzesRes[$i]['TopicName']?> to receive <?php echo $quizzesRes[$i]['Points']?> points.</div>
-                                        </div>
-                                    </a>
-    <?php                       break;
+                                    <div class="game-nav-item game-standard-drinking-tool">
+<?php                       } ?>
+                                        <div class="game-nav-logo"></div>
+                                        <div class="game-nav-title">Standard Drinking Tool</div>
+                                        <div class="game-nav-divider"></div>
+                                        <div class="game-nav-desc">Complete Standard Drinking Tool on <?php echo $quizzesRes[$i]['TopicName']?> to receive <?php echo $quizzesRes[$i]['Points']?> points.</div>
+<?php                      if(isset($quizzesRes[$i]['Status'])) { ?>
+                                        <div class="game-nav-status">Completed</div>
+<?php                       } ?>
+                                    </div>
+                                </a>
+<?php                       break;
+                    case "Video":
+                            if(isset($quizzesRes[$i]['Status'])) { ?>
+                                <div href="standard-drinking-tool.php?quiz_id=<?php echo $quizzesRes[$i]['QuizID']?>">
+                                    <div class="game-nav-item game-nav-item-completed game-video">
+<?php                       } else { ?>
+                                <a href="pre-task-material.php?quiz_id=<?php echo $quizzesRes[$i]['QuizID']?>">
+                                    <div class="game-nav-item game-video">
+<?php                       } ?>
+                                        <div class="game-nav-logo"></div>
+                                        <div class="game-nav-title">Video</div>
+                                        <div class="game-nav-divider"></div>
+                                        <div class="game-nav-desc">Complete Standard Drinking Tool on <?php echo $quizzesRes[$i]['TopicName']?> to receive <?php echo $quizzesRes[$i]['Points']?> points.</div>
+<?php                       if($quizzesRes[$i]['Status'] == "UNGRADED") { ?>
+                                        <div class="game-nav-status">Completed</div>
+<?php                       } else if($quizzesRes[$i]['Status'] == "GRADED") {?>
+                                        <div class="game-nav-status">Completed</div>
+                                        <div class="game-nav-feedback game-nav-feedback-animate">Teacher's Feedback Available</div>
+<?php                   } ?>
+                                    </div>
+                                </a>
+<?php                       break;
 
                  } ?>
                             </div>
 
-     <?php       }    ?>
+<?php       }    ?>
 
             </div>
         </div>

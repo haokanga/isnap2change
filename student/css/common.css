@@ -81,6 +81,12 @@ body {
 /**
  * $tool 工具类
  **/
+ .show {
+    display: block !important;
+ }
+ .hide {
+    display: none !important;
+ }
 .clearfix:before,
 .clearfix:after {
     content: "";
@@ -332,10 +338,33 @@ body {
 }
 .sitenav-progress a {
     background-image: url("../img/progress_icon.png");
-
 }
 .sitenav-reading-material a {
     background-image: url("../img/reading_material_icon.png");
+}
+.sitenav-facts-home a {
+    background-image: url("../img/snap_fact_circle_icon.png");
+}
+.sitenav-smoking a {
+    background-image: url("../img/smoking_icon.png");
+}
+.sitenav-nutrition a {
+    background-image: url("../img/nutrition_icon.png");
+}
+.sitenav-alcohol a {
+    background-image: url("../img/alcohol_icon.png");
+}
+.sitenav-physical a {
+    background-image: url("../img/physical_activity_icon.png");
+}
+.sitenav-health a {
+    background-image: url("../img/health_and_wellbeing_icon.png");
+}
+.sitenav-sexual a {
+    background-image: url("../img/sexual_health_icon.png");
+}
+.sitenav-drgus a {
+    background-image: url("../img/drugs_icon.png");
 }
 
 /**
@@ -344,7 +373,7 @@ body {
 
 .back-top {
     width: 48px;
-    height: 80px;
+    height: 48px;
     position: fixed;
     right: 20px;
     bottom: 80px;
@@ -380,7 +409,7 @@ body {
     right: 0;
     bottom: 0;
     left: 0;
-    z-index: 2048;
+    z-index: 99999;
 }
 .snap-alert-mask {
     width: 100%;
@@ -506,15 +535,38 @@ body {
 }
 .question-item {
     display: block;
-    margin-bottom: 20px;
+    margin-bottom: 10px;
 }
 .question-title {
-    margin-bottom: 20px;
+    margin-bottom: 10px;
     display: block;
 }
-.question-field {
+.question-content {
     display: block;
     width: 100%;
+    overflow: hidden;
+    position: relative;
+}
+.question-addon-container .question-field {
+    padding-left: 40px;
+}
+.question-addon {
+    padding: 7px 12px;
+    font-size: 14px;
+    font-weight: 400;
+    line-height: 1;
+    position: absolute;
+    left: 0;
+    top: 0;
+    color: #555;
+    text-align: center;
+    background-color: #eee;
+    border: 1px solid #ccc;
+    border-radius: 4px 0 0 4px;
+}
+.question-field {
+    float: left;
+    width: calc(100% - 100px);
     border-radius: 10px;
     border: 0;
     height: 30px;
@@ -526,16 +578,19 @@ body {
 }
 .question-error {
     display: none;
+    float: left;
+    width: 100px;
     color: red;
-    padding-top: 10px;
+    padding-top: 6px;
+    padding-left: 10px;
 }
 .question-error-show {
     display: block;
 }
 .question-submit {
     display: block;
-    width: 100px;
-    height: 100px;
+    width: 80px;
+    height: 80px;
     margin: 0 auto;
     background-color: transparent;
     border: 0;
@@ -543,6 +598,97 @@ body {
     background-image: url("../img/submit_icon.png");
     cursor: pointer;
 }
+.question-submit:disabled {
+    cursor: not-allowed;
+}
 .question-submit:focus {
     outline: 0;
+}
+
+/**
+ * $icon
+ **/
+.image-icon {
+    background-size: 100% 100%;
+}
+.image-icon-smoking {
+    background-image: url("../img/smoking_icon.png");
+}
+.image-icon-nutrition {
+    background-image: url("../img/nutrition_icon.png");
+}
+.image-icon-alcohol {
+    background-image: url("../img/alcohol_icon.png");
+}
+.image-icon-physical {
+    background-image: url("../img/physical_activity_icon.png");
+}
+.image-icon-health {
+    background-image: url("../img/health_and_wellbeing_icon.png");
+}
+.image-icon-sexual {
+    background-image: url("../img/sexual_health_icon.png");
+}
+.image-icon-drugs {
+    background-image: url("../img/drugs_icon.png");
+}
+
+/**
+ * $cancel task
+ **/
+.cancel-task {
+    position: fixed;
+    top: 100px;
+    right: 200px;
+    width: 40px;
+    text-align: center;
+    background-color: #000;
+    z-index: 1024;
+}
+.cancel-icon {
+    display: block;
+    width: 24px;
+    height: 24px;
+    margin: 0 auto 10px;
+    background-size: 100% 100%;
+    background-image: url("../img/cancel_icon.png");
+    cursor: pointer;
+}
+
+/**
+ * $pagination
+ **/
+.pagination {
+    text-align: center;
+    display: flex;
+    justify-content: center;
+    cursor: pointer;
+}
+.pagination-nav {
+    display: inline-block;
+    width: 32px;
+    height: 32px;
+    margin: 0 10px;
+    background-size: 100% 100%;
+    background-image: url("../img/direction_icon.png");
+}
+.pagination-prev {
+    transform: rotate(180deg);
+}
+.pagination-nav-list {
+    display: inline-block;
+    height: 32px;
+
+}
+.pagination-nav-item {
+    display: inline-block;
+    margin: 0;
+    color: #fff;
+    font-size: 20px;
+    width: 32px;
+    height: 32px;
+    line-height: 32px;
+}
+.pagination .active {
+    color: #fcee2d;
 }

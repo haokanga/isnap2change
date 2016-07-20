@@ -5,7 +5,7 @@
     require_once("../mysql-lib.php");
     require_once("../debug.php");
 
-    $pageName = "cost-calculaor";
+    $pageName = "cost-calculator";
 
     //check whether a request is GET or POST
     if($_SERVER["REQUEST_METHOD"] == "GET"){
@@ -47,7 +47,6 @@
     }
 
     db_close($conn);
-
 ?>
 
 <!DOCTYPE html>
@@ -102,45 +101,6 @@
         }
         .result-value {
             color: #fcee2f;
-        }
-
-        .question-form {
-            font-size: 18px;
-        }
-        .question-item {
-            display: block;
-            margin-bottom: 30px;
-        }
-        .question-title {
-            display: block;
-            margin-bottom: 20px;
-        }
-        .question-field {
-            display: block;
-            width: 100%;
-            height: 30px;
-            line-height: 30px;
-            border-radius: 15px;
-            padding: 0 10px;
-            outline: 0;
-            border: 0;
-            font-size: 14px;
-            font-family: 'Maitree', serif;
-            -webkit-box-sizing: border-box;
-            -moz-box-sizing: border-box;
-            box-sizing: border-box;
-            -webkit-box-shadow: none;
-            -moz-box-shadow: none;
-            box-shadow: none;
-        }
-        .question-error {
-            color: red;
-            display: block;
-            margin: 5px 0;
-            display: none;
-        }
-        .question-error-show {
-            display: block;
         }
     </style>
 
@@ -200,7 +160,6 @@
 <div class="page-wrapper">
     <div class="header-wrapper">
         <div class="header">
-            <a href="weekly-task.php?week=<?php echo $week?>" class="header-back-link"></a>
             <a class="home-link">SNAP</a>
 
             <div class="settings">
@@ -292,37 +251,46 @@
             <div class="col-6">
                 <form class="question-form">
                     <label class="question-item">
-                        <span class="question-title">Q.1 What would the cost be of smoking 10 cigarettes a day for 10 years if a packet of 20 cigarettes costs $25?</span>
+                        <span class="question-title h5">Q.1 What would the cost be of smoking 10 cigarettes a day for 10 years if a packet of 20 cigarettes costs $25?</span>
+                        <span class="question-content question-addon-container">
+                            <span class="question-addon">$</span>
             <?php
                     if($status == "UNANSWERED"){ ?>
-                        <input type="text" name="q1" class="question-field">
+                            <input type="number" step="0.01" name="q1" class="question-field p2">
             <?php   }
                     if($status == "GRADED"){ ?>
-                        <input type="text" name="q1" class="question-field" value="$45625.00" disabled="disabled">
+                            <input type="number" step="0.01" name="q1" class="question-field p2" value="45625.00" disabled="disabled">
             <?php   } ?>
-                        <span class="question-error">Error</span>
+                            <span class="question-error">Error</span>
+                        </span>
                     </label>
                     <label class="question-item">
-                        <span class="question-title">Q.2 What would the cost be of smoking 20 cigarettes a day for 20 years if a packet of 20 cigarettes costs $25?</span>
+                        <span class="question-title h5">Q.2 What would the cost be of smoking 20 cigarettes a day for 20 years if a packet of 20 cigarettes costs $25?</span>
+                        <span class="question-content question-addon-container">
+                            <span class="question-addon">$</span>
             <?php
                     if($status == "UNANSWERED"){ ?>
-                        <input type="text" name="q2" class="question-field">
+                            <input type="number" step="0.01" name="q2" class="question-field p2">
             <?php   }
                     if($status == "GRADED"){ ?>
-                        <input type="text" name="q2" class="question-field" value="$182500.00" disabled="disabled">
+                            <input type="number" step="0.01" name="q2" class="question-field p2" value="182500.00" disabled="disabled">
             <?php   } ?>
-                        <span class="question-error">Error</span>
+                            <span class="question-error">Error</span>
+                        </span>
                     </label>
                     <label class="question-item">
-                        <span class="question-title">Q.3 What would the cost be of smoking 40 cigarettes a day for 20 years if a packet of 20 cigarettes costs $25?</span>
+                        <span class="question-title h5">Q.3 What would the cost be of smoking 40 cigarettes a day for 20 years if a packet of 20 cigarettes costs $25?</span>
+                        <span class="question-content question-addon-container">
+                            <span class="question-addon">$</span>
             <?php
                     if($status == "UNANSWERED"){ ?>
-                        <input type="text" name="q3" class="question-field">
+                            <input type="number" step="0.01" name="q3" class="question-field p2">
             <?php   }
                     if($status == "GRADED"){ ?>
-                        <input type="text" name="q3" class="question-field" value="$365000.00" disabled="disabled">
+                            <input type="number" step="0.01" name="q3" class="question-field p2" value="365000.00" disabled="disabled">
             <?php   } ?>
-                        <span class="question-error">Error</span>
+                            <span class="question-error">Error</span>
+                        </span>
                     </label>
             <?php
                     if($status == "UNANSWERED"){ ?>
@@ -338,6 +306,12 @@
         </div>
     </div>
 
+    <a href="weekly-task.php?week=<?php echo $week?>" class="cancel-task">
+        <span class="cancel-icon"></span>
+        <span class="cancel-label">Cancel Task</span>
+    </a>
+
+
     <div class="footer-wrapper">
         <div class="footer">
             <div class="footer-content">
@@ -350,10 +324,6 @@
         </div>
     </div>
 </div>
-
-<script src="./js/vendor/jqxcore.js"></script>
-<script src="./js/vendor/jqxnumberinput.js"></script>
-<script src="./js/vendor/jqxbuttons.js"></script>
 
 <script>
     var ResultCtrl = {
@@ -495,82 +465,20 @@
         }
     });
 
-    var QuestionCtrl = {
-        init: function (opt) {
-            opt = opt || {
-                    onSubmit: $.noop
-                };
-            this.onSubmit = opt.onSubmit;
-            this.cacheElements();
-<?php   if($status == "UNANSWERED"){ ?>
-            this.$fields.find('input').jqxNumberInput({width: '100%', spinButtons: true, symbol: '$'});
-            this.addListeners();
-<?php   } ?>
-
-        },
-        cacheElements: function () {
-            var $main = $('.question-form');
-            this.$main = $main;
-            this.$fields = $main.find('.question-item')
-        },
-        addListeners: function () {
-            var that = this;
-            this.$main.on('submit', function (e) {
-                e.preventDefault();
-                that.onSubmit(that.getFormData());
-            })
-        },
-        getFormData: function () {
-
-            var data = {};
-            this.$fields.find('input')
-                .each(function () {
-                    var $field = $(this);
-                    var name = $field.prop('name');
-                    if (name) {
-                        data[name] = $field.jqxNumberInput('val')
-                    }
-                });
-
-            return data;
-        },
-        /**
-         * 设置错误信息
-         * @param errors {Array} 错误信息数组
-         * @param err.index 错误字段下标
-         * @param err.text 错误信息文本
-         **/
-        setError: function (errors) {
-            errors = errors || [];
-            var that = this;
-            that.$fields.removeClass('question-error-show');
-            errors.forEach(function (err) {
-                var $error = that.$fields.eq(err.index).find('.question-error');
-                $error.addClass('question-error-show');
-                if (err.text) {
-                    $error.text(err.text)
-                }
-            })
-        }
-    };
-    QuestionCtrl.init({
-        /**
-         * @param data.q1 {string} answer for the first question
-         * @param data.q2 {string} answer for the second question
-         * @param data.q3 {string} answer for the third question
-         **/
+    var form = new snap.Form({
+        form: '.question-form',
         onSubmit: function (data) {
-
             $('.question-error').removeClass('question-error-show');
 
             var answerArr = [data.q1, data.q2, data.q3];
 
             $.ajax({
-                url: "cost-calculator-feedback.php",
+                url: "numeric-question-feedback.php",
                 data: {
-                    studentID: <?php echo $studentID?>,
-                    quizID: <?php echo $quizID?>,
-                    answerArr: JSON.stringify(answerArr)
+                    student_id: <?php echo $studentID?>,
+                    quiz_id: <?php echo $quizID?>,
+                    answer_arr: JSON.stringify(answerArr),
+                    type: "cost_calculator"
                 },
                 type: "POST",
                 dataType : "json"
@@ -601,23 +509,23 @@
                 onClose: function () { }
             });
 
-            $('.question-field').jqxNumberInput('disabled','true');
+            $('.question-field').attr('disabled','disabled');
 
-            $(".question-submit").attr("disabled","disabled");
+            $('.question-submit').attr("disabled","disabled");
         } else if(feedback.result == "fail") {
-            //alert("Sorry! You have failed this quiz.");
 
-            for(i = 0; i < feedback.detail.length; i++) {
-                QuestionCtrl.setError([
-                    {
-                        index: feedback.detail[i],
-                        text: 'Wrong answer, please try again'
-                    }
-                ])
+            var errors = '[';
+
+            for(i = 0; i < feedback.detail.length - 1; i++) {
+                errors = errors + '{"index":' + feedback.detail[i] + ','
+                                + '"text" : "Wrong answer."},';
             }
 
-        }
+            errors = errors + '{"index":' + feedback.detail[feedback.detail.length-1] + ','
+                            + '"text" : "Wrong answer."}]';
 
+            form.setErrors(JSON.parse(errors));
+        }
     }
 </script>
 

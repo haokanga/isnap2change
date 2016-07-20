@@ -168,7 +168,6 @@
 				} else{
 					alert(result.message);
 				}
-
             }
         }
 		

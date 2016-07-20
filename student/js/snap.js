@@ -200,3 +200,55 @@ snap.Form.prototype = {
       return data
     }
 }
+
+
+snap.Pagination = function (opt) {
+  this.init(opt)
+}
+snap.Pagination.prototype = {
+    init: function (opt) {
+        this.opt = $.extend({
+          main: '.pagination',
+          onChange: $.noop,
+          index: 0
+        }, opt)
+        this.cacheElements()
+        this.addListeners()
+        this.activeItem(this.opt.index)
+    },
+    cacheElements: function () {
+      var $main = $(this.opt.main)
+      this.$main = $main
+      this.$items = $main.find('.pagination-nav-item')
+      this.$prev = $main.find('.pagination-prev')
+      this.$next = $main.find('.pagination-next')
+    },
+    addListeners: function () {
+      var that = this
+      this.$main.on('click', '.pagination-nav-item', function (e) {
+        var index = that.$items.index(e.currentTarget)
+        that.activeItem(index)
+        that.opt.onChange(index)
+      })
+      this.$prev.on('click', function (e) {
+        var index = that.opt.index - 1
+        if (index >= 0) {
+          that.activeItem(index)
+          that.opt.onChange(index)
+        }
+      })
+      this.$next.on('click', function (e) {
+        var index = that.opt.index + 1
+        if (index < that.$items.length) {
+          that.activeItem(index)
+          that.opt.onChange(index)
+        }
+      })
+    },
+    activeItem: function (index) {
+      this.opt.index = index
+      this.$items.removeClass('active')
+        .eq(index)
+        .addClass('active')
+    }
+}

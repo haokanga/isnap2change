@@ -82,6 +82,7 @@
             color: #000;
             font-family: Maitree, serif;
             font-size: 18px;
+            min-height: 350px;
         }
         .material-content p {
             margin: 0 0 30px 0;
@@ -101,13 +102,11 @@
 <div class="page-wrapper">
     <div class="header-wrapper">
         <div class="header">
-            <a href="weekly-task.php?week=<?php echo $week?>" class="header-back-link"></a>
             <a class="home-link">SNAP</a>
-
             <div class="settings">
                 <div class="setting-icon dropdown">
                     <ul class="dropdown-menu">
-                        <li class="dropdown-item"><a href="setting.php">Setting</a></li>
+                        <li class="dropdown-item"><a href="settings.php">Setting</a></li>
                         <li class="dropdown-item"><a href="logout.php">Logout</a></li>
                     </ul>
                 </div>
@@ -135,17 +134,22 @@
                     <a href="" class="material-start"></a>
          <?php      break;
                 case "Poster": ?>
-                    <a href="" class="material-start"></a>
+                    <a href="poster.php?quiz_id=<?php echo $quizID?>" class="material-start"></a>
          <?php      break;
                 case "Calculator": ?>
                     <a href="cost-calculator.php?quiz_id=<?php echo $quizID?>" class="material-start"></a>
         <?php       break;
                 case "DrinkingTool": ?>
-                    <a href="" class="material-start"></a>
+                    <a href="standard-drinking-tool.php?quiz_id=<?php echo $quizID?>" class="material-start"></a>
         <?php       break;
             }  ?>
         </div>
     </div>
+
+    <a href="weekly-task.php?week=<?php echo $week?>" class="cancel-task">
+        <span class="cancel-icon"></span>
+        <span class="cancel-label">Cancel Task</span>
+    </a>
 
 
     <div class="footer-wrapper">

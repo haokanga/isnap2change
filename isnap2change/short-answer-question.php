@@ -7,7 +7,7 @@
     $pageName = "short-answer-question";
 
     //POST parameters
-    if ($_SERVER["REQUEST_METHOD"] == "POST") {
+ /*   if ($_SERVER["REQUEST_METHOD"] == "POST") {
         if(isset($_POST["quizID"]) && isset($_POST["week"])){
             $quizID = $_POST["quizID"];
             $week = $_POST["week"];
@@ -17,8 +17,10 @@
     } else {
 
     }
-
+*/
     $conn = null;
+    $studentID = 2;
+    $quizID = 3;
 
     try{   
         $conn = db_connect();
@@ -181,7 +183,7 @@
                     <button id="submitBtn" type="button" <?php if($status == "GRADED" || $status == "UNGRADED") echo 'disabled="disabled"';?> onclick="submitQuiz(<?php echo $quizID; ?>, <?php echo $studentID; ?>, 'SUBMIT');" class="btn btn-success">SUBMIT</button>
                     <button id="back-btn" type="button" onclick="goBack()" class="btn btn-success">GO BACK</button>
                 <form id="goBack" method=post action=weekly-task.php>
-                    <input type=hidden name="week" value=<?php echo $week; ?>>
+
                 </form>
             </div>
             <div class="nav navbar-nav navbar-btn navbar-right" style="margin-right: 15px; font-size: x-large;">
@@ -227,8 +229,7 @@
             </div>
         <!--form submission-->    
         <form id="submission" method="post">
-            <input type=hidden name="goback" value=0 > 
-            <input type=hidden name="week" value=<?php echo $week; ?> >        
+            <input type=hidden name="goback" value=0 >
             <input type=hidden name="quizID" value=<?php echo $quizID; ?> >
             <input type=hidden name="status" value="UNGRADED" >
             <!--start of saq for-loop-->

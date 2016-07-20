@@ -1,7 +1,32 @@
 <?php
 
+    //check login status
+    require_once('./student-validation.php');
 
+    require_once("../mysql-lib.php");
+    require_once("../debug.php");
+    $pageName = "settings";
 
+    $conn = null;
+
+    try{
+        $conn = db_connect();
+
+        //get student account information
+        $studentInfo = getStudent($conn, $studentID);
+
+    } catch(Exception $e) {
+        if($conn != null) {
+            db_close($conn);
+        }
+
+        debug_err($pageName, $e);
+        //to do: handle sql error
+        //...
+        exit;
+    }
+
+    db_close($conn);
 ?>
 
 <!DOCTYPE html>
@@ -76,9 +101,7 @@
             color: #fcec1b;
             height: 40px;
             line-height: 40px;
-
         }
-
         .addition-info {
             max-width: 600px;
             margin: 40px auto;
@@ -149,13 +172,13 @@
                 <form class="account-form">
                     <div class="account-item">
                         <label>
-                            <span class="account-field-name">Name</span>
-                            <input type="text" name="name" class="account-field">
+                            <span class="account-field-name">Username</span>
+                            <input type="text" name="name" class="account-field" value="<?php echo $studentInfo->Username?>">
                         </label>
                     </div>
                     <div class="account-item">
                         <label>
-                            <span class="account-field-name">Username</span>
+                            <span class="account-field-name">Nickname</span>
                             <input type="text" name="username" class="account-field">
                         </label>
                     </div>
@@ -174,7 +197,7 @@
                     <div class="account-item">
                         <label>
                             <span class="account-field-name">Email</span>
-                            <input type="text" name="email" class="account-field">
+                            <input type="text" name="email" class="account-field" value="<?php echo $studentInfo->Email?>">
                         </label>
                     </div>
                     <div class="account-operation">
@@ -253,10 +276,10 @@
     })
 
 
-    var $additionSubmit = $('.addition-submit')
-    var $additionField = $('.addition-field')
+    var $additionSubmit = $('.addition-submit');
+    var $additionField = $('.addition-field');
     $additionSubmit.on('click', function (e) {
-        e.preventDefault()
+        e.preventDefault();
         console.log($additionField.val())
     })
 </script>
