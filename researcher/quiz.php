@@ -5,6 +5,7 @@ require_once("../debug.php");
 require_once("researcher-lib.php");
 $columnName = array('QuizID', 'Week', 'QuizType', 'TopicName', 'Points');
 
+
 try {
     $conn = db_connect();
     if ($_SERVER["REQUEST_METHOD"] == "POST") {
@@ -18,7 +19,8 @@ try {
                     $topicID = getTopicByName($conn, $topicName)->TopicID;
 
                     $conn->beginTransaction();
-                    $points = 0;
+                    $points = isset($_POST['points']) ? $_POST['points'] : 0;
+
                     //if editable
                     if (in_array($quizType, $editableQuizTypeArr)) {
                         //create quiz section
@@ -62,7 +64,7 @@ try {
                     } //if misc
                     else {
                         $quizID = createQuiz($conn, $topicID, 'Misc', $week);
-                        createMiscSection($conn, $quizID, $quizType);
+                        createMiscSection($conn, $quizID, $points, $quizType);
                     }
 
                     $conn->commit();
@@ -70,6 +72,19 @@ try {
                     debug_err($pageName, $e);
                     $conn->rollBack();
                 }
+            } else if ($update == 0) {
+                // if edit misc quiz
+                $week = $_POST['week'];
+                $quizID = $_POST['quizID'];
+                $topicName = $_POST['topicName'];
+                $topicID = getTopicByName($conn, $topicName)->TopicID;
+
+                $conn->beginTransaction();
+                $points = isset($_POST['points']) ? $_POST['points'] : 0;
+
+                updateQuiz($conn, $quizID, $topicID, $week);
+                updateMiscSection($conn, $quizID, $points);
+
             } else if ($update == -1) {
                 $quizID = $_POST['quizID'];
                 deleteQuiz($conn, $quizID);
@@ -82,10 +97,16 @@ try {
 
 
 try {
-    if (isset($_GET['week'])) {
-        $quizResult = getQuizzesByWeek($conn, $_GET['week']);
-    } else {
-        $quizResult = getQuizzes($conn);
+    // misc.php
+    if (strpos($pageName, 'misc') !== false) {
+        $quizResult = getMiscQuizzes($conn);
+    } // quiz.php
+    else if (strpos($pageName, 'quiz') !== false) {
+        if (isset($_GET['week'])) {
+            $quizResult = getQuizzesByWeek($conn, $_GET['week']);
+        } else {
+            $quizResult = getQuizzes($conn);
+        }
     }
     $topicResult = getTopics($conn);
 } catch (Exception $e) {
@@ -150,15 +171,18 @@ db_close($conn);
                                         <td><?php echo $quizType ?></td>
                                         <td><?php echo $quizResult[$i]->TopicName ?></td>
                                         <td><?php echo $points ?>
-                                            <!--if editable-->
+                                            <span class="glyphicon glyphicon-remove pull-right"
+                                                  aria-hidden="true"></span>
+                                            <span class="pull-right" aria-hidden="true">&nbsp;</span>
                                             <?php if (in_array($quizType, $editableQuizTypeArr)) { ?>
-                                                <span class="glyphicon glyphicon-remove pull-right"
-                                                      aria-hidden="true"></span>
-                                                <span class="pull-right" aria-hidden="true">&nbsp;</span>
                                                 <a href="<?php echo strtolower($quizType); ?>-editor.php?quizID=<?php echo $quizID ?>">
                                                     <span class="glyphicon glyphicon-edit pull-right"
                                                           aria-hidden="true"></span>
                                                 </a>
+                                            <?php } else if (in_array($quizType, $miscQuizTypeArr)) { ?>
+                                                <span class="glyphicon glyphicon-edit pull-right"
+                                                      data-toggle="modal"
+                                                      data-target="#dialog" aria-hidden="true"></span>
                                             <?php } ?>
                                         </td>
                                     </tr>
@@ -206,12 +230,16 @@ db_close($conn);
                     <label for='QuizType'>QuizType</label>
                     <select class="form-control dialoginput" id="QuizType" form="submission" name="quizType" required>
                         <option value="" disabled selected>Select Quiz Type</option>
-                        <optgroup label="Editable Quiz">
-                            <?php for ($i = 0; $i < count($editableQuizTypeArr); $i++) { ?>
-                                <option
-                                    value="<?php echo $editableQuizTypeArr[$i] ?>"><?php echo $editableQuizTypeArr[$i] ?></option>
-                            <?php } ?>
-                        </optgroup>
+
+                        // quiz.php
+                        <?php if (strpos($pageName, 'quiz') !== false) { ?>
+                            <optgroup label="Editable Quiz">
+                                <?php for ($i = 0; $i < count($editableQuizTypeArr); $i++) { ?>
+                                    <option
+                                        value="<?php echo $editableQuizTypeArr[$i] ?>"><?php echo $editableQuizTypeArr[$i] ?></option>
+                                <?php } ?>
+                            </optgroup>
+                        <?php } ?>
                         <optgroup label="Misc Quiz">
                             <?php for ($i = 0; $i < count($miscQuizTypeArr); $i++) { ?>
                                 <option
@@ -228,6 +256,10 @@ db_close($conn);
                                 value='<?php echo $topicResult[$j]->TopicName ?>'><?php echo $topicResult[$j]->TopicName ?></option>
                         <?php } ?>
                     </select>
+                    <br>
+                    <label for="Points">Points</label>
+                    <input type="text" class="form-control dialoginput" id="Points" name="points"
+                           placeholder="Input Points">
                     <br>
                 </form>
             </div>
@@ -247,13 +279,27 @@ db_close($conn);
 <script>
     //DO NOT put them in $(document).ready() since the table has multi pages
     var dialogInputArr = $('.dialoginput');
+    var len = dialogInputArr.length;
+    var pointsIndex = len - 1;
+    var quizTypeIndex = len - 3;
+
     $('.glyphicon-edit').on('click', function () {
-        /*...*/
+        $("label").remove(".error");
+        $('#dialogTitle').text("Edit <?php echo $pageNameForView ?>");
+        $('#update').val(0);
+        for (i = 0; i < dialogInputArr.length; i++) {
+            dialogInputArr.eq(i).val($(this).parent().parent().children('td').eq(i).text().trim());
+        }
+        //if edit, disable quiz type
+        dialogInputArr.eq(quizTypeIndex).attr('disabled', 'disabled');
     });
     $('.glyphicon-plus').on('click', function () {
-        $('#dialogTitle').text("Add Quiz");
+        $("label").remove(".error");
+        $('#dialogTitle').text("Add <?php echo $pageNameForView ?>");
         $('#update').val(1);
+        //enable all the buttons
         for (i = 0; i < dialogInputArr.length; i++) {
+            dialogInputArr.eq(i).prop('disabled', false);
             if (i != 1) {
                 dialogInputArr.eq(i).val('');
             } else {
@@ -278,6 +324,10 @@ db_close($conn);
                 week: {
                     required: true,
                     digits: true
+                },
+                points: {
+                    <?php if (strpos($pageName, 'misc') !== false) echo "required: true,"; ?>
+                    digits: true
                 }
             }
         });
@@ -300,6 +350,14 @@ db_close($conn);
         table.search(
             $("#keyword").val().trim(), true, false, true
         ).draw();
+        //if quiz is saq-like, disable Points
+        $("#QuizType").change(function () {
+            if ($.inArray($(this).val().trim(), <?php echo json_encode($saqLikeQuizTypeArr); ?>) != -1) {
+                dialogInputArr.eq(pointsIndex).attr('disabled', 'disabled');
+            } else {
+                dialogInputArr.eq(pointsIndex).prop('disabled', false);
+            }
+        });
     });
 </script>
 </body>

@@ -1319,10 +1319,19 @@ function getQuizzesStatusByWeek(PDO $conn, $studentID, $week, $extraQuiz)
 /* Poster */
 function createPosterSection(PDO $conn, $quizID, $question, $points)
 {
-    $updateSql = "INSERT INTO Poster_Section(QuizID, Question, Points)
+    $updateSql = "INSERT INTO poster_section(QuizID, Description, Points)
                     VALUES (?,?,?)";
     $updateSql = $conn->prepare($updateSql);
     $updateSql->execute(array($quizID, htmlspecialchars($question), $points));
+}
+
+function updatePosterSection(PDO $conn, $quizID, $description, $points, $title)
+{
+    $updateSql = "UPDATE poster_section 
+                SET Title = ?, Description = ?, Points = ?
+                WHERE QuizID = ?";
+    $updateSql = $conn->prepare($updateSql);
+    $updateSql->execute(array(htmlspecialchars($title), htmlspecialchars($description), $points, $quizID));
 }
 
 function updatePosterDraft(PDO $conn, $quizID, $studentID, $zwibblerDoc)
@@ -1382,6 +1391,13 @@ function getPosterRecords(PDO $conn)
 {
     return getRecords($conn, "Poster_Record");
 }
+
+function getPosterQuizzes(PDO $conn)
+{
+    return getRecords($conn, "Poster_Section", array("Quiz", "Topic"));
+}
+
+/* Poster */
 
 
 /* SAQ-Grading */
@@ -1565,15 +1581,23 @@ function getFactsByTopicID(PDO $conn, $topicID)
 
 /* Misc Quiz */
 
-function createMiscSection(PDO $conn, $quizID, $quizType)
+function createMiscSection(PDO $conn, $quizID, $points, $quizType)
 {
-    $updateSql = "INSERT INTO misc_section(QuizID, QuizSubType)
-         VALUES (?,?)";
+    $updateSql = "INSERT INTO misc_section(QuizID, QuizSubType, Points)
+         VALUES (?,?,?)";
     $updateSql = $conn->prepare($updateSql);
-    $updateSql->execute(array($quizID, $quizType));
+    $updateSql->execute(array($quizID, $quizType, $points));
     return $conn->lastInsertId();
 }
 
+function updateMiscSection(PDO $conn, $quizID, $points)
+{
+    $updateSql = "UPDATE misc_section 
+                SET Points = ?
+                WHERE QuizID = ?";
+    $updateSql = $conn->prepare($updateSql);
+    $updateSql->execute(array($points, $quizID));
+}
 
 function getMiscQuizType(PDO $conn, $quizID)
 {
@@ -1594,6 +1618,11 @@ function getMiscQuizType(PDO $conn, $quizID)
     $miscQuizTypeQuery->execute(array($quizID));
     $miscQuizTypeQueryRes = $miscQuizTypeQuery->fetch(PDO::FETCH_OBJ);
     return $miscQuizTypeQueryRes->QuizSubType;
+}
+
+function getMiscQuizzes(PDO $conn)
+{
+    return getRecords($conn, "Misc_Section", array("Quiz", "Topic"));
 }
 
 /* Misc Quiz */

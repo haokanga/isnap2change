@@ -186,6 +186,7 @@ if (isset($_GET['classID'])) {
     //DO NOT put them in $(document).ready() since the table has multi pages
     var dialogInputArr = $('.dialoginput');
     $('.glyphicon-edit').on('click', function () {
+		$("label").remove(".error");
         $('#update').val(0);
         //studentID, username
         dialogInputArr.eq(0).val($(this).parent().parent().children('td').eq(0).text());

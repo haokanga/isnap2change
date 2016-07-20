@@ -180,7 +180,8 @@ db_close($conn);
     //DO NOT put them in $(document).ready() since the table has multi pages
     var dialogInputArr = $('.dialoginput');
     $('.glyphicon-edit').on('click', function () {
-        $('#dialogTitle').text("Edit School");
+		$("label").remove(".error");
+        $('#dialogTitle').text("Edit <?php echo $pageNameForView ?>");
         $('#update').val(0);
         for (i = 0; i < dialogInputArr.length; i++) {
             dialogInputArr.eq(i).val($(this).parent().parent().children('td').eq(i).text().trim());
@@ -190,7 +191,8 @@ db_close($conn);
         dialogInputArr.eq(2).attr('disabled', 'disabled');
     });
     $('.glyphicon-plus').on('click', function () {
-        $('#dialogTitle').text("Add School");
+		$("label").remove(".error");
+        $('#dialogTitle').text("Add <?php echo $pageNameForView ?>");
         $('#update').val(1);
         for (i = 0; i < dialogInputArr.length; i++) {
             dialogInputArr.eq(i).val('');

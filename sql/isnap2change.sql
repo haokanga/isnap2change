@@ -289,7 +289,8 @@ CREATE TABLE IF NOT EXISTS `Matching_Option` (
 
 CREATE TABLE IF NOT EXISTS `Poster_Section` (
     QuizID MEDIUMINT,
-    Question TEXT,
+    Title TEXT,
+    Description TEXT,
     Points MEDIUMINT,
     CONSTRAINT Poster_Section_QuizID_PK PRIMARY KEY (QuizID),
     CONSTRAINT Poster_Section_QuizID_FK FOREIGN KEY (QuizID)
@@ -783,7 +784,7 @@ INSERT IGNORE INTO `MCQ_Option`(Content, Explanation, MCQID) VALUES('4', "Wrong"
 INSERT IGNORE INTO `MCQ_Option`(Content, Explanation, MCQID) VALUES('5', "Correct", @MCQ_QUESTION_LAST_INSERT_ID);
 
 # [Example] insert a poster task into Poster_Section
-INSERT INTO `isnap2changedb`.`poster_section` (`QuizID`, `Points`) VALUES ('9', '20');
+INSERT INTO `isnap2changedb`.`poster_section` (`QuizID`, `Title`, `Description`, `Points`) VALUES (9, 'Create a Future Board', 'What would you linke to achieve this school term? Make board with pictures of what you would like to achieve and the people and things that inspire you and whtat you aspire to be. You can also put down things about yourself that you would like to improve on. If you would feel more comvortable using words or pictures that only you know what they mean, you can . After all, some goals are personal.', 20);
 
 # [Example] insert a learning material for a Poster task with QuizID = 9
 INSERT INTO `isnap2changedb`.`learning_material` (`Content`, `QuizID`) VALUES ('<p>Learning material for this quiz has not been added.</p>', '9');

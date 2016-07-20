@@ -221,7 +221,8 @@ if (isset($_GET['schoolID'])) {
         dialogInputArr.eq(len - 1).val(currentWeek);
     }
     $('.glyphicon-edit').on('click', function () {
-        $('#dialogTitle').text("Edit Class");
+        $("label").remove(".error");
+        $('#dialogTitle').text("Edit <?php echo $pageNameForView ?>");
         $('#update').val(0);
         for (i = 0; i < len - 2; i++) {
             dialogInputArr.eq(i).val($(this).parent().parent().children('td').eq(i).text().trim());
@@ -233,7 +234,8 @@ if (isset($_GET['schoolID'])) {
         dialogInputArr.eq(len - 3).attr('disabled', 'disabled');
     });
     $('.glyphicon-plus').on('click', function () {
-        $('#dialogTitle').text("Add Class");
+        $("label").remove(".error");
+        $('#dialogTitle').text("Add <?php echo $pageNameForView ?>");
         $('#update').val(1);
         for (i = 0; i < len; i++) {
             dialogInputArr.eq(i).val('');
@@ -261,7 +263,6 @@ if (isset($_GET['schoolID'])) {
     });
     $('#btnSave').on('click', function () {
         $('#submission').validate();
-        //enable ClassID and EnrolledStudents
         dialogInputArr.eq(0).prop('disabled', false);
         $('#submission').submit();
     });
