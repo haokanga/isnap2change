@@ -237,6 +237,7 @@ db_close($conn);
     //DO NOT put them in $(document).ready() since the table has multi pages
     var dialogInputArr = $('.dialoginput');
     $('.glyphicon-plus').on('click', function () {
+		$("label").remove(".error");
         $('#dialogTitle').text("Add Option");
         $('#update').val(1);
         for (i = 0; i < dialogInputArr.length - 1; i++) {
@@ -273,7 +274,7 @@ db_close($conn);
             "aoColumnDefs": [
                 {"bSearchable": false, "aTargets": [0]}
             ]
-        })
+        });
         $('#metadata-save').on('click', function () {
             $('#metadataUpdate').val(0);
             $('#metadata-submission').validate();

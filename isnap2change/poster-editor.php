@@ -157,7 +157,7 @@
 		function uploadDone(status, result) {
             if (status === "ok") {
 				if(result.message == "success"){
-					var url = "http://localhost/isnap2change/isnap2change/tmp_poster_img/" + result.fileid;
+					var url = <?php getURL("/tmp_poster_img/") ?> + result.fileid;
 
 					zwibbler.beginTransaction();
 					var nodeId = zwibbler.createNode("ImageNode", {

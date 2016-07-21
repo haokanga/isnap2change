@@ -142,7 +142,7 @@ CREATE TABLE IF NOT EXISTS `Student_Week_Record` (
 CREATE TABLE IF NOT EXISTS `MCQ_Section` (
     QuizID MEDIUMINT,
     Points MEDIUMINT DEFAULT 0,
-    Questionnaires BOOLEAN DEFAULT 0,
+    Questionnaire BOOLEAN DEFAULT 0,
     CONSTRAINT MCQ_Section_QuizID_PK PRIMARY KEY (QuizID),
     CONSTRAINT MCQ_Section_QuizID_FK FOREIGN KEY (QuizID)
         REFERENCES Quiz (QuizID)

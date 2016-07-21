@@ -50,10 +50,12 @@ DROP TABLE IF EXISTS Poster_Record;
 DROP TABLE IF EXISTS Misc_Section;
 DROP TABLE IF EXISTS Game;
 DROP TABLE IF EXISTS Game_Record;
+/*
 DROP TABLE IF EXISTS Bonus;
 DROP TABLE IF EXISTS Bonus_Record;
 DROP TABLE IF EXISTS Bonus_Task;
 DROP TABLE IF EXISTS Bonus_Task_Record;
+*/
 
 CREATE TABLE IF NOT EXISTS `School` (
     SchoolID MEDIUMINT AUTO_INCREMENT,
@@ -105,8 +107,8 @@ CREATE TABLE IF NOT EXISTS `Snap_Fact` (
     SnapFactID MEDIUMINT AUTO_INCREMENT,
     Content TEXT,
     TopicID MEDIUMINT,
-    CONSTRAINT Fact_SnapFactID_PK PRIMARY KEY (SnapFactID),
-    CONSTRAINT Fact_TopicID_FK FOREIGN KEY (TopicID)
+    CONSTRAINT Snap_Fact_SnapFactID_PK PRIMARY KEY (SnapFactID),
+    CONSTRAINT Snap_Fact_TopicID_FK FOREIGN KEY (TopicID)
         REFERENCES Topic (TopicID)
         ON DELETE CASCADE ON UPDATE CASCADE
 )  ENGINE=INNODB;
@@ -176,7 +178,7 @@ CREATE TABLE IF NOT EXISTS `Student_Week_Record` (
 CREATE TABLE IF NOT EXISTS `MCQ_Section` (
     QuizID MEDIUMINT,
     Points MEDIUMINT DEFAULT 0,
-    Questionnaires BOOLEAN DEFAULT 0,
+    Questionnaire BOOLEAN DEFAULT 0,
     CONSTRAINT MCQ_Section_QuizID_PK PRIMARY KEY (QuizID),
     CONSTRAINT MCQ_Section_QuizID_FK FOREIGN KEY (QuizID)
         REFERENCES Quiz (QuizID)
@@ -289,7 +291,8 @@ CREATE TABLE IF NOT EXISTS `Matching_Option` (
 
 CREATE TABLE IF NOT EXISTS `Poster_Section` (
     QuizID MEDIUMINT,
-    Question TEXT,
+    Title TEXT,
+    Description TEXT,
     Points MEDIUMINT,
     CONSTRAINT Poster_Section_QuizID_PK PRIMARY KEY (QuizID),
     CONSTRAINT Poster_Section_QuizID_FK FOREIGN KEY (QuizID)
@@ -343,6 +346,7 @@ CREATE TABLE IF NOT EXISTS `Game_Record` (
         ON DELETE CASCADE ON UPDATE CASCADE
 )  ENGINE=INNODB;
 
+/*
 CREATE TABLE IF NOT EXISTS `Bonus` (
     BonusID MEDIUMINT AUTO_INCREMENT,
     Week MEDIUMINT,
@@ -386,6 +390,8 @@ CREATE TABLE IF NOT EXISTS `Bonus_Task_Record` (
         REFERENCES Bonus_Task (BonusQuestionID)
         ON DELETE CASCADE ON UPDATE CASCADE
 )  ENGINE=INNODB;
+*/ 
+ 
  
 SET FOREIGN_KEY_CHECKS=1;
 
@@ -441,7 +447,7 @@ INSERT IGNORE INTO Topic(TopicName) VALUES('Health and Wellbeing');
 # [Formal] insert MCQ section with multiple questions
 INSERT IGNORE INTO Quiz(Week,QuizType,TopicID) VALUES(1,'MCQ',2);
 SET @QUIZ_LAST_INSERT_ID = LAST_INSERT_ID();
-INSERT IGNORE INTO MCQ_Section(QuizID,Points,Questionnaires) VALUES(@QUIZ_LAST_INSERT_ID,30,0);
+INSERT IGNORE INTO MCQ_Section(QuizID,Points,Questionnaire) VALUES(@QUIZ_LAST_INSERT_ID,30,0);
 INSERT IGNORE INTO MCQ_Question(Question, CorrectChoice, QuizID) VALUES('Which of these breakfast foods will provide you with the most energy?', 'Whole grain cereal or oatmeal', @QUIZ_LAST_INSERT_ID);
 SET @MCQ_QUESTION_LAST_INSERT_ID = LAST_INSERT_ID();
 INSERT IGNORE INTO `MCQ_Option`(Content, Explanation, MCQID) VALUES('Candy bar', 'Candy bars will give you an instant burst of energy but will not last!', @MCQ_QUESTION_LAST_INSERT_ID);
@@ -501,7 +507,7 @@ INSERT IGNORE INTO `MCQ_Option`(Content, Explanation, MCQID) VALUES('Orange Juic
 
 INSERT IGNORE INTO Quiz(Week,QuizType,TopicID) VALUES(1,'MCQ',5);
 SET @QUIZ_LAST_INSERT_ID = LAST_INSERT_ID();
-INSERT IGNORE INTO MCQ_Section(QuizID,Points,Questionnaires) VALUES(@QUIZ_LAST_INSERT_ID,20,0);
+INSERT IGNORE INTO MCQ_Section(QuizID,Points,Questionnaire) VALUES(@QUIZ_LAST_INSERT_ID,20,0);
 INSERT IGNORE INTO MCQ_Question(Question, CorrectChoice, QuizID) VALUES('Alcohol has an immediate effect on the:', 'Brain', @QUIZ_LAST_INSERT_ID);
 SET @MCQ_QUESTION_LAST_INSERT_ID = LAST_INSERT_ID();
 INSERT IGNORE INTO `MCQ_Option`(Content, Explanation, MCQID) VALUES('Knees', "Wrong", @MCQ_QUESTION_LAST_INSERT_ID);
@@ -583,7 +589,7 @@ INSERT IGNORE INTO Misc_Section(QuizID, QuizSubType, Points) VALUES(@QUIZ_LAST_I
 
 INSERT IGNORE INTO Quiz(Week,QuizType,TopicID) VALUES(6,'MCQ',3);
 SET @QUIZ_LAST_INSERT_ID = LAST_INSERT_ID();
-INSERT IGNORE INTO MCQ_Section(QuizID,Points,Questionnaires) VALUES(@QUIZ_LAST_INSERT_ID,30,0);
+INSERT IGNORE INTO MCQ_Section(QuizID,Points,Questionnaire) VALUES(@QUIZ_LAST_INSERT_ID,30,0);
 # [Formal] Matching quesitons
 INSERT IGNORE INTO Quiz(Week,QuizType,TopicID) VALUES(6,'Matching',2);
 SET @QUIZ_LAST_INSERT_ID = LAST_INSERT_ID();
@@ -680,6 +686,7 @@ INSERT IGNORE INTO Game_Record(GameID,StudentID,`Level`,Score) VALUES(2,3,1,30);
 INSERT IGNORE INTO Game_Record(GameID,StudentID,`Level`,Score) VALUES(2,4,1,30);
 INSERT IGNORE INTO Game_Record(GameID,StudentID,`Level`,Score) VALUES(2,5,1,40);
 
+/*
 # [Example] add Bonus and tasks
 INSERT IGNORE INTO Bonus(Week) VALUES(1);
 SET @BONUS_LAST_INSERT_ID = LAST_INSERT_ID();
@@ -692,6 +699,7 @@ INSERT IGNORE INTO Bonus_Task(Question, Points, BonusID) VALUES('Attend a basket
 INSERT IGNORE INTO Bonus(Week) VALUES(3);
 SET @BONUS_LAST_INSERT_ID = LAST_INSERT_ID();
 INSERT IGNORE INTO Bonus_Task(Question, Points, BonusID) VALUES('Attend a football game', 10, @BONUS_LAST_INSERT_ID);
+*/
 
 # [Example] update Submission time
 UPDATE `isnap2changedb`.`student` SET `Score`='80' WHERE `StudentID`='10';
@@ -748,7 +756,7 @@ INSERT INTO `isnap2changedb`.`quiz` (`Week`, `QuizType`, `TopicID`) VALUES ('2',
 
 INSERT IGNORE INTO Quiz(Week,QuizType,TopicID) VALUES(1,'MCQ',5);
 SET @QUIZ_LAST_INSERT_ID = LAST_INSERT_ID();
-INSERT IGNORE INTO MCQ_Section(QuizID,Points,Questionnaires) VALUES(@QUIZ_LAST_INSERT_ID,20,0);
+INSERT IGNORE INTO MCQ_Section(QuizID,Points,Questionnaire) VALUES(@QUIZ_LAST_INSERT_ID,20,0);
 INSERT IGNORE INTO MCQ_Question(Question, CorrectChoice, QuizID) VALUES('0 option:', '0', @QUIZ_LAST_INSERT_ID);
 SET @MCQ_QUESTION_LAST_INSERT_ID = LAST_INSERT_ID();
 
@@ -783,7 +791,7 @@ INSERT IGNORE INTO `MCQ_Option`(Content, Explanation, MCQID) VALUES('4', "Wrong"
 INSERT IGNORE INTO `MCQ_Option`(Content, Explanation, MCQID) VALUES('5', "Correct", @MCQ_QUESTION_LAST_INSERT_ID);
 
 # [Example] insert a poster task into Poster_Section
-INSERT INTO `isnap2changedb`.`poster_section` (`QuizID`, `Points`) VALUES ('9', '20');
+INSERT INTO `isnap2changedb`.`poster_section` (`QuizID`, `Title`, `Description`, `Points`) VALUES (9, 'Create a Future Board', 'What would you linke to achieve this school term? Make board with pictures of what you would like to achieve and the people and things that inspire you and whtat you aspire to be. You can also put down things about yourself that you would like to improve on. If you would feel more comvortable using words or pictures that only you know what they mean, you can . After all, some goals are personal.', 20);
 
 # [Example] insert a learning material for a Poster task with QuizID = 9
 INSERT INTO `isnap2changedb`.`learning_material` (`Content`, `QuizID`) VALUES ('<p>Learning material for this quiz has not been added.</p>', '9');
@@ -807,6 +815,11 @@ INSERT INTO `isnap2changedb`.`misc_section` (`QuizID`, `QuizSubType`, `Points`) 
 UPDATE `isnap2changedb`.`quiz` SET `ExtraQuiz`='1' WHERE `QuizID`='3';
 UPDATE `isnap2changedb`.`quiz` SET `ExtraQuiz`='1' WHERE `QuizID`='10';
 UPDATE `isnap2changedb`.`quiz` SET `ExtraQuiz`='1' WHERE `QuizID`='6';
+
+# [Example] add poster record
+# run unit_test/poster-generator.php
+
+
 /*
 #TEST
 

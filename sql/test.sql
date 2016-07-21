@@ -31,9 +31,9 @@ SELECT MAX(OptionNum) AS MaxOptionNum FROM (SELECT COUNT(*) AS OptionNum FROM MC
 SELECT * FROM `Option`;
 SELECT * FROM MCQ_Question;
 
-SELECT QuizID, Week, TopicName, Points, Questionnaires, COUNT(MCQID) AS Questions
+SELECT QuizID, Week, TopicName, Points, Questionnaire, COUNT(MCQID) AS Questions
                FROM Quiz NATURAL JOIN Topic NATURAL JOIN MCQ_Section LEFT JOIN MCQ_Question USING (QuizID) WHERE QuizType = 'MCQ' GROUP BY QuizID;
-SELECT Quiz.QuizID, Week, TopicName, Points, Questionnaires, Question, CorrectChoice
+SELECT Quiz.QuizID, Week, TopicName, Points, Questionnaire, Question, CorrectChoice
                FROM Quiz NATURAL JOIN Topic NATURAL JOIN MCQ_Section LEFT JOIN MCQ_Question ON MCQ_Section.QuizID = MCQ_Question.QuizID AND QuizType = 'MCQ';
          
 SELECT MCQID,Question,`Option`,Explanation FROM MCQ_Question NATURAL JOIN `Option` WHERE MCQID = 1;         
@@ -75,7 +75,7 @@ SELECT * FROM    Quiz_Record;
 								  NATURAL JOIN `Option`
 			       WHERE  QuizID = 1
 			       ORDER BY MCQID;  
-SELECT QuizID, Week, TopicName, Points, Questionnaires, COUNT(MCQID) AS Questions
+SELECT QuizID, Week, TopicName, Points, Questionnaire, COUNT(MCQID) AS Questions
                    FROM Quiz NATURAL JOIN Topic NATURAL JOIN MCQ_Section LEFT JOIN MCQ_Question USING (QuizID) WHERE QuizType = 'MCQ' GROUP BY QuizID ;      
 SELECT * FROM MCQ_Question NATURAL JOIN `Option` WHERE MCQID = 1;                   
 SELECT * FROM Quiz;

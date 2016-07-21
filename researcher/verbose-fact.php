@@ -117,7 +117,8 @@ db_close($conn);
                             </div>
                             <div class="alert alert-info">
                                 <p>For long paragraphs, it will only show part of content to make this table clean, if
-                                    you want to view full paragraph, you can click the buttons in the cells.</p>
+                                    you want to view full paragraph, you can click the <b>"Show Full
+                                    Paragraph"</b> buttons in the cells.</p>
                             </div>
                         </div>
                     </div>

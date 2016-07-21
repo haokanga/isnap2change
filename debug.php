@@ -17,7 +17,7 @@ function debug_alert($message)
     echo "<script language=\"javascript\">  alert(\"" . $message . "\"); </script>";
 }
 
-function debug_err($pageName, Exception $e)
+function debug_err($pageName = null, Exception $e)
 {
     if ($e instanceof PDOException) {
         // duplicate entry
@@ -35,15 +35,19 @@ function debug_err($pageName, Exception $e)
 
 function handle_exception(Exception $e)
 {
-    $bugReportPage = "Location: bug-report.php";
-
     if ($GLOBALS['DEBUG_MODE']) {
         echo $e->getMessage();
         echo "The exception was created on line: " . $e->getLine();
         echo "View Log Database to check this bug.";
     }
     logger_write($e);
-    header($bugReportPage);
+    redirectToBugReportPage();
+}
+
+function redirectToBugReportPage()
+{
+    $url = getBugReportURL();
+    header("Location: $url");
 }
 
 function logger_write(Exception $e)
@@ -66,5 +70,22 @@ function logger_write(Exception $e)
 
     return $bugID;
 }
+
+
+/* helper function*/
+
+function getBugReportURL()
+{
+    return getURL("/bug-report.php");
+}
+
+function getURL($pageName){
+    $debug_page_dir = __DIR__;
+    $host = $_SERVER['HTTP_HOST'];
+    $relative_dir = explode("htdocs", $debug_page_dir, 2)[1];
+    $url = "http://" . $host . $relative_dir . $pageName;
+    return $url;
+}
+/* helper function*/
 
 ?>

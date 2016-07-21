@@ -1,4 +1,5 @@
 <?php
+require_once("../mysql-lib.php");
 require_once("../debug.php");
 
 /* Session */
@@ -15,13 +16,23 @@ if (isset($_SESSION['researcherID'])) {
 }
 /* Session */
 
+/* Array Definition */
+
+// sidebar
 $userAdminPageArr = array('School', 'Class', 'Student');
 $userAdminIconArr = array('mortar-board', 'users', 'child');
 $contentAdminPageArr = array('Week', 'Quiz', 'Snap Fact', 'Verbose Fact', 'MCQ', 'SAQ', 'Matching', 'Poster', 'Video', 'Image', 'Misc');
 $quizTypeArr = array('Matching', 'Poster', 'Video', 'Image', 'Misc');
-$contentAdminIconArr = array('calendar', 'book', 'lightbulb-o', 'folder-open', 'check', 'pencil', 'th-list', 'exclamation-triangle', 'video-camera', 'picture-o', 'exclamation-triangle');
+$contentAdminIconArr = array('calendar', 'book', 'lightbulb-o', 'folder-open', 'check', 'pencil', 'th-list', 'paint-brush', 'video-camera', 'picture-o', 'magic');
 $gradingPageArr = array('SAQ Grading', 'Video Grading', 'Image Grading', 'Poster Grading');
-$gradingIconArr = array('check', 'check', 'check', 'exclamation-triangle');
+$gradingIconArr = array('pencil', 'video-camera', 'picture-o', 'exclamation-triangle');
+
+// php quiz type classification
+$editableQuizTypeArr = array('Questionnaire', 'MCQ', 'SAQ', 'Matching', 'Poster', 'Video', 'Image');
+$miscQuizTypeArr = array('DrinkingTool', 'Calculator');
+$saqLikeQuizTypeArr = array('SAQ', 'Video', 'Image');
+
+/* Array Definition */
 
 
 // get page name
@@ -43,6 +54,8 @@ function getPageNameForView($pageName)
 {
     if ($pageName == 'mcq')
         $pageNameForView = 'Multiple Choice Quiz';
+    else if ($pageName == 'mcq-editor')
+        $pageNameForView = 'Multiple Choice Quiz Editor';
     else if (strpos($pageName, 'saq') !== false)
         $pageNameForView = 'SAQ';
     // video, image, video-editor, image-editor

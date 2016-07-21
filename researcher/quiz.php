@@ -1,15 +1,10 @@
 <?php
-/**
- * TODO:
- * edit quiz (jump to different editor)
- */
 session_start();
 require_once("../mysql-lib.php");
 require_once("../debug.php");
 require_once("researcher-lib.php");
 $columnName = array('QuizID', 'Week', 'QuizType', 'TopicName', 'Points');
-// list all editable quiz types    
-$editableQuizTypeArr = array('MCQ', 'SAQ', 'Matching', 'Poster', 'Video', 'Image');
+
 
 try {
     $conn = db_connect();
@@ -21,49 +16,75 @@ try {
                     $week = $_POST['week'];
                     $quizType = $_POST['quizType'];
                     $topicName = $_POST['topicName'];
+                    $topicID = getTopicByName($conn, $topicName)->TopicID;
 
                     $conn->beginTransaction();
-                    
-                    $topicID = getTopicByName($conn, $topicName)->TopicID;
-                    $quizID = createQuiz($conn, $topicID, $quizType, $week);
+                    $points = isset($_POST['points']) ? $_POST['points'] : 0;
 
-                    $points = 0;
-                    $questionnaires = 0;
-                    $description = '';
-                    $question = '';
-
-                    //create quiz section
-                    switch ($quizType) {
-                        case "MCQ":
-                            createMCQSection($conn, $quizID, $points, $questionnaires);
-                            break;
-                        case "SAQ":
-                        case "Video":
-                        case "Image":
-                            createSAQLikeSection($conn, $quizID);
-                            break;
-                        case "Matching":
-                            createMatchingSection($conn, $quizID, $description, $points);
-                            break;
-                        case "Poster":
-                            createPosterSection($conn, $quizID, $question, $points);
-                            break;
-                        default:
-                            throw new Exception("Unexpected Quiz Type. QuizID: " . $quizID);
+                    //if editable
+                    if (in_array($quizType, $editableQuizTypeArr)) {
+                        //create quiz section
+                        switch ($quizType) {
+                            case "MCQ":
+                                $quizID = createQuiz($conn, $topicID, $quizType, $week);
+                                $questionnaire = 0;
+                                createMCQSection($conn, $quizID, $points, $questionnaire);
+                                break;
+                            case "Questionnaire":
+                                $quizID = createQuiz($conn, $topicID, $quizType, $week);
+                                $questionnaire = 1;
+                                createMCQSection($conn, $quizID, $points, $questionnaire);
+                                break;
+                            case "SAQ":
+                            case "Video":
+                            case "Image":
+                                $quizID = createQuiz($conn, $topicID, $quizType, $week);
+                                createSAQLikeSection($conn, $quizID);
+                                break;
+                            case "Matching":
+                                $quizID = createQuiz($conn, $topicID, $quizType, $week);
+                                $description = '';
+                                createMatchingSection($conn, $quizID, $description, $points);
+                                break;
+                            case "Poster":
+                                $quizID = createQuiz($conn, $topicID, $quizType, $week);
+                                $question = '';
+                                createPosterSection($conn, $quizID, $question, $points);
+                                break;
+                            default:
+                                throw new Exception("Unexpected Quiz Type. QuizID: " . $quizID);
+                        }
+                        //create default learning material
+                        if ($quizType == "Video")
+                            createVideoLearningMaterial($conn, $quizID);
+                        else if ($quizType == "Image")
+                            createImageLearningMaterial($conn, $quizID);
+                        else
+                            createEmptyLearningMaterial($conn, $quizID);
+                    } //if misc
+                    else {
+                        $quizID = createQuiz($conn, $topicID, 'Misc', $week);
+                        createMiscSection($conn, $quizID, $points, $quizType);
                     }
-                    //create default learning material
-                    if ($quizType == "Video")
-                        createVideoLearningMaterial($conn, $quizID);
-                    else if ($quizType == "Image")
-                        createImageLearningMaterial($conn, $quizID);
-                    else
-                        createEmptyLearningMaterial($conn, $quizID);
 
                     $conn->commit();
                 } catch (Exception $e) {
                     debug_err($pageName, $e);
                     $conn->rollBack();
                 }
+            } else if ($update == 0) {
+                // if edit misc quiz
+                $week = $_POST['week'];
+                $quizID = $_POST['quizID'];
+                $topicName = $_POST['topicName'];
+                $topicID = getTopicByName($conn, $topicName)->TopicID;
+
+                $conn->beginTransaction();
+                $points = isset($_POST['points']) ? $_POST['points'] : 0;
+
+                updateQuiz($conn, $quizID, $topicID, $week);
+                updateMiscSection($conn, $quizID, $points);
+
             } else if ($update == -1) {
                 $quizID = $_POST['quizID'];
                 deleteQuiz($conn, $quizID);
@@ -76,10 +97,16 @@ try {
 
 
 try {
-    if (isset($_GET['week'])) {
-        $quizResult = getQuizzesByWeek($conn, $_GET['week']);
-    } else {
-        $quizResult = getQuizzes($conn);
+    // misc.php
+    if (strpos($pageName, 'misc') !== false) {
+        $quizResult = getMiscQuizzes($conn);
+    } // quiz.php
+    else if (strpos($pageName, 'quiz') !== false) {
+        if (isset($_GET['week'])) {
+            $quizResult = getQuizzesByWeek($conn, $_GET['week']);
+        } else {
+            $quizResult = getQuizzes($conn);
+        }
     }
     $topicResult = getTopics($conn);
 } catch (Exception $e) {
@@ -102,7 +129,7 @@ db_close($conn);
     <div id="page-wrapper">
         <div class="row">
             <div class="col-lg-12">
-                <h1 class="page-header">Quiz Overview
+                <h1 class="page-header"><?php echo $pageNameForView; ?> Overview
                     <?php if (isset($_GET['week'])) { ?>
                         <div class="alert alert-info alert-dismissable" style="display: inline-block;">
                             <button type="button" class="close" data-dismiss="alert" aria-hidden="true"
@@ -144,14 +171,18 @@ db_close($conn);
                                         <td><?php echo $quizType ?></td>
                                         <td><?php echo $quizResult[$i]->TopicName ?></td>
                                         <td><?php echo $points ?>
+                                            <span class="glyphicon glyphicon-remove pull-right"
+                                                  aria-hidden="true"></span>
+                                            <span class="pull-right" aria-hidden="true">&nbsp;</span>
                                             <?php if (in_array($quizType, $editableQuizTypeArr)) { ?>
-                                                <span class="glyphicon glyphicon-remove pull-right"
-                                                      aria-hidden="true"></span>
-                                                <span class="pull-right" aria-hidden="true">&nbsp;</span>
                                                 <a href="<?php echo strtolower($quizType); ?>-editor.php?quizID=<?php echo $quizID ?>">
                                                     <span class="glyphicon glyphicon-edit pull-right"
                                                           aria-hidden="true"></span>
                                                 </a>
+                                            <?php } else if (in_array($quizType, $miscQuizTypeArr)) { ?>
+                                                <span class="glyphicon glyphicon-edit pull-right"
+                                                      data-toggle="modal"
+                                                      data-target="#dialog" aria-hidden="true"></span>
                                             <?php } ?>
                                         </td>
                                     </tr>
@@ -199,10 +230,22 @@ db_close($conn);
                     <label for='QuizType'>QuizType</label>
                     <select class="form-control dialoginput" id="QuizType" form="submission" name="quizType" required>
                         <option value="" disabled selected>Select Quiz Type</option>
-                        <?php for ($i = 0; $i < count($editableQuizTypeArr); $i++) { ?>
-                            <option
-                                value="<?php echo $editableQuizTypeArr[$i] ?>"><?php echo $editableQuizTypeArr[$i] ?></option>
+
+                        // quiz.php
+                        <?php if (strpos($pageName, 'quiz') !== false) { ?>
+                            <optgroup label="Editable Quiz">
+                                <?php for ($i = 0; $i < count($editableQuizTypeArr); $i++) { ?>
+                                    <option
+                                        value="<?php echo $editableQuizTypeArr[$i] ?>"><?php echo $editableQuizTypeArr[$i] ?></option>
+                                <?php } ?>
+                            </optgroup>
                         <?php } ?>
+                        <optgroup label="Misc Quiz">
+                            <?php for ($i = 0; $i < count($miscQuizTypeArr); $i++) { ?>
+                                <option
+                                    value="<?php echo $miscQuizTypeArr[$i] ?>"><?php echo $miscQuizTypeArr[$i] ?></option>
+                            <?php } ?>
+                        </optgroup>
                     </select>
                     <br>
                     <label for='TopicName'>TopicName</label>
@@ -213,6 +256,10 @@ db_close($conn);
                                 value='<?php echo $topicResult[$j]->TopicName ?>'><?php echo $topicResult[$j]->TopicName ?></option>
                         <?php } ?>
                     </select>
+                    <br>
+                    <label for="Points">Points</label>
+                    <input type="text" class="form-control dialoginput" id="Points" name="points"
+                           placeholder="Input Points">
                     <br>
                 </form>
             </div>
@@ -232,13 +279,27 @@ db_close($conn);
 <script>
     //DO NOT put them in $(document).ready() since the table has multi pages
     var dialogInputArr = $('.dialoginput');
+    var len = dialogInputArr.length;
+    var pointsIndex = len - 1;
+    var quizTypeIndex = len - 3;
+
     $('.glyphicon-edit').on('click', function () {
-        /*...*/
+        $("label").remove(".error");
+        $('#dialogTitle').text("Edit <?php echo $pageNameForView ?>");
+        $('#update').val(0);
+        for (i = 0; i < dialogInputArr.length; i++) {
+            dialogInputArr.eq(i).val($(this).parent().parent().children('td').eq(i).text().trim());
+        }
+        //if edit, disable quiz type
+        dialogInputArr.eq(quizTypeIndex).attr('disabled', 'disabled');
     });
     $('.glyphicon-plus').on('click', function () {
-        $('#dialogTitle').text("Add Quiz");
+        $("label").remove(".error");
+        $('#dialogTitle').text("Add <?php echo $pageNameForView ?>");
         $('#update').val(1);
+        //enable all the buttons
         for (i = 0; i < dialogInputArr.length; i++) {
+            dialogInputArr.eq(i).prop('disabled', false);
             if (i != 1) {
                 dialogInputArr.eq(i).val('');
             } else {
@@ -263,6 +324,10 @@ db_close($conn);
                 week: {
                     required: true,
                     digits: true
+                },
+                points: {
+                    <?php if (strpos($pageName, 'misc') !== false) echo "required: true,"; ?>
+                    digits: true
                 }
             }
         });
@@ -280,11 +345,19 @@ db_close($conn);
             "aoColumnDefs": [
                 {"bSearchable": false, "aTargets": [0]}
             ]
-        })
+        });
         //search keyword, exact match
         table.search(
             $("#keyword").val().trim(), true, false, true
         ).draw();
+        //if quiz is saq-like, disable Points
+        $("#QuizType").change(function () {
+            if ($.inArray($(this).val().trim(), <?php echo json_encode($saqLikeQuizTypeArr); ?>) != -1) {
+                dialogInputArr.eq(pointsIndex).attr('disabled', 'disabled');
+            } else {
+                dialogInputArr.eq(pointsIndex).prop('disabled', false);
+            }
+        });
     });
 </script>
 </body>

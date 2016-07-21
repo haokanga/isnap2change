@@ -3,7 +3,7 @@ session_start();
 require_once("../mysql-lib.php");
 require_once("../debug.php");
 require_once("researcher-lib.php");
-$columnName = array('QuizID', 'Week', 'TopicName', 'Points', 'Questionnaires', 'Questions');
+$columnName = array('QuizID', 'Week', 'TopicName', 'Points', 'Questionnaire', 'Questions');
 
 try {
     $conn = db_connect();
@@ -16,12 +16,12 @@ try {
                     $quizType = 'MCQ';
                     $topicName = $_POST['topicName'];
                     $points = $_POST['points'];
-                    $questionnaires = $_POST['questionnaires'];
+                    $questionnaire = $_POST['questionnaire'];
                     $conn->beginTransaction();
 
                     $topicID = getTopicByName($conn, $topicName)->TopicID;
                     $quizID = createQuiz($conn, $topicID, $quizType, $week);
-                    createMCQSection($conn, $quizID, $points, $questionnaires);
+                    createMCQSection($conn, $quizID, $points, $questionnaire);
                     createEmptyLearningMaterial($conn, $quizID);
 
                     $conn->commit();
@@ -93,7 +93,7 @@ db_close($conn);
                                                 echo 'style="display:none"';
                                             } ?>>
                                                 <?php
-                                                // Questionnaires: if 1, true; else if 0, false
+                                                // Questionnaire: if 1, true; else if 0, false
                                                 if ($j == count($columnName) - 2) {
                                                     echo $quizResult[$i]->$columnName[$j] ? 'True' : 'False';
                                                 } else {
@@ -163,9 +163,9 @@ db_close($conn);
                     <input type="text" class="form-control dialoginput" id="Points" name="points"
                            placeholder="Input Points" required>
                     <br>
-                    <label for="Questionnaires">Questionnaires</label>
-                    <input type="hidden" class="form-control" id="Questionnaires" name="questionnaires" value="0">
-                    <input type="checkbox" class="form-control" id="Questionnaires" name="questionnaires" value="1">
+                    <label for="Questionnaire">Questionnaire</label>
+                    <input type="hidden" class="form-control" id="Questionnaire" name="questionnaire" value="0">
+                    <input type="checkbox" class="form-control" id="Questionnaire" name="questionnaire" value="1">
                 </form>
             </div>
             <div class="modal-footer">
@@ -182,6 +182,7 @@ db_close($conn);
     //DO NOT put them in $(document).ready() since the table has multi pages
     var dialogInputArr = $('.dialoginput');
     $('.glyphicon-plus').on('click', function () {
+		$("label").remove(".error");
         $('#dialogTitle').text("Add <?php echo $pageNameForView; ?>");
         $('#update').val(1);
         for (i = 0; i < dialogInputArr.length; i++) {
