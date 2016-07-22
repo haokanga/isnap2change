@@ -813,6 +813,11 @@ UPDATE `isnap2changedb`.`quiz` SET `ExtraQuiz`='1' WHERE `QuizID`='3';
 UPDATE `isnap2changedb`.`quiz` SET `ExtraQuiz`='1' WHERE `QuizID`='10';
 UPDATE `isnap2changedb`.`quiz` SET `ExtraQuiz`='1' WHERE `QuizID`='6';
 
+# [Example] insert a poster task into Quiz
+INSERT INTO `isnap2changedb`.`quiz` (`Week`, `QuizType`, `TopicID`) VALUES ('4', 'Poster', '3');
+# [Example] insert a poster task into Poster_Section
+INSERT INTO `isnap2changedb`.`poster_section` (`QuizID`, `Title`, `Description`, `Points`) VALUES (12, 'Create a Future Board', 'What would you linke to achieve this school term? Make board with pictures of what you would like to achieve and the people and things that inspire you and whtat you aspire to be. You can also put down things about yourself that you would like to improve on. If you would feel more comvortable using words or pictures that only you know what they mean, you can . After all, some goals are personal.', 20);
+
 # [Example] add poster record
 # run unit_test/poster-generator.php
 

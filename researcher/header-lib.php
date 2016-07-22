@@ -33,6 +33,9 @@
     <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
     <![endif]-->
 
+    <!-- Magnific Popup core CSS file -->
+    <link rel="stylesheet" href="../bower_components/magnific-popup/magnific-popup.css">
+
     <style>
         .glyphicon:hover {
             background-color: rgb(153, 153, 102);

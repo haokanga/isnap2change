@@ -3,7 +3,7 @@ session_start();
 require_once("../mysql-lib.php");
 require_once("../debug.php");
 require_once("researcher-lib.php");
-$columnName = array('QuizID', 'Week', 'TopicName', 'Points', 'SubmissionNum', 'Edit');
+$columnName = array('QuizID', 'Week', 'TopicName', 'Points', 'SubmissionNum', 'Ungraded', 'Edit');
 
 $conn = null;
 try {
@@ -72,9 +72,17 @@ db_close($conn);
                                                 echo 'style="display:none"';
                                             } ?>>
                                                 <?php
-                                                if ($j != count($columnName) - 1)
+                                                if ($j < count($columnName) - 2)
                                                     echo $quizResult[$i]->$columnName[$j];
-                                                else { ?>
+                                                else if ($j == count($columnName) - 2) {
+                                                    try {
+                                                        if ($conn == null) $conn = db_connect();
+                                                        echo getUngradedPosterSubmissions($conn, $quizResult[$i]->QuizID);
+                                                        db_close($conn);
+                                                    } catch (Exception $e) {
+                                                        debug_err($e);
+                                                    }
+                                                } else { ?>
                                                     <span class="glyphicon glyphicon-remove pull-right"
                                                           aria-hidden="true"></span>
                                                     <span class="pull-right" aria-hidden="true">&nbsp;</span>

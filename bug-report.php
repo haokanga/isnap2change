@@ -53,11 +53,11 @@ try {
                     <input type="text" class="form-control dialoginput" id="logID" name="logID" style="display:none">
                     <label for="userFeedback">User Feedback</label>
                     <textarea class="form-control dialoginput" id="userFeedback" name="userFeedback"
-                              placeholder="Describe bug" rows="8" required></textarea>
+                              placeholder="Please describe how you run into this bug and help us catch it!" rows="8" required></textarea>
                     <br>
                 </form>
             </div>
-            <div class="modal-footer">
+            <div class="modal-footer"><button type="button" id="btnSave" class="btn btn-default">Back to Welcome Page</button>
                 <button type="button" id="btnSave" class="btn btn-default">Save</button>
             </div>
         </div>

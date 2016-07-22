@@ -1346,9 +1346,39 @@ function updatePosterSubmission(PDO $conn, $quizID, $studentID, $zwibblerDoc, $i
 {
     $posterRecordSubmittedSql = "INSERT INTO Poster_Record(QuizID, StudentID, ZwibblerDoc, ImageURL)
 									 VALUES (?,?,?,?) ON DUPLICATE KEY UPDATE ZwibblerDoc = ? , ImageURL = ?";
-
     $posterRecordSubmittedQuery = $conn->prepare($posterRecordSubmittedSql);
     $posterRecordSubmittedQuery->execute(array($quizID, $studentID, $zwibblerDoc, $imageUrl, $zwibblerDoc, $imageUrl));
+}
+
+function updatePosterGradings(PDO $conn, $quizID, array $studentID, array $grading)
+{
+    if (count($studentID) == count($grading)) {
+        try {
+            $conn->beginTransaction();
+            for ($i = 0; $i < count($studentID); $i++) {
+                updateQuizRecord($conn, $quizID, $studentID[$i], "GRADED");
+                updatePostGrading($conn, $quizID, $studentID[$i], $grading[$i]);
+            }
+            $conn->commit();
+        } catch (Exception $e) {
+            debug_err($e);
+            $conn->rollBack();
+        }
+    } else
+        throw new Exception("The length of studentID array and grading array don't match. ");
+}
+
+function updatePostGrading(PDO $conn, $quizID, $studentID, $grading)
+{
+    if (!is_numeric($grading)) {
+        throw new Exception("Grading is not numeric: $grading");
+    }
+
+    $updateSql = "UPDATE poster_record
+                  SET Grading = ?
+                  WHERE QuizID = ? AND StudentID = ?";
+    $updateSql = $conn->prepare($updateSql);
+    $updateSql->execute(array($grading, $quizID, $studentID));
 }
 
 function deletePosterSubmission(PDO $conn, $quizID, $studentID)
@@ -1418,10 +1448,28 @@ function getPosterQuizzes(PDO $conn)
 
 function getPosterSubmissions(PDO $conn)
 {
-    $tableSql = "SELECT * , COUNT(*) AS SubmissionNum FROM poster_section NATURAL JOIN quiz NATURAL JOIN topic NATURAL JOIN quiz_record";
+    $tableSql = "SELECT * , COUNT(*) AS SubmissionNum FROM poster_section NATURAL JOIN quiz NATURAL JOIN topic NATURAL JOIN quiz_record NATURAL JOIN poster_record GROUP BY QuizID";
     $tableQuery = $conn->prepare($tableSql);
     $tableQuery->execute();
     $tableResult = $tableQuery->fetchAll(PDO::FETCH_OBJ);
+    return $tableResult;
+}
+
+function getPosterSubmissionsByQuiz(PDO $conn, $quizID)
+{
+    $tableSql = "SELECT * FROM poster_section NATURAL JOIN quiz NATURAL JOIN topic NATURAL JOIN quiz_record NATURAL JOIN poster_record WHERE QuizID = ?";
+    $tableQuery = $conn->prepare($tableSql);
+    $tableQuery->execute(array($quizID));
+    $tableResult = $tableQuery->fetchAll(PDO::FETCH_OBJ);
+    return $tableResult;
+}
+
+function getUngradedPosterSubmissions(PDO $conn, $quizID)
+{
+    $tableSql = "SELECT COUNT(*) AS Ungraded FROM poster_section NATURAL JOIN topic NATURAL JOIN quiz NATURAL JOIN quiz_record WHERE `Status` = 'UNGRADED' AND QuizID = ? ";
+    $tableQuery = $conn->prepare($tableSql);
+    $tableQuery->execute(array($quizID));
+    $tableResult = $tableQuery->fetch(PDO::FETCH_OBJ)->Ungraded;
     return $tableResult;
 }
 
@@ -1437,16 +1485,15 @@ function updateSAQQuestionRecord(PDO $conn, $saqID, $studentID, $answer)
     $updateSql->execute(array($studentID, $saqID, htmlspecialchars($answer), htmlspecialchars($answer)));
 }
 
-
-function updateSAQSubmissionGrading(PDO $conn, $quizID, $saqID, $studentID, $feedback, $grading)
+function updateSAQSubmissionGrading(PDO $conn, $quizID, array $saqID, $studentID, array $feedback, array $grading)
 {
     if (count($saqID) == count($grading) && count($saqID) == count($feedback)) {
         try {
             $conn->beginTransaction();
+            updateQuizRecord($conn, $quizID, $studentID, "GRADED");
             for ($i = 0; $i < count($saqID); $i++) {
                 updateSAQQuestionGrading($conn, $saqID[$i], $studentID, $feedback[$i], $grading[$i]);
             }
-            updateQuizRecord($conn, $quizID, $studentID, "GRADED");
             $conn->commit();
         } catch (Exception $e) {
             debug_err($e);
@@ -1464,7 +1511,6 @@ function updateSAQQuestionGrading(PDO $conn, $saqID, $studentID, $feedback, $gra
     $updateSql = $conn->prepare($updateSql);
     $updateSql->execute(array(htmlspecialchars($feedback), $grading, $saqID, $studentID));
 }
-
 
 function deleteSAQQuestionRecord(PDO $conn, $saqID, $studentID)
 {
@@ -1492,10 +1538,10 @@ function updateSAQDraft(PDO $conn, $quizID, $saqID, $studentID, $answer)
     if (count($saqID) == count($answer)) {
         try {
             $conn->beginTransaction();
+            updateQuizRecord($conn, $quizID, $studentID, "UNSUBMITTED");
             for ($i = 0; $i < count($saqID); $i++) {
                 updateSAQQuestionRecord($conn, $saqID[$i], $studentID, $answer[$i]);
             }
-            updateQuizRecord($conn, $quizID, $studentID, "UNSUBMITTED");
             $conn->commit();
         } catch (Exception $e) {
             debug_err($e);
@@ -1510,11 +1556,10 @@ function updateSAQSubmission(PDO $conn, $quizID, $saqID, $studentID, $answer)
 {
     try {
         $conn->beginTransaction();
+        updateQuizRecord($conn, $quizID, $studentID, "UNGRADED");
         for ($i = 0; $i < count($saqID); $i++) {
             updateSAQQuestionRecord($conn, $saqID[$i], $studentID, $answer[$i]);
         }
-
-        updateQuizRecord($conn, $quizID, $studentID, "UNGRADED");
         $conn->commit();
     } catch (Exception $e) {
         debug_err($e);
@@ -1876,11 +1921,11 @@ function generateRandomSAQSubmissions(PDO $conn)
         for ($studentIndex = 0; $studentIndex < count($studentResult); $studentIndex++) {
             $studentID = $studentResult[$studentIndex]->StudentID;
             if ($studentID >= 3) {
+                updateQuizRecord($conn, $quizID, $studentID, "UNGRADED");
                 for ($saqIndex = 0; $saqIndex < count($saqResult); $saqIndex++) {
                     $saqID = $saqResult[$saqIndex]->SAQID;
                     updateSAQQuestionRecord($conn, $saqID, $studentID, generateRandomString(300));
                 }
-                updateQuizRecord($conn, $quizID, $studentID, "UNGRADED");
             }
         }
     }

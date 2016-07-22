@@ -3,7 +3,6 @@ session_start();
 require_once("../mysql-lib.php");
 require_once("../debug.php");
 require_once("researcher-lib.php");
-$columnName = array('QuizID', 'Week', 'TopicName', 'Points', 'Questions');
 
 if (isset($_GET['quizID']) && isset($_GET['studentID'])) {
     $quizID = $_GET['quizID'];
@@ -97,7 +96,7 @@ db_close($conn);
                                     <br>
                                     <label for="grading[]">Grading</label>
                                     <input type="text" class="dialoginput pull-right" id="textInput<?php echo $saqID ?>"
-                                           value="<?php if (strlen($saqSubmissionResult[$i]->Grading) > 0) echo $saqSubmissionResult[$i]->Grading; else echo $saqSubmissionResult[$i]->Points ?>"
+                                           value="<?php echo $saqSubmissionResult[$i]->Grading > 0 ? $saqSubmissionResult[$i]->Grading : $saqSubmissionResult[$i]->Points; ?>"
                                            disabled>
                                     <input type="range" class="dialoginput" min="0"
                                            max="<?php echo $saqSubmissionResult[$i]->Points ?>"

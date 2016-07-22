@@ -22,3 +22,5 @@
 
 <link rel="stylesheet" href="//code.jquery.com/ui/1.11.4/themes/ui-lightness/jquery-ui.css"/>
 <link rel="stylesheet" href="//code.jquery.com/qunit/qunit-1.18.0.css"/>
+<!-- Magnific Popup core JS file -->
+<script src="../bower_components/magnific-popup/jquery.magnific-popup.js"></script>
