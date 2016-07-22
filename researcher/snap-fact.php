@@ -153,6 +153,7 @@ db_close($conn);
     //DO NOT put them in $(document).ready() since the table has multi pages
     var dialogInputArr = $('.dialoginput');
     $('.glyphicon-edit').on('click', function () {
+        $("label").remove(".error");
         $('#dialogTitle').text("Edit <?php echo $pageNameForView ?>");
         $('#update').val(0);
         for (i = 0; i < dialogInputArr.length; i++) {
@@ -161,6 +162,7 @@ db_close($conn);
         dialogInputArr.eq(0).attr('disabled', 'disabled');
     });
     $('.glyphicon-plus').on('click', function () {
+        $("label").remove(".error");
         $('#dialogTitle').text("Add <?php echo $pageNameForView ?>");
         $('#update').val(1);
         for (i = 0; i < dialogInputArr.length; i++) {

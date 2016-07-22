@@ -91,7 +91,11 @@ db_close($conn);
     <div id="page-wrapper">
         <div class="row">
             <div class="col-lg-12">
-                <h1 class="page-header"><?php echo $pageNameForView; ?> Editor</h1>
+                <h1 class="page-header"><?php echo $pageNameForView; ?> Editor
+                    <button type="button" class="btn btn-lg btn-info pull-right"
+                            onclick="location.href='<?php echo SAQ_LIKE_QUIZ_TYPE . ".php" ?>'">GO BACK
+                    </button>
+                </h1>
             </div>
             <!-- /.col-lg-12 -->
         </div>
@@ -271,7 +275,7 @@ db_close($conn);
     //DO NOT put them in $(document).ready() since the table has multi pages
     var dialogInputArr = $('.dialoginput');
     $('.glyphicon-plus').on('click', function () {
-		$("label").remove(".error");
+        $("label").remove(".error");
         $('#dialogTitle').text("Add Question");
         $('#update').val(1);
         for (i = 0; i < dialogInputArr.length; i++) {

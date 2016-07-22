@@ -642,8 +642,8 @@ function deleteVerboseFact(PDO $conn, $verboseFactID)
 function getVerboseFactsByTopic(PDO $conn, $topicID)
 {
     $factSql = "SELECT * FROM Topic 
-                LEFT JOIN Verbose_Fact 
-                USING (TopicID) WHERE TopicID = ? ";
+                NATURAL JOIN Verbose_Fact 
+                WHERE TopicID = ? ";
     $factQuery = $conn->prepare($factSql);
     $factQuery->execute(array($topicID));
     $factResult = $factQuery->fetchAll(PDO::FETCH_OBJ);

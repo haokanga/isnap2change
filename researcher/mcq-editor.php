@@ -83,7 +83,11 @@ db_close($conn);
     <div id="page-wrapper">
         <div class="row">
             <div class="col-lg-12">
-                <h1 class="page-header">Multiple Choice Quiz Editor</h1>
+                <h1 class="page-header">Multiple Choice Quiz Editor
+                    <button type="button" class="btn btn-lg btn-info pull-right"
+                            onclick="location.href='<?php echo "mcq.php" ?>'">GO BACK
+                    </button>
+                </h1>
             </div>
             <!-- /.col-lg-12 -->
         </div>

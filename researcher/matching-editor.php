@@ -105,7 +105,11 @@ db_close($conn);
     <div id="page-wrapper">
         <div class="row">
             <div class="col-lg-12">
-                <h1 class="page-header">Matching Quiz Editor</h1>
+                <h1 class="page-header">Matching Quiz Editor
+                    <button type="button" class="btn btn-lg btn-info pull-right"
+                            onclick="location.href='<?php echo "matching.php" ?>'">GO BACK
+                    </button>
+                </h1>
             </div>
             <!-- /.col-lg-12 -->
         </div>
