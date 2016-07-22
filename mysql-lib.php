@@ -1413,22 +1413,9 @@ function getPosterSubmissions(PDO $conn)
 
 function deletePosterSubmissions(PDO $conn, $quizID)
 {
-    try {
-        $conn->beginTransaction();
-
-        $updateSql = "DELETE FROM quiz_record WHERE QuizID = ?";
-        $updateSql = $conn->prepare($updateSql);
-        $updateSql->execute(array($quizID));
-
-        $updateSql = "DELETE FROM poster_record WHERE QuizID = ?";
-        $updateSql = $conn->prepare($updateSql);
-        $updateSql->execute(array($quizID));
-
-        $conn->commit();
-    } catch (Exception $e) {
-        debug_err($e);
-        $conn->rollBack();
-    }
+    $updateSql = "DELETE FROM quiz_record WHERE QuizID = ?";
+    $updateSql = $conn->prepare($updateSql);
+    $updateSql->execute(array($quizID));
 }
 
 /* Poster */
