@@ -19,7 +19,7 @@ try {
                 $saqID = $_POST['saqID'];
                 $feedback = $_POST['feedback'];
                 $grading = $_POST['grading'];
-                updateSAQSubmissionGrading($conn, $quizID, $saqID, $studentID, $feedback, $grading, $pageName);
+                updateSAQSubmissionGrading($conn, $quizID, $saqID, $studentID, $feedback, $grading);
                 $parentPage = 'Location: ' . strtolower(getQuizType($conn, $quizID)) . '-grading.php';
                 header($parentPage);
             }

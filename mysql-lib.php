@@ -1185,7 +1185,7 @@ function updateLearningMaterial(PDO $conn, $quizID, $content)
             SET Content = ?, Excluded = ?
             WHERE QuizID = ?";
     $updateSql = $conn->prepare($updateSql);
-    $updateSql->execute(array(htmlspecialchars($content), $excluded, $quizID));
+    $updateSql->execute(array($content, $excluded, $quizID));
 }
 
 function getLearningMaterial(PDO $conn, $quizID)
@@ -1351,6 +1351,20 @@ function updatePosterSubmission(PDO $conn, $quizID, $studentID, $zwibblerDoc, $i
     $posterRecordSubmittedQuery->execute(array($quizID, $studentID, $zwibblerDoc, $imageUrl, $zwibblerDoc, $imageUrl));
 }
 
+function deletePosterSubmission(PDO $conn, $quizID, $studentID)
+{
+    $updateSql = "DELETE FROM quiz_record WHERE QuizID = ? AND StudentID = ?";
+    $updateSql = $conn->prepare($updateSql);
+    $updateSql->execute(array($quizID, $studentID));
+}
+
+function deletePosterSubmissions(PDO $conn, $quizID)
+{
+    $updateSql = "DELETE FROM quiz_record WHERE QuizID = ?";
+    $updateSql = $conn->prepare($updateSql);
+    $updateSql->execute(array($quizID));
+}
+
 // getPosterRecord for both draft and submission
 function getPosterRecord(PDO $conn, $quizID, $studentID)
 {
@@ -1411,13 +1425,6 @@ function getPosterSubmissions(PDO $conn)
     return $tableResult;
 }
 
-function deletePosterSubmissions(PDO $conn, $quizID)
-{
-    $updateSql = "DELETE FROM quiz_record WHERE QuizID = ?";
-    $updateSql = $conn->prepare($updateSql);
-    $updateSql->execute(array($quizID));
-}
-
 /* Poster */
 
 
@@ -1431,7 +1438,7 @@ function updateSAQQuestionRecord(PDO $conn, $saqID, $studentID, $answer)
 }
 
 
-function updateSAQSubmissionGrading(PDO $conn, $quizID, $saqID, $studentID, $feedback, $grading, $pageName)
+function updateSAQSubmissionGrading(PDO $conn, $quizID, $saqID, $studentID, $feedback, $grading)
 {
     if (count($saqID) == count($grading) && count($saqID) == count($feedback)) {
         try {
@@ -1480,7 +1487,7 @@ function getSAQRecords(PDO $conn, $quizID, $studentID)
 }
 
 
-function updateSAQDraft(PDO $conn, $quizID, $saqID, $studentID, $answer, $pageName)
+function updateSAQDraft(PDO $conn, $quizID, $saqID, $studentID, $answer)
 {
     if (count($saqID) == count($answer)) {
         try {
@@ -1499,7 +1506,7 @@ function updateSAQDraft(PDO $conn, $quizID, $saqID, $studentID, $answer, $pageNa
 
 }
 
-function updateSAQSubmission(PDO $conn, $quizID, $saqID, $studentID, $answer, $pageName)
+function updateSAQSubmission(PDO $conn, $quizID, $saqID, $studentID, $answer)
 {
     try {
         $conn->beginTransaction();
@@ -1515,7 +1522,7 @@ function updateSAQSubmission(PDO $conn, $quizID, $saqID, $studentID, $answer, $p
     }
 }
 
-function deleteSAQSubmission(PDO $conn, $quizID, $studentID, $pageName)
+function deleteSAQSubmission(PDO $conn, $quizID, $studentID)
 {
     try {
         $conn->beginTransaction();

@@ -13,7 +13,7 @@ try {
             if ($update == -1) {
                 $quizID = $_POST['quizID'];
                 $studentID = $_POST['studentID'];
-                deleteSAQSubmission($conn, $quizID, $studentID, $pageName);
+                deleteSAQSubmission($conn, $quizID, $studentID);
             }
         }
     }

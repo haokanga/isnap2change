@@ -666,7 +666,7 @@ INSERT IGNORE INTO Learning_Material(Content,QuizID, Excluded) VALUES('
 
 # [Example] Learning_Material (for Video Quiz)
 
-INSERT IGNORE INTO Learning_Material(Content,QuizID, Excluded) VALUES('&lt;p&gt;&lt;iframe src=&quot;//www.youtube.com/embed/UQ0hFLUiHTg?autoplay=1&amp;amp;start=60&amp;amp;end=70&amp;amp;rel=0&amp;quot;&quot; width=&quot;560&quot; height=&quot;314&quot; allowfullscreen=&quot;allowfullscreen&quot;&gt;&lt;/iframe&gt;&lt;/p&gt;',3,-1);
+INSERT IGNORE INTO Learning_Material(Content,QuizID, Excluded) VALUES('<p><iframe src="//www.youtube.com/embed/UQ0hFLUiHTg?autoplay=1&amp;start=60&amp;end=70&amp;rel=0&quot;" width="560" height="314" allowfullscreen="allowfullscreen"></iframe></p>',3,-1);
 
 # [Formal] Games
 INSERT IGNORE INTO Game(Description,Levels) VALUES('Fruit Ninja',5);
