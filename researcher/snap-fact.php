@@ -29,14 +29,14 @@ try {
         }
     }
 } catch (Exception $e) {
-    debug_err($pageName, $e);
+    debug_err($e);
 }
 
 try {
     $snapFactResult = getSnapFacts($conn);
     $topicResult = getTopics($conn);
 } catch (Exception $e) {
-    debug_err($pageName, $e);
+    debug_err($e);
 }
 
 db_close($conn);

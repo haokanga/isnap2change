@@ -9,7 +9,7 @@ try {
     db_close(testAuthenticationFailure());
 } catch (Exception $e) {
     $pageName = basename($_SERVER['SCRIPT_FILENAME'], '.php');
-    debug_err($pageName, $e);
+    debug_err($e);
 }
 
 function testAuthenticationFailure()

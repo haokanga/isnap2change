@@ -41,7 +41,7 @@ try {
         }
     }
 } catch (Exception $e) {
-    debug_err($pageName, $e);
+    debug_err($e);
 }
 
 try {
@@ -54,7 +54,7 @@ try {
         $parentPage = 'Location: mcq-editor.php?quizID=' . $quizID;
     }
 } catch (Exception $e) {
-    debug_err($pageName, $e);
+    debug_err($e);
 }
 
 db_close($conn);

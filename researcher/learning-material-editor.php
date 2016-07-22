@@ -15,7 +15,7 @@ try {
         }
     }
 } catch (Exception $e) {
-    debug_err($pageName, $e);
+    debug_err($e);
 }
 
 try {
@@ -25,7 +25,7 @@ try {
         $phpSelf = $pageName . '.php?quizID=' . $quizID;
     }
 } catch (Exception $e) {
-    debug_err($pageName, $e);
+    debug_err($e);
 }
 
 ?>

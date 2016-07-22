@@ -25,7 +25,7 @@ $contentAdminPageArr = array('Week', 'Quiz', 'Snap Fact', 'Verbose Fact', 'MCQ',
 $quizTypeArr = array('Matching', 'Poster', 'Video', 'Image', 'Misc');
 $contentAdminIconArr = array('calendar', 'book', 'lightbulb-o', 'folder-open', 'check', 'pencil', 'th-list', 'paint-brush', 'video-camera', 'picture-o', 'magic');
 $gradingPageArr = array('SAQ Grading', 'Video Grading', 'Image Grading', 'Poster Grading');
-$gradingIconArr = array('pencil', 'video-camera', 'picture-o', 'exclamation-triangle');
+$gradingIconArr = array('pencil', 'video-camera', 'picture-o', 'magic');
 
 // php quiz type classification
 $editableQuizTypeArr = array('Questionnaire', 'MCQ', 'SAQ', 'Matching', 'Poster', 'Video', 'Image');

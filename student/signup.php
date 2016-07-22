@@ -22,7 +22,7 @@ try {
         db_close($conn);
     }
 
-    debug_err($pageName, $e);
+    debug_err($e);
     //to do: handle sql error
     //...
     exit;

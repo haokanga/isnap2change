@@ -13,14 +13,14 @@ try {
         unset($updateSql);
     }
 } catch (Exception $e) {
-    debug_err($pageName, $e);
+    debug_err($e);
 }
 
 try {
     $weekResult = getQuizNum($conn);
     $weekNumResult = getMaxWeek($conn);
 } catch (Exception $e) {
-    debug_err($pageName, $e);
+    debug_err($e);
 }
 
 db_close($conn);

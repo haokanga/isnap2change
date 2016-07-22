@@ -1402,6 +1402,35 @@ function getPosterQuizzes(PDO $conn)
     return getRecords($conn, "Poster_Section", array("Quiz", "Topic"));
 }
 
+function getPosterSubmissions(PDO $conn)
+{
+    $tableSql = "SELECT * , COUNT(*) AS SubmissionNum FROM poster_section NATURAL JOIN quiz NATURAL JOIN topic NATURAL JOIN quiz_record";
+    $tableQuery = $conn->prepare($tableSql);
+    $tableQuery->execute();
+    $tableResult = $tableQuery->fetchAll(PDO::FETCH_OBJ);
+    return $tableResult;
+}
+
+function deletePosterSubmissions(PDO $conn, $quizID)
+{
+    try {
+        $conn->beginTransaction();
+
+        $updateSql = "DELETE FROM quiz_record WHERE QuizID = ?";
+        $updateSql = $conn->prepare($updateSql);
+        $updateSql->execute(array($quizID));
+
+        $updateSql = "DELETE FROM poster_record WHERE QuizID = ?";
+        $updateSql = $conn->prepare($updateSql);
+        $updateSql->execute(array($quizID));
+
+        $conn->commit();
+    } catch (Exception $e) {
+        debug_err($e);
+        $conn->rollBack();
+    }
+}
+
 /* Poster */
 
 
@@ -1426,7 +1455,7 @@ function updateSAQSubmissionGrading(PDO $conn, $quizID, $saqID, $studentID, $fee
             updateQuizRecord($conn, $quizID, $studentID, "GRADED");
             $conn->commit();
         } catch (Exception $e) {
-            debug_err($pageName, $e);
+            debug_err($e);
             $conn->rollBack();
         }
     } else
@@ -1475,7 +1504,7 @@ function updateSAQDraft(PDO $conn, $quizID, $saqID, $studentID, $answer, $pageNa
             updateQuizRecord($conn, $quizID, $studentID, "UNSUBMITTED");
             $conn->commit();
         } catch (Exception $e) {
-            debug_err($pageName, $e);
+            debug_err($e);
             $conn->rollBack();
         }
     } else
@@ -1494,7 +1523,7 @@ function updateSAQSubmission(PDO $conn, $quizID, $saqID, $studentID, $answer, $p
         updateQuizRecord($conn, $quizID, $studentID, "UNGRADED");
         $conn->commit();
     } catch (Exception $e) {
-        debug_err($pageName, $e);
+        debug_err($e);
         $conn->rollBack();
     }
 }
@@ -1512,7 +1541,7 @@ function deleteSAQSubmission(PDO $conn, $quizID, $studentID, $pageName)
         }
         $conn->commit();
     } catch (Exception $e) {
-        debug_err($pageName, $e);
+        debug_err($e);
         $conn->rollBack();
     }
 

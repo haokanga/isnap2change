@@ -26,7 +26,7 @@ try {
 
                     $conn->commit();
                 } catch (Exception $e) {
-                    debug_err($pageName, $e);
+                    debug_err($e);
                     $conn->rollBack();
                 }
             } else if ($update == -1) {
@@ -36,14 +36,14 @@ try {
         }
     }
 } catch (Exception $e) {
-    debug_err($pageName, $e);
+    debug_err($e);
 }
 
 try {
     $quizResult = getMatchingQuizzes($conn);
     $topicResult = getTopics($conn);
 } catch (Exception $e) {
-    debug_err($pageName, $e);
+    debug_err($e);
 }
 db_close($conn);
 

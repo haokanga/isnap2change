@@ -11,7 +11,7 @@ try {
     $verboseFactResult = getVerboseFacts($conn);
     $phpSelf = $pageName;
 } catch (Exception $e) {
-    debug_err($pageName, $e);
+    debug_err($e);
 }
 
 db_close($conn);

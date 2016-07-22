@@ -301,17 +301,14 @@ CREATE TABLE IF NOT EXISTS `Poster_Section` (
 )  ENGINE=INNODB;
 
 CREATE TABLE IF NOT EXISTS `Poster_Record` (
+    QuizID MEDIUMINT,    
     StudentID MEDIUMINT,
-    QuizID MEDIUMINT,
     ZwibblerDoc LONGTEXT,
     ImageURL LONGTEXT,
     Grading MEDIUMINT,
-    CONSTRAINT Poster_Record_Record_PK PRIMARY KEY (StudentID , QuizID),
-    CONSTRAINT Poster_Record_Record_StudentID_FK FOREIGN KEY (StudentID)
-        REFERENCES Student (StudentID)
-        ON DELETE CASCADE ON UPDATE CASCADE,
-    CONSTRAINT Poster_Record_Record_QuizID_FK FOREIGN KEY (QuizID)
-        REFERENCES Poster_Section (QuizID)
+    CONSTRAINT Poster_Record_PK PRIMARY KEY (QuizID, StudentID),
+    CONSTRAINT Poster_Record_StudentID_QuizID_FK FOREIGN KEY (QuizID, StudentID)
+        REFERENCES quiz_record (QuizID, StudentID)
         ON DELETE CASCADE ON UPDATE CASCADE
 )  ENGINE=INNODB;
 

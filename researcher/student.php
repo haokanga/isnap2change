@@ -22,14 +22,14 @@ try {
         }
     }
 } catch (Exception $e) {
-    debug_err($pageName, $e);
+    debug_err($e);
 }
 
 try {
     refreshAllStudentsScore($conn);
     $studentResult = getStudents($conn);
 } catch (Exception $e) {
-    debug_err($pageName, $e);
+    debug_err($e);
 }
 
 db_close($conn);
@@ -170,7 +170,7 @@ if (isset($_GET['classID'])) {
         $classResult = getClass($conn, $classID);
         echo $classResult->ClassName;
     } catch (Exception $e) {
-        debug_err($pageName, $e);
+        debug_err($e);
         echo '';
     }
 } else

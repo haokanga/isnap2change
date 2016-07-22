@@ -26,7 +26,7 @@ try {
 
                     $conn->commit();
                 } catch (Exception $e) {
-                    debug_err($pageName, $e);
+                    debug_err($e);
                     $conn->rollBack();
                 }
             } else if ($metadataUpdate == -1) {
@@ -49,7 +49,7 @@ try {
         }
     }
 } catch (Exception $e) {
-    debug_err($pageName, $e);
+    debug_err($e);
 }
 
 try {
@@ -62,7 +62,7 @@ try {
         $phpSelf = $pageName . '.php?quizID=' . $quizID;
     }
 } catch (Exception $e) {
-    debug_err($pageName, $e);
+    debug_err($e);
 }
 
 db_close($conn);

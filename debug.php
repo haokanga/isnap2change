@@ -17,7 +17,7 @@ function debug_alert($message)
     echo "<script language=\"javascript\">  alert(\"" . $message . "\"); </script>";
 }
 
-function debug_err($pageName = null, Exception $e)
+function debug_err(Exception $e)
 {
     if ($e instanceof PDOException) {
         // duplicate entry
@@ -79,13 +79,15 @@ function getBugReportURL()
     return getURL("/bug-report.php");
 }
 
-function getURL($pageName){
+function getURL($pageName)
+{
     $debug_page_dir = __DIR__;
     $host = $_SERVER['HTTP_HOST'];
     $relative_dir = explode("htdocs", $debug_page_dir, 2)[1];
     $url = "http://" . $host . $relative_dir . $pageName;
     return $url;
 }
+
 /* helper function*/
 
 ?>

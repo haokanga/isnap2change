@@ -23,8 +23,9 @@ function generatePosterRecordInFile()
             $status = "UNGRADED";
 
             $conn->beginTransaction();
-            updatePosterSubmission($conn, $quizID, $studentID, $defaultZwibblerDoc, $imageUrl);
+
             updateQuizRecord($conn, $quizID, $studentID, $status);
+            updatePosterSubmission($conn, $quizID, $studentID, $defaultZwibblerDoc, $imageUrl);
 
             $conn->commit();
             echo "[SUCCESS]";

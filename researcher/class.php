@@ -34,7 +34,7 @@ try {
         }
     }
 } catch (Exception $e) {
-    debug_err($pageName, $e);
+    debug_err($e);
 }
 
 try {
@@ -43,7 +43,7 @@ try {
     $classResult = getClasses($conn);
     $studentNumResult = getStudentNum($conn);
 } catch (Exception $e) {
-    debug_err($pageName, $e);
+    debug_err($e);
 }
 
 db_close($conn);
@@ -192,7 +192,7 @@ if (isset($_GET['schoolID'])) {
         $schoolResult = getSchool($conn, $schoolID);
         echo $schoolResult->SchoolName;
     } catch (Exception $e) {
-        debug_err($pageName, $e);
+        debug_err($e);
         echo '';
     }
 } else
