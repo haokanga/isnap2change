@@ -602,8 +602,8 @@
 <?php                           }
                             } else { ?>
                                <a href="pre-task-material.php?quiz_id=<?php echo $quizzesRes[$i]['QuizID']?>">
+                                    <div class="game-nav-item game-poster">
 <?php                       } ?>
-                                <div class="game-nav-item game-poster">
                                     <div class="game-nav-logo"></div>
                                     <div class="game-nav-title">Poster</div>
                                     <div class="game-nav-divider"></div>
@@ -652,7 +652,7 @@
 <?php                       break;
                     case "Video":
                             if(isset($quizzesRes[$i]['Status'])) { ?>
-                                <div href="standard-drinking-tool.php?quiz_id=<?php echo $quizzesRes[$i]['QuizID']?>">
+                                <a href="standard-drinking-tool.php?quiz_id=<?php echo $quizzesRes[$i]['QuizID']?>">
                                     <div class="game-nav-item game-nav-item-completed game-video">
 <?php                       } else { ?>
                                 <a href="pre-task-material.php?quiz_id=<?php echo $quizzesRes[$i]['QuizID']?>">
@@ -661,7 +661,7 @@
                                         <div class="game-nav-logo"></div>
                                         <div class="game-nav-title">Video</div>
                                         <div class="game-nav-divider"></div>
-                                        <div class="game-nav-desc">Complete Standard Drinking Tool on <?php echo $quizzesRes[$i]['TopicName']?> to receive <?php echo $quizzesRes[$i]['Points']?> points.</div>
+                                        <div class="game-nav-desc">Complete Video on <?php echo $quizzesRes[$i]['TopicName']?> to receive <?php echo $quizzesRes[$i]['Points']?> points.</div>
 <?php                       if($quizzesRes[$i]['Status'] == "UNGRADED") { ?>
                                         <div class="game-nav-status">Completed</div>
 <?php                       } else if($quizzesRes[$i]['Status'] == "GRADED") {?>

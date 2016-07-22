@@ -1,6 +1,41 @@
 <?php
+    //check login status
+    require_once('./student-validation.php');
 
+    require_once("../mysql-lib.php");
+    require_once("../debug.php");
+    $pageName = "extra-activities";
 
+    $conn = null;
+
+    try {
+        $conn = db_connect();
+
+        //get student week
+        $studentWeek = getStudentWeek($conn, $studentID);
+
+        //get max week
+        $maxWeek = getMaxWeek($conn)->WeekNum;
+
+        //get material topics
+        $extraActivities = array();
+
+        for($i = 0; $i < $studentWeek; $i++) {
+            array_push($extraActivities, getQuizzesStatusByWeek($conn, $studentID, ($i+1), 1));
+        }
+
+    } catch(Exception $e) {
+        if($conn != null) {
+            db_close($conn);
+        }
+
+        debug_err($pageName, $e);
+        //to do: handle sql error
+        //...
+        //exit;
+    }
+
+    db_close($conn);
 ?>
 
 <!DOCTYPE html>
@@ -75,6 +110,8 @@
         .extra-activities-tab-content {
             max-width: 1000px;
             margin: 0 auto;
+            text-align: center;
+            overflow: hidden;
         }
 
         .extra-activities-week-detail {
@@ -83,55 +120,112 @@
         .extra-activities-week-detail-active {
             display: block;
         }
-
-        .extra-activities-item {
+        .game-nav-item {
             width: 340px;
-            margin: 0 auto 20px;
+            margin: 20px auto;
+            position: relative;
+        }
+        .game-nav-item-completed .game-nav-logo,
+        .game-nav-item-completed .game-nav-title,
+        .game-nav-item-completed .game-nav-divider,
+        .game-nav-item-completed .game-nav-desc {
+            opacity: 0.5;
+        }
+        .game-nav-item-completed .game-nav-status,
+        .game-nav-item-completed .game-nav-feedback {
+            display: block;
+        }
+        .game-nav-status {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
             text-align: center;
-            cursor: pointer;
-            display: block;
+            color: #fff;
+            font-size: 70px;
+            display: none;
         }
-        .extra-activities-item-logo {
-            width: 110px;
-            height: 110px;
-            margin: 0 auto 10px;
+        .game-nav-feedback {
+            position: absolute;
+            top: 80px;
+            left: 0;
+            right: 0;
+            text-align: center;
+            color: #fcee2d;
+            font-size: 20px;
+            display: none;
+        }
+        .game-nav-feedback-animate {
+            animation: fadein 2s ease-out infinite;
+        }
+        @keyframes fadein {
+            0% {
+                opacity: 0;
+            }
+            100% {
+                opacity: 1;
+            }
+        }
+        .game-nav-logo {
+            display: block;
+            width: 128px;
+            height: 128px;
+            margin: 0 auto 0 auto;
             background-size: 100% 100%;
-            display: block;
         }
-        .extra-activities-item-game {
-            color: #2fedc9;
-        }
-        .extra-activities-item-game .extra-activities-item-logo {
-            background-image: url("./img/game_icon.png");
-        }
-        .extra-activities-item-quiz {
+
+        .game-multiple-choice-quiz {
             color: #f7751e;
         }
-        .extra-activities-item-quiz .extra-activities-item-logo {
+        .game-multiple-choice-quiz .game-nav-logo {
             background-image: url("./img/quiz_icon.png");
         }
-        .extra-activities-item-video {
-            color: #93c;
+        .game-short-answer-question {
+            color: #00f8cd;
         }
-        .extra-activities-item-video .extra-activities-item-logo {
+        .game-short-answer-question .game-nav-logo {
+            background-image: url("./img/short_answer_question_icon.png");
+        }
+        .game-poster {
+            color: #f7751e;
+        }
+        .game-poster .game-nav-logo {
+            background-image: url("./img/poster_icon.png");
+        }
+        .game-matching {
+            color: #AF24D1;
+        }
+        .game-matching .game-nav-logo {
+            background-image: url("./img/matching_icon.png");
+        }
+        .game-cost-calculator {
+            color: #FCEE2D;
+        }
+        .game-cost-calculator .game-nav-logo {
+            background-image: url("./img/calculator_icon.png");
+        }
+        .game-standard-drinking-tool {
+            color: #DB1B1B;
+        }
+        .game-standard-drinking-tool .game-nav-logo {
+            background-image: url("./img/standard_drinking_tool_icon.png");
+        }
+        .game-video {
+            color: #AF24D1;
+        }
+        .game-video .game-nav-logo {
             background-image: url("./img/video_icon.png");
         }
-        .extra-activities-item-title {
-            font-size: 20px;
-            display: block;
+        .game-nav-title {
+            font-size: 24px;
         }
-        .extra-activities-item-divider {
+        .game-nav-divider {
             border-top: 2px solid;
-            margin: 10px 0;
-            display: block;
         }
-        .extra-activities-item-desc {
+        .game-nav-desc {
+            width: 340px;
+            margin: 0 auto 0 auto;
             color: #fff;
-            width: 200px;
-            font-size: 18px;
-            font-family: Maitree, serif;
-            margin: 0 auto;
-            display: block;
         }
 
 
@@ -165,79 +259,178 @@
             <div class="extra-activities-tab">
                 <h2 class="extra-activities-tab-title">Select Your week</h2>
                 <div class="extra-activities-tab-list">
-                    <div class="extra-activities-tab-item">1</div>
-                    <div class="extra-activities-tab-item">2</div>
-                    <div class="extra-activities-tab-item">3</div>
-                    <div class="extra-activities-tab-item">4</div>
-                    <div class="extra-activities-tab-item">5</div>
-                    <div class="extra-activities-tab-item">6</div>
-                    <div class="extra-activities-tab-item extra-activities-tab-item-active">7</div>
-                    <div class="extra-activities-tab-item extra-activities-tab-item-disabled">8</div>
-                    <div class="extra-activities-tab-item extra-activities-tab-item-disabled">8</div>
-                    <div class="extra-activities-tab-item extra-activities-tab-item-disabled">8</div>
-                    <div class="extra-activities-tab-item extra-activities-tab-item-disabled">8</div>
-                    <div class="extra-activities-tab-item extra-activities-tab-item-disabled">8</div>
+<?php
+                    for($i = 0; $i < ($studentWeek-1); $i++) { ?>
+                        <div class="extra-activities-tab-item"><?php echo ($i+1) ?></div>
+<?php               } ?>
+                        <div class="extra-activities-tab-item extra-activities-tab-item-active"><?php echo $studentWeek ?></div>
+<?php
+                    for($i = $studentWeek; $i < $maxWeek; $i++) { ?>
+                        <div class="extra-activities-tab-item extra-activities-tab-item-disabled"><?php echo ($i+1) ?></div>
+<?php               } ?>
                 </div>
             </div>
             <div class="extra-activities-tab-content">
-
-                <!-- index=0 -->
+<?php
+        for ($i = 0; $i < $studentWeek; $i++) {
+            if($i == ($studentWeek-1)) { ?>
                 <div class="extra-activities-week-detail extra-activities-week-detail-active mini-row">
-                    <div class="col-6">
-                        <a class="extra-activities-item extra-activities-item-game" href="">
-                            <span class="extra-activities-item-logo"></span>
-                            <span class="extra-activities-item-title">Nutrition</span>
-                            <span class="extra-activities-item-divider"></span>
-                            <span class="extra-activities-item-desc">Information on the types of food we eat</span>
-                        </a>
-                    </div>
-                    <div class="col-6">
-                        <a class="extra-activities-item extra-activities-item-quiz" href="">
-                            <span class="extra-activities-item-logo"></span>
-                            <span class="extra-activities-item-title">Nutrition</span>
-                            <span class="extra-activities-item-divider"></span>
-                            <span class="extra-activities-item-desc">Information on the types of food we eat</span>
-                        </a>
-                    </div>
-                    <div class="col-6">
-                        <a class="extra-activities-item extra-activities-item-video" href="">
-                            <span class="extra-activities-item-logo"></span>
-                            <span class="extra-activities-item-title">Nutrition</span>
-                            <span class="extra-activities-item-divider"></span>
-                            <span class="extra-activities-item-desc">Information on the types of food we eat</span>
-                        </a>
-                    </div>
-                </div>
-
-
-                <!-- index=1 -->
+<?php       } else { ?>
                 <div class="extra-activities-week-detail mini-row">
-                    <div class="col-6">
-                        <a class="extra-activities-item extra-activities-item-nutrition" herf="">
-                            <span class="extra-activities-item-logo"></span>
-                            <span class="extra-activities-item-title">Nutrition</span>
-                            <span class="extra-activities-item-divider"></span>
-                            <span class="extra-activities-item-desc">Information on the types of food we eat</span>
-                        </a>
-                    </div>
-                    <div class="col-6">
-                        <a class="extra-activities-item extra-activities-item-nutrition" href="">
-                            <span class="extra-activities-item-logo"></span>
-                            <span class="extra-activities-item-title">Nutrition</span>
-                            <span class="extra-activities-item-divider"></span>
-                            <span class="extra-activities-item-desc">Information on the types of food we eat</span>
-                        </a>
-                    </div>
+<?php       }
 
-                </div>
-
+            for ($j = 0; $j < count($extraActivities[$i]); $j++) { ?>
+                    <div class="col-6">
+<?php
+                //list of question type
+                switch($extraActivities[$i][$j]['QuizType']){
+                    case "MCQ":
+                        if(isset($extraActivities[$i][$j]['Status'])) { ?>
+                        <a href="game-home.php">
+                            <div class="game-nav-item game-nav-item-completed game-multiple-choice-quiz" >
+<?php               } else { ?>
+                        <a href="pre-task-material.php?quiz_id=<?php echo $extraActivities[$i][$j]['QuizID']?>">
+                            <div class="game-nav-item game-multiple-choice-quiz">
+<?php               } ?>
+                                <div class="game-nav-logo"></div>
+                                <div class="game-nav-title">Multiple Choice Question</div>
+                                <div class="game-nav-divider"></div>
+                                <div class="game-nav-desc">Complete Multiple Choice Question on <?php echo $extraActivities[$i][$j]['TopicName']?> to receive <?php echo $extraActivities[$i][$j]['Points']?> points.</div>
+<?php                   if(isset($extraActivities[$i][$j]['Status'])) { ?>
+                                <div class="game-nav-status">Completed</div>
+<?php                   } ?>
+                            </div>
+                        </a>
+<?php                   break;
+                    case "SAQ":
+                        if(isset($extraActivities[$i][$j]['Status'])) { ?>
+                        <a href="game-home.php">
+<?php                       if($extraActivities[$i][$j]['Status'] == "UNGRADED" || $extraActivities[$i][$j]['Status'] == "GRADED"){ ?>
+                            <div class="game-nav-item game-nav-item-completed game-short-answer-question">
+<?php                       } else { ?>
+                            <div class="game-nav-item game-short-answer-question">
+<?php                       }
+                        } else { ?>
+                        <a href="pre-task-material.php?quiz_id=<?php echo $extraActivities[$i][$j]['QuizID']?>">
+                            <div class="game-nav-item game-short-answer-question">
+<?php                   } ?>
+                                <div class="game-nav-logo"></div>
+                                <div class="game-nav-title">Short Answer Question</div>
+                                <div class="game-nav-divider"></div>
+                                <div class="game-nav-desc">Complete Short Answer Question on <?php echo $extraActivities[$i][$j]['TopicName']?> to receive <?php echo $extraActivities[$i][$j]['Points']?> points.</div>
+<?php                   if($extraActivities[$i][$j]['Status'] == "UNGRADED") { ?>
+                                <div class="game-nav-status">Completed</div>
+<?php                   } else if($extraActivities[$i][$j]['Status'] == "GRADED") {?>
+                                <div class="game-nav-status">Completed</div>
+                                <div class="game-nav-feedback game-nav-feedback-animate">Teacher's Feedback Available</div>
+<?php                   } ?>
+                            </div>
+                        </a>
+<?php                   break;
+                    case "Matching":
+                        if(isset($extraActivities[$i][$j]['Status'])) { ?>
+                        <a href="game-home.php">
+                            <div class="game-nav-item game-nav-item-completed game-matching">
+<?php                   } else { ?>
+                        <a href="pre-task-material.php?quiz_id=<?php echo $extraActivities[$i][$j]['QuizID']?>">
+                            <div class="game-nav-item game-matching">
+<?php                   } ?>
+                                <div class="game-nav-logo"></div>
+                                <div class="game-nav-title">Matching</div>
+                                <div class="game-nav-divider"></div>
+                                <div class="game-nav-desc">Complete Matching on <?php echo $extraActivities[$i][$j]['TopicName']?> to receive <?php echo $extraActivities[$i][$j]['Points']?> points.</div>
+<?php                   if(isset($extraActivities[$i][$j]['Status'])) { ?>
+                                <div class="game-nav-status">Completed</div>
+<?php                   } ?>
+                            </div>
+                        </a>
+<?php                   break;
+                    case "Poster":
+                        if(isset($extraActivities[$i][$j]['Status'])) { ?>
+                        <a href="poster.php?quiz_id=<?php echo $extraActivities[$i][$j]['QuizID']?>">
+<?php                       if($extraActivities[$i][$j]['Status'] == "UNGRADED" || $extraActivities[$i][$j]['Status'] == "GRADED"){ ?>
+                            <div class="game-nav-item game-nav-item-completed game-poster">
+<?php                       } else { ?>
+                            <div class="game-nav-item game-poster">
+<?php                       }
+                        } else { ?>
+                        <a href="pre-task-material.php?quiz_id=<?php echo $extraActivities[$i][$j]['QuizID']?>">
+                            <div class="game-nav-item game-poster">
+<?php                       } ?>
+                                <div class="game-nav-logo"></div>
+                                <div class="game-nav-title">Poster</div>
+                                <div class="game-nav-divider"></div>
+                                <div class="game-nav-desc">Complete Poster on <?php echo $extraActivities[$i][$j]['TopicName']?> to receive <?php echo $extraActivities[$i][$j]['Points']?> points.</div>
+<?php                   if($extraActivities[$i][$j]['Status'] == "UNGRADED" || $extraActivities[$i][$j]['Status'] == "GRADED") { ?>
+                                <div class="game-nav-status">Completed</div>
+<?php                   } ?>
+                            </div>
+                        </a>
+<?php                   break;
+                    case "Calculator":
+                        if(isset($extraActivities[$i][$j]['Status'])) { ?>
+                        <a href="cost-calculator.php?quiz_id=<?php echo $extraActivities[$i][$j]['QuizID']?>">
+                            <div class="game-nav-item game-nav-item-completed game-cost-calculator">
+<?php                   } else { ?>
+                        <a href="pre-task-material.php?quiz_id=<?php echo $extraActivities[$i][$j]['QuizID']?>">
+                            <div class="game-nav-item game-cost-calculator">
+<?php                   } ?>
+                                <div class="game-nav-logo"></div>
+                                <div class="game-nav-title">Cost Calculator</div>
+                                <div class="game-nav-divider"></div>
+                                <div class="game-nav-desc">Complete Cost Calculator on <?php echo $extraActivities[$i][$j]['TopicName']?> to receive <?php echo $extraActivities[$i][$j]['Points']?> points.</div>
+<?php                   if(isset($extraActivities[$i][$j]['Status'])) { ?>
+                                <div class="game-nav-status">Completed</div>
+<?php                   } ?>
+                            </div>
+                        </a>
+<?php                   break;
+                    case "DrinkingTool":
+                        if(isset($extraActivities[$i][$j]['Status'])) { ?>
+                        <a href="standard-drinking-tool.php?quiz_id=<?php echo $extraActivities[$i][$j]['QuizID']?>">
+                            <div class="game-nav-item game-nav-item-completed game-standard-drinking-tool">
+<?php                   } else { ?>
+                        <a href="pre-task-material.php?quiz_id=<?php echo $extraActivities[$i][$j]['QuizID']?>">
+                            <div class="game-nav-item game-standard-drinking-tool">
+<?php                   } ?>
+                                <div class="game-nav-logo"></div>
+                                <div class="game-nav-title">Standard Drinking Tool</div>
+                                <div class="game-nav-divider"></div>
+                                <div class="game-nav-desc">Complete Standard Drinking Tool on <?php echo $extraActivities[$i][$j]['TopicName']?> to receive <?php echo $extraActivities[$i][$j]['Points']?> points.</div>
+<?php                   if(isset($extraActivities[$i][$j]['Status'])) { ?>
+                                <div class="game-nav-status">Completed</div>
+<?php                   } ?>
+                            </div>
+                        </a>
+<?php                   break;
+                    case "Video":
+                        if(isset($extraActivities[$i][$j]['Status'])) { ?>
+                        <a href="standard-drinking-tool.php?quiz_id=<?php echo $extraActivities[$i][$j]['QuizID']?>">
+                            <div class="game-nav-item game-nav-item-completed game-video">
+<?php                   } else { ?>
+                        <a href="pre-task-material.php?quiz_id=<?php echo $extraActivities[$i][$j]['QuizID']?>">
+                            <div class="game-nav-item game-video">
+<?php                   } ?>
+                                <div class="game-nav-logo"></div>
+                                <div class="game-nav-title">Video</div>
+                                <div class="game-nav-divider"></div>
+                                <div class="game-nav-desc">Complete Standard Drinking Tool on <?php echo $extraActivities[$i][$j]['TopicName']?> to receive <?php echo $extraActivities[$i][$j]['Points']?> points.</div>
+<?php                    if($extraActivities[$i][$j]['Status'] == "UNGRADED") { ?>
+                                <div class="game-nav-status">Completed</div>
+<?php                    } else if($extraActivities[$i][$j]['Status'] == "GRADED") {?>
+                                <div class="game-nav-status">Completed</div>
+                                <div class="game-nav-feedback game-nav-feedback-animate">Teacher's Feedback Available</div>
+<?php                    } ?>
+                            </div>
+                        </a>
+<?php                   break;
+    
+            } ?>
+                    </div>
+<?php    } ?>
             </div>
-
-
-
-
-
-
+<?php } ?>
+            </div>
         </div>
     </div>
 
@@ -360,10 +553,7 @@
             this.$materialItems.removeClass('material-item-active')
         }
     }
-    // MaterialCtrl.init()
 
-
-    snap.enableBackTop()
 </script>
 </body>
 </html>
