@@ -236,7 +236,7 @@
             <?php for($i=0; $i<count($saqResult); $i++) {
                 $currentsaqID = $saqResult[$i] -> SAQID;
                 if($currentsaqID != $lastsaqID){?>
-                <div class="myques <?php if($questionIndex != 1){echo "hidden";} ?> " id="panel<?php echo $questionIndex;?>">
+                <div class="myques <?php if($questionIndex != 1){echo "hidden";} ?> col-md-9" id="panel<?php echo $questionIndex;?>">
                     <!--heading-->
                     <div class="panel-heading" style="font-size: xx-large; font-weight: 600; color:black; height:35%; min-height: 35%; max-height: 35%; text-align:center;">
                         <div class="ques" >                        

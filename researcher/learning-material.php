@@ -5,7 +5,7 @@
     </div>
     <!-- /.panel-heading -->
     <div class="panel-body">
-        <?php echo htmlspecialchars_decode($materialRes->Content); ?>
+        <?php echo $materialRes->Content ?>
     </div>
     <!-- /.panel-body -->
 </div>

@@ -6,7 +6,12 @@ require_once("../debug.php");
 // turn on the generator here
 generatePosterRecordInFile();
 
-
+try {
+    $conn = db_connect();
+    //deletePosterSubmissions($conn, 9);
+} catch (Exception $e) {
+    debug_err($e);
+}
 
 function generatePosterRecordInFile()
 {
@@ -23,8 +28,9 @@ function generatePosterRecordInFile()
             $status = "UNGRADED";
 
             $conn->beginTransaction();
-            updatePosterSubmission($conn, $quizID, $studentID, $defaultZwibblerDoc, $imageUrl);
+
             updateQuizRecord($conn, $quizID, $studentID, $status);
+            updatePosterSubmission($conn, $quizID, $studentID, $defaultZwibblerDoc, $imageUrl);
 
             $conn->commit();
             echo "[SUCCESS]";

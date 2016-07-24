@@ -642,8 +642,8 @@ function deleteVerboseFact(PDO $conn, $verboseFactID)
 function getVerboseFactsByTopic(PDO $conn, $topicID)
 {
     $factSql = "SELECT * FROM Topic 
-                LEFT JOIN Verbose_Fact 
-                USING (TopicID) WHERE TopicID = ? ";
+                NATURAL JOIN Verbose_Fact 
+                WHERE TopicID = ? ";
     $factQuery = $conn->prepare($factSql);
     $factQuery->execute(array($topicID));
     $factResult = $factQuery->fetchAll(PDO::FETCH_OBJ);
@@ -1208,7 +1208,7 @@ function updateLearningMaterial(PDO $conn, $quizID, $content)
             SET Content = ?, Excluded = ?
             WHERE QuizID = ?";
     $updateSql = $conn->prepare($updateSql);
-    $updateSql->execute(array(htmlspecialchars($content), $excluded, $quizID));
+    $updateSql->execute(array($content, $excluded, $quizID));
 }
 
 function getLearningMaterial(PDO $conn, $quizID)
@@ -1375,6 +1375,20 @@ function updatePosterSubmission(PDO $conn, $quizID, $studentID, $zwibblerDoc, $i
     $posterRecordSubmittedQuery->execute(array($quizID, $studentID, $zwibblerDoc, $imageUrl, $zwibblerDoc, $imageUrl));
 }
 
+function deletePosterSubmission(PDO $conn, $quizID, $studentID)
+{
+    $updateSql = "DELETE FROM quiz_record WHERE QuizID = ? AND StudentID = ?";
+    $updateSql = $conn->prepare($updateSql);
+    $updateSql->execute(array($quizID, $studentID));
+}
+
+function deletePosterSubmissions(PDO $conn, $quizID)
+{
+    $updateSql = "DELETE FROM quiz_record WHERE QuizID = ?";
+    $updateSql = $conn->prepare($updateSql);
+    $updateSql->execute(array($quizID));
+}
+
 // getPosterRecord for both draft and submission
 function getPosterRecord(PDO $conn, $quizID, $studentID)
 {
@@ -1426,6 +1440,15 @@ function getPosterQuizzes(PDO $conn)
     return getRecords($conn, "Poster_Section", array("Quiz", "Topic"));
 }
 
+function getPosterSubmissions(PDO $conn)
+{
+    $tableSql = "SELECT * , COUNT(*) AS SubmissionNum FROM poster_section NATURAL JOIN quiz NATURAL JOIN topic NATURAL JOIN quiz_record";
+    $tableQuery = $conn->prepare($tableSql);
+    $tableQuery->execute();
+    $tableResult = $tableQuery->fetchAll(PDO::FETCH_OBJ);
+    return $tableResult;
+}
+
 /* Poster */
 
 
@@ -1439,7 +1462,7 @@ function updateSAQQuestionRecord(PDO $conn, $saqID, $studentID, $answer)
 }
 
 
-function updateSAQSubmissionGrading(PDO $conn, $quizID, $saqID, $studentID, $feedback, $grading, $pageName)
+function updateSAQSubmissionGrading(PDO $conn, $quizID, $saqID, $studentID, $feedback, $grading)
 {
     if (count($saqID) == count($grading) && count($saqID) == count($feedback)) {
         try {
@@ -1450,7 +1473,7 @@ function updateSAQSubmissionGrading(PDO $conn, $quizID, $saqID, $studentID, $fee
             updateQuizRecord($conn, $quizID, $studentID, "GRADED");
             $conn->commit();
         } catch (Exception $e) {
-            debug_err($pageName, $e);
+            debug_err($e);
             $conn->rollBack();
         }
     } else
@@ -1488,7 +1511,7 @@ function getSAQRecords(PDO $conn, $quizID, $studentID)
 }
 
 
-function updateSAQDraft(PDO $conn, $quizID, $saqID, $studentID, $answer, $pageName)
+function updateSAQDraft(PDO $conn, $quizID, $saqID, $studentID, $answer)
 {
     if (count($saqID) == count($answer)) {
         try {
@@ -1499,7 +1522,7 @@ function updateSAQDraft(PDO $conn, $quizID, $saqID, $studentID, $answer, $pageNa
             updateQuizRecord($conn, $quizID, $studentID, "UNSUBMITTED");
             $conn->commit();
         } catch (Exception $e) {
-            debug_err($pageName, $e);
+            debug_err($e);
             $conn->rollBack();
         }
     } else
@@ -1507,7 +1530,7 @@ function updateSAQDraft(PDO $conn, $quizID, $saqID, $studentID, $answer, $pageNa
 
 }
 
-function updateSAQSubmission(PDO $conn, $quizID, $saqID, $studentID, $answer, $pageName)
+function updateSAQSubmission(PDO $conn, $quizID, $saqID, $studentID, $answer)
 {
     try {
         $conn->beginTransaction();
@@ -1518,12 +1541,12 @@ function updateSAQSubmission(PDO $conn, $quizID, $saqID, $studentID, $answer, $p
         updateQuizRecord($conn, $quizID, $studentID, "UNGRADED");
         $conn->commit();
     } catch (Exception $e) {
-        debug_err($pageName, $e);
+        debug_err($e);
         $conn->rollBack();
     }
 }
 
-function deleteSAQSubmission(PDO $conn, $quizID, $studentID, $pageName)
+function deleteSAQSubmission(PDO $conn, $quizID, $studentID)
 {
     try {
         $conn->beginTransaction();
@@ -1536,7 +1559,7 @@ function deleteSAQSubmission(PDO $conn, $quizID, $studentID, $pageName)
         }
         $conn->commit();
     } catch (Exception $e) {
-        debug_err($pageName, $e);
+        debug_err($e);
         $conn->rollBack();
     }
 

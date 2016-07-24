@@ -13,12 +13,12 @@ try {
             if ($update == -1) {
                 $quizID = $_POST['quizID'];
                 $studentID = $_POST['studentID'];
-                deleteSAQSubmission($conn, $quizID, $studentID, $pageName);
+                deleteSAQSubmission($conn, $quizID, $studentID);
             }
         }
     }
 } catch (Exception $e) {
-    debug_err($pageName, $e);
+    debug_err($e);
 }
 
 try {
@@ -30,7 +30,7 @@ try {
         $submissionResult = getImageSubmissions($conn);
     }
 } catch (Exception $e) {
-    debug_err($pageName, $e);
+    debug_err($e);
 }
 db_close($conn);
 

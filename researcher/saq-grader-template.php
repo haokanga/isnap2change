@@ -19,14 +19,14 @@ try {
                 $saqID = $_POST['saqID'];
                 $feedback = $_POST['feedback'];
                 $grading = $_POST['grading'];
-                updateSAQSubmissionGrading($conn, $quizID, $saqID, $studentID, $feedback, $grading, $pageName);
+                updateSAQSubmissionGrading($conn, $quizID, $saqID, $studentID, $feedback, $grading);
                 $parentPage = 'Location: ' . strtolower(getQuizType($conn, $quizID)) . '-grading.php';
                 header($parentPage);
             }
         }
     }
 } catch (Exception $e) {
-    debug_err($pageName, $e);
+    debug_err($e);
 }
 
 try {
@@ -34,7 +34,7 @@ try {
     $materialRes = getLearningMaterial($conn, $quizID);
     $phpSelf = $pageName . '.php?quizID=' . $quizID . '&studentID=' . $studentID;
 } catch (Exception $e) {
-    debug_err($pageName, $e);
+    debug_err($e);
 }
 
 db_close($conn);

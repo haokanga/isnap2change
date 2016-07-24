@@ -44,6 +44,11 @@ body
     background-color: gainsboro !important;
 }
 
+.btn-block
+{
+    white-space: normal !important ;
+}
+
 .options>.btn:hover
 {
    background-color: lightgrey !important;

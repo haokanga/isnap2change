@@ -26,7 +26,7 @@ try {
 
                     $conn->commit();
                 } catch (Exception $e) {
-                    debug_err($pageName, $e);
+                    debug_err($e);
                     $conn->rollBack();
                 }
             } else if ($metadataUpdate == -1) {
@@ -49,7 +49,7 @@ try {
         }
     }
 } catch (Exception $e) {
-    debug_err($pageName, $e);
+    debug_err($e);
 }
 
 try {
@@ -62,7 +62,7 @@ try {
         $phpSelf = $pageName . '.php?quizID=' . $quizID;
     }
 } catch (Exception $e) {
-    debug_err($pageName, $e);
+    debug_err($e);
 }
 
 db_close($conn);
@@ -83,7 +83,11 @@ db_close($conn);
     <div id="page-wrapper">
         <div class="row">
             <div class="col-lg-12">
-                <h1 class="page-header">Multiple Choice Quiz Editor</h1>
+                <h1 class="page-header">Multiple Choice Quiz Editor
+                    <button type="button" class="btn btn-lg btn-info pull-right"
+                            onclick="location.href='<?php echo "mcq.php" ?>'">GO BACK
+                    </button>
+                </h1>
             </div>
             <!-- /.col-lg-12 -->
         </div>

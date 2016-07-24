@@ -3,35 +3,17 @@ session_start();
 require_once("../mysql-lib.php");
 require_once("../debug.php");
 require_once("researcher-lib.php");
-$columnName = array('QuizID', 'Week', 'TopicName', 'Points', 'Questionnaire', 'Questions');
+$columnName = array('QuizID', 'Week', 'TopicName', 'Points', 'SubmissionNum', 'Edit');
 
+$conn = null;
 try {
     $conn = db_connect();
     if ($_SERVER["REQUEST_METHOD"] == "POST") {
         if (isset($_POST['update'])) {
             $update = $_POST['update'];
-            if ($update == 1) {
-                try {
-                    $week = $_POST['week'];
-                    $quizType = 'MCQ';
-                    $topicName = $_POST['topicName'];
-                    $points = $_POST['points'];
-                    $questionnaire = $_POST['questionnaire'];
-                    $conn->beginTransaction();
-
-                    $topicID = getTopicByName($conn, $topicName)->TopicID;
-                    $quizID = createQuiz($conn, $topicID, $quizType, $week);
-                    createMCQSection($conn, $quizID, $points, $questionnaire);
-                    createEmptyLearningMaterial($conn, $quizID);
-
-                    $conn->commit();
-                } catch (Exception $e) {
-                    debug_err($e);
-                    $conn->rollBack();
-                }
-            } else if ($update == -1) {
+            if ($update == -1) {
                 $quizID = $_POST['quizID'];
-                deleteQuiz($conn, $quizID);
+                deletePosterSubmissions($conn, $quizID);
             }
         }
     }
@@ -40,7 +22,7 @@ try {
 }
 
 try {
-    $quizResult = getMCQQuizzes($conn);
+    $quizResult = getPosterSubmissions($conn);
     $topicResult = getTopics($conn);
 } catch (Exception $e) {
     debug_err($e);
@@ -59,7 +41,6 @@ db_close($conn);
 <div id="wrapper">
     <!-- Navigation Layout-->
     <?php require_once('navigation.php'); ?>
-
     <div id="page-wrapper">
         <div class="row">
             <div class="col-lg-12">
@@ -72,9 +53,7 @@ db_close($conn);
             <div class="col-lg-12">
                 <div class="panel panel-default">
                     <div class="panel-heading">
-                        <?php echo $pageNameForView; ?> Information Table <span
-                            class="glyphicon glyphicon-plus pull-right"
-                            data-toggle="modal" data-target="#dialog"></span>
+                        <?php echo $pageNameForView; ?> Information Table
                     </div>
                     <!-- /.panel-heading -->
                     <div class="panel-body">
@@ -93,20 +72,16 @@ db_close($conn);
                                                 echo 'style="display:none"';
                                             } ?>>
                                                 <?php
-                                                // Questionnaire: if 1, true; else if 0, false
-                                                if ($j == count($columnName) - 2) {
-                                                    echo $quizResult[$i]->$columnName[$j] ? 'True' : 'False';
-                                                } else {
+                                                if ($j != count($columnName) - 1)
                                                     echo $quizResult[$i]->$columnName[$j];
-                                                }
-                                                ?>
-                                                <?php if ($j == count($columnName) - 1) { ?>
+                                                else { ?>
                                                     <span class="glyphicon glyphicon-remove pull-right"
                                                           aria-hidden="true"></span>
                                                     <span class="pull-right" aria-hidden="true">&nbsp;</span>
-                                                    <a href="mcq-editor.php?quizID=<?php echo $quizResult[$i]->QuizID ?>">
-                                                        <span class="glyphicon glyphicon-edit pull-right"
-                                                              aria-hidden="true"></span></a>
+                                                    <a href="poster-grader.php?quizID=<?php echo $quizResult[$i]->QuizID ?>">
+                                                    <span class="glyphicon glyphicon-edit pull-right"
+                                                          aria-hidden="true"></span>
+                                                    </a>
                                                 <?php } ?>
                                             </td>
                                         <?php } ?>
@@ -159,13 +134,6 @@ db_close($conn);
                         <?php } ?>
                     </select>
                     <br>
-                    <label for="Points">Points</label>
-                    <input type="text" class="form-control dialoginput" id="Points" name="points"
-                           placeholder="Input Points" required>
-                    <br>
-                    <label for="Questionnaire">Questionnaire</label>
-                    <input type="hidden" class="form-control" id="Questionnaire" name="questionnaire" value="0">
-                    <input type="checkbox" class="form-control" id="Questionnaire" name="questionnaire" value="1">
                 </form>
             </div>
             <div class="modal-footer">
@@ -182,7 +150,7 @@ db_close($conn);
     //DO NOT put them in $(document).ready() since the table has multi pages
     var dialogInputArr = $('.dialoginput');
     $('.glyphicon-plus').on('click', function () {
-		$("label").remove(".error");
+        $("label").remove(".error");
         $('#dialogTitle').text("Add <?php echo $pageNameForView; ?>");
         $('#update').val(1);
         for (i = 0; i < dialogInputArr.length; i++) {
@@ -204,16 +172,11 @@ db_close($conn);
                 week: {
                     required: true,
                     digits: true
-                },
-                points: {
-                    required: true,
-                    digits: true
                 }
             }
         });
         $('#submission').submit();
     });
-
     $(document).ready(function () {
         var table = $('#datatables').DataTable({
             responsive: true,

@@ -51,7 +51,7 @@
 			db_close($conn);
 		}
 
-		debug_err($pageName, $e);
+		debug_err($e);
 		//to do: handle sql error
 		//...
 		exit;
@@ -360,7 +360,7 @@
                             </button>
 						</li>
                     
-					
+				<!-- please add the for-loop logic here based on images -->
 			<?php 
 					for($i=0; $i<$quesNum; $i++) { ?>
 						
@@ -389,7 +389,7 @@
                     <div class="footer" style="display:flex;justify-content:center;align-items:center;width:100%;height:20%; margin-top: 4%;">              
                         <img src="img/start_icon.png" style="height: 36px; width: 36px;">               
                    </div> 
-                </div>
+         </div>
         
 
 		<?php for($i=0; $i<count($mcqRes); $i++) {
@@ -465,7 +465,23 @@
 							</div>
 							<br>
 							<div class="nav-options" style="text-align: center;">
-								<a class="btn btn-default last" role="button" style="padding-top:8px; padding-bottom: 10px;"><span class="glyphicon glyphicon-chevron-left"></span></a>
+								<a class="btn btn-default last" role="button" style="padding-top:8px; padding-bottom: 10px;border: none;
+                            background: none; cursor: pointer;""><img src="img/direction_icon.png" style="width:32px; height: 32px;"></a>
+                            <br>
+                            <?php
+						if($status == "GRADED"){ ?>
+						<form id="goBack" method=post action=weekly-task.php>
+							 <button type="button" style="border-radius: 0px !important; color: white !important; border-color: white; background-color: rgb(0,0,0) !important;" onclick="return goBack()" class="btn btn-default btn-lg">GO BACK</button>
+						</form>
+				<?php	}
+					
+						if($status == "UNANSWERED"){ ?>
+						<form id="goBack" method=post action=weekly-task.php>
+							<button id="back-btn" type="button" style="border-radius: 0px !important; color: white !important; border-color: white; background-color: rgb(0,0,0) !important;" onclick="return submitQuiz(<?php echo $quizID; ?>, <?php echo $studentID; ?>);" class="btn btn-default btn-lg">SUBMIT</button>
+
+						</form>
+				<?php	} ?>
+                           
 							</div>
 						</div>
 					</div>
@@ -496,6 +512,8 @@
 		<?php	}
 			  }
 		} ?>
+
+
             
 			  
             <input type="hidden" id="hiddenIndex" value="1">
@@ -509,7 +527,9 @@
 
 			</form>
 		</div>
+		
         </div>
+
     </body>
 </html>
 

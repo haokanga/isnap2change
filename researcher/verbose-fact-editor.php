@@ -27,7 +27,7 @@ try {
         }
     }
 } catch (Exception $e) {
-    debug_err($pageName, $e);
+    debug_err($e);
 }
 
 try {
@@ -38,7 +38,7 @@ try {
         $phpSelf = $pageName . '.php?topicID=' . $topicID;
     }
 } catch (Exception $e) {
-    debug_err($pageName, $e);
+    debug_err($e);
 }
 
 db_close($conn);
@@ -206,7 +206,7 @@ db_close($conn);
     //DO NOT put them in $(document).ready() since the table has multi pages
     var dialogInputArr = $('.dialoginput');
     $('.glyphicon-plus').on('click', function () {
-		$("label").remove(".error");
+        $("label").remove(".error");
         $('#dialogTitle').text("Add Verbose Fact");
         $('#update').val(1);
         for (i = 0; i < dialogInputArr.length - 1; i++) {

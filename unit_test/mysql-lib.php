@@ -94,7 +94,7 @@ try{
 
     $conn->commit();
 } catch(Exception $e) {
-    debug_err($pageName, $e);
+    debug_err($e);
     $conn->rollBack();
 }
 echo 'getStudentScore(\$conn, 1) '.getStudentScore($conn, 1).'<br>';
