@@ -52,7 +52,7 @@
          * main.html
          **/
         .main-content {
-            padding: 30px 0 0 0;
+            padding: 60px 0 0 0;
             max-width: 1000px;
             margin: 0 auto;
         }
@@ -60,7 +60,7 @@
             display: block;
             width: 100%;
             text-align: center;
-            margin-bottom: 10px;
+            margin-bottom: 20px;
             font-size: 20px;
         }
         .operation-game {
@@ -78,6 +78,8 @@
         .operation-logo {
             width: 128px;
             height: 128px;
+            display: block;
+            margin: 0 auto;
         }
         .achievement-score {
             font-size: 45px;
@@ -280,7 +282,7 @@
         </div>
         <div class="main-content">
             <div class="mini-row">
-                <div class="col-4">
+                <div class="col-6">
                     <div class="mini-row">
                         <div class="col-6">
                             <a href="#" class="operation-item operation-game">
@@ -308,7 +310,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="col-8">
+                <div class="col-6">
                     <h2 class="achievement-score">Total Score:
                         <span class="count"><?php echo $studentScore?></span>
                     </h2>

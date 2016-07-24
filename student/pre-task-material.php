@@ -73,27 +73,43 @@
             text-align: center;
             font-size: 24px;
             max-width: 700px;
-            margin: 20px auto;
+            margin: 50px auto;
         }
-        .material-content {
-            background-color: #dedfdf;
+        .material-content-included {
             padding: 14px 120px;
+            background-color: #dedfdf;
             border-radius: 10px;
             color: #000;
-            font-family: Maitree, serif;
-            font-size: 18px;
             min-height: 350px;
         }
-        .material-content p {
+        .material-content-included p {
             margin: 0 0 30px 0;
+        }
+        .material-content-excluded {
+            padding: 14px 190px;
+            text-align: center;
         }
         .material-start {
             display: block;
-            width: 64px;
-            height: 24px;
-            background-size: 100% 100%;
+            width: 60px;
+            text-align: center;
             margin: 20px auto;
-            background-image: url("./img/start_icon_1.png");
+            color: #fcec1b;
+            background-color: transparent;
+            cursor: pointer;
+            font-size: 20px;
+            border: 0;
+        }
+        .material-start-icon {
+            display: block;
+            width: 60px;
+            height: 60px;
+            background-size: 100% 100%;
+            background-image: url("./img/start_flag_icon.png");
+            margin-bottom: 10px;
+        }
+        .task-operation {
+            right: 350px;
         }
     </style>
 </head>
@@ -119,37 +135,70 @@
     <div class="content-wrapper">
         <div class="material">
             <h2 class="material-title">Read the follow information about <?php echo strtolower($materialRes->TopicName) ?> then finish the task provided.</h2>
-            <div class="material-content">
+<?php   if ($materialRes->Excluded == 0 || $quizType == "Questionnaire") { ?>
+            <div class="material-content-included p1">
                 <?php echo $materialRes->Content; ?>
             </div>
-        <?php
+<?php   } else { ?>
+            <div class="material-content-excluded h1">
+                <p>There is no reading material for this task. Please press Start to begin the task.</p>
+            </div>
+<?php   } ?>
+
+<?php
             switch ($quizType) {
                 case "MCQ": ?>
-                    <a href="" class="material-start"></a>
-         <?php      break;
+                    <a href="" class="material-start">
+                        <span class="material-start-icon"></span>
+                        Start
+                    </a>
+<?php               break;
                 case "SAQ": ?>
-                    <a href="" class="material-start"></a>
+                    <a href="short-answer-question.php?quiz_id=<?php echo $quizID?>" class="material-start">
+                        <span class="material-start-icon"></span>
+                        Start
+                    </a>
          <?php      break;
                 case "Matching": ?>
-                    <a href="" class="material-start"></a>
+                    <a href="" class="material-start">
+                        <span class="material-start-icon"></span>
+                        Start
+                    </a>
          <?php      break;
                 case "Poster": ?>
-                    <a href="poster.php?quiz_id=<?php echo $quizID?>" class="material-start"></a>
+                    <a href="poster.php?quiz_id=<?php echo $quizID?>" class="material-start">
+                        <span class="material-start-icon"></span>
+                        Start
+                    </a>
          <?php      break;
                 case "Calculator": ?>
-                    <a href="cost-calculator.php?quiz_id=<?php echo $quizID?>" class="material-start"></a>
+                    <a href="cost-calculator.php?quiz_id=<?php echo $quizID?>" class="material-start">
+                        <span class="material-start-icon"></span>
+                        Start
+                    </a>
         <?php       break;
                 case "DrinkingTool": ?>
-                    <a href="standard-drinking-tool.php?quiz_id=<?php echo $quizID?>" class="material-start"></a>
+                    <a href="standard-drinking-tool.php?quiz_id=<?php echo $quizID?>" class="material-start">
+                        <span class="material-start-icon"></span>
+                        Start
+                    </a>
         <?php       break;
+                case "Video": ?>
+                    <a href="video.php?quiz_id=<?php echo $quizID?>" class="material-start">
+                        <span class="material-start-icon"></span>
+                        Start
+                    </a>
+        <?php       break;
+
             }  ?>
         </div>
     </div>
 
-    <a href="weekly-task.php?week=<?php echo $week?>" class="cancel-task">
-        <span class="cancel-icon"></span>
-        <span class="cancel-label">Cancel Task</span>
-    </a>
+    <ul class="task-operation">
+        <li class="cancel-task">
+            <a href="weekly-task.php?week=<?php echo $week?>" title="Cancel Task"></a>
+        </li>
+    </ul>
 
 
     <div class="footer-wrapper">

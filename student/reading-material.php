@@ -303,38 +303,68 @@
         <?php       switch ($materialTopics[$i][$j]->TopicName) {
                         case "Smoking": ?>
                             <div class="reading-item reading-item-smoking" data-target=".material-<?php echo $materialTopics[$i][$j]->QuizID?>">
+                                <div class="reading-item-logo"></div>
+                                <div class="reading-item-title"><?php echo $materialTopics[$i][$j]->TopicName ?></div>
+                                <div class="reading-item-divider"></div>
+                                <div class="reading-item-desc">Information on the types of food we eat</div>
+                            </div>
                     <?php
                             break;
                         case "Nutrition": ?>
                             <div class="reading-item reading-item-nutrition" data-target=".material-<?php echo $materialTopics[$i][$j]->QuizID?>">
+                                <div class="reading-item-logo"></div>
+                                <div class="reading-item-title"><?php echo $materialTopics[$i][$j]->TopicName ?></div>
+                                <div class="reading-item-divider"></div>
+                                <div class="reading-item-desc">Information on the types of food we eat</div>
+                            </div>
                     <?php
                             break;
                         case "Alcohol": ?>
                             <div class="reading-item reading-item-alcohol" data-target=".material-<?php echo $materialTopics[$i][$j]->QuizID?>">
+                                <div class="reading-item-logo"></div>
+                                <div class="reading-item-title"><?php echo $materialTopics[$i][$j]->TopicName ?></div>
+                                <div class="reading-item-divider"></div>
+                                <div class="reading-item-desc">Information on the types of food we eat</div>
+                            </div>
                     <?php
                             break;
                         case "Physical Activity": ?>
                             <div class="reading-item reading-item-physical-activity" data-target=".material-<?php echo $materialTopics[$i][$j]->QuizID?>">
+                                <div class="reading-item-logo"></div>
+                                <div class="reading-item-title"><?php echo $materialTopics[$i][$j]->TopicName ?></div>
+                                <div class="reading-item-divider"></div>
+                                <div class="reading-item-desc">Information on the types of food we eat</div>
+                            </div>
                     <?php
                             break;
                         case "Drugs": ?>
                             <div class="reading-item reading-item-drugs" data-target=".material-<?php echo $materialTopics[$i][$j]->QuizID?>">
+                                <div class="reading-item-logo"></div>
+                                <div class="reading-item-title"><?php echo $materialTopics[$i][$j]->TopicName ?></div>
+                                <div class="reading-item-divider"></div>
+                                <div class="reading-item-desc">Information on the types of food we eat</div>
+                            </div>
                     <?php
                             break;
                         case "Sexual Health": ?>
                             <div class="reading-item reading-item-sexual-health" data-target=".material-<?php echo $materialTopics[$i][$j]->QuizID?>">
+                                <div class="reading-item-logo"></div>
+                                <div class="reading-item-title"><?php echo $materialTopics[$i][$j]->TopicName ?></div>
+                                <div class="reading-item-divider"></div>
+                                <div class="reading-item-desc">Information on the types of food we eat</div>
+                            </div>
                     <?php
                             break;
                         case "Health and Wellbeing": ?>
                             <div class="reading-item reading-item-health-and-wellbeing" data-target=".material-<?php echo $materialTopics[$i][$j]->QuizID?>">
+                                <div class="reading-item-logo"></div>
+                                <div class="reading-item-title"><?php echo $materialTopics[$i][$j]->TopicName ?></div>
+                                <div class="reading-item-divider"></div>
+                                <div class="reading-item-desc">Information on the types of food we eat</div>
+                            </div>
                     <?php
                             break;
                     } ?>
-                            <div class="reading-item-logo"></div>
-                            <div class="reading-item-title"><?php echo $materialTopics[$i][$j]->TopicName ?></div>
-                            <div class="reading-item-divider"></div>
-                            <div class="reading-item-desc">Information on the types of food we eat</div>
-                        </div>
                     </div>
         <?php     } ?>
                     </div>

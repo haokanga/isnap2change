@@ -252,3 +252,70 @@ snap.Pagination.prototype = {
         .addClass('active')
     }
 }
+
+
+snap.QuizNav = function (opt) {
+  this.init(opt)
+}
+snap.QuizNav.cls = {
+  navItemActive: 'quiz-nav-item-inverted',
+  navItemFilled: 'quiz-nav-item-filled',
+  quizItemActive: 'quiz-item-active',
+
+}
+snap.QuizNav.prototype = {
+    init: function (opt) {
+        this.opt = $.extend({
+          navList: '.quiz-nav-list',
+          quizList: '.quiz-list',
+          index: 0
+        }, opt)
+        this.cacheElements()
+        this.addListeners()
+        this.activeItem(this.opt.index)
+    },
+    cacheElements: function () {
+      var $nav = $(this.opt.navList)
+      this.$nav = $nav
+      this.$navItems = $nav.find('.quiz-nav-item')
+      var $quizList = $(this.opt.quizList)
+      this.$quizList = $quizList
+      this.$quizItems = $quizList.find('.quiz-item')
+    },
+    addListeners: function () {
+      var that = this
+
+      var $doc = $(document)
+      $doc.on('click', '.quiz-nav-item', function (e) {
+        that.activeItem(that.$navItems.index(e.currentTarget))
+      })
+      $doc.on('click', '.quiz-nav-prev', function () {
+        if (that.opt.index > 0) {
+          that.activeItem(that.opt.index - 1)
+        }
+      })
+      $doc.on('click', '.quiz-nav-next', function () {
+        if (that.opt.index < that.$navItems.length - 1) {
+          that.activeItem(that.opt.index + 1)
+        }
+      })
+    },
+    activeItem: function (index) {
+      this.opt.index = index
+      this.$navItems.removeClass(snap.QuizNav.cls.navItemActive)
+        .eq(index)
+        .addClass(snap.QuizNav.cls.navItemActive)
+
+      this.$quizItems.removeClass(snap.QuizNav.cls.quizItemActive)
+        .eq(index)
+        .addClass(snap.QuizNav.cls.quizItemActive)
+    },
+    fillItem: function (index) {
+      this.$navItems.eq(index)
+        .addClass(snap.QuizNav.cls.navItemFilled)
+    },
+    unfillItem: function (index) {
+      this.$navItems.eq(index)
+        .removeClass(snap.QuizNav.cls.navItemFilled)
+    }
+}

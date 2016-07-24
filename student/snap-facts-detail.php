@@ -404,6 +404,7 @@ switch ($topicID) {
     var pagination = new snap.Pagination({
         onChange: function (i) {
             PanelCtrl.activePanel(i)
+            window.scrollTo(0, 0)
         }
     })
 </script>

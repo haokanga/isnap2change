@@ -146,6 +146,7 @@ CREATE TABLE IF NOT EXISTS `Quiz_Record` (
     QuizID MEDIUMINT,
     StudentID MEDIUMINT,    
     `Status` ENUM('UNSUBMITTED', 'UNGRADED', 'GRADED') DEFAULT 'GRADED',
+    Viewed BOOLEAN DEFAULT 0,
     CONSTRAINT Quiz_Record_PK PRIMARY KEY (QuizID , StudentID),
     CONSTRAINT Quiz_Record_QuizID_FK FOREIGN KEY (QuizID)
         REFERENCES Quiz (QuizID)
@@ -815,6 +816,11 @@ INSERT INTO `isnap2changedb`.`misc_section` (`QuizID`, `QuizSubType`, `Points`) 
 UPDATE `isnap2changedb`.`quiz` SET `ExtraQuiz`='1' WHERE `QuizID`='3';
 UPDATE `isnap2changedb`.`quiz` SET `ExtraQuiz`='1' WHERE `QuizID`='10';
 UPDATE `isnap2changedb`.`quiz` SET `ExtraQuiz`='1' WHERE `QuizID`='6';
+
+# [Example] set questionnaire in the quiz
+UPDATE `isnap2changedb`.`mcq_section` SET `Questionnaire`='1' WHERE `QuizID`='2';
+UPDATE `isnap2changedb`.`mcq_section` SET `Questionnaire`='1' WHERE `QuizID`='10';
+
 
 # [Example] add poster record
 # run unit_test/poster-generator.php

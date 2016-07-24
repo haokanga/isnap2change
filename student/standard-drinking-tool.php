@@ -99,6 +99,9 @@
             float: left;
             padding-left: 30px;
         }
+        .task-operation {
+            right: 250px;
+        }
 
     </style>
 
@@ -396,7 +399,7 @@
             <div class="drink-question-container">
                 <form class="question-form drink-form">
                     <label class="question-item">
-                        <span class="question-title h5">Q.1 What is the correct volume of red wine to pour into a large wine glass for 1.0 standard drinks?(unit: ml)</span>
+                        <span class="question-title h5">Q.1 What is the correct volume of red wine to pour into a large wine glass for 1.0 standard drinks? (unit: ml)</span>
                             <span class="question-content">
                     <?php
                              if($status == "UNANSWERED"){ ?>
@@ -409,7 +412,7 @@
                             </span>
                     </label>
                     <label class="question-item ">
-                        <span class="question-title h5">Q.2 What is the correct volume of mid-strength beer to pour into a schooner glass for 1.0 standard drinks?(unit: ml)</span>
+                        <span class="question-title h5">Q.2 What is the correct volume of mid-strength beer to pour into a schooner glass for 1.0 standard drinks? (unit: ml)</span>
                             <span class="question-content">
                     <?php
                                 if($status == "UNANSWERED"){ ?>
@@ -422,7 +425,7 @@
                             </span>
                     </label>
                     <label class="question-item ">
-                        <span class="question-title h5">Q.3 What is the correct amount of spirits to pour into a shot glass for 1.0 standard drinks?(unit: ml)</span>
+                        <span class="question-title h5">Q.3 What is the correct amount of spirits to pour into a shot glass for 1.0 standard drinks? (unit: ml)</span>
                             <span class="question-content">
                     <?php
                                 if($status == "UNANSWERED"){ ?>
@@ -435,7 +438,7 @@
                             </span>
                     </label>
                     <label class="question-item ">
-                        <span class="question-title h5">Q.4 What is the correct amount of white wine to pour into a bottle for 1.0 standard drinks?(unit: ml)</span>
+                        <span class="question-title h5">Q.4 What is the correct amount of white wine to pour into a bottle for 1.0 standard drinks? (unit: ml)</span>
                             <span class="question-content">
                     <?php
                                 if($status == "UNANSWERED"){ ?>
@@ -450,10 +453,16 @@
 
                     <?php
                             if($status == "UNANSWERED"){ ?>
-                                <button type="submit" class="question-submit"></button>
+                                <button type="submit" class="question-submit">
+                                    <span class="question-submit-icon"></span>
+                                    SUBMIT
+                                </button>
                     <?php   }
                             if($status == "GRADED"){ ?>
-                                <button type="submit" class="question-submit" disabled="disabled"></button>
+                                <button type="submit" class="question-submit" disabled="disabled">
+                                    <span class="question-submit-icon"></span>
+                                    SUBMIT
+                                </button>
                     <?php   } ?>
                 </form>
             </div>
@@ -462,10 +471,11 @@
 
     </div>
 
-    <a href="weekly-task.php?week=<?php echo $week?>" class="cancel-task">
-        <span class="cancel-icon"></span>
-        <span class="cancel-label">Cancel Task</span>
-    </a>
+    <ul class="task-operation">
+        <li class="cancel-task">
+            <a href="weekly-task.php?week=<?php echo $week?>" title="Cancel Task"></a>
+        </li>
+    </ul>
 
     <div class="footer-wrapper">
         <div class="footer">
@@ -513,7 +523,7 @@
                     console.dir( xhr );
                 });
         }
-    })
+    });
 
     function parseFeedback(feedback) {
         if(feedback.message != "success") {
@@ -528,7 +538,6 @@
             });
 
             $('.question-field').attr('disabled','disabled');
-
             $('.question-submit').attr("disabled","disabled");
         } else if(feedback.result == "fail") {
             var errors = '[';
