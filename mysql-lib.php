@@ -736,13 +736,24 @@ function getMCQSection(PDO $conn, $quizID)
     return getRecord($conn, $quizID, 'Quiz', array('MCQ_Section'));
 }
 
-
 function getMCQQuestion(PDO $conn, $mcqID)
 {
     $mcqQuesSql = "SELECT * FROM MCQ_Question WHERE MCQID = ?";
     $mcqQuesQuery = $conn->prepare($mcqQuesSql);
     $mcqQuesQuery->execute(array($mcqID));
     $mcqQuesResult = $mcqQuesQuery->fetch(PDO::FETCH_OBJ);
+    return $mcqQuesResult;
+}
+
+function getMCQQuestionsByQuizID(PDO $conn, $quizID)
+{
+    $mcqQuesSql = "SELECT *
+                    FROM MCQ_Section NATURAL JOIN MCQ_Question
+                    WHERE QuizID = ?
+                    ORDER BY MCQID";
+    $mcqQuesQuery = $conn->prepare($mcqQuesSql);
+    $mcqQuesQuery->execute(array($quizID));
+    $mcqQuesResult = $mcqQuesQuery->fetchAll(PDO::FETCH_OBJ);
     return $mcqQuesResult;
 }
 
@@ -816,16 +827,18 @@ function getMCQSubmission(PDO $conn, $quizID, $studentID)
     return $mcqSubmissionRes;
 }
 
-function getMCQSubmissionCorrectNum(PDO $conn, $MCQIDArr, $answerArr)
+function getMCQSubmissionCorrectNum(PDO $conn, $answerArr)
 {
     $score = 0;
 
     $mcqCorrectNumSql = "SELECT COUNT(*) FROM MCQ_Question 
-                             WHERE `MCQID` = BINARY ? AND `CorrectChoice` = BINARY ?";
+                         WHERE `MCQID` = BINARY ? AND `CorrectChoice` = BINARY ?";
 
-    for ($i = 0; $i < count($MCQIDArr); $i++) {
-        $mcqCorrectNumQuery = $conn->prepare($mcqCorrectNumSql);
-        $mcqCorrectNumQuery->execute(array($MCQIDArr[$i], htmlspecialchars($answerArr[$i])));
+    $mcqCorrectNumQuery = $conn->prepare($mcqCorrectNumSql);
+
+
+    foreach ($answerArr as $mcqID => $answer) {
+        $mcqCorrectNumQuery->execute(array(intval($mcqID), htmlspecialchars($answer)));
         $score = $score + (int)$mcqCorrectNumQuery->fetchColumn();
     }
 
@@ -915,6 +928,15 @@ function updateSAQQuestion(PDO $conn, $saqID, $points, $question)
                     WHERE SAQID = ?";
     $updateSql = $conn->prepare($updateSql);
     $updateSql->execute(array(htmlspecialchars($question), $points, $saqID));
+}
+
+function updateSAQViewedStatus(PDO $conn, $quizID, $studentID)
+{
+    $updateSql = "UPDATE Quiz_Record
+                  SET Viewed = ?
+                  WHERE QuizID = ? AND StudentID = ?";
+    $updateSql = $conn->prepare($updateSql);
+    $updateSql->execute(array(1, $quizID, $studentID));
 }
 
 function deleteSAQQuestion(PDO $conn, $saqID)
@@ -1118,6 +1140,28 @@ function deleteMatchingOption(PDO $conn, $optionID)
     $updateSql->execute(array($optionID));
 }
 
+function getMatchingOptions(PDO $conn, $quizID)
+{
+    $matchingOptionsSql = "SELECT *
+                          FROM Matching_Question NATURAL JOIN Matching_Option
+                          WHERE QuizID = ?";
+    $matchingOptionsQuery = $conn->prepare($matchingOptionsSql);
+    $matchingOptionsQuery->execute(array($quizID));
+    $matchingOptionsResult = $matchingOptionsQuery->fetchAll(PDO::FETCH_OBJ);
+    return $matchingOptionsResult;
+}
+
+function getMatchingOptionsByMatchingID(PDO $conn, $matchingID)
+{
+    $matchingOptionsSql = "SELECT *
+                          FROM Matching_Question NATURAL JOIN Matching_Option
+                          WHERE MatchingID = ?";
+    $matchingOptionsQuery = $conn->prepare($matchingOptionsSql);
+    $matchingOptionsQuery->execute(array($matchingID));
+    $matchingOptionsResult = $matchingOptionsQuery->fetchAll(PDO::FETCH_OBJ);
+    return $matchingOptionsResult;
+}
+
 function getMaxMatchingOptionNum(PDO $conn, $quizID)
 {
     $optionNumSql = "SELECT MAX(OptionNum) AS MaxOptionNum FROM (SELECT COUNT(*) AS OptionNum FROM Matching_Question NATURAL JOIN Matching_Option WHERE QuizID = ? GROUP BY MatchingID) AS OptionNumTable";
@@ -1127,6 +1171,26 @@ function getMaxMatchingOptionNum(PDO $conn, $quizID)
     return $optionNumResult->MaxOptionNum;
 }
 
+function checkMatchingAnswer(PDO $conn, $matchingID, $answer)
+{
+    $matchingOptionsSql = "SELECT OptionID
+                           FROM  Matching_Option
+                           WHERE MatchingID = ?";
+    $matchingOptionsQuery = $conn->prepare($matchingOptionsSql);
+    $matchingOptionsQuery->execute(array($matchingID));
+    $matchingOptionsResult = $matchingOptionsQuery->fetchAll(PDO::FETCH_OBJ);
+
+    $correctAns = array();
+
+    foreach ($matchingOptionsResult as $correctOption) {
+        array_push($correctAns, $correctOption->OptionID);
+    }
+    
+   // sort($answer);
+   // sort($correctAns);
+
+    return array_diff($correctAns, $answer);
+}
 /* Matching_Option */
 
 /* Learning_Material */
@@ -1299,7 +1363,7 @@ function getQuizzesStatusByWeek(PDO $conn, $studentID, $week, $extraQuiz)
 {
     $quizzesRes = array();
 
-    $quizzesStatusSql = "SELECT Quiz.QuizID, QuizType, `Status`, TopicName FROM Quiz LEFT JOIN (SELECT * FROM Quiz_Record WHERE StudentID = ?) Student_Quiz_Record ON Quiz.QuizID = Student_Quiz_Record.QuizID 
+    $quizzesStatusSql = "SELECT Quiz.QuizID, QuizType, `Status`, Viewed, TopicName FROM Quiz LEFT JOIN (SELECT * FROM Quiz_Record WHERE StudentID = ?) Student_Quiz_Record ON Quiz.QuizID = Student_Quiz_Record.QuizID 
                                                                           NATURAL JOIN Topic WHERE Week = ? AND ExtraQuiz = ? ORDER BY Quiz.QuizID";
     $quizzesStatusQuery = $conn->prepare($quizzesStatusSql);
     $quizzesStatusQuery->execute(array($studentID, $week, $extraQuiz));
@@ -1308,6 +1372,7 @@ function getQuizzesStatusByWeek(PDO $conn, $studentID, $week, $extraQuiz)
     for ($i = 0; $i < count($quizzesStatusRes); $i++) {
         $quizzesRes[$i]['QuizID'] = $quizzesStatusRes[$i]->QuizID;
         $quizzesRes[$i]['Status'] = $quizzesStatusRes[$i]->Status;
+        $quizzesRes[$i]['Viewed'] = $quizzesStatusRes[$i]->Viewed;
         $quizzesRes[$i]['TopicName'] = $quizzesStatusRes[$i]->TopicName;
         $quizzesRes[$i]['QuizType'] = getQuizType($conn, $quizzesStatusRes[$i]->QuizID);
         $quizzesRes[$i]['Points'] = getQuizPoints($conn, $quizzesStatusRes[$i]->QuizID);

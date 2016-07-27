@@ -33,10 +33,7 @@
         $snapFactsCount = count($snapFacts);
         $verboseFactsCount = count($verboseFacts);
         $totalFactsCount = $snapFactsCount + $verboseFactsCount;
-
-        echo "<script>console.log('".($snapFactsCount)."')</script>";
-        echo "<script>console.log(".$totalFactsCount.")</script>";
-
+        
         if($totalFactsCount % 9 == 0){
             $pageCount = intval($totalFactsCount / 9);
         } else {
@@ -404,6 +401,7 @@ switch ($topicID) {
     var pagination = new snap.Pagination({
         onChange: function (i) {
             PanelCtrl.activePanel(i)
+            window.scrollTo(0, 0)
         }
     })
 </script>

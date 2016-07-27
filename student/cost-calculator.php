@@ -102,6 +102,9 @@
         .result-value {
             color: #fcee2f;
         }
+        .task-operation {
+            right: 350px;
+        }
     </style>
 
 
@@ -294,10 +297,16 @@
                     </label>
             <?php
                     if($status == "UNANSWERED"){ ?>
-                    <button type="submit" class="question-submit"></button>
+                    <button type="submit" class="question-submit">
+                        <span class="question-submit-icon"></span>
+                        SUBMIT
+                    </button>
             <?php   }
                     if($status == "GRADED"){ ?>
-                    <button type="submit" class="question-submit" disabled="disabled"></button>
+                    <button type="submit" class="question-submit" disabled="disabled">
+                        <span class="question-submit-icon"></span>
+                        SUBMIT
+                    </button>
             <?php   } ?>
                 </form>
             </div>
@@ -306,11 +315,11 @@
         </div>
     </div>
 
-    <a href="weekly-task.php?week=<?php echo $week?>" class="cancel-task">
-        <span class="cancel-icon"></span>
-        <span class="cancel-label">Cancel Task</span>
-    </a>
-
+    <ul class="task-operation">
+        <li class="cancel-task">
+            <a href="weekly-task.php?week=<?php echo $week?>" title="Cancel Task"></a>
+        </li>
+    </ul>
 
     <div class="footer-wrapper">
         <div class="footer">
@@ -518,11 +527,11 @@
 
             for(i = 0; i < feedback.detail.length - 1; i++) {
                 errors = errors + '{"index":' + feedback.detail[i] + ','
-                                + '"text" : "Wrong answer."},';
+                                + '"text" : "Wrong"},';
             }
 
             errors = errors + '{"index":' + feedback.detail[feedback.detail.length-1] + ','
-                            + '"text" : "Wrong answer."}]';
+                            + '"text" : "Wrong"}]';
 
             form.setErrors(JSON.parse(errors));
         }

@@ -146,6 +146,7 @@ CREATE TABLE IF NOT EXISTS `Quiz_Record` (
     QuizID MEDIUMINT,
     StudentID MEDIUMINT,    
     `Status` ENUM('UNSUBMITTED', 'UNGRADED', 'GRADED') DEFAULT 'GRADED',
+    Viewed BOOLEAN DEFAULT 0,
     CONSTRAINT Quiz_Record_PK PRIMARY KEY (QuizID , StudentID),
     CONSTRAINT Quiz_Record_QuizID_FK FOREIGN KEY (QuizID)
         REFERENCES Quiz (QuizID)
@@ -561,7 +562,7 @@ SET @QUIZ_LAST_INSERT_ID = LAST_INSERT_ID();
 INSERT IGNORE INTO SAQ_Section(QuizID, MediaTitle, MediaSource) VALUES(@QUIZ_LAST_INSERT_ID, 'It is a trap!', 'The Truth Site');
 INSERT IGNORE INTO SAQ_Question(Question, Points, QuizID) VALUES('Based on the video, list 3 problems or challenges that these teenagers face as a result of their smoking?', 10, @QUIZ_LAST_INSERT_ID);
 INSERT IGNORE INTO SAQ_Question(Question, Points, QuizID) VALUES('List 1 strategy that you could use to help convince a peer to stop smoking?', 10, @QUIZ_LAST_INSERT_ID);
-INSERT IGNORE INTO SAQ_Question(Question, Points, QuizID) VALUES('List 3 the different ways that you have seen anti-smoking messages presented to the public. With each suggest if you think they have been ‘effective’ or ‘not effective’. Eg. Poster-Effective.', 20, @QUIZ_LAST_INSERT_ID);
+INSERT IGNORE INTO SAQ_Question(Question, Points, QuizID) VALUES('List 3 the different ways that you have seen anti-smoking messages presented to the public. With each suggest if you think they have been ‘effective�or ‘not effective� Eg. Poster-Effective.', 20, @QUIZ_LAST_INSERT_ID);
 
 # [Sample] Answer and Grading Feedback of SAQ 
 INSERT IGNORE INTO Quiz_Record(QuizID, StudentID,`Status`) VALUES(3, 1, 'GRADED');
@@ -735,7 +736,7 @@ INSERT IGNORE INTO `verbose_fact`(Title, Content, TopicID) VALUES("Short Term Ef
 INSERT IGNORE INTO `verbose_fact`(Title, Content, TopicID) VALUES("Emphysema",'Emphysema is a long-term, progressive disease of the lungs that primarily causes shortness of breath due to over-inflation of the alveoli (air sacs in the lung). In people with emphysema, the lung tissue involved in exchange of gases (oxygen and carbon dioxide) is impaired or destroyed. Emphysema is included in a group of diseases called chronic obstructive pulmonary disease or COPD (pulmonary refers to the lungs).
 Emphysema is called an obstructive lung disease because airflow on exhalation is slowed or stopped because over-inflated alveoli do not exchange gases when a person breaths due to little or no movement of gases out of the alveoli.
 Emphysema changes the anatomy of the lung in several important ways. This is due to in part to the destruction of lung tissue around smaller airways. This tissue normally holds these small airways, called bronchioles, open, allowing air to leave the lungs on exhalation. When this tissue is damaged, these airways collapse, making it difficult for the lungs to empty and the air (gases) becomes trapped in the alveoli.
-Normal lung tissue looks like a new sponge. Emphysematous lung looks like an old used sponge, with large holes and a dramatic loss of “springy-ness” or elasticity. When the lung is stretched during inflation (inhalation), the nature of the stretched tissue wants to relax to its resting state. In emphysema, this elastic function is impaired, resulting in air trapping in the lungs. Emphysema destroys this spongy tissue of the lung and also severely affects the small blood vessels (capillaries of the lung) and airways that run throughout the lung. Thus, not only is airflow affected but so is blood flow. This has dramatic impact on the ability for the lung not only to empty its air sacs called alveoli (pleural for alveolus) but also for blood to flow through the lungs to receive oxygen.',1);
+Normal lung tissue looks like a new sponge. Emphysematous lung looks like an old used sponge, with large holes and a dramatic loss of “springy-ness�or elasticity. When the lung is stretched during inflation (inhalation), the nature of the stretched tissue wants to relax to its resting state. In emphysema, this elastic function is impaired, resulting in air trapping in the lungs. Emphysema destroys this spongy tissue of the lung and also severely affects the small blood vessels (capillaries of the lung) and airways that run throughout the lung. Thus, not only is airflow affected but so is blood flow. This has dramatic impact on the ability for the lung not only to empty its air sacs called alveoli (pleural for alveolus) but also for blood to flow through the lungs to receive oxygen.',1);
 INSERT IGNORE INTO `verbose_fact`(Title, Content, TopicID) VALUES("Long Term Effects of Smoking",'Long Term Effects of Smoking Content...',1);
 INSERT IGNORE INTO `verbose_fact`(Title, Content, TopicID) VALUES("Long Term Effects of Smoking",'Long Term Effects of Smoking Content...',1);
 INSERT IGNORE INTO `verbose_fact`(Title, Content, TopicID) VALUES("Long Term Effects of Smoking",'Long Term Effects of Smoking Content...',1);
@@ -812,6 +813,21 @@ INSERT INTO `isnap2changedb`.`misc_section` (`QuizID`, `QuizSubType`, `Points`) 
 UPDATE `isnap2changedb`.`quiz` SET `ExtraQuiz`='1' WHERE `QuizID`='3';
 UPDATE `isnap2changedb`.`quiz` SET `ExtraQuiz`='1' WHERE `QuizID`='10';
 UPDATE `isnap2changedb`.`quiz` SET `ExtraQuiz`='1' WHERE `QuizID`='6';
+
+# [Example] set questionnaire in the quiz
+UPDATE `isnap2changedb`.`mcq_section` SET `Questionnaire`='1' WHERE `QuizID`='2';
+UPDATE `isnap2changedb`.`mcq_section` SET `Questionnaire`='1' WHERE `QuizID`='10';
+
+# [Example] update some mockup data in the matching
+UPDATE `isnap2changedb`.`matching_option` SET `Content`='Meat' WHERE `OptionID`='7';
+UPDATE `isnap2changedb`.`matching_option` SET `Content`='Lamb' WHERE `OptionID`='8';
+UPDATE `isnap2changedb`.`matching_option` SET `Content`='Pork' WHERE `OptionID`='9';
+UPDATE `isnap2changedb`.`matching_option` SET `Content`='Nuts' WHERE `OptionID`='11';
+UPDATE `isnap2changedb`.`matching_option` SET `Content`='Cookie' WHERE `OptionID`='12';
+UPDATE `isnap2changedb`.`matching_option` SET `Content`='Apple' WHERE `OptionID`='14';
+UPDATE `isnap2changedb`.`matching_option` SET `Content`='Cake' WHERE `OptionID`='16';
+
+
 
 # [Example] insert a poster task into Quiz
 INSERT INTO `isnap2changedb`.`quiz` (`Week`, `QuizType`, `TopicID`) VALUES ('4', 'Poster', '3');

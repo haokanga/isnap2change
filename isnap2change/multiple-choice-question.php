@@ -452,7 +452,7 @@
 									
 						<?php	}
 						
-								if($status == "UNANSWERED"){  ?>
+								if($status == "UNANSWERED") {  ?>
 										<button type="button" id="<?php echo $i?>" class="btn btn-default btn-lg btn-block" name="<?php echo $mcqRes[$i]->MCQID;?>" value="<?php echo $mcqRes[$i]->Content;?>">
 										<span class="glyphicon glyphicon-remove hidden"></span> 
 										<span class="glyphicon glyphicon-ok hidden"></span> 

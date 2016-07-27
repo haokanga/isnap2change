@@ -227,8 +227,6 @@
             margin: 0 auto 0 auto;
             color: #fff;
         }
-
-
     </style>
 </head>
 <body>
@@ -282,150 +280,235 @@
             for ($j = 0; $j < count($extraActivities[$i]); $j++) { ?>
                     <div class="col-6">
 <?php
-                //list of question type
-                switch($extraActivities[$i][$j]['QuizType']){
-                    case "MCQ":
-                        if(isset($extraActivities[$i][$j]['Status'])) { ?>
+            //list of question type
+            switch ($extraActivities[$i][$j]['QuizType']) {
+                case "MCQ":
+                    if (isset($extraActivities[$i][$j]['Status'])) { ?>
                         <a href="game-home.php">
                             <div class="game-nav-item game-nav-item-completed game-multiple-choice-quiz" >
-<?php               } else { ?>
-                        <a href="pre-task-material.php?quiz_id=<?php echo $extraActivities[$i][$j]['QuizID']?>">
-                            <div class="game-nav-item game-multiple-choice-quiz">
-<?php               } ?>
                                 <div class="game-nav-logo"></div>
                                 <div class="game-nav-title">Multiple Choice Question</div>
                                 <div class="game-nav-divider"></div>
                                 <div class="game-nav-desc">Complete Multiple Choice Question on <?php echo $extraActivities[$i][$j]['TopicName']?> to receive <?php echo $extraActivities[$i][$j]['Points']?> points.</div>
-<?php                   if(isset($extraActivities[$i][$j]['Status'])) { ?>
                                 <div class="game-nav-status">Completed</div>
-<?php                   } ?>
                             </div>
                         </a>
-<?php                   break;
-                    case "SAQ":
-                        if(isset($extraActivities[$i][$j]['Status'])) { ?>
-                        <a href="game-home.php">
-<?php                       if($extraActivities[$i][$j]['Status'] == "UNGRADED" || $extraActivities[$i][$j]['Status'] == "GRADED"){ ?>
-                            <div class="game-nav-item game-nav-item-completed game-short-answer-question">
-<?php                       } else { ?>
-                            <div class="game-nav-item game-short-answer-question">
+<?php               } else { ?>
+                        <a href="pre-task-material.php?quiz_id=<?php echo $extraActivities[$i][$j]['QuizID']?>">
+                            <div class="game-nav-item game-multiple-choice-quiz">
+                                <div class="game-nav-logo"></div>
+                                <div class="game-nav-title">Multiple Choice Question</div>
+                                <div class="game-nav-divider"></div>
+                                <div class="game-nav-desc">Complete Multiple Choice Question on <?php echo $extraActivities[$i][$j]['TopicName']?> to receive <?php echo $extraActivities[$i][$j]['Points']?> points.</div>
+                            </div>
+                        </a>
+<?php               }
+                    break;
+                case "SAQ":
+                    if (isset($extraActivities[$i][$j]['Status'])) {
+                        if ($extraActivities[$i][$j]['Status'] == "UNGRADED" || $extraActivities[$i][$j]['Status'] == "GRADED") { ?>
+                            <a href="game-home.php">
+                                <div class="game-nav-item game-nav-item-completed game-short-answer-question">
+                                    <div class="game-nav-logo"></div>
+                                    <div class="game-nav-title">Short Answer Question</div>
+                                    <div class="game-nav-divider"></div>
+                                    <div class="game-nav-desc">Complete Short Answer Question on <?php echo $extraActivities[$i][$j]['TopicName']?> to receive <?php echo $extraActivities[$i][$j]['Points']?> points.</div>
+                                    <div class="game-nav-status">Completed</div>
+<?php                           if ($extraActivities[$i][$j]['Status'] == "GRADED") { ?>
+                                        <div class="game-nav-feedback game-nav-feedback-animate">Teacher's Feedback Available</div>
+<?php                           } ?>
+                                </div>
+                            </a>
+<?php                   }
+
+                        if ($extraActivities[$i][$j]['Status'] == "UNSUBMITTED") { ?>
+                            <a href="game-home.php">
+                                <div class="game-nav-item game-short-answer-question">
+                                    <div class="game-nav-logo"></div>
+                                    <div class="game-nav-title">Short Answer Question</div>
+                                    <div class="game-nav-divider"></div>
+                                    <div class="game-nav-desc">Complete Short Answer Question on <?php echo $extraActivities[$i][$j]['TopicName']?> to receive <?php echo $extraActivities[$i][$j]['Points']?> points.</div>
+                                </div>
+                            </a>
 <?php                       }
-                        } else { ?>
+                    } else { ?>
                         <a href="pre-task-material.php?quiz_id=<?php echo $extraActivities[$i][$j]['QuizID']?>">
                             <div class="game-nav-item game-short-answer-question">
-<?php                   } ?>
                                 <div class="game-nav-logo"></div>
                                 <div class="game-nav-title">Short Answer Question</div>
                                 <div class="game-nav-divider"></div>
                                 <div class="game-nav-desc">Complete Short Answer Question on <?php echo $extraActivities[$i][$j]['TopicName']?> to receive <?php echo $extraActivities[$i][$j]['Points']?> points.</div>
-<?php                   if($extraActivities[$i][$j]['Status'] == "UNGRADED") { ?>
-                                <div class="game-nav-status">Completed</div>
-<?php                   } else if($extraActivities[$i][$j]['Status'] == "GRADED") {?>
-                                <div class="game-nav-status">Completed</div>
-                                <div class="game-nav-feedback game-nav-feedback-animate">Teacher's Feedback Available</div>
-<?php                   } ?>
                             </div>
                         </a>
-<?php                   break;
-                    case "Matching":
-                        if(isset($extraActivities[$i][$j]['Status'])) { ?>
+<?php               }
+                    break;
+                case "Matching":
+                    if (isset($extraActivities[$i][$j]['Status'])) { ?>
                         <a href="game-home.php">
                             <div class="game-nav-item game-nav-item-completed game-matching">
-<?php                   } else { ?>
-                        <a href="pre-task-material.php?quiz_id=<?php echo $extraActivities[$i][$j]['QuizID']?>">
-                            <div class="game-nav-item game-matching">
-<?php                   } ?>
                                 <div class="game-nav-logo"></div>
                                 <div class="game-nav-title">Matching</div>
                                 <div class="game-nav-divider"></div>
                                 <div class="game-nav-desc">Complete Matching on <?php echo $extraActivities[$i][$j]['TopicName']?> to receive <?php echo $extraActivities[$i][$j]['Points']?> points.</div>
-<?php                   if(isset($extraActivities[$i][$j]['Status'])) { ?>
                                 <div class="game-nav-status">Completed</div>
-<?php                   } ?>
                             </div>
                         </a>
-<?php                   break;
-                    case "Poster":
-                        if(isset($extraActivities[$i][$j]['Status'])) { ?>
-                        <a href="poster.php?quiz_id=<?php echo $extraActivities[$i][$j]['QuizID']?>">
-<?php                       if($extraActivities[$i][$j]['Status'] == "UNGRADED" || $extraActivities[$i][$j]['Status'] == "GRADED"){ ?>
-                            <div class="game-nav-item game-nav-item-completed game-poster">
-<?php                       } else { ?>
-                            <div class="game-nav-item game-poster">
-<?php                       }
-                        } else { ?>
+<?php               } else { ?>
+                        <a href="pre-task-material.php?quiz_id=<?php echo $extraActivities[$i][$j]['QuizID']?>">
+                            <div class="game-nav-item game-matching">
+                                <div class="game-nav-logo"></div>
+                                <div class="game-nav-title">Matching</div>
+                                <div class="game-nav-divider"></div>
+                                <div class="game-nav-desc">Complete Matching on <?php echo $extraActivities[$i][$j]['TopicName']?> to receive <?php echo $extraActivities[$i][$j]['Points']?> points.</div>
+                            </div>
+                        </a>
+<?php               }
+                    break;
+                case "Poster":
+                    if (isset($extraActivities[$i][$j]['Status'])) {
+                        if ($extraActivities[$i][$j]['Status'] == "UNGRADED" || $extraActivities[$i][$j]['Status'] == "GRADED") { ?>
+                            <a href="poster.php?quiz_id=<?php echo $extraActivities[$i][$j]['QuizID'] ?>">
+                                <div class="game-nav-item game-nav-item-completed game-poster">
+                                    <div class="game-nav-logo"></div>
+                                    <div class="game-nav-title">Poster</div>
+                                    <div class="game-nav-divider"></div>
+                                    <div class="game-nav-desc">Complete Poster on <?php echo $extraActivities[$i][$j]['TopicName']?> to receive <?php echo $extraActivities[$i][$j]['Points']?> points.</div>
+                                    <div class="game-nav-status">Completed</div>
+                                </div>
+                            </a>
+<?php                   }
+
+                        if ($extraActivities[$i][$j]['Status'] == "UNSUBMITTED") { ?>
+                            <a href="poster.php?quiz_id=<?php echo $extraActivities[$i][$j]['QuizID'] ?>">
+                                <div class="game-nav-item game-poster">
+                                    <div class="game-nav-logo"></div>
+                                    <div class="game-nav-title">Poster</div>
+                                    <div class="game-nav-divider"></div>
+                                    <div class="game-nav-desc">Complete Poster on <?php echo $extraActivities[$i][$j]['TopicName']?> to receive <?php echo $extraActivities[$i][$j]['Points']?> points.</div>
+                                </div>
+                            </a>
+<?php                   }
+                    } else { ?>
                         <a href="pre-task-material.php?quiz_id=<?php echo $extraActivities[$i][$j]['QuizID']?>">
                             <div class="game-nav-item game-poster">
-<?php                       } ?>
                                 <div class="game-nav-logo"></div>
                                 <div class="game-nav-title">Poster</div>
                                 <div class="game-nav-divider"></div>
                                 <div class="game-nav-desc">Complete Poster on <?php echo $extraActivities[$i][$j]['TopicName']?> to receive <?php echo $extraActivities[$i][$j]['Points']?> points.</div>
-<?php                   if($extraActivities[$i][$j]['Status'] == "UNGRADED" || $extraActivities[$i][$j]['Status'] == "GRADED") { ?>
-                                <div class="game-nav-status">Completed</div>
-<?php                   } ?>
                             </div>
                         </a>
-<?php                   break;
-                    case "Calculator":
-                        if(isset($extraActivities[$i][$j]['Status'])) { ?>
+<?php               }
+                    break;
+                case "Calculator":
+                    if (isset($extraActivities[$i][$j]['Status'])) { ?>
                         <a href="cost-calculator.php?quiz_id=<?php echo $extraActivities[$i][$j]['QuizID']?>">
                             <div class="game-nav-item game-nav-item-completed game-cost-calculator">
-<?php                   } else { ?>
-                        <a href="pre-task-material.php?quiz_id=<?php echo $extraActivities[$i][$j]['QuizID']?>">
-                            <div class="game-nav-item game-cost-calculator">
-<?php                   } ?>
                                 <div class="game-nav-logo"></div>
                                 <div class="game-nav-title">Cost Calculator</div>
                                 <div class="game-nav-divider"></div>
                                 <div class="game-nav-desc">Complete Cost Calculator on <?php echo $extraActivities[$i][$j]['TopicName']?> to receive <?php echo $extraActivities[$i][$j]['Points']?> points.</div>
-<?php                   if(isset($extraActivities[$i][$j]['Status'])) { ?>
                                 <div class="game-nav-status">Completed</div>
-<?php                   } ?>
                             </div>
                         </a>
-<?php                   break;
-                    case "DrinkingTool":
-                        if(isset($extraActivities[$i][$j]['Status'])) { ?>
+<?php               } else { ?>
+                        <a href="pre-task-material.php?quiz_id=<?php echo $extraActivities[$i][$j]['QuizID']?>">
+                            <div class="game-nav-item game-cost-calculator">
+                                <div class="game-nav-logo"></div>
+                                <div class="game-nav-title">Cost Calculator</div>
+                                <div class="game-nav-divider"></div>
+                                <div class="game-nav-desc">Complete Cost Calculator on <?php echo $extraActivities[$i][$j]['TopicName']?> to receive <?php echo $extraActivities[$i][$j]['Points']?> points.</div>
+                            </div>
+                        </a>
+<?php               }
+                    break;
+                case "DrinkingTool":
+                    if (isset($extraActivities[$i][$j]['Status'])) { ?>
                         <a href="standard-drinking-tool.php?quiz_id=<?php echo $extraActivities[$i][$j]['QuizID']?>">
                             <div class="game-nav-item game-nav-item-completed game-standard-drinking-tool">
-<?php                   } else { ?>
-                        <a href="pre-task-material.php?quiz_id=<?php echo $extraActivities[$i][$j]['QuizID']?>">
-                            <div class="game-nav-item game-standard-drinking-tool">
-<?php                   } ?>
                                 <div class="game-nav-logo"></div>
                                 <div class="game-nav-title">Standard Drinking Tool</div>
                                 <div class="game-nav-divider"></div>
                                 <div class="game-nav-desc">Complete Standard Drinking Tool on <?php echo $extraActivities[$i][$j]['TopicName']?> to receive <?php echo $extraActivities[$i][$j]['Points']?> points.</div>
-<?php                   if(isset($extraActivities[$i][$j]['Status'])) { ?>
                                 <div class="game-nav-status">Completed</div>
-<?php                   } ?>
                             </div>
                         </a>
-<?php                   break;
-                    case "Video":
-                        if(isset($extraActivities[$i][$j]['Status'])) { ?>
-                        <a href="standard-drinking-tool.php?quiz_id=<?php echo $extraActivities[$i][$j]['QuizID']?>">
-                            <div class="game-nav-item game-nav-item-completed game-video">
-<?php                   } else { ?>
+<?php               } else { ?>
+                        <a href="pre-task-material.php?quiz_id=<?php echo $extraActivities[$i][$j]['QuizID']?>">
+                            <div class="game-nav-item game-standard-drinking-tool">
+                                <div class="game-nav-logo"></div>
+                                <div class="game-nav-title">Standard Drinking Tool</div>
+                                <div class="game-nav-divider"></div>
+                                <div class="game-nav-desc">Complete Standard Drinking Tool on <?php echo $extraActivities[$i][$j]['TopicName']?> to receive <?php echo $extraActivities[$i][$j]['Points']?> points.</div>
+                            </div>
+                        </a>
+<?php               }
+                    break;
+                case "Video":
+                    if (isset($extraActivities[$i][$j]['Status'])) {
+                        if ($extraActivities[$i][$j]['Status'] == "UNGRADED" || $extraActivities[$i][$j]['Status'] == "GRADED") { ?>
+                            <a href="video.php?quiz_id=<?php echo $extraActivities[$i][$j]['QuizID']?>">
+                                <div class="game-nav-item game-nav-item-completed game-video">
+                                    <div class="game-nav-logo"></div>
+                                    <div class="game-nav-title">Video</div>
+                                    <div class="game-nav-divider"></div>
+                                    <div class="game-nav-desc">Complete Video on <?php echo $extraActivities[$i][$j]['TopicName']?> to receive <?php echo $extraActivities[$i][$j]['Points']?> points.</div>
+                                    <div class="game-nav-status">Completed</div>
+<?php                       if ($extraActivities[$i][$j]['Status'] == "GRADED") {
+                                if ($extraActivities[$i][$j]['Viewed'] == 0) { ?>
+                                    <div class="game-nav-feedback game-nav-feedback-animate">Teacher's Feedback Available</div>
+<?php                           } else { ?>
+                                    <div class="game-nav-feedback">Teacher's Feedback Available</div>
+<?php                           }
+                            } ?>
+                                </div>
+                            </a>
+<?php               }
+
+                        if ($extraActivities[$i][$j]['Status'] == "UNSUBMITTED") { ?>
+                            <a href="video.php?quiz_id=<?php echo $extraActivities[$i][$j]['QuizID']?>">
+                                <div class="game-nav-item game-video">
+                                    <div class="game-nav-logo"></div>
+                                    <div class="game-nav-title">Video</div>
+                                    <div class="game-nav-divider"></div>
+                                    <div class="game-nav-desc">Complete Video on <?php echo $extraActivities[$i][$j]['TopicName']?> to receive <?php echo $extraActivities[$i][$j]['Points']?> points.</div>
+                                </div>
+                            </a>
+<?php                   }
+                    } else { ?>
                         <a href="pre-task-material.php?quiz_id=<?php echo $extraActivities[$i][$j]['QuizID']?>">
                             <div class="game-nav-item game-video">
-<?php                   } ?>
                                 <div class="game-nav-logo"></div>
                                 <div class="game-nav-title">Video</div>
                                 <div class="game-nav-divider"></div>
-                                <div class="game-nav-desc">Complete Standard Drinking Tool on <?php echo $extraActivities[$i][$j]['TopicName']?> to receive <?php echo $extraActivities[$i][$j]['Points']?> points.</div>
-<?php                    if($extraActivities[$i][$j]['Status'] == "UNGRADED") { ?>
-                                <div class="game-nav-status">Completed</div>
-<?php                    } else if($extraActivities[$i][$j]['Status'] == "GRADED") {?>
-                                <div class="game-nav-status">Completed</div>
-                                <div class="game-nav-feedback game-nav-feedback-animate">Teacher's Feedback Available</div>
-<?php                    } ?>
+                                <div class="game-nav-desc">Complete Video on <?php echo $extraActivities[$i][$j]['TopicName']?> to receive <?php echo $extraActivities[$i][$j]['Points']?> points.</div>
                             </div>
                         </a>
-<?php                   break;
-    
-            } ?>
+<?php               }
+                    break;
+                case "Questionnaire":
+                    if (isset($extraActivities[$i][$j]['Status'])) { ?>
+                        <a href="game-home.php">
+                            <div class="game-nav-item game-nav-item-completed game-multiple-choice-quiz" >
+                                <div class="game-nav-logo"></div>
+                                <div class="game-nav-title">Questionnaire</div>
+                                <div class="game-nav-divider"></div>
+                                <div class="game-nav-desc">Complete Questionnaire to receive <?php echo $extraActivities[$i][$j]['Points']?> points.</div>
+                                <div class="game-nav-status">Completed</div>
+                            </div>
+                        </a>
+<?php               } else { ?>
+                        <a href="pre-task-material.php?quiz_id=<?php echo $extraActivities[$i][$j]['QuizID']?>">
+                            <div class="game-nav-item game-multiple-choice-quiz">
+                                <div class="game-nav-logo"></div>
+                                <div class="game-nav-title">Questionnaire</div>
+                                <div class="game-nav-divider"></div>
+                                <div class="game-nav-desc">Complete Questionnaire to receive <?php echo $extraActivities[$i][$j]['Points']?> points.</div>
+                            </div>
+                        </a>
+<?php               }
+                    break;
+
+        } ?>
                     </div>
 <?php    } ?>
             </div>

@@ -141,6 +141,10 @@
         .canvas-footer {
             clear: all;
         }
+        .task-operation {
+            top: 70px; !important;
+            right: 350px;
+        }
     </style>
 </head>
 <body>
@@ -165,7 +169,7 @@
     <div class="content-wrapper">
         <div class="canvas-header">
             <h2 class="h2 canvas-title">Create a Future Board</h2>
-            <div class="canvas-prompt p1">What would you linke to achieve this school term? Make board with pictures of what you would like to achieve and the people and things that inspire you and whtat you aspire to be. You can also put down things about yourself that you would like to improve on. If you would feel more comvortable using words or pictures that only you know what they mean, you can . After all, some goals are personal.</div>
+            <div class="canvas-prompt p1">What would you like to achieve this school term? Make board with pictures of what you would like to achieve and the people and things that inspire you and whtat you aspire to be. You can also put down things about yourself that you would like to improve on. If you would feel more comvortable using words or pictures that only you know what they mean, you can . After all, some goals are personal.</div>
         </div>
         <div class="canvas-container clearfix">
             <div class="canvas-menu">
@@ -194,14 +198,18 @@
             </form>
         </div>
         <div class="canvas-footer">
-            <button class="question-submit" type="button"></button>
+            <button class="question-submit u-submit" type="button">
+                <span class="question-submit-icon u-submit-icon"></span>
+                SUBMIT
+            </button>
         </div>
     </div>
 
-    <a href="weekly-task.php?week=<?php echo $week?>" class="cancel-task">
-        <span class="cancel-icon"></span>
-        <span class="cancel-label">Cancel Task</span>
-    </a>
+    <ul class="task-operation">
+        <li class="cancel-task">
+            <a href="weekly-task.php?week=<?php echo $week?>" title="Cancel Task"></a>
+        </li>
+    </ul>
     
     <div class="footer-wrapper">
         <div class="footer">
