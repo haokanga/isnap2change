@@ -33,10 +33,7 @@
         $snapFactsCount = count($snapFacts);
         $verboseFactsCount = count($verboseFacts);
         $totalFactsCount = $snapFactsCount + $verboseFactsCount;
-
-        echo "<script>console.log('".($snapFactsCount)."')</script>";
-        echo "<script>console.log(".$totalFactsCount.")</script>";
-
+        
         if($totalFactsCount % 9 == 0){
             $pageCount = intval($totalFactsCount / 9);
         } else {

@@ -70,15 +70,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="initial-scale=1.0, width=device-width, user-scalable=no">
-    <title>Short Answer Question</title>
+    <title>Short Answer Question | SNAP</title>
     <link rel="stylesheet" href="./css/common.css">
     <link href='https://fonts.googleapis.com/css?family=Maitree|Lato:400,900' rel='stylesheet' type='text/css'>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
-    <script src="./js/vendor/jquery.js"></script>
-    <script src="./js/snap.js"></script>
+
     <style>
         .quiz-short .quiz-title {
             margin-left: 0;
+        }
+        .quiz-answer-container {
+            min-height: 500px;
         }
         .quiz-answer-title {
             text-align: center;
@@ -229,6 +231,13 @@
         </li>
     </ul>
 
+    <div class="attachment">
+        <ul class="attachment-nav">
+            <li class="attachment-nav-item">SNAP <br>FACTS</li>
+            <li class="attachment-nav-item">READING <br> MATERIAL</li>
+        </ul>
+    </div>
+
     <div class="footer-wrapper">
         <div class="footer">
             <div class="footer-content">
@@ -242,8 +251,11 @@
     </div>
 </div>
 
-
+<script src="./js/snap.js"></script>
 <script>
+
+    snap.initAttachmentCtrl();
+
     var quizNav = new snap.QuizNav();
 
 
@@ -319,7 +331,7 @@
             data: {
                 student_id: <?php echo $studentID?>,
                 quiz_id: <?php echo $quizID?>,
-                answer_arr: JSON.stringify(form.getData()),
+                answer_arr: JSON.stringify(QuizCtrl.getData()),
                 status: "UNSUBMITTED"
             },
             type: "POST",
@@ -353,10 +365,12 @@
         if(feedback.status == "UNGRADED"){
             snap.alert({
                 content: 'You have submitted your work. And you cannot edit your answer anymore.',
-                onClose: function () { }
+                onClose: function () {
+                    $('.quiz-answer-field').attr('disabled','disabled');
+                    $('.question-submit').attr('disabled','disabled');
+                    $('.save-task').addClass('save-task-disable');
+                }
             });
-            $('.question-answer-field').attr('disabled','disabled');
-            $('.question-submit').attr("disabled","disabled");
         }
     }
 </script>

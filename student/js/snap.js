@@ -11,14 +11,16 @@ var snap = {
             onClose: $.noop
         }, opt)
         var alertTpl =
-            '<div class="snap-alert">' +
-            '    <div class="snap-alert-mask"></div>' +
-            '    <div class="snap-alert-container">' +
-            '        <a href="#" class="snap-alert-logo"></a>' +
-            '        <div class="snap-alert-content">content here</div>' +
-            '        <div class="snap-alert-confirm">OK</div>' +
-            '    </div>' +
-            '</div>';
+'<div class="snap-alert">' +
+'    <div class="snap-alert-mask"></div>' +
+'    <div class="snap-alert-container">' +
+'        <a href="#" class="snap-alert-logo"></a>' +
+'        <div class="snap-alert-content">content here</div>' +
+'        <div class="snap-alert-operation">' +
+'            <div class="snap-alert-btn snap-alert-confirm">OK</div>' +
+'        </div>' +
+'    </div>' +
+'</div>';
 
 
         if (!this.$alert) {
@@ -26,7 +28,7 @@ var snap = {
             var $body = $('body')
             $body.append(this.$alert)
             this.$alertContent = this.$alert.find('.snap-alert-content')
-            $body.on('click', '.snap-alert-confirm', function () {
+            this.$alert.on('click', '.snap-alert-confirm', function () {
                 snap.$alert.hide()
                 snap.alert.onClose()
             })
@@ -35,6 +37,47 @@ var snap = {
         this.$alertContent.text(opt.content)
         this.$alert.show()
 
+    },
+
+    confirm: function (opt) {
+        opt = $.extend({
+            content: 'Missing title!',
+            onConfirm: $.noop,
+            onCancel: $.noop
+        }, opt)
+        var confirmTpl =
+'<div class="snap-alert">' +
+'    <div class="snap-alert-mask"></div>' +
+'    <div class="snap-alert-container">' +
+'        <div href="#" class="snap-alert-logo"></div>' +
+'        <div class="snap-alert-content">content here</div>' +
+'        <div class="snap-alert-operation">' +
+'            <div class="snap-alert-btn snap-alert-confirm">OK</div>' +
+'            <div class="snap-alert-btn snap-alert-cancel">Cancel</div>' +
+'        </div>' +
+'    </div>' +
+'</div>';
+
+
+
+        if (!this.$confirm) {
+            this.$confirm = $(confirmTpl)
+            var $body = $('body')
+            $body.append(this.$confirm)
+            this.$confirmContent = this.$confirm.find('.snap-alert-content')
+            this.$confirm.on('click', '.snap-alert-confirm', function () {
+                snap.$confirm.hide()
+                snap.confirm.onConfirm()
+            })
+            this.$confirm.on('click', '.snap-alert-cancel', function () {
+              snap.$confirm.hide()
+              snap.confirm.onCancel()
+            })
+        }
+        this.confirm.onConfirm = opt.onConfirm
+        this.confirm.onCancel = opt.onCancel
+        this.$confirmContent.text(opt.content)
+        this.$confirm.show()
     },
 
     enableBackTop: function () {
@@ -117,9 +160,6 @@ var AttachmentCtrl = {
       var $main = $('.attachment')
       this.$main = $main
       this.$navItems = $main.find('.attachment-nav-item')
-      this.$contentContainer = $main.find('.attachment-content-container')
-      this.$contents = $main.find('.attachment-content')
-      this.$close = $main.find('.attachment-close')
     },
     addListeners: function () {
       var that = this
@@ -128,27 +168,12 @@ var AttachmentCtrl = {
         that.activeItem(itemIndex)
       })
 
-      this.$main.on('click', '.attachment-close', function (e) {
-        that.resetItem()
-      })
     },
     activeItem: function (index) {
-      this.$navItems.addClass('attachment-nav-item-hide')
-      this.$navItems.eq(index)
-        .removeClass('attachment-nav-item-hide')
-        .addClass('attachment-nav-item-active')
+      window.open(this.$navItems.eq(index).data('url'), null, 'width=800,height=600,toolbar=no,location=no')
 
-      this.$contentContainer.addClass('attachment-content-container-show')
-      this.$contents.removeClass('attachment-content-show')
-        .eq(index)
-        .addClass('attachment-content-show')
-      this.$close.addClass('attachment-close-show')
     },
     resetItem: function () {
-      this.$navItems.removeClass('attachment-nav-item-hide attachment-nav-item-active')
-      this.$contentContainer.removeClass('attachment-content-container-show')
-      this.$contents.removeClass('attachment-content-show')
-      this.$close.removeClass('attachment-close-show')
     }
 }
 
@@ -264,6 +289,10 @@ snap.QuizNav.cls = {
 
 }
 snap.QuizNav.prototype = {
+    tpl: {
+      correct: '<span class="quiz-nav-state quiz-nav-state-correct"></span>',
+      incorrect: '<span class="quiz-nav-state quiz-nav-state-incorrect"></span>'
+    },
     init: function (opt) {
         this.opt = $.extend({
           navList: '.quiz-nav-list',
@@ -317,5 +346,10 @@ snap.QuizNav.prototype = {
     unfillItem: function (index) {
       this.$navItems.eq(index)
         .removeClass(snap.QuizNav.cls.navItemFilled)
+    },
+    feedback: function (index, isCorrect) {
+
+      this.$navItems.eq(index)
+        .append(isCorrect ? this.tpl.correct : this.tpl.incorrect)
     }
 }

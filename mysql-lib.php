@@ -745,18 +745,18 @@ function getMCQQuestion(PDO $conn, $mcqID)
     return $mcqQuesResult;
 }
 
-function getMCQQuestions(PDO $conn, $quizID)
+function getMCQQuestionsByQuizID(PDO $conn, $quizID)
 {
-    $mcqQuesSql = "SELECT * FROM MCQ_Question 
-                   WHERE  QuizID = ?
-                   ORDER BY MCQID";
+    $mcqQuesSql = "SELECT *
+                    FROM MCQ_Section NATURAL JOIN MCQ_Question
+                    WHERE QuizID = ?
+                    ORDER BY MCQID";
     $mcqQuesQuery = $conn->prepare($mcqQuesSql);
     $mcqQuesQuery->execute(array($quizID));
     $mcqQuesResult = $mcqQuesQuery->fetchAll(PDO::FETCH_OBJ);
     return $mcqQuesResult;
 }
 
-/*
 function getMCQQuestions(PDO $conn, $quizID)
 {
     $mcqQuesSql = "SELECT *
@@ -769,7 +769,6 @@ function getMCQQuestions(PDO $conn, $quizID)
     $mcqQuesResult = $mcqQuesQuery->fetchAll(PDO::FETCH_OBJ);
     return $mcqQuesResult;
 }
-*/
 
 function getMCQQuestionNum(PDO $conn, $quizID)
 {
@@ -1141,6 +1140,28 @@ function deleteMatchingOption(PDO $conn, $optionID)
     $updateSql->execute(array($optionID));
 }
 
+function getMatchingOptions(PDO $conn, $quizID)
+{
+    $matchingOptionsSql = "SELECT *
+                          FROM Matching_Question NATURAL JOIN Matching_Option
+                          WHERE QuizID = ?";
+    $matchingOptionsQuery = $conn->prepare($matchingOptionsSql);
+    $matchingOptionsQuery->execute(array($quizID));
+    $matchingOptionsResult = $matchingOptionsQuery->fetchAll(PDO::FETCH_OBJ);
+    return $matchingOptionsResult;
+}
+
+function getMatchingOptionsByMatchingID(PDO $conn, $matchingID)
+{
+    $matchingOptionsSql = "SELECT *
+                          FROM Matching_Question NATURAL JOIN Matching_Option
+                          WHERE MatchingID = ?";
+    $matchingOptionsQuery = $conn->prepare($matchingOptionsSql);
+    $matchingOptionsQuery->execute(array($matchingID));
+    $matchingOptionsResult = $matchingOptionsQuery->fetchAll(PDO::FETCH_OBJ);
+    return $matchingOptionsResult;
+}
+
 function getMaxMatchingOptionNum(PDO $conn, $quizID)
 {
     $optionNumSql = "SELECT MAX(OptionNum) AS MaxOptionNum FROM (SELECT COUNT(*) AS OptionNum FROM Matching_Question NATURAL JOIN Matching_Option WHERE QuizID = ? GROUP BY MatchingID) AS OptionNumTable";
@@ -1150,6 +1171,26 @@ function getMaxMatchingOptionNum(PDO $conn, $quizID)
     return $optionNumResult->MaxOptionNum;
 }
 
+function checkMatchingAnswer(PDO $conn, $matchingID, $answer)
+{
+    $matchingOptionsSql = "SELECT OptionID
+                           FROM  Matching_Option
+                           WHERE MatchingID = ?";
+    $matchingOptionsQuery = $conn->prepare($matchingOptionsSql);
+    $matchingOptionsQuery->execute(array($matchingID));
+    $matchingOptionsResult = $matchingOptionsQuery->fetchAll(PDO::FETCH_OBJ);
+
+    $correctAns = array();
+
+    foreach ($matchingOptionsResult as $correctOption) {
+        array_push($correctAns, $correctOption->OptionID);
+    }
+    
+   // sort($answer);
+   // sort($correctAns);
+
+    return array_diff($correctAns, $answer);
+}
 /* Matching_Option */
 
 /* Learning_Material */

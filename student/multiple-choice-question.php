@@ -22,29 +22,51 @@
     try{
         $conn = db_connect();
 
-        //get learning material
-        $materialRes = getLearningMaterial($conn, $quizID);
+        $week = getWeekByQuiz($conn, $quizID);
+
+        //check whether the week is locked or not
+        if ($week > getStudentWeek($conn, $studentID)) {
+            echo '<script>alert("This is a locked quiz!")</script>';
+            echo '<script>window.location="game-home.php"</script>';
+        }
 
         //check quiz status
         $status = getQuizStatus($conn, $quizID, $studentID);
 
-        //if graded
-        if($status == "GRADED"){
-            $mcqRes = getMCQSubmission($conn, $quizID, $studentID);
-        }
+        //get learning material
+        $materialRes = getLearningMaterial($conn, $quizID);
 
         //get mcq questions
-        $mcqQuestions = getMCQQuestions($conn, $quizID);
+        $mcqQuestions = getMCQQuestionsByQuizID($conn, $quizID);
 
-        //get mcq options
+
         $mcqOptions = array();
+        $feedback = array();
 
-        for($i = 0; $i < count($mcqQuestions); $i++) {
-            array_push($mcqOptions, getOptions($conn, $mcqQuestions[$i]->MCQID));
+        for ($i = 0; $i < count($mcqQuestions); $i++) {
+            //get mcq options
+            $options = getOptions($conn, $mcqQuestions[$i]->MCQID);
+
+            array_push($mcqOptions, $options);
+
+            //if graded
+            if ($status == "GRADED") {
+                $singleFeedback = array();
+
+                $singleFeedback["MCQID"] = $mcqQuestions[$i]->MCQID;
+                $singleFeedback["correctAns"] = $mcqQuestions[$i]->CorrectChoice;
+                $singleFeedback["explanation"] = array();
+
+                foreach($options as $row) {
+                    $singleFeedback["explanation"][$row->OptionID] = $row->Explanation;
+                }
+
+                array_push($feedback, $singleFeedback);
+            }
         }
 
-    } catch(Exception $e){
-        if($conn != null){
+    } catch(Exception $e) {
+        if ($conn != null) {
             db_close($conn);
         }
 
@@ -62,14 +84,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="initial-scale=1.0, width=device-width, user-scalable=no">
-    <title>Document</title>
+    <title>Multiple Chocie Question | SNAP</title>
     <link rel="stylesheet" href="./css/common.css">
     <link href='https://fonts.googleapis.com/css?family=Maitree|Lato:400,900' rel='stylesheet' type='text/css'>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
-    <script src="./js/vendor/jquery.js"></script>
-    <script src="./js/snap.js"></script>
     <style>
-
+        .task-operation {
+            right: 350px;
+        }
     </style>
 </head>
 <body>
@@ -77,13 +99,7 @@
 <div class="page-wrapper">
     <div class="header-wrapper">
         <div class="header">
-            <a href="#" class="header-back-link"></a>
-            <a class="home-link" href="#">SNAP</a>
-            <ul class="nav-list">
-                <li class="nav-item"><a  class="nav-link" href="http://taobao.com">GAME HOME</a></li>
-                <li class="nav-item"><a  class="nav-link" href="http://taobao.com">Snap Facts</a></li>
-                <li class="nav-item"><a  class="nav-link" href="http://taobao.com">Resources</a></li>
-            </ul>
+            <a class="home-link">SNAP</a>
             <div class="settings">
                 <div class="setting-icon dropdown">
                     <ul class="dropdown-menu">
@@ -157,6 +173,13 @@
         </li>
     </ul>
 
+    <div class="attachment">
+        <ul class="attachment-nav">
+            <li class="attachment-nav-item">SNAP <br>FACTS</li>
+            <li class="attachment-nav-item">READING <br> MATERIAL</li>
+        </ul>
+    </div>
+
     <div class="footer-wrapper">
         <div class="footer">
             <div class="footer-content">
@@ -170,8 +193,10 @@
     </div>
 </div>
 
-
+<script src="./js/snap.js"></script>
 <script>
+    snap.initAttachmentCtrl();
+
     var quizNav = new snap.QuizNav();
 
     var QuizCtrl = {
@@ -181,31 +206,38 @@
         init: function (opt) {
             this.opt = $.extend({
                 onSubmit: $.noop
-            }, opt)
-            this.cacheElements()
+            }, opt);
+            this.cacheElements();
             this.addListeners()
         },
         cacheElements: function () {
-            this.$form = $('.question-form')
+            this.$form = $('.question-form');
             this.$quizItems = $('.quiz-item')
         },
         addListeners: function () {
-            var that = this
-            var $doc = $(document)
+            var that = this;
+            var $doc = $(document);
             this.$form.on('submit', function (e) {
-                e.preventDefault()
+                e.preventDefault();
                 that.opt.onSubmit(that.getData())
-            })
+            });
             $doc.on('click', '.quiz-answer-item', function (e) {
                 var $target = $(e.currentTarget)
-                var $quiz = $target.closest('.quiz-item')
-                $quiz.find('.quiz-answer-item').removeClass(that.cls.answerSelected)
-                $target.addClass(that.cls.answerSelected)
+                var isOriginalSelected = $target.hasClass(that.cls.answerSelected);
+                var $quiz = $target.closest('.quiz-item');
+                $quiz.find('.quiz-answer-item').removeClass(that.cls.answerSelected);
+                if (!isOriginalSelected) {
+                    $target.addClass(that.cls.answerSelected)
+                }
 
 
-                var index = that.$quizItems.index($quiz)
-                quizNav.fillItem(index)
+                var index = that.$quizItems.index($quiz);
 
+                if ($quiz.find('.quiz-answer-item-selected').length) {
+                    quizNav.fillItem(index)
+                } else {
+                    quizNav.unfillItem(index)
+                }
             })
         },
         getData: function () {
@@ -222,6 +254,48 @@
                 }
             });
             return result
+        },
+        setFeedback: function (data) {
+            detail = detail || [];
+            var that = this;
+            var $quizItems = this.$quizItems;
+            var feedbackTpl =
+                '         <div class="quiz-feedback">' +
+                '             <div class="quiz-feedback-title">This is correct:</div>' +
+                '             <div class="quiz-feedback-content">aaa</div>' +
+                '         </div>'
+                detail.forEach(function (quizState) {
+                var $quizItem = $quizItems.filter('[data-id="' + quizState.MCQID +'"]')
+                var $quizAnswers = $quizItem.find('.quiz-answer-item')
+                var isCorrect = false
+
+                for (var key in quizState.explanation) {
+                    var $answerItem = $quizAnswers.filter('[data-answer="' + key + '"]')
+                    var answerId = $answerItem.data('answer')
+                    var $feedback = $(feedbackTpl)
+
+                    $feedback.find('.quiz-feedback-title')
+                        .text(answerId == quizState.correctAns ? 'This is correct:' : 'This is incorrect')
+                    $feedback.find('.quiz-feedback-content').text(quizState.explanation[key])
+                    $answerItem.find('.quiz-answer-content')
+                        .append($feedback)
+
+                    if (answerId == quizState.correctAns) {
+                        $answerItem.addClass('quiz-answer-item-correct')
+                    }
+
+                    if ($answerItem.hasClass('quiz-answer-item-selected')) {
+                        if (answerId == quizState.correctAns) {
+                            isCorrect = true
+                        } else {
+                            $answerItem.addClass('quiz-answer-item-incorrect')
+                        }
+                    }
+                }
+
+                quizNav.feedback($quizItems.index($quizItem), isCorrect)
+            })
+
         }
     };
 
@@ -251,6 +325,11 @@
         }
     });
 
+<?php
+        if ($status == "GRADED") { ?>
+            QuizCtrl.setFeedback(<?php echo $feedback?>);
+<?php    } ?>
+
     function parseFeedback(feedback) {
         if (feedback.message != "success") {
             alert(feedback.message + ". Please try again!");
@@ -260,13 +339,14 @@
         if (feedback.result == "pass") {
             snap.alert({
                 content: 'Congratulations! You have passed this quiz. The result is: ' + feedback.score + '/' + feedback.quesNumber + '.'
-            })
+            });
 
+            QuizCtrl.setFeedback(feedback.detail);
 
         } else if (feedback.result == "fail") {
-
-
-
+            snap.alert({
+                content: 'Sorry! You have failed this quiz. The result is: ' + feedback.score + '/' + feedback.quesNumber + '.'
+            })
         }
     }
 

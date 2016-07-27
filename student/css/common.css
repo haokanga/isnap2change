@@ -150,6 +150,12 @@ body {
     clear: both;
 }
 
+.col-3 {
+  width: 25%;
+  float: left;
+  padding: 0 15px;
+  position: relative;
+}
 .col-4 {
   width: 33.33333%;
   float: left;
@@ -446,8 +452,13 @@ body {
     font-family: Maitree, serif;
     font-size: 18px;
 }
-.snap-alert-confirm {
-    margin: 0 auto;
+.snap-alert-operation {
+    text-align: center;
+}
+
+.snap-alert-btn {
+    margin: 0 10px;
+    display: inline-block;
     width: 110px;
     height: 40px;
     line-height: 40px;
@@ -536,7 +547,7 @@ body {
 }
 .question-item {
     display: block;
-    margin-bottom: 15px;
+    margin-bottom: 10px;
 }
 .question-title {
     margin-bottom: 10px;
@@ -568,7 +579,7 @@ body {
 .question-field,
 .question-area {
     float: left;
-    width: 100%;
+    width: calc(100% - 100px);
     border-radius: 10px;
     border: 0;
     height: 30px;
@@ -596,13 +607,13 @@ body {
 }
 .question-submit {
     display: block;
-    width: 60px;
+    width: 64px;
     text-align: center;
     margin: 20px auto;
     color: #fcec1b;
     background-color: transparent;
     cursor: pointer;
-    font-size: 18px;
+    font-size: 20px;
     border: 0;
 }
 .question-submit-icon {
@@ -625,7 +636,7 @@ body {
 }
 
 .feedback-title {
-    font-size: 16px;
+    font-size: 24px;
     margin: 10px;
 }
 .feedback-title-hilight {
@@ -634,7 +645,7 @@ body {
 .feedback-content {
     border-radius: 10px;
     padding: 10px;
-    font-size: 16px;
+    font-size: 20px;
     background-color: #fff;
     color: #000;
 }
@@ -679,13 +690,13 @@ body {
  **/
 .task-operation {
     position: fixed;
-    top: 85px;
+    top: 80px;
     z-index: 1024;
 }
 .task-operation li {
     float: left;
-    width: 24px;
-    height: 24px;
+    width: 32px;
+    height: 32px;
     margin-left: 10px;
 }
 .task-operation a {
@@ -699,6 +710,9 @@ body {
 }
 .task-operation .save-task a {
     background-image: url("../img/save_file_icon.png");
+}
+.task-operation .save-task-disable a {
+    cursor: not-allowed;
 }
 
 /**
@@ -738,6 +752,7 @@ body {
 .pagination .active {
     color: #fcee2d;
 }
+
 
 /**
  * $quiz layout
@@ -1060,6 +1075,11 @@ body {
 .quiz-header {
     overflow: hidden;
     margin-bottom: 30px;
+    margin-top: 40px;
+
+}
+.quiz-answer-list {
+    min-height: 400px;
 }
 .quiz-label {
     float: left;
@@ -1117,4 +1137,13 @@ body {
 .quiz-feedback-title {
     color: #000;
 }
+/**
+ * $feedback border
+ **/
 
+.border-incorrect {
+    border: 5px solid rgb(214, 0, 0);
+}
+.border-correct {
+    border: 5px solid rgb(0, 210, 31);
+}

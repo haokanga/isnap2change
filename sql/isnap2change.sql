@@ -818,6 +818,16 @@ UPDATE `isnap2changedb`.`quiz` SET `ExtraQuiz`='1' WHERE `QuizID`='6';
 UPDATE `isnap2changedb`.`mcq_section` SET `Questionnaire`='1' WHERE `QuizID`='2';
 UPDATE `isnap2changedb`.`mcq_section` SET `Questionnaire`='1' WHERE `QuizID`='10';
 
+# [Example] update some mockup data in the matching
+UPDATE `isnap2changedb`.`matching_option` SET `Content`='Meat' WHERE `OptionID`='7';
+UPDATE `isnap2changedb`.`matching_option` SET `Content`='Lamb' WHERE `OptionID`='8';
+UPDATE `isnap2changedb`.`matching_option` SET `Content`='Pork' WHERE `OptionID`='9';
+UPDATE `isnap2changedb`.`matching_option` SET `Content`='Nuts' WHERE `OptionID`='11';
+UPDATE `isnap2changedb`.`matching_option` SET `Content`='Cookie' WHERE `OptionID`='12';
+UPDATE `isnap2changedb`.`matching_option` SET `Content`='Apple' WHERE `OptionID`='14';
+UPDATE `isnap2changedb`.`matching_option` SET `Content`='Cake' WHERE `OptionID`='16';
+
+
 
 # [Example] add poster record
 # run unit_test/poster-generator.php
