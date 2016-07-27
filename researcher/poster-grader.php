@@ -66,32 +66,53 @@ db_close($conn);
                     </div>
                     <!-- /.panel-heading -->
                     <div class="panel-body">
+                        <div class="parent-container">
+                            <!-- Grader -->
+                            <form id="submission" method="post" action="<?php echo $phpSelf ?>"
+                                  style="text-align: center;">
+                                <input type=hidden name="update" id="update" value="0" required>
+                                <input type=hidden name="quizID" value="<?php echo $quizID ?>" required>
+                                <?php for ($i = 0; $i < count($posterSubmissionResult); $i++) {
+                                    $quizID = $posterSubmissionResult[$i]->QuizID;
+                                    ?>
+                                    <div class="col-lg-4">
 
-                        <!-- Grader -->
-                        <form id="submission" method="post" action="<?php echo $phpSelf ?>">
-                            <input type=hidden name="update" id="update" value="0" required>
-                            <input type=hidden name="quizID" value="<?php echo $quizID ?>" required>
-                            <?php for ($i = 0; $i < count($posterSubmissionResult); $i++) {
-                                $quizID = $posterSubmissionResult[$i]->QuizID;
-                                ?>
-                                <input type=hidden id="studentID[]"
-                                       disabled value="<?php echo $posterSubmissionResult[$i]->StudentID ?>">
-                                <br>
-                                <label for=ImageURL[]">Student Poster:</label>
-                                <textarea id="ImageURL[]" rows="8"
-                                          disabled><?php echo $posterSubmissionResult[$i]->ImageURL ?></textarea>
-                                <br>
-                                <label for="grading[]">Grading</label>
-                                <input type="text" class="dialoginput pull-right" id="textInput<?php echo $quizID ?>"
-                                       value="<?php echo $posterSubmissionResult[$i]->Grading > 0 ? $posterSubmissionResult[$i]->Grading : $posterSubmissionResult[$i]->Points; ?>"
-                                       disabled>
-                                <input type="hidden" id="bonus[]" name="bonus[]"
-                                       value="0">
-                                <input type="checkbox" id="bonus[]" name="bonus[]"
-                                       value="1" <?php if ($posterSubmissionResult[$i]->Grading > 0) echo 'checked'; ?>>
-                                <br>
-                            <?php } ?>
-                        </form>
+                                        <div class="panel panel-default">
+                                            <div class="panel-heading">
+
+                                            </div>
+                                            <div class="panel-body">
+                                                <input type=hidden id="studentID[]"
+                                                       disabled
+                                                       value="<?php echo $posterSubmissionResult[$i]->StudentID ?>">
+                                                <br>
+                                                <a href="<?php echo $posterSubmissionResult[$i]->ImageURL ?>"><img
+                                                        src="<?php echo $posterSubmissionResult[$i]->ImageURL ?>"
+                                                        alt="Failed to load poster. Please contact developers."
+                                                        width="200"
+                                                        height="200"/></a>
+                                                <br>
+                                                <br>
+                                                <label for="textInput<?php echo $quizID ?>">Grading</label>
+                                                <input type="text" class="pull-right"
+                                                       id="textInput<?php echo $quizID ?>" name="grading[]"
+                                                       value="<?php echo $posterSubmissionResult[$i]->Grading > 0 ? $posterSubmissionResult[$i]->Grading : $posterSubmissionResult[$i]->Points; ?>"
+                                                       disabled>
+                                                <label for="bonus<?php echo $quizID ?>">Bonus</label>
+                                                <input type="hidden" id="bonus[]" name="bonus[]"
+                                                       value="0">
+                                                <input class="form-control" type="checkbox"
+                                                       id="bonus<?php echo $quizID ?>" name="bonus[]"
+                                                       value="1" <?php if ($posterSubmissionResult[$i]->Grading > 0) echo 'checked'; ?>>
+                                                <br>
+                                            </div>
+                                        </div>
+
+                                    </div>
+
+                                <?php } ?>
+                            </form>
+                        </div>
                     </div>
                     <!-- /.panel-body -->
                     <div class="panel-footer text-center">
@@ -121,6 +142,20 @@ db_close($conn);
             $('#submission').validate();
             $('#submission').submit();
         });
+
+        $('.parent-container').magnificPopup({
+            delegate: 'a', // child items selector, by clicking on it popup will open
+            type: 'image',
+            // other options
+            gallery: {
+                enabled: true, // set to true to enable gallery
+                navigateByImgClick: true,
+                arrowMarkup: '<button title="%title%" type="button" class="mfp-arrow mfp-arrow-%dir%"></button>', // markup of an arrow button
+                tPrev: 'Previous (Left arrow key)', // title for left button
+                tNext: 'Next (Right arrow key)', // title for right button
+                tCounter: '<span class="mfp-counter">%curr% of %total%</span>' // markup of counter
+            }
+        })
     });
 </script>
 </body>

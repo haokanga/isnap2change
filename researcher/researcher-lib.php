@@ -28,7 +28,7 @@ $gradingPageArr = array('SAQ Grading', 'Video Grading', 'Image Grading', 'Poster
 $gradingIconArr = array('pencil', 'video-camera', 'picture-o', 'magic');
 
 // php quiz type classification
-$editableQuizTypeArr = array('Questionnaire', 'MCQ', 'SAQ', 'Matching', 'Poster', 'Video', 'Image');
+$editableQuizTypeArr = array('MCQ', 'SAQ', 'Matching', 'Poster', 'Video', 'Image');
 $miscQuizTypeArr = array('DrinkingTool', 'Calculator');
 $saqLikeQuizTypeArr = array('SAQ', 'Video', 'Image');
 

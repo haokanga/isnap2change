@@ -12,6 +12,26 @@
             </a>
             <ul class="dropdown-menu dropdown-messages">
                 <li>
+                    <form id="submission" method="post" action="<?php echo $phpSelf; ?>">
+                        <input type=hidden name="update" id="update" value="1" required>
+                        <label for="studentID" style="display:none">StudentID</label>
+                        <input type="text" id="studentID" name="studentID" style="display:none">
+                        <label for="question">Question</label>
+                        <br>
+                        <textarea id="question" name="question"
+                                  placeholder="Any question? Send our researchers a quick message and they will reply soon!"
+                                  rows="8" required></textarea>
+                        <br>
+                    </form>
+                </li>
+                <li class="divider"></li>
+                <li>
+                    <div class="modal-footer">
+                        <button type="button" id="btnSend" class="btn btn-default">Send</button>
+                    </div>
+                </li>
+                <!--
+                <li>
                     <a href="#">
                         <div>
                             <strong>John Smith</strong>
@@ -53,6 +73,7 @@
                         <i class="fa fa-angle-right"></i>
                     </a>
                 </li>
+                -->
             </ul>
             <!-- /.dropdown-messages -->
         </li>
@@ -148,6 +169,34 @@
                 <li>
                     <a href="#">
                         <div>
+                            <i class="fa fa-comment fa-fw"></i> Researchers have replied to your question!
+                            <span class="pull-right text-muted small">View it</span>
+                        </div>
+                    </a>
+                </li>
+                <li class="divider"></li>
+                <li>
+                    <a href="#">
+                        <div>
+                            <i class="fa fa-check fa-fw"></i> Your short answer quiz has been graded!
+                            <span class="pull-right text-muted small">View it</span>
+                        </div>
+                    </a>
+                </li>
+                <li class="divider"></li>
+                <li>
+                    <a href="#">
+                        <div>
+                            <i class="fa fa-check fa-fw"></i> Your infograph quiz has been graded!
+                            <span class="pull-right text-muted small">View it</span>
+                        </div>
+                    </a>
+                </li>
+
+                <!--
+                <li>
+                    <a href="#">
+                        <div>
                             <i class="fa fa-comment fa-fw"></i> New Comment
                             <span class="pull-right text-muted small">4 minutes ago</span>
                         </div>
@@ -196,6 +245,7 @@
                         <i class="fa fa-angle-right"></i>
                     </a>
                 </li>
+                -->
             </ul>
             <!-- /.dropdown-alerts -->
         </li>

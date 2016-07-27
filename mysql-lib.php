@@ -473,13 +473,6 @@ function getQuizType(PDO $conn, $quizID)
         return getMiscQuizType($conn, $quizID);
     }
 
-    // questionnaire
-    if ($quizTypeQueryRes->QuizType == 'MCQ') {
-        if (getMCQSection($conn, $quizID)->Questionnaire == 1) {
-            return "Questionnaire";
-        }
-    }
-
     return $quizTypeQueryRes->QuizType;
 }
 
@@ -689,21 +682,21 @@ function getVerboseFacts(PDO $conn)
 
 
 /* MCQ */
-function createMCQSection(PDO $conn, $quizID, $points, $questionnaire)
+function createMCQSection(PDO $conn, $quizID, $points)
 {
-    $updateSql = "INSERT INTO MCQ_Section(QuizID, Points, Questionnaire)
-                    VALUES (?,?,?)";
+    $updateSql = "INSERT INTO MCQ_Section(QuizID, Points)
+                    VALUES (?,?)";
     $updateSql = $conn->prepare($updateSql);
-    $updateSql->execute(array($quizID, $points, $questionnaire));
+    $updateSql->execute(array($quizID, $points));
 }
 
-function updateMCQSection(PDO $conn, $quizID, $points, $questionnaire)
+function updateMCQSection(PDO $conn, $quizID, $points)
 {
     $updateSql = "UPDATE MCQ_Section
-                    SET Points = ?, Questionnaire = ?
+                    SET Points = ?
                     WHERE QuizID = ?";
     $updateSql = $conn->prepare($updateSql);
-    $updateSql->execute(array($points, $questionnaire, $quizID));
+    $updateSql->execute(array($points, $quizID));
 }
 
 function createMCQQuestion(PDO $conn, $quizID, $question)
@@ -1185,12 +1178,13 @@ function checkMatchingAnswer(PDO $conn, $matchingID, $answer)
     foreach ($matchingOptionsResult as $correctOption) {
         array_push($correctAns, $correctOption->OptionID);
     }
-    
-   // sort($answer);
-   // sort($correctAns);
+
+    // sort($answer);
+    // sort($correctAns);
 
     return array_diff($correctAns, $answer);
 }
+
 /* Matching_Option */
 
 /* Learning_Material */

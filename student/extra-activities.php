@@ -485,28 +485,6 @@
                         </a>
 <?php               }
                     break;
-                case "Questionnaire":
-                    if (isset($extraActivities[$i][$j]['Status'])) { ?>
-                        <a href="game-home.php">
-                            <div class="game-nav-item game-nav-item-completed game-multiple-choice-quiz" >
-                                <div class="game-nav-logo"></div>
-                                <div class="game-nav-title">Questionnaire</div>
-                                <div class="game-nav-divider"></div>
-                                <div class="game-nav-desc">Complete Questionnaire to receive <?php echo $extraActivities[$i][$j]['Points']?> points.</div>
-                                <div class="game-nav-status">Completed</div>
-                            </div>
-                        </a>
-<?php               } else { ?>
-                        <a href="pre-task-material.php?quiz_id=<?php echo $extraActivities[$i][$j]['QuizID']?>">
-                            <div class="game-nav-item game-multiple-choice-quiz">
-                                <div class="game-nav-logo"></div>
-                                <div class="game-nav-title">Questionnaire</div>
-                                <div class="game-nav-divider"></div>
-                                <div class="game-nav-desc">Complete Questionnaire to receive <?php echo $extraActivities[$i][$j]['Points']?> points.</div>
-                            </div>
-                        </a>
-<?php               }
-                    break;
 
         } ?>
                     </div>
