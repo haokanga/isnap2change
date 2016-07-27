@@ -667,10 +667,9 @@ function getVerboseFactNumByTopic(PDO $conn, $topicID)
 
 function getVerboseFacts(PDO $conn)
 {
-    //get verbose fact for all the topics (TOPIC.Introduction excluded)
     $factSql = "SELECT * FROM Topic 
                 LEFT JOIN Verbose_Fact 
-                USING (TopicID) WHERE TopicName != 'Introduction'";
+                USING (TopicID)";
     $factQuery = $conn->prepare($factSql);
     $factQuery->execute();
     $factResult = $factQuery->fetchAll(PDO::FETCH_OBJ);

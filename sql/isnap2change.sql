@@ -51,12 +51,12 @@ DROP TABLE IF EXISTS Poster_Record;
 DROP TABLE IF EXISTS Misc_Section;
 DROP TABLE IF EXISTS Game;
 DROP TABLE IF EXISTS Game_Record;
-/*
-DROP TABLE IF EXISTS Bonus;
-DROP TABLE IF EXISTS Bonus_Record;
-DROP TABLE IF EXISTS Bonus_Task;
-DROP TABLE IF EXISTS Bonus_Task_Record;
-*/
+DROP TABLE IF EXISTS Recipe;
+DROP TABLE IF EXISTS Recipe_Ingredient;
+DROP TABLE IF EXISTS Recipe_Nutrition;
+DROP TABLE IF EXISTS Recipe_Step;
+DROP TABLE IF EXISTS Student_Question;
+DROP TABLE IF EXISTS Public_Question;
 
 CREATE TABLE IF NOT EXISTS `School` (
   SchoolID   MEDIUMINT AUTO_INCREMENT,
@@ -402,52 +402,93 @@ CREATE TABLE IF NOT EXISTS `Game_Record` (
 )
   ENGINE = INNODB;
 
-/*
-CREATE TABLE IF NOT EXISTS `Bonus` (
-    BonusID MEDIUMINT AUTO_INCREMENT,
-    Week MEDIUMINT,
-    CONSTRAINT Bonus_BonusID_PK PRIMARY KEY (BonusID)
-)  ENGINE=INNODB;
 
-CREATE TABLE IF NOT EXISTS `Bonus_Record` (
-    BonusID MEDIUMINT,
-    StudentID MEDIUMINT,
-    CONSTRAINT Bonus_Record_PK PRIMARY KEY (BonusID , StudentID),
-    CONSTRAINT Bonus_Record_BonusID_FK FOREIGN KEY (BonusID)
-        REFERENCES Bonus (BonusID)
-        ON DELETE CASCADE ON UPDATE CASCADE,
-    CONSTRAINT Bonus_Record_StudentID_FK FOREIGN KEY (StudentID)
-        REFERENCES Student (StudentID)
-        ON DELETE CASCADE ON UPDATE CASCADE
-)  ENGINE=INNODB;
+CREATE TABLE IF NOT EXISTS `Recipe` (
+  RecipeID        MEDIUMINT AUTO_INCREMENT,
+  RecipeName      TEXT      NOT NULL,
+  Source          TEXT, # for credit
+  MealType        TEXT      NOT NULL,
+  PreparationTime MEDIUMINT NOT NULL,
+  CookingTime     MEDIUMINT NOT NULL,
+  Serves          MEDIUMINT NOT NULL,
+  Image           TEXT      DEFAULT NULL,
+  CONSTRAINT Recipe_RecipeID_PK PRIMARY KEY (RecipeID)
+)
+  ENGINE = INNODB;
 
-CREATE TABLE IF NOT EXISTS `Bonus_Task` (
-    BonusQuestionID MEDIUMINT AUTO_INCREMENT,
-    Question TEXT,
-    Points MEDIUMINT,
-    BonusID MEDIUMINT,
-    CONSTRAINT Bonus_Task_BonusQuestionID_PK PRIMARY KEY (BonusQuestionID),
-    CONSTRAINT Bonus_Task_BonusID_FK FOREIGN KEY (BonusID)
-        REFERENCES Bonus (BonusID)
-        ON DELETE CASCADE ON UPDATE CASCADE
-)  ENGINE=INNODB;
+CREATE TABLE IF NOT EXISTS `Recipe_Ingredient` (
+  IngredientID MEDIUMINT AUTO_INCREMENT,
+  Content      TEXT,
+  RecipeID     MEDIUMINT NOT NULL,
+  CONSTRAINT Recipe_Ingredient_IngredientID_PK PRIMARY KEY (IngredientID),
+  CONSTRAINT Recipe_Ingredient_RecipeID_FK FOREIGN KEY (RecipeID)
+  REFERENCES Recipe (RecipeID)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE
+)
+  ENGINE = INNODB;
 
-CREATE TABLE IF NOT EXISTS `Bonus_Task_Record` (
-    StudentID MEDIUMINT,
-    BonusQuestionID MEDIUMINT,
-    Answer TEXT,
-    Feedback TEXT,
-    Grading MEDIUMINT,
-    CONSTRAINT Bonus_Task_Record_PK PRIMARY KEY (StudentID , BonusQuestionID),
-    CONSTRAINT Bonus_Task_Record_StudentID FOREIGN KEY (StudentID)
-        REFERENCES Student (StudentID)
-        ON DELETE CASCADE ON UPDATE CASCADE,
-    CONSTRAINT Bonus_Task_Record_BonusQuestionID FOREIGN KEY (BonusQuestionID)
-        REFERENCES Bonus_Task (BonusQuestionID)
-        ON DELETE CASCADE ON UPDATE CASCADE
-)  ENGINE=INNODB;
-*/
+CREATE TABLE IF NOT EXISTS `Recipe_Step` (
+  StepID      MEDIUMINT AUTO_INCREMENT,
+  Description TEXT,
+  RecipeID    MEDIUMINT NOT NULL,
+  CONSTRAINT Recipe_Step_StepID_PK PRIMARY KEY (StepID),
+  CONSTRAINT Recipe_Step_RecipeID_FK FOREIGN KEY (RecipeID)
+  REFERENCES Recipe (RecipeID)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE
+)
+  ENGINE = INNODB;
 
+CREATE TABLE IF NOT EXISTS `Recipe_Nutrition` (
+  NutritionID     MEDIUMINT AUTO_INCREMENT,
+  NutritionName   TEXT,
+  MeasurementUnit TEXT, # e.g. kj, g, mg, etc.
+  RecipeID        MEDIUMINT NOT NULL,
+  CONSTRAINT Recipe_Nutrition_NutritionID_PK PRIMARY KEY (NutritionID),
+  CONSTRAINT Recipe_Nutrition_RecipeID_FK FOREIGN KEY (RecipeID)
+  REFERENCES Recipe (RecipeID)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE
+)
+  ENGINE = INNODB;
+
+
+CREATE TABLE IF NOT EXISTS `Student_Question` (
+  QuestionID MEDIUMINT AUTO_INCREMENT,
+  Subject    TEXT      NOT NULL,
+  Content    TEXT,
+  StudentID  MEDIUMINT NOT NULL,
+  CONSTRAINT Student_Question_QuestionID_PK PRIMARY KEY (QuestionID),
+  CONSTRAINT Student_Question_StudentID_FK FOREIGN KEY (StudentID)
+  REFERENCES Student (StudentID)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE
+)
+  ENGINE = INNODB;
+
+CREATE TABLE IF NOT EXISTS `Student_Question_Feedback` (
+  FeedbackID MEDIUMINT AUTO_INCREMENT,
+  Feedback   TEXT,
+  Viewed     BOOLEAN   DEFAULT 0,
+  QuestionID MEDIUMINT NOT NULL,
+  CONSTRAINT Student_Question_Feedback_PK PRIMARY KEY (FeedbackID),
+  CONSTRAINT Student_Question_Feedback_QuestionID_FK FOREIGN KEY (QuestionID)
+  REFERENCES Student_Question (QuestionID)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE
+)
+  ENGINE = INNODB;
+
+CREATE TABLE IF NOT EXISTS `Public_Question` (
+  QuestionID MEDIUMINT AUTO_INCREMENT,
+  Name       TEXT      NOT NULL,
+  Email      TEXT      NOT NULL,
+  Content    MEDIUMINT NOT NULL,
+  Solved     BOOLEAN   DEFAULT 0,
+  CONSTRAINT Public_Question_QuestionID_PK PRIMARY KEY (QuestionID)
+)
+  ENGINE = INNODB;
 
 SET FOREIGN_KEY_CHECKS = 1;
 
@@ -543,7 +584,6 @@ INSERT IGNORE INTO Topic (TopicName) VALUES ('Smoking');
 INSERT IGNORE INTO Topic (TopicName) VALUES ('Nutrition');
 INSERT IGNORE INTO Topic (TopicName) VALUES ('Alcohol');
 INSERT IGNORE INTO Topic (TopicName) VALUES ('Physical Activity');
-INSERT IGNORE INTO Topic (TopicName) VALUES ('Introduction');
 INSERT IGNORE INTO Topic (TopicName) VALUES ('Drugs');
 INSERT IGNORE INTO Topic (TopicName) VALUES ('Sexual Health');
 INSERT IGNORE INTO Topic (TopicName) VALUES ('Health and Wellbeing');
@@ -1058,7 +1098,7 @@ VALUES ('Short Term Effects of Smoking', 'Short Term Effects of Smoking Content.
 INSERT IGNORE INTO `Verbose_Fact` (Title, Content, TopicID) VALUES ('Emphysema', 'Emphysema is a long-term, progressive disease of the lungs that primarily causes shortness of breath due to over-inflation of the alveoli (air sacs in the lung). In people with emphysema, the lung tissue involved in exchange of gases (oxygen and carbon dioxide) is impaired or destroyed. Emphysema is included in a group of diseases called chronic obstructive pulmonary disease or COPD (pulmonary refers to the lungs).
 Emphysema is called an obstructive lung disease because airflow on exhalation is slowed or stopped because over-inflated alveoli do not exchange gases when a person breaths due to little or no movement of gases out of the alveoli.
 Emphysema changes the anatomy of the lung in several important ways. This is due to in part to the destruction of lung tissue around smaller airways. This tissue normally holds these small airways, called bronchioles, open, allowing air to leave the lungs on exhalation. When this tissue is damaged, these airways collapse, making it difficult for the lungs to empty and the air (gases) becomes trapped in the alveoli.
-Normal lung tissue looks like a new sponge. Emphysematous lung looks like an old used sponge, with large holes and a dramatic loss of “springy-ness�or elasticity. When the lung is stretched during inflation (inhalation), the nature of the stretched tissue wants to relax to its resting state. In emphysema, this elastic function is impaired, resulting in air trapping in the lungs. Emphysema destroys this spongy tissue of the lung and also severely affects the small blood vessels (capillaries of the lung) and airways that run throughout the lung. Thus, not only is airflow affected but so is blood flow. This has dramatic impact on the ability for the lung not only to empty its air sacs called alveoli (pleural for alveolus) but also for blood to flow through the lungs to receive oxygen.',
+Normal lung tissue looks like a new sponge. Emphysematous lung looks like an old used sponge, with large holes and a dramatic loss of “springy-nessor elasticity. When the lung is stretched during inflation (inhalation), the nature of the stretched tissue wants to relax to its resting state. In emphysema, this elastic function is impaired, resulting in air trapping in the lungs. Emphysema destroys this spongy tissue of the lung and also severely affects the small blood vessels (capillaries of the lung) and airways that run throughout the lung. Thus, not only is airflow affected but so is blood flow. This has dramatic impact on the ability for the lung not only to empty its air sacs called alveoli (pleural for alveolus) but also for blood to flow through the lungs to receive oxygen.',
                                                                     1);
 INSERT IGNORE INTO `Verbose_Fact` (Title, Content, TopicID)
 VALUES ('Long Term Effects of Smoking', 'Long Term Effects of Smoking Content...', 1);
