@@ -11,25 +11,6 @@
                 <i class="fa fa-envelope fa-fw"></i> <i class="fa fa-caret-down"></i>
             </a>
             <ul class="dropdown-menu dropdown-messages">
-                <li>
-                    <form id="submission" method="post" action="<?php echo $phpSelf; ?>">
-                        <input type=hidden name="update" id="update" value="1" required>
-                        <label for="studentID" style="display:none">StudentID</label>
-                        <input type="text" id="studentID" name="studentID" style="display:none">
-                        <label for="question">Question</label>
-                        <br>
-                        <textarea id="question" name="question"
-                                  placeholder="Any question? Send our researchers a quick message and they will reply soon!"
-                                  rows="8" required></textarea>
-                        <br>
-                    </form>
-                </li>
-                <li class="divider"></li>
-                <li>
-                    <div class="modal-footer">
-                        <button type="button" id="btnSend" class="btn btn-default">Send</button>
-                    </div>
-                </li>
                 <!--
                 <li>
                     <a href="#">
