@@ -1826,6 +1826,104 @@ function updateStudentGameScores(PDO $conn, $gameID, $studentID, $score)
 
 /* Game */
 
+
+/* MCQ */
+function createRecipe(PDO $conn, $cookingTime, $mealType, $preparationTime, $recipeName, $serves, $source)
+{
+    $updateSql = "INSERT INTO Recipe(RecipeName, Source, MealType, PreparationTime, CookingTime, Serves)
+                    VALUES (?,?,?,?,?,?)";
+    $updateSql = $conn->prepare($updateSql);
+    $updateSql->execute(array($recipeName, $source, $mealType, $preparationTime, $cookingTime, $serves));
+}
+
+function updateRecipe(PDO $conn, $recipeID, $cookingTime, $mealType, $preparationTime, $recipeName, $serves, $source)
+{
+    $updateSql = "UPDATE Recipe
+                    SET RecipeName = ?, Source= ?, MealType= ?, PreparationTime= ?, CookingTime= ?, Serves= ?
+                    WHERE RecipeID = ?";
+    $updateSql = $conn->prepare($updateSql);
+    $updateSql->execute(array($recipeName, $source, $mealType, $preparationTime, $cookingTime, $serves, $recipeID));
+}
+
+function deleteRecipe(PDO $conn, $recipeID)
+{
+    deleteRecord($conn, $recipeID, "Recipe");
+}
+
+function createRecipeIngredient(PDO $conn, $recipeID, $content)
+{
+    $updateSql = "INSERT INTO Recipe_Ingredient(Content, RecipeID)
+                    VALUES (?,?)";
+    $updateSql = $conn->prepare($updateSql);
+    $updateSql->execute(array(htmlspecialchars($content), $recipeID));
+    return $conn->lastInsertId();
+}
+
+function updateRecipeIngredient(PDO $conn, $ingredientID, $content)
+{
+    $updateSql = "UPDATE Recipe_Ingredient
+                    SET Content = ?
+                    WHERE IngredientID = ?";
+    $updateSql = $conn->prepare($updateSql);
+    $updateSql->execute(array(htmlspecialchars($content), $ingredientID));
+}
+
+function deleteRecipeIngredient(PDO $conn, $ingredientID)
+{
+    deleteRecord($conn, $ingredientID, "Recipe_Ingredient");
+}
+
+function deleteRecipeNutrition(PDO $conn, $ingredientID)
+{
+    deleteRecord($conn, $ingredientID, "Recipe_Nutrition");
+}
+
+function deleteRecipeStep(PDO $conn, $ingredientID)
+{
+    deleteRecord($conn, $ingredientID, "Recipe_Step");
+}
+
+
+function getRecipe(PDO $conn, $recipeID)
+{
+    return getRecord($conn, $recipeID, 'Recipe');
+}
+
+function getRecipes(PDO $conn)
+{
+    return getRecords($conn, 'Recipe');
+}
+
+function getRecordsByRecipeID(PDO $conn, $recipeID, $tableName)
+{
+    $tableSql = "SELECT *
+                    FROM Recipe NATURAL JOIN $tableName
+                    WHERE RecipeID = ?";
+    $tableQuery = $conn->prepare($tableSql);
+    $tableQuery->execute(array($recipeID));
+    $tableResult = $tableQuery->fetchAll(PDO::FETCH_OBJ);
+    return $tableResult;
+}
+
+
+function getRecipeIngredients(PDO $conn, $recipeID)
+{
+    return getRecordsByRecipeID($conn, $recipeID, "Recipe_Ingredient");
+}
+
+function getRecipeNutritions(PDO $conn, $recipeID)
+{
+    return getRecordsByRecipeID($conn, $recipeID, "Recipe_Nutrition");
+}
+
+function getRecipeSteps(PDO $conn, $recipeID)
+{
+    return getRecordsByRecipeID($conn, $recipeID, "Recipe_Step");
+}
+
+/* MCQ */
+
+
 /* Log */
 function createLog(PDO $conn, $logArr)
 {
