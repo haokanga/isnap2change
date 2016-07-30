@@ -1257,6 +1257,36 @@ INSERT INTO `isnap2changedb`.`Poster_Section` (`QuizID`, `Title`, `Description`,
 # [Example] add poster record
 # run unit_test/poster-generator.php
 
+# [Example] add recipe
+INSERT INTO `isnap2changedb`.`Recipe` (`RecipeName`, `Source`, `MealType`,`PreparationTime`,`CookingTime`,`Serves`) VALUES ('Eggplant Parmesan Pizza', 'http://www.eatingwell.com/recipes_menus/recipe_slideshows/vegetarian_pizza_recipes?slide=1#leaderboardad', 'Main Meal', 15,20,4);
+SET @RECIPE_LAST_INSERT_ID = LAST_INSERT_ID();
+INSERT INTO `isnap2changedb`.`Recipe_Ingredient` (`Content`, `RecipeID`) VALUES ('1 small eggplant, (about 12 ounces)', @RECIPE_LAST_INSERT_ID);
+INSERT INTO `isnap2changedb`.`Recipe_Ingredient` (`Content`, `RecipeID`) VALUES ('Yellow cornmeal, for dusting', @RECIPE_LAST_INSERT_ID);
+INSERT INTO `isnap2changedb`.`Recipe_Ingredient` (`Content`, `RecipeID`) VALUES ('1 pound Easy Whole-Wheat Pizza Dough, or other prepared dough (recipe follows)', @RECIPE_LAST_INSERT_ID);
+INSERT INTO `isnap2changedb`.`Recipe_Ingredient` (`Content`, `RecipeID`) VALUES ('3/4 cup prepared marinara sauce', @RECIPE_LAST_INSERT_ID);
+INSERT INTO `isnap2changedb`.`Recipe_Ingredient` (`Content`, `RecipeID`) VALUES ('2 tablespoons chopped fresh basil', @RECIPE_LAST_INSERT_ID);
+INSERT INTO `isnap2changedb`.`Recipe_Ingredient` (`Content`, `RecipeID`) VALUES ('1 medium clove garlic, minced medium clove garlic, minced', @RECIPE_LAST_INSERT_ID);
+INSERT INTO `isnap2changedb`.`Recipe_Ingredient` (`Content`, `RecipeID`) VALUES ('3/4 cup thinly shaved Parmigiano-Reggiano cheese, (see Tip)', @RECIPE_LAST_INSERT_ID);
+
+INSERT INTO `isnap2changedb`.`Recipe_Step` (`Description`, `RecipeID`) VALUES ('Preheat grill to medium-high. (For charcoal grilling or an oven variation, see below.)', @RECIPE_LAST_INSERT_ID);
+INSERT INTO `isnap2changedb`.`Recipe_Step` (`Description`, `RecipeID`) VALUES ('Cut eggplant into 1/2-inch thick rounds. Grill, turning once, until marked and softened, 4 to 6 minutes. Let cool slightly, then thinly slice into strips. Reduce heat to low.', @RECIPE_LAST_INSERT_ID);
+INSERT INTO `isnap2changedb`.`Recipe_Step` (`Description`, `RecipeID`) VALUES ('Sprinkle cornmeal onto a pizza peel or large baking sheet. Roll out the dough (see Tip) and transfer it to the prepared peel or baking sheet, making sure the underside of the dough is completely coated with cornmeal.', @RECIPE_LAST_INSERT_ID);
+INSERT INTO `isnap2changedb`.`Recipe_Step` (`Description`, `RecipeID`) VALUES ('Slide the crust onto the grill rack; close the lid. Cook until lightly browned, 3 to 4 minutes.', @RECIPE_LAST_INSERT_ID);
+INSERT INTO `isnap2changedb`.`Recipe_Step` (`Description`, `RecipeID`) VALUES ('Using a large spatula, flip the crust. Spread marinara sauce on the crust, leaving a 1-inch border. Quickly top with the eggplant, basil and garlic. Lay the Parmigiano-Reggiano shavings on top.', @RECIPE_LAST_INSERT_ID);
+INSERT INTO `isnap2changedb`.`Recipe_Step` (`Description`, `RecipeID`) VALUES ('Close the lid again and grill until the cheese has melted and the bottom of the crust has browned, about 8 minutes.', @RECIPE_LAST_INSERT_ID);
+
+INSERT INTO `isnap2changedb`.`Recipe_Nutrition` (`MeasurementUnit`,`NutritionName`, `RecipeID`) VALUES ('359','calories', @RECIPE_LAST_INSERT_ID);
+INSERT INTO `isnap2changedb`.`Recipe_Nutrition` (`MeasurementUnit`,`NutritionName`, `RecipeID`) VALUES ('7 g','fat', @RECIPE_LAST_INSERT_ID);
+INSERT INTO `isnap2changedb`.`Recipe_Nutrition` (`MeasurementUnit`,`NutritionName`, `RecipeID`) VALUES ('12 mg','cholesterol', @RECIPE_LAST_INSERT_ID);
+INSERT INTO `isnap2changedb`.`Recipe_Nutrition` (`MeasurementUnit`,`NutritionName`, `RecipeID`) VALUES ('59 g','carbohydrates', @RECIPE_LAST_INSERT_ID);
+INSERT INTO `isnap2changedb`.`Recipe_Nutrition` (`MeasurementUnit`,`NutritionName`, `RecipeID`) VALUES ('16 g','protein', @RECIPE_LAST_INSERT_ID);
+INSERT INTO `isnap2changedb`.`Recipe_Nutrition` (`MeasurementUnit`,`NutritionName`, `RecipeID`) VALUES ('9 g','fiber', @RECIPE_LAST_INSERT_ID);
+INSERT INTO `isnap2changedb`.`Recipe_Nutrition` (`MeasurementUnit`,`NutritionName`, `RecipeID`) VALUES ('713 mg','sodium', @RECIPE_LAST_INSERT_ID);
+INSERT INTO `isnap2changedb`.`Recipe_Nutrition` (`MeasurementUnit`,`NutritionName`, `RecipeID`) VALUES ('416 mg','potassium', @RECIPE_LAST_INSERT_ID);
+
+
+
+
 
 /*
 #TEST

@@ -13,7 +13,7 @@ Major work: Project Management; Front-end development for student system;  Integ
 Also contribute to: Database design & PDO Library
 ###Haokang (Marshall) An: 
 
-Major work: Development for researcher system; Unit test; Integration between Unity3D games and database; Server deployment and backup
+Major work: Development for researcher system; Unit test; Integration between Unity3D games and database; Text-To-Speech(TTS); Server deployment and backup
 
 Also contribute to: Database design & PDO Library
 

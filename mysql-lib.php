@@ -1868,19 +1868,37 @@ function updateRecipeIngredient(PDO $conn, $ingredientID, $content)
     $updateSql->execute(array(htmlspecialchars($content), $ingredientID));
 }
 
+function updateRecipeNutrition(PDO $conn, $nutritionID, $measurementUnit, $nutritionName)
+{
+    $updateSql = "UPDATE Recipe_Nutrition
+                    SET NutritionName = ?, MeasurementUnit = ?
+                    WHERE NutritionID = ?";
+    $updateSql = $conn->prepare($updateSql);
+    $updateSql->execute(array(htmlspecialchars($nutritionName), htmlspecialchars($measurementUnit), $nutritionID));
+}
+
+function updateRecipeStep(PDO $conn, $stepID, $description)
+{
+    $updateSql = "UPDATE Recipe_Step
+                    SET Description = ?
+                    WHERE StepID = ?";
+    $updateSql = $conn->prepare($updateSql);
+    $updateSql->execute(array(htmlspecialchars($description), $stepID));
+}
+
 function deleteRecipeIngredient(PDO $conn, $ingredientID)
 {
     deleteRecord($conn, $ingredientID, "Recipe_Ingredient");
 }
 
-function deleteRecipeNutrition(PDO $conn, $ingredientID)
+function deleteRecipeNutrition(PDO $conn, $nutritionID)
 {
-    deleteRecord($conn, $ingredientID, "Recipe_Nutrition");
+    deleteRecord($conn, $nutritionID, "Recipe_Nutrition");
 }
 
-function deleteRecipeStep(PDO $conn, $ingredientID)
+function deleteRecipeStep(PDO $conn, $stepID)
 {
-    deleteRecord($conn, $ingredientID, "Recipe_Step");
+    deleteRecord($conn, $stepID, "Recipe_Step");
 }
 
 
