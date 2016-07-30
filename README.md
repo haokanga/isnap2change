@@ -6,24 +6,25 @@ Harshani Jayasinghe, The Clinical Practice Unit (Respiratory Medicine)
 
 
 ## Collaborators and Responsibilities in the Production Version of Website
-###Weijun (Mike) Wu: 
+###Weijun (Mike) Wu, Core Developer
 
 Major work: Project Management; Front-end development for student system;  Integration between front-end and back-end for student system
 
 Also contribute to: Database design & PDO Library
-###Haokang (Marshall) An: 
+###Haokang (Marshall) An, Core Developer
 
 Major work: Development for researcher system; Unit test; Integration between Unity3D games and database; Text-To-Speech(TTS); Server deployment and backup
 
 Also contribute to: Database design & PDO Library
 
-###Timothy Casiero:
+###Timothy Casiero, Designer
 
-Designer for the whole website, covering all the layouts, icons and styles
+Design all the layouts, icons and styles in the website
 
-###Zhuoran Zhang (Part-time):
+###Chris Stavrakis, Game Developer
+
+Embedded Unity3D games
+
+###Zhuoran Zhang, Part-time Developer
 
 Contribute to: Front-end development for student system;  Integration between front-end and back-end for student system
-
-###Chris Stavrakis:
-Embedded Unity3D games
