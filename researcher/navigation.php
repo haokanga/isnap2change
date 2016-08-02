@@ -11,6 +11,7 @@
                 <i class="fa fa-envelope fa-fw"></i> <i class="fa fa-caret-down"></i>
             </a>
             <ul class="dropdown-menu dropdown-messages">
+                <!--
                 <li>
                     <a href="#">
                         <div>
@@ -53,6 +54,7 @@
                         <i class="fa fa-angle-right"></i>
                     </a>
                 </li>
+                -->
             </ul>
             <!-- /.dropdown-messages -->
         </li>
@@ -148,6 +150,34 @@
                 <li>
                     <a href="#">
                         <div>
+                            <i class="fa fa-comment fa-fw"></i> Researchers have replied to your question!
+                            <span class="pull-right text-muted small">View it</span>
+                        </div>
+                    </a>
+                </li>
+                <li class="divider"></li>
+                <li>
+                    <a href="#">
+                        <div>
+                            <i class="fa fa-check fa-fw"></i> Your short answer quiz has been graded!
+                            <span class="pull-right text-muted small">View it</span>
+                        </div>
+                    </a>
+                </li>
+                <li class="divider"></li>
+                <li>
+                    <a href="#">
+                        <div>
+                            <i class="fa fa-check fa-fw"></i> Your infograph quiz has been graded!
+                            <span class="pull-right text-muted small">View it</span>
+                        </div>
+                    </a>
+                </li>
+
+                <!--
+                <li>
+                    <a href="#">
+                        <div>
                             <i class="fa fa-comment fa-fw"></i> New Comment
                             <span class="pull-right text-muted small">4 minutes ago</span>
                         </div>
@@ -196,6 +226,7 @@
                         <i class="fa fa-angle-right"></i>
                     </a>
                 </li>
+                -->
             </ul>
             <!-- /.dropdown-alerts -->
         </li>

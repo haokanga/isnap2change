@@ -27,13 +27,7 @@ try {
                         switch ($quizType) {
                             case "MCQ":
                                 $quizID = createQuiz($conn, $topicID, $quizType, $week);
-                                $questionnaire = 0;
-                                createMCQSection($conn, $quizID, $points, $questionnaire);
-                                break;
-                            case "Questionnaire":
-                                $quizID = createQuiz($conn, $topicID, $quizType, $week);
-                                $questionnaire = 1;
-                                createMCQSection($conn, $quizID, $points, $questionnaire);
+                                createMCQSection($conn, $quizID, $points);
                                 break;
                             case "SAQ":
                             case "Video":

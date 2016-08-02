@@ -135,7 +135,7 @@
     <div class="content-wrapper">
         <div class="material">
             <h2 class="material-title">Read the follow information about <?php echo strtolower($materialRes->TopicName) ?> then finish the task provided.</h2>
-<?php   if ($materialRes->Excluded == 0 || $quizType == "Questionnaire") { ?>
+<?php   if ($materialRes->Excluded == 0) { ?>
             <div class="material-content-included p1">
                 <?php echo $materialRes->Content; ?>
             </div>

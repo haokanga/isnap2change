@@ -21,14 +21,14 @@ if (isset($_SESSION['researcherID'])) {
 // sidebar
 $userAdminPageArr = array('School', 'Class', 'Student');
 $userAdminIconArr = array('mortar-board', 'users', 'child');
-$contentAdminPageArr = array('Week', 'Quiz', 'Snap Fact', 'Verbose Fact', 'MCQ', 'SAQ', 'Matching', 'Poster', 'Video', 'Image', 'Misc');
+$contentAdminPageArr = array('Week', 'Quiz', 'Snap Fact', 'Verbose Fact', 'Recipe', 'MCQ', 'SAQ', 'Matching', 'Poster', 'Video', 'Image', 'Misc');
 $quizTypeArr = array('Matching', 'Poster', 'Video', 'Image', 'Misc');
-$contentAdminIconArr = array('calendar', 'book', 'lightbulb-o', 'folder-open', 'check', 'pencil', 'th-list', 'paint-brush', 'video-camera', 'picture-o', 'magic');
+$contentAdminIconArr = array('calendar', 'book', 'lightbulb-o', 'folder-open', 'spoon', 'check', 'pencil', 'th-list', 'paint-brush', 'video-camera', 'picture-o', 'magic');
 $gradingPageArr = array('SAQ Grading', 'Video Grading', 'Image Grading', 'Poster Grading');
 $gradingIconArr = array('pencil', 'video-camera', 'picture-o', 'magic');
 
 // php quiz type classification
-$editableQuizTypeArr = array('Questionnaire', 'MCQ', 'SAQ', 'Matching', 'Poster', 'Video', 'Image');
+$editableQuizTypeArr = array('MCQ', 'SAQ', 'Matching', 'Poster', 'Video', 'Image');
 $miscQuizTypeArr = array('DrinkingTool', 'Calculator');
 $saqLikeQuizTypeArr = array('SAQ', 'Video', 'Image');
 

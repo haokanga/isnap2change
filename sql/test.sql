@@ -49,7 +49,6 @@ SELECT QuizType FROM Quiz WHERE QuizID = 9;
 
 
 SELECT * FROM Quiz natural join Quiz_Record WHERE QuizID=1 AND StudentID = 2 AND `Status`='GRADED' ;
-*/
 
 
 
@@ -130,7 +129,10 @@ SELECT COUNT(*)
 				 WHERE SnapFact = 0 AND TopicID = 3;             
 SELECT * 
                         FROM   Quiz LEFT JOIN Learning_Material USING (QuizID);
+             
+SELECT * , COUNT(*) AS SubmissionNum FROM poster_section NATURAL JOIN quiz NATURAL JOIN topic NATURAL JOIN quiz_record GROUP BY QuizID;
+*/
 
-                 
-                 
-                 
+SELECT * , COUNT(*) AS Ungraded FROM poster_section NATURAL JOIN topic NATURAL JOIN quiz LEFT JOIN quiz_record USING (QuizID) WHERE `Status` = 'UNGRADED' GROUP BY QuizID;
+SELECT COUNT(*) AS Ungraded FROM poster_section NATURAL JOIN topic NATURAL JOIN quiz NATURAL JOIN quiz_record WHERE `Status` = 'UNGRADED' AND QuizID = 9;
+SELECT COUNT(*) AS Ungraded FROM poster_section NATURAL JOIN topic NATURAL JOIN quiz NATURAL JOIN quiz_record WHERE `Status` = 'UNGRADED' AND QuizID = 12;            

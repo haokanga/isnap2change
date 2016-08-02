@@ -3,7 +3,7 @@ session_start();
 require_once("../mysql-lib.php");
 require_once("../debug.php");
 require_once("researcher-lib.php");
-$columnName = array('QuizID', 'Week', 'TopicName', 'Points', 'Questionnaire', 'Questions');
+$columnName = array('QuizID', 'Week', 'TopicName', 'Points', 'Questions');
 
 try {
     $conn = db_connect();
@@ -16,12 +16,11 @@ try {
                     $quizType = 'MCQ';
                     $topicName = $_POST['topicName'];
                     $points = $_POST['points'];
-                    $questionnaire = $_POST['questionnaire'];
                     $conn->beginTransaction();
 
                     $topicID = getTopicByName($conn, $topicName)->TopicID;
                     $quizID = createQuiz($conn, $topicID, $quizType, $week);
-                    createMCQSection($conn, $quizID, $points, $questionnaire);
+                    createMCQSection($conn, $quizID, $points);
                     createEmptyLearningMaterial($conn, $quizID);
 
                     $conn->commit();
@@ -93,12 +92,7 @@ db_close($conn);
                                                 echo 'style="display:none"';
                                             } ?>>
                                                 <?php
-                                                // Questionnaire: if 1, true; else if 0, false
-                                                if ($j == count($columnName) - 2) {
-                                                    echo $quizResult[$i]->$columnName[$j] ? 'True' : 'False';
-                                                } else {
-                                                    echo $quizResult[$i]->$columnName[$j];
-                                                }
+                                                echo $quizResult[$i]->$columnName[$j];
                                                 ?>
                                                 <?php if ($j == count($columnName) - 1) { ?>
                                                     <span class="glyphicon glyphicon-remove pull-right"
@@ -163,9 +157,6 @@ db_close($conn);
                     <input type="text" class="form-control dialoginput" id="Points" name="points"
                            placeholder="Input Points" required>
                     <br>
-                    <label for="Questionnaire">Questionnaire</label>
-                    <input type="hidden" class="form-control" id="Questionnaire" name="questionnaire" value="0">
-                    <input type="checkbox" class="form-control" id="Questionnaire" name="questionnaire" value="1">
                 </form>
             </div>
             <div class="modal-footer">
@@ -182,7 +173,7 @@ db_close($conn);
     //DO NOT put them in $(document).ready() since the table has multi pages
     var dialogInputArr = $('.dialoginput');
     $('.glyphicon-plus').on('click', function () {
-		$("label").remove(".error");
+        $("label").remove(".error");
         $('#dialogTitle').text("Add <?php echo $pageNameForView; ?>");
         $('#update').val(1);
         for (i = 0; i < dialogInputArr.length; i++) {

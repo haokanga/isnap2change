@@ -110,9 +110,12 @@ db_close($conn);
                                 <option value='' selected>No Correct Choice Selected</option>
                                 <?php for ($i = 0; $i < count($optionResult); $i++) { ?>
                                     <option
-                                        value="<?php echo $optionResult[$i]->Content; ?>" <?php if ($mcqQuesResult->CorrectChoice == $optionResult[$i]->Content) {
-                                        echo 'selected';
-                                    } ?>><?php echo $optionResult[$i]->Content; ?></option>
+                                        value="<?php echo $optionResult[$i]->OptionID; ?>"
+                                        <?php if ($mcqQuesResult->CorrectChoice == $optionResult[$i]->OptionID) {
+                                            echo 'selected';
+                                        } ?>>
+                                        <?php echo $optionResult[$i]->Content; ?>
+                                    </option>
                                 <?php } ?>
                             </select>
                             <br>
@@ -237,7 +240,7 @@ db_close($conn);
     //DO NOT put them in $(document).ready() since the table has multi pages
     var dialogInputArr = $('.dialoginput');
     $('.glyphicon-plus').on('click', function () {
-		$("label").remove(".error");
+        $("label").remove(".error");
         $('#dialogTitle').text("Add Option");
         $('#update').val(1);
         for (i = 0; i < dialogInputArr.length - 1; i++) {

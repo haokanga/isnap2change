@@ -17,12 +17,11 @@ try {
                     $week = $_POST['week'];
                     $topicName = $_POST['topicName'];
                     $points = $_POST['points'];
-                    $questionnaire = $_POST['questionnaire'];
                     $conn->beginTransaction();
-                    
+
                     $topicID = getTopicByName($conn, $topicName)->TopicID;
                     updateQuiz($conn, $quizID, $topicID, $week);
-                    updateMCQSection($conn, $quizID, $points, $questionnaire);
+                    updateMCQSection($conn, $quizID, $points);
 
                     $conn->commit();
                 } catch (Exception $e) {
@@ -126,11 +125,6 @@ db_close($conn);
                             <input type="text" class="form-control" id="Points" name="points" placeholder="Input Points"
                                    value="<?php echo $quizResult->Points; ?>" required>
                             <br>
-                            <label for="Questionnaire">Questionnaire</label>
-                            <input type="hidden" class="form-control" id="Questionnaire" name="questionnaire"
-                                   value="0">
-                            <input type="checkbox" class="form-control" id="Questionnaire" name="questionnaire"
-                                   value="1" <?php if ($quizResult->Questionnaire != 0) echo 'checked'; ?>>
                             <label for="Questions">Questions</label>
                             <input type="text" class="form-control" id="Questions" name="questions"
                                    value="<?php echo $quizResult->Questions; ?>" disabled>
@@ -169,9 +163,9 @@ db_close($conn);
                                     } ?>">
                                         <td style="display:none"><?php echo $mcqQuesResult[$i]->$columnName[0]; ?></td>
                                         <!--Question-->
-                                        <td><?php echo $mcqQuesResult[$i]->$columnName[1]?>
+                                        <td><?php echo $mcqQuesResult[$i]->$columnName[1] ?>
                                         </td>
-                                        <td class="<?php if ($mcqQuesResult[$i]->Content == $mcqQuesResult[$i]->CorrectChoice && strlen($mcqQuesResult[$i]->Content) > 0) {
+                                        <td class="<?php if ($mcqQuesResult[$i]->OptionID == $mcqQuesResult[$i]->CorrectChoice) {
                                             echo 'bg-success';
                                         } else {
                                             echo 'bg-danger';
@@ -184,7 +178,8 @@ db_close($conn);
                                                   aria-hidden="true"></span>
                                             <span class="pull-right" aria-hidden="true">&nbsp;</span>
                                             <a href="mcq-option-editor.php?quizID=<?php echo $quizID ?>&mcqID=<?php echo $mcqQuesResult[$i]->$columnName[0]; ?>">
-                                                <span class="glyphicon glyphicon-edit pull-right" aria-hidden="true"></span></a>
+                                                <span class="glyphicon glyphicon-edit pull-right"
+                                                      aria-hidden="true"></span></a>
                                         </td>
                                     </tr>
                                 <?php } ?>
@@ -254,7 +249,7 @@ db_close($conn);
     //DO NOT put them in $(document).ready() since the table has multi pages
     var dialogInputArr = $('.dialoginput');
     $('.glyphicon-plus').on('click', function () {
-		$("label").remove(".error");
+        $("label").remove(".error");
         $('#dialogTitle').text("Add Question");
         $('#update').val(1);
         for (i = 0; i < dialogInputArr.length; i++) {
