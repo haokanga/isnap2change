@@ -265,13 +265,13 @@
                 '             <div class="quiz-feedback-content">aaa</div>' +
                 '         </div>'
                 detail.forEach(function (quizState) {
-                var $quizItem = $quizItems.filter('[data-id="' + quizState.MCQID +'"]')
-                var $quizAnswers = $quizItem.find('.quiz-answer-item')
-                var isCorrect = false
+                var $quizItem = $quizItems.filter('[data-id="' + quizState.MCQID +'"]');
+                var $quizAnswers = $quizItem.find('.quiz-answer-item');
+                var isCorrect = false;
 
                 for (var key in quizState.explanation) {
-                    var $answerItem = $quizAnswers.filter('[data-answer="' + key + '"]')
-                    var answerId = $answerItem.data('answer')
+                    var $answerItem = $quizAnswers.filter('[data-answer="' + key + '"]');
+                    var answerId = $answerItem.data('answer');
                     var $feedback = $(feedbackTpl)
 
                     $feedback.find('.quiz-feedback-title')

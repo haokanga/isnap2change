@@ -6,6 +6,7 @@
     require_once("../debug.php");
     $pageName = "extra-activities";
 
+
     $conn = null;
 
     try {
@@ -13,6 +14,17 @@
 
         //get student week
         $studentWeek = getStudentWeek($conn, $studentID);
+
+        //get active week
+        if ($_SERVER["REQUEST_METHOD"] == "GET") {
+            if(isset($_GET["week"])) {
+                $activeWeek = $_GET["week"];
+            } else {
+                $activeWeek = $studentWeek;
+            }
+        } else {
+
+        }
 
         //get max week
         $maxWeek = getMaxWeek($conn)->WeekNum;
@@ -36,6 +48,8 @@
     }
 
     db_close($conn);
+
+
 ?>
 
 <!DOCTYPE html>
@@ -258,11 +272,9 @@
                 <h2 class="extra-activities-tab-title">Select Your week</h2>
                 <div class="extra-activities-tab-list">
 <?php
-                    for($i = 0; $i < ($studentWeek-1); $i++) { ?>
+                    for($i = 0; $i < $studentWeek; $i++) { ?>
                         <div class="extra-activities-tab-item"><?php echo ($i+1) ?></div>
-<?php               } ?>
-                        <div class="extra-activities-tab-item extra-activities-tab-item-active"><?php echo $studentWeek ?></div>
-<?php
+<?php               }
                     for($i = $studentWeek; $i < $maxWeek; $i++) { ?>
                         <div class="extra-activities-tab-item extra-activities-tab-item-disabled"><?php echo ($i+1) ?></div>
 <?php               } ?>
@@ -539,6 +551,7 @@
 
 <script>
 
+
     var TabCtrl = {
         cls: {
             tabActive: 'extra-activities-tab-item-active',
@@ -588,6 +601,8 @@
             MaterialCtrl.showNavPanel(index)
         }
     })
+
+    TabCtrl.activeItem(<?php echo $activeWeek-1 ?>);
 
 
     var MaterialCtrl = {

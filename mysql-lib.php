@@ -483,6 +483,28 @@ function getQuizType(PDO $conn, $quizID)
     return $quizTypeQueryRes->QuizType;
 }
 
+function getQuizExtraAttr($conn, $quizID)
+{
+    $quizSql = "SELECT COUNT(*)
+                FROM Quiz 
+                WHERE QuizID = ?";
+    $quizQuery = $conn->prepare($quizSql);
+    $quizQuery->execute(array($quizID));
+
+    if ($quizQuery->fetchColumn() != 1) {
+        throw new Exception("Fail to get extra attribute for a quiz");
+    }
+
+    $quizSql = "SELECT ExtraQuiz
+                FROM Quiz 
+                WHERE QuizID = ?";
+    $quizQuery = $conn->prepare($quizSql);
+    $quizQuery->execute(array($quizID));
+
+    $quizResult = $quizQuery->fetch(PDO::FETCH_OBJ);
+    return $quizResult;
+}
+
 function getQuiz(PDO $conn, $quizID)
 {
     return getRecord($conn, $quizID, "Quiz");
