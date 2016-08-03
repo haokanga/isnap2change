@@ -3,7 +3,8 @@ session_start();
 require_once("../mysql-lib.php");
 require_once("../debug.php");
 require_once("researcher-lib.php");
-$columnName = array('QuizID', 'Week', 'TopicName', 'Points', 'Edit');
+$columnName = array('RecipeID', 'RecipeName', 'MealType', 'PreparationTime', 'CookingTime', 'Serves', 'Edit');
+
 
 try {
     $conn = db_connect();
@@ -11,29 +12,18 @@ try {
         if (isset($_POST['update'])) {
             $update = $_POST['update'];
             if ($update == 1) {
-                try {
-                    $week = $_POST['week'];
-                    $quizType = 'Poster';
-                    $topicName = $_POST['topicName'];
-                    $conn->beginTransaction();
-                    $question = '';
-                    $points = 0;
 
-                    $topicID = getTopicByName($conn, $topicName)->TopicID;
-                    $quizID = createQuiz($conn, $topicID, $quizType, $week);
-                    createPosterSection($conn, $quizID, $question, $points);
-                    createEmptyLearningMaterial($conn, $quizID);
+                $cookingTime = $_POST['cookingTime'];
+                $mealType = $_POST['mealType'];
+                $preparationTime = $_POST['preparationTime'];
+                $recipeName = $_POST['recipeName'];
+                $serves = $_POST['serves'];
 
-                    $conn->commit();
+                createRecipe($conn, $cookingTime, $mealType, $preparationTime, $recipeName, $serves);
 
-                    header('Location: poster-editor.php?quizID=' . $quizID);
-                } catch (Exception $e) {
-                    debug_err($e);
-                    $conn->rollBack();
-                }
             } else if ($update == -1) {
-                $quizID = $_POST['quizID'];
-                deleteQuiz($conn, $quizID);
+                $recipeID = $_POST['recipeID'];
+                deleteRecipe($conn, $recipeID);
             }
         }
     }
@@ -41,12 +31,13 @@ try {
     debug_err($e);
 }
 
+
 try {
-    $quizResult = getPosterQuizzes($conn);
-    $topicResult = getTopics($conn);
+    $recipeResult = getRecipes($conn);
 } catch (Exception $e) {
     debug_err($e);
 }
+
 db_close($conn);
 
 ?>
@@ -59,12 +50,12 @@ db_close($conn);
 <body>
 
 <div id="wrapper">
-    <!-- Navigation Layout-->
     <?php require_once('navigation.php'); ?>
     <div id="page-wrapper">
         <div class="row">
             <div class="col-lg-12">
-                <h1 class="page-header"><?php echo $pageNameForView; ?> Overview</h1>
+                <h1 class="page-header"><?php echo $pageNameForView; ?> Overview
+                </h1>
             </div>
             <!-- /.col-lg-12 -->
         </div>
@@ -74,8 +65,8 @@ db_close($conn);
                 <div class="panel panel-default">
                     <div class="panel-heading">
                         <?php echo $pageNameForView; ?> Information Table <span
-                            class="glyphicon glyphicon-plus pull-right"
-                            data-toggle="modal" data-target="#dialog"></span>
+                            class="glyphicon glyphicon-plus pull-right" data-toggle="modal"
+                            data-target="#dialog"></span>
                     </div>
                     <!-- /.panel-heading -->
                     <div class="panel-body">
@@ -83,7 +74,7 @@ db_close($conn);
                             <table class="table table-striped table-bordered table-hover" id="datatables">
                                 <?php require_once('table-head.php'); ?>
                                 <tbody>
-                                <?php for ($i = 0; $i < count($quizResult); $i++) { ?>
+                                <?php for ($i = 0; $i < count($recipeResult); $i++) { ?>
                                     <tr class="<?php if ($i % 2 == 0) {
                                         echo "odd";
                                     } else {
@@ -95,12 +86,12 @@ db_close($conn);
                                             } ?>>
                                                 <?php
                                                 if ($j != count($columnName) - 1)
-                                                    echo $quizResult[$i]->$columnName[$j];
+                                                    echo $recipeResult[$i]->$columnName[$j];
                                                 else { ?>
                                                     <span class="glyphicon glyphicon-remove pull-right"
                                                           aria-hidden="true"></span>
                                                     <span class="pull-right" aria-hidden="true">&nbsp;</span>
-                                                    <a href="poster-editor.php?quizID=<?php echo $quizResult[$i]->QuizID ?>">
+                                                    <a href="recipe-editor.php?recipeID=<?php echo $recipeResult[$i]->RecipeID ?>">
                                                     <span class="glyphicon glyphicon-edit pull-right"
                                                           aria-hidden="true"></span>
                                                     </a>
@@ -113,7 +104,12 @@ db_close($conn);
                             </table>
                         </div>
                         <!-- /.table-responsive -->
-                        <?php require_once('quiz-overview-notification.php'); ?>
+                        <div class="well row">
+                            <h4><?php echo $pageNameForView; ?> Overview Notification</h4>
+                            <div class="alert alert-info">
+                                <p>View recipes by filtering or searching. You can create/update/delete any recipe.</p>
+                            </div>
+                        </div>
                     </div>
                     <!-- /.panel-body -->
                 </div>
@@ -122,10 +118,8 @@ db_close($conn);
             <!-- /.col-lg-12 -->
         </div>
         <!-- /.row -->
-
     </div>
     <!-- /#page-wrapper -->
-
 </div>
 <!-- /#wrapper -->
 <!-- Modal -->
@@ -141,21 +135,22 @@ db_close($conn);
                 <form id="submission" method="post" action="<?php echo $_SERVER['PHP_SELF']; ?>">
                     <!--if 1, insert; else if -1 delete;-->
                     <input type=hidden name="update" id="update" value="1" required>
-                    <label for="QuizID" style="display:none">QuizID</label>
-                    <input type="text" class="form-control dialoginput" id="QuizID" name="quizID" style="display:none">
-                    <label for="Week">Week</label>
-                    <input type="text" class="form-control dialoginput" id="Week" name="week"
-                           placeholder="Input Week Number" required>
-                    <br>
-                    <label for='TopicName'>TopicName</label>
-                    <select class="form-control dialoginput" id="TopicName" form="submission" name="topicName" required>
-                        <option value="" disabled selected>Select Topic</option>
-                        <?php for ($j = 0; $j < count($topicResult); $j++) { ?>
-                            <option
-                                value='<?php echo $topicResult[$j]->TopicName ?>'><?php echo $topicResult[$j]->TopicName ?></option>
-                        <?php } ?>
-                    </select>
-                    <br>
+                    <label for="recipeID" style="display:none">recipeID</label>
+                    <input type="text" class="form-control dialoginput" id="recipeID" name="recipeID"
+                           style="display:none">
+
+                    <?php
+                    $dialogInputArr = array('RecipeName', 'MealType', 'PreparationTime', 'CookingTime', 'Serves');
+                    for ($i = 0; $i < count($dialogInputArr); $i++) { ?>
+                        <label
+                            for="<?php echo lcfirst($dialogInputArr[$i]) ?>"><?php echo $dialogInputArr[$i] ?></label>
+                        <input type="text" class="form-control dialoginput"
+                               id="<?php echo lcfirst($dialogInputArr[$i]) ?>"
+                               name="<?php echo lcfirst($dialogInputArr[$i]) ?>"
+                               placeholder="Input <?php echo $dialogInputArr[$i] ?>" required>
+                        <br>
+                    <?php } ?>
+
                 </form>
             </div>
             <div class="modal-footer">
@@ -180,7 +175,7 @@ db_close($conn);
         }
     });
     $('.glyphicon-remove').on('click', function () {
-        if (confirm('[WARNING] Are you sure to remove this quiz? If you remove one quiz. All the questions and submission of this quiz will also get deleted (not recoverable). It includes learning material, questions and options, their submissions and your grading/feedback, not only the quiz itself.')) {
+        if (confirm('[WARNING] Are you sure to remove this recipe?')) {
             $('#update').val(-1);
             for (i = 0; i < dialogInputArr.length; i++) {
                 dialogInputArr.eq(i).val($(this).parent().parent().children('td').eq(i).text().trim());
@@ -191,7 +186,15 @@ db_close($conn);
     $('#btnSave').on('click', function () {
         $('#submission').validate({
             rules: {
-                week: {
+                preparationTime: {
+                    required: true,
+                    digits: true
+                },
+                cookingTime: {
+                    required: true,
+                    digits: true
+                },
+                serves: {
                     required: true,
                     digits: true
                 }

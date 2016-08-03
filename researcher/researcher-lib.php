@@ -69,7 +69,7 @@ function getPageNameForView($pageName)
         $pageNameForView = ucwords(str_replace('-', ' ', $pageName)) . " Quiz";
     } // school, class, student, snap-fact, verbose-fact
     else
-        $pageNameForView = ucwords(str_replace('-', ' ', $pageName));
+        $pageNameForView = ucwords(str_replace('-', ' ', str_replace('editor', '', $pageName)));
 
 
     return $pageNameForView;

@@ -15,12 +15,24 @@
 <script src="../sb-admin/js/sb-admin-2.js"></script>
 
 <!--jQuery Validate plugin-->
+<!--
+Localized:
 <script src="//ajax.aspnetcdn.com/ajax/jquery.validate/1.15.0/jquery.validate.min.js"></script>
+-->
+<script src="../bower_components/jquery.validate.min.js"></script>
 
 <!-- DataTables rowsGroup Plugin -->
 <script src="../bower_components/datatables-plugins/rowsgroup/dataTables.rowsGroup.js "></script>
 
+<!--
+Localized:
 <link rel="stylesheet" href="//code.jquery.com/ui/1.11.4/themes/ui-lightness/jquery-ui.css"/>
+-->
+<link rel="stylesheet" href="../bower_components/jquery-ui.css"/>
+<!--
+Localized:
 <link rel="stylesheet" href="//code.jquery.com/qunit/qunit-1.18.0.css"/>
+-->
+<link rel="stylesheet" href="../bower_components/qunit-1.18.0.css"/>
 <!-- Magnific Popup core JS file -->
 <script src="../bower_components/magnific-popup/jquery.magnific-popup.js"></script>

@@ -1828,12 +1828,12 @@ function updateStudentGameScores(PDO $conn, $gameID, $studentID, $score)
 
 
 /* MCQ */
-function createRecipe(PDO $conn, $cookingTime, $mealType, $preparationTime, $recipeName, $serves, $source)
+function createRecipe(PDO $conn, $cookingTime, $mealType, $preparationTime, $recipeName, $serves)
 {
-    $updateSql = "INSERT INTO Recipe(RecipeName, Source, MealType, PreparationTime, CookingTime, Serves)
-                    VALUES (?,?,?,?,?,?)";
+    $updateSql = "INSERT INTO Recipe(RecipeName, MealType, PreparationTime, CookingTime, Serves)
+                    VALUES (?,?,?,?,?)";
     $updateSql = $conn->prepare($updateSql);
-    $updateSql->execute(array($recipeName, $source, $mealType, $preparationTime, $cookingTime, $serves));
+    $updateSql->execute(array($recipeName, $mealType, $preparationTime, $cookingTime, $serves));
 }
 
 function updateRecipe(PDO $conn, $recipeID, $cookingTime, $mealType, $preparationTime, $recipeName, $serves, $source)
@@ -1877,6 +1877,16 @@ function updateRecipeNutrition(PDO $conn, $nutritionID, $measurementUnit, $nutri
     $updateSql->execute(array(htmlspecialchars($nutritionName), htmlspecialchars($measurementUnit), $nutritionID));
 }
 
+function updateRecipeImage(PDO $conn, $recipeID, $image)
+{
+    $updateSql = "UPDATE Recipe 
+            SET Image = ?
+            WHERE RecipeID = ?";
+    $updateSql = $conn->prepare($updateSql);
+    $updateSql->execute(array($image, $recipeID));
+}
+
+
 function updateRecipeStep(PDO $conn, $stepID, $description)
 {
     $updateSql = "UPDATE Recipe_Step
@@ -1907,10 +1917,16 @@ function getRecipe(PDO $conn, $recipeID)
     return getRecord($conn, $recipeID, 'Recipe');
 }
 
+function getRecipeImage($conn, $recipeID)
+{
+    return getRecipe($conn, $recipeID)->Image;
+}
+
 function getRecipes(PDO $conn)
 {
     return getRecords($conn, 'Recipe');
 }
+
 
 function getRecordsByRecipeID(PDO $conn, $recipeID, $tableName)
 {
