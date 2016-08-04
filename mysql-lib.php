@@ -1964,7 +1964,7 @@ function createLog(PDO $conn, $logArr)
     $updateSql = "INSERT INTO Log( ExceptionMessage, ExceptionTrace, PageName, RequestMethod, RequestParameters, SessionDump)
          VALUES (?,?,?,?,?,?)";
     $updateSql = $conn->prepare($updateSql);
-    $updateSql->execute(array_map("htmlspecialchars", $logArr));
+    $updateSql->execute($logArr);
     return $conn->lastInsertId();
 }
 

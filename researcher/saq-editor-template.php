@@ -209,7 +209,7 @@ db_close($conn);
                         </div>
                         <!-- /.table-responsive -->
                         <div class="well row">
-                            <h4><?php echo $pageNameForView; ?> Overview Notification</h4>
+                            <h4><?php echo $pageNameForView; ?> Notification</h4>
                             <div class="alert alert-info">
                                 <p>View questions in this quiz by filtering or searching. You can
                                     create/update/delete any question.</p>
@@ -289,6 +289,7 @@ db_close($conn);
         }
     });
     $('td > .glyphicon-edit').on('click', function () {
+        $('#dialogTitle').text("Edit Question");
         $('#update').val(0);
         for (i = 0; i < dialogInputArr.length; i++) {
             dialogInputArr.eq(i).val($(this).parent().parent().children('td').eq(i).text().trim());

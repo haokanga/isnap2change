@@ -76,7 +76,8 @@ try {
                                                   aria-hidden="true"></span>
                             <span class="pull-right" aria-hidden="true">&nbsp;</span>
                             <span class="glyphicon glyphicon-edit pull-right"
-                                  aria-hidden="true"></span>
+                                  aria-hidden="true" data-toggle="modal"
+                                  data-target="#dialog"></span>
                         </td>
                     </tr>
                 <?php } ?>

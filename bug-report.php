@@ -57,7 +57,7 @@ try {
                     <br>
                 </form>
             </div>
-            <div class="modal-footer"><button type="button" id="btnSave" class="btn btn-default">Back to Welcome Page</button>
+            <div class="modal-footer"><button type="button" id="btnSave" class="btn btn-default" onclick="location.href='student/welcome.php';">Back to Welcome Page</button>
                 <button type="button" id="btnSave" class="btn btn-default">Save</button>
             </div>
         </div>
