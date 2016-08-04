@@ -113,7 +113,7 @@ db_close($conn);
                             <label for="CorrectChoice">CorrectChoice</label>
                             <select class="form-control" id="CorrectChoice" form="metadata-submission"
                                     name="correctChoice">
-                                <option value='' selected>No Correct Choice Selected</option>
+                                <option value='' disabled selected>No Correct Choice Selected</option>
                                 <?php for ($i = 0; $i < count($optionResult); $i++) { ?>
                                     <option
                                         value="<?php echo $optionResult[$i]->OptionID; ?>"
