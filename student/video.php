@@ -34,6 +34,13 @@
         //check quiz status
         $status = getQuizStatus($conn, $quizID, $studentID);
 
+        //check quiz extra attr
+        if (getQuizExtraAttr($conn, $quizID)) {
+            $backPage = "extra-activities.php?week=".$week;
+        } else {
+            $backPage = "weekly-task.php?quiz_id=".$quizID;
+        }
+
         //get media
         $mediaContent = getLearningMaterial($conn, $quizID);
 
@@ -195,7 +202,7 @@
             <a href="javascript:;" title="Save"></a>
         </li>
         <li class="cancel-task">
-            <a href="#" title="Cancel Task"></a>
+            <a href="<?php echo $backPage?>" title="Cancel Task"></a>
         </li>
     </ul>
 
