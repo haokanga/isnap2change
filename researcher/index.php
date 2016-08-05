@@ -4,6 +4,14 @@ require_once("../mysql-lib.php");
 require_once("../debug.php");
 require_once("researcher-lib.php");
 $conn = db_connect();
+$connLog = db_connect('log');
+
+try {
+    $bugNum = getUnsolvedLogNum($connLog);
+} catch (Exception $e) {
+    debug_err($e);
+}
+
 
 db_close($conn);
 
@@ -114,7 +122,7 @@ db_close($conn);
                                                 <i class="fa fa-support fa-5x"></i>
                                             </div>
                                             <div class="col-xs-9 text-right">
-                                                <div class="huge">13</div>
+                                                <div class="huge"><?php echo $bugNum; ?></div>
                                                 <div>New Tech Report!</div>
                                             </div>
                                         </div>
@@ -146,65 +154,14 @@ db_close($conn);
         <!-- /.row -->
     </div>
     <!-- /#page-wrapper -->
-
 </div>
 <!-- /#wrapper -->
-<!-- Modal -->
-<div class="modal fade" id="dialog" role="dialog">
-    <div class="modal-dialog">
-        <!-- Modal content-->
-        <div class="modal-content">
-            <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal">&times;</button>
-                <h4 class="modal-title" id="dialogTitle">Edit Class</h4>
-            </div>
-            <div class="modal-body">
-                <form id="submission" method="post" action="<?php echo $_SERVER['PHP_SELF']; ?>">
-                    <!--if 1, insert; else if 0 update; else if -1 delete;-->
-                    <input type=hidden name="update" id="update" value="1">
-                    <label for="ClassID" style="display:none">ClassID</label>
-                    <input type="text" class="form-control dialoginput" id="ClassID" name="classID"
-                           style="display:none">
-                    <br><label for="ClassName">ClassName</label>
-                    <input type="text" class="form-control dialoginput" id="ClassName" name="className" required>
-                    <br><label for="SchoolName">SchoolName</label>
-                    <select class="form-control dialoginput" id="SchoolName" form="submission" name="schoolName"
-                            required>
-                        <?php for ($i = 0; $i < count($schoolResult); $i++) { ?>
-                            <option
-                                value="<?php echo $schoolResult[$i]->SchoolName ?>"><?php echo $schoolResult[$i]->SchoolName ?></option>
-                        <?php } ?>
-                    </select>
-                    <br><label for="TeacherToken">TeacherToken</label><span
-                        class="glyphicon glyphicon-random pull-right"></span>
-                    <input type="text" class="form-control dialoginput" id="TeacherToken" name="teacherToken" required>
-                    <br><label for="StudentToken">StudentToken</label><span
-                        class="glyphicon glyphicon-random pull-right"></span>
-                    <input type="text" class="form-control dialoginput" id="StudentToken" name="studentToken" required>
-                    <br><label for="EnrolledStudents">EnrolledStudents</label>
-                    <input type="text" class="form-control dialoginput" id="EnrolledStudents" name="EnrolledStudents">
-                    <br><label for="UnlockedProgress">UnlockedProgress</label>
-                    <input type="text" class="form-control dialoginput" id="UnlockedProgress" name="UnlockedProgress">
-                </form>
-            </div>
-            <div class="modal-footer">
-                <button type="button" id="btnSave" class="btn btn-default">Save</button>
-                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-            </div>
-        </div>
-    </div>
-</div>
-<input type=hidden name="keyword" id="keyword" value="<?php if (isset($_GET['schoolName'])) {
-    echo $_GET['schoolName'];
-} ?>">
 
 <!-- SB Admin Library -->
 <?php require_once('sb-admin-lib.php'); ?>
-
-<!--jQuery Validate plugin-->
-<script src="http://ajax.aspnetcdn.com/ajax/jquery.validate/1.15.0/jquery.validate.min.js"></script>
-
 <!-- Page-Level Scripts -->
+<script>
+</script>
 </body>
 
 </html>

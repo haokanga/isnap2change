@@ -2011,6 +2011,20 @@ function getLogs(PDO $conn)
     return getRecords($conn, 'Log');
 }
 
+function getLogNum(PDO $conn)
+{
+    return getRecordNum($conn, 'Log');
+}
+
+function getUnsolvedLogNum(PDO $conn)
+{
+    $tableSql = "SELECT COUNT(*) AS Count FROM Log WHERE Solved = 0";
+    $tableQuery = $conn->prepare($tableSql);
+    $tableQuery->execute();
+    $tableResult = $tableQuery->fetch(PDO::FETCH_OBJ);
+    return $tableResult->Count;
+}
+
 /* Log */
 
 /* Helper Function */
@@ -2065,6 +2079,20 @@ function getRecord(PDO $conn, $recordID, $tableName, array $joinTables = null)
     $tableQuery->execute(array($recordID));
     $tableResult = $tableQuery->fetch(PDO::FETCH_OBJ);
     return $tableResult;
+}
+
+function getRecordNum(PDO $conn, $tableName, array $joinTables = null)
+{
+    $tableSql = "SELECT COUNT(*) AS Count FROM " . $tableName;
+    if ($joinTables != null) {
+        foreach ($joinTables as $joinTable) {
+            $tableSql .= " NATURAL JOIN " . $joinTable;
+        }
+    }
+    $tableQuery = $conn->prepare($tableSql);
+    $tableQuery->execute();
+    $tableResult = $tableQuery->fetch(PDO::FETCH_OBJ);
+    return $tableResult->Count;
 }
 
 function getRecords(PDO $conn, $tableName, array $joinTables = null)
