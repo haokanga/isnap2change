@@ -135,10 +135,11 @@
             <div class="settings">
                 <div class="setting-icon dropdown">
                     <ul class="dropdown-menu">
+                        <li class="dropdown-item"><a href="settings.php">Setting</a></li>
                         <li class="dropdown-item"><a href="#">Logout</a></li>
                     </ul>
                 </div>
-                <a href="#" class="setting-text">NoButSrsly</a>
+                <a class="setting-text"><?php echo $studentUsername?></a>
             </div>
         </div>
     </div>

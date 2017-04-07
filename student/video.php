@@ -1,11 +1,8 @@
 <?php
     //check login status
     require_once('student-validation.php');
-
     require_once("../mysql-lib.php");
     require_once("../debug.php");
-
-    $pageName = "video";
 
     //check whether a request is GET or POST
     if($_SERVER["REQUEST_METHOD"] == "GET"){
@@ -35,10 +32,10 @@
         $status = getQuizStatus($conn, $quizID, $studentID);
 
         //check quiz extra attr
-        if (getQuizExtraAttr($conn, $quizID)) {
+        if (getQuizExtraAttr($conn, $quizID) == 1) {
             $backPage = "extra-activities.php?week=".$week;
         } else {
-            $backPage = "weekly-task.php?quiz_id=".$quizID;
+            $backPage = "weekly-task.php?week=".$week;
         }
 
         //get media
@@ -62,7 +59,7 @@
             db_close($conn);
         }
 
-        debug_err($pageName, $e);
+        debug_err($e);
         //to do: handle sql error
         //...
         exit;
@@ -76,11 +73,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="initial-scale=1.0, width=device-width, user-scalable=no">
-    <title>Video</title>
+    <title>Video | SNAP</title>
     <link rel="stylesheet" href="./css/common.css">
     <link href='https://fonts.googleapis.com/css?family=Maitree|Lato:400,900' rel='stylesheet' type='text/css'>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
-    <script src="./js/snap.js"></script>
     <style>
         .video-container {
             max-width: 1000px;
@@ -104,8 +100,8 @@
             height: auto;
         }
         .video-content iframe {
-            width: 800px;
-            height: 800px;
+            width: 100%;
+            height: 561px;
         }
         .question-container {
             max-width: 800px;
@@ -219,7 +215,7 @@
     </div>
 </div>
 
-
+<script src="./js/snap.js"></script>
 <script>
     var form = new snap.Form({
         form: '.question-form',

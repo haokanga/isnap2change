@@ -1,9 +1,9 @@
 <?php
-//	require_once('student-validation.php');
+	require_once('student-validation.php');
     require_once("../mysql-lib.php");
     require_once("../debug.php");
     $pageName = "multiple-choice-question";
-/*
+
     if ($_SERVER["REQUEST_METHOD"] == "GET") {
         if(isset($_GET["quiz_id"])){
             $quizID = $_GET["quiz_id"];
@@ -13,9 +13,6 @@
     } else {
 
     }
-*/
-    $studentID = 1;
-    $quizID = 1;
 
     $conn = null;
 
@@ -53,18 +50,16 @@
             if ($status == "GRADED") {
                 $singleFeedback = array();
 
-                $singleFeedback["MCQID"] = $mcqQuestions[$i]->MCQID;
-                $singleFeedback["correctAns"] = $mcqQuestions[$i]->CorrectChoice;
-                $singleFeedback["explanation"] = array();
-
                 foreach($options as $row) {
-                    $singleFeedback["explanation"][$row->OptionID] = $row->Explanation;
+                    $feedbackDetails = array();
+                    $feedbackDetails["correctAns"] = $mcqQuestions[$i]->CorrectChoice;
+                    $feedbackDetails["Explanation"] = $row->Explanation;
+                    array_push($singleFeedback, $feedbackDetails);
                 }
 
                 array_push($feedback, $singleFeedback);
             }
         }
-
     } catch(Exception $e) {
         if ($conn != null) {
             db_close($conn);
@@ -100,13 +95,15 @@
     <div class="header-wrapper">
         <div class="header">
             <a class="home-link">SNAP</a>
+
             <div class="settings">
                 <div class="setting-icon dropdown">
                     <ul class="dropdown-menu">
+                        <li class="dropdown-item"><a href="setting.php">Setting</a></li>
                         <li class="dropdown-item"><a href="#">Logout</a></li>
                     </ul>
                 </div>
-                <a href="#" class="setting-text">NoButSrsly</a>
+                <a class="setting-text"><?php echo $studentUsername?></a>
             </div>
         </div>
     </div>
@@ -137,12 +134,26 @@
                 </div>
                 <ul class="quiz-answer-list">
 <?php       for ($j = 0; $j < count($mcqOptions[$i]); $j++) { ?>
-                    <li class="quiz-answer-item" data-answer="<?php echo $mcqOptions[$i][$j]->Content ?>">
+                    <li class="quiz-answer-item" data-answer="<?php echo $mcqOptions[$i][$j]->OptionID ?>">
                         <div class="quiz-label">
                             <span class="image-icon-speech"></span>
                         </div>
                         <div class="quiz-answer-content">
                             <?php echo $mcqOptions[$i][$j]->Content ?>
+<?php
+                            if ($status == "GRADED") { ?>
+                                <div class="quiz-feedback">
+                                    <div class="quiz-feedback-title">
+<?php
+                                if ($feedback[$i][$j]["correctAns"] == $mcqOptions[$i][$j]->OptionID) { ?>
+                                    This is correct:
+<?php                           } else { ?>
+                                    This is incorrect:
+<?php                           }?>
+                                    </div>
+                                    <div class="quiz-feedback-content"><?php echo $feedback[$i][$j]["Explanation"] ?></div>
+                                </div>
+<?php                       } ?>
                         </div>
                     </li>
 <?php       } ?>
@@ -153,10 +164,21 @@
                 </div>
 
                 <form class="question-form">
+
+<?php
+                if($status == "UNANSWERED"){ ?>
                     <button type="submit" class="question-submit">
                         <span class="question-submit-icon"></span>
-                        Submit
+                        SUBMIT
                     </button>
+<?php           }
+                if($status == "GRADED"){ ?>
+                    <button type="submit" class="question-submit" disabled="disabled">
+                        <span class="question-submit-icon"></span>
+                        SUBMIT
+                    </button>
+<?php           } ?>
+
                 </form>
             </div>
 <?php   } ?>
@@ -166,10 +188,7 @@
 
     <ul class="task-operation">
         <li class="cancel-task">
-            <a href="#" title="Cancel Task"></a>
-        </li>
-        <li class="save-task">
-            <a href="javascript:;" title="Save Task"></a>
+            <a href="weekly-task.php?week=<?php echo $week?>" title="Cancel Task"></a>
         </li>
     </ul>
 
@@ -256,7 +275,7 @@
             return result
         },
         setFeedback: function (data) {
-            detail = detail || [];
+            detail = data || [];
             var that = this;
             var $quizItems = this.$quizItems;
             var feedbackTpl =
@@ -295,7 +314,6 @@
 
                 quizNav.feedback($quizItems.index($quizItem), isCorrect)
             })
-
         }
     };
 
@@ -325,10 +343,7 @@
         }
     });
 
-<?php
-        if ($status == "GRADED") { ?>
-            QuizCtrl.setFeedback(<?php echo $feedback?>);
-<?php    } ?>
+
 
     function parseFeedback(feedback) {
         if (feedback.message != "success") {
@@ -338,14 +353,14 @@
 
         if (feedback.result == "pass") {
             snap.alert({
-                content: 'Congratulations! You have passed this quiz. The result is: ' + feedback.score + '/' + feedback.quesNumber + '.'
+                content: 'Congratulations! You have passed this quiz. The result is: ' + feedback.score + '/' + feedback.quesNum + '.'
             });
 
             QuizCtrl.setFeedback(feedback.detail);
 
         } else if (feedback.result == "fail") {
             snap.alert({
-                content: 'Sorry! You have failed this quiz. The result is: ' + feedback.score + '/' + feedback.quesNumber + '.'
+                content: 'Sorry! You have failed this quiz. The result is: ' + feedback.score + '/' + feedback.quesNum + '.'
             })
         }
     }

@@ -56,6 +56,7 @@ DROP TABLE IF EXISTS Recipe_Ingredient;
 DROP TABLE IF EXISTS Recipe_Nutrition;
 DROP TABLE IF EXISTS Recipe_Step;
 DROP TABLE IF EXISTS Student_Question;
+DROP TABLE IF EXISTS Student_Question_Feedback;
 DROP TABLE IF EXISTS Public_Question;
 
 CREATE TABLE IF NOT EXISTS `School` (
@@ -458,23 +459,14 @@ CREATE TABLE IF NOT EXISTS `Student_Question` (
   QuestionID MEDIUMINT AUTO_INCREMENT,
   Subject    TEXT      NOT NULL,
   Content    TEXT,
+  SendTime   TIMESTAMP,
+  Feedback   TEXT,
+  Viewed     BOOLEAN   DEFAULT 0,
+  Replied	 BOOLEAN   DEFAULT 0,
   StudentID  MEDIUMINT NOT NULL,
   CONSTRAINT Student_Question_QuestionID_PK PRIMARY KEY (QuestionID),
   CONSTRAINT Student_Question_StudentID_FK FOREIGN KEY (StudentID)
   REFERENCES Student (StudentID)
-    ON DELETE CASCADE
-    ON UPDATE CASCADE
-)
-  ENGINE = INNODB;
-
-CREATE TABLE IF NOT EXISTS `Student_Question_Feedback` (
-  FeedbackID MEDIUMINT AUTO_INCREMENT,
-  Feedback   TEXT,
-  Viewed     BOOLEAN   DEFAULT 0,
-  QuestionID MEDIUMINT NOT NULL,
-  CONSTRAINT Student_Question_Feedback_PK PRIMARY KEY (FeedbackID),
-  CONSTRAINT Student_Question_Feedback_QuestionID_FK FOREIGN KEY (QuestionID)
-  REFERENCES Student_Question (QuestionID)
     ON DELETE CASCADE
     ON UPDATE CASCADE
 )
@@ -1283,9 +1275,6 @@ INSERT INTO `isnap2changedb`.`Recipe_Nutrition` (`MeasurementUnit`,`NutritionNam
 INSERT INTO `isnap2changedb`.`Recipe_Nutrition` (`MeasurementUnit`,`NutritionName`, `RecipeID`) VALUES ('9 g','fiber', @RECIPE_LAST_INSERT_ID);
 INSERT INTO `isnap2changedb`.`Recipe_Nutrition` (`MeasurementUnit`,`NutritionName`, `RecipeID`) VALUES ('713 mg','sodium', @RECIPE_LAST_INSERT_ID);
 INSERT INTO `isnap2changedb`.`Recipe_Nutrition` (`MeasurementUnit`,`NutritionName`, `RecipeID`) VALUES ('416 mg','potassium', @RECIPE_LAST_INSERT_ID);
-
-
-
 
 
 /*

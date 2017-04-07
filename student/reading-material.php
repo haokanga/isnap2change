@@ -11,6 +11,12 @@
     try {
         $conn = db_connect();
 
+        //get quiz viewed attribute
+        $quizViewedAttrs = getQuizViewdAttr($conn, $studentID);
+
+        //get student question viewed attribute
+        $studentQuesViewedAttrs = getStudentQuesViewedAttr($conn, $studentID);
+
         //get student week
         $studentWeek = getStudentWeek($conn, $studentID);
 
@@ -252,18 +258,82 @@
 <div class="page-wrapper">
     <div class="header-wrapper">
         <div class="header">
-            <a class="home-link" href="#">SNAP</a>
+            <a class="home-link">SNAP</a>
             <ul class="nav-list">
-                <li class="nav-item"><a  class="nav-link" href="http://taobao.com">GAME HOME</a></li>
-                <li class="nav-item"><a  class="nav-link" href="http://taobao.com">Snap Facts</a></li>
-                <li class="nav-item"><a  class="nav-link" href="http://taobao.com">Resources</a></li>
+                <li class="nav-item"><a  class="nav-link" href="game-home.php">Snap Change</a></li>
+                <li class="nav-item"><a  class="nav-link" href="snap-facts.php">Snap Facts</a></li>
+                <li class="nav-item"><a  class="nav-link" href="#">Resources</a></li>
             </ul>
-            <a href="#" class="settings">
-                <span class="setting-icon"></span>
-                <span class="setting-text"><?php echo $_SESSION["studentUsername"]?></span>
-            </a>
+            <div class="settings">
+                <div class="info-item info-notification">
+                    <a class="info-icon" href="javascript:;"></a>
+                    <?php           if (count($quizViewedAttrs) != 0) { ?>
+                        <span class="info-number"><?php echo count($quizViewedAttrs) ?></span>
+                    <?php           } ?>
+                    <ul class="info-message-list">
+                        <?php           for ($i = 0; $i < count($quizViewedAttrs); $i++) {
+                            if ($quizViewedAttrs[$i]["extraQuiz"] == 0) {
+                                $url = "weekly-task.php?week=".$quizViewedAttrs[$i]["week"];
+                            } else {
+                                $url = "extra-activities.php?week=".$quizViewedAttrs[$i]["week"];
+                            }?>
+                            <li class="info-message-item">
+                                <a href="<?php echo $url ?>">
+                                    <?php
+                                    $message = "A ";
+
+                                    switch($quizViewedAttrs[$i]["quizType"]) {
+                                        case "Video":
+                                            $message = $message."Video task";
+                                            break;
+                                        case "Image":
+                                            $message = $message."Image task";
+                                            break;
+                                        case "SAQ":
+                                            $message = $message."Short Answer Question task";
+                                            break;
+                                        case "Poster":
+                                            $message = $message."Poster task";
+                                            break;
+                                    }
+
+                                    $message = $message." in Week ".$quizViewedAttrs[$i]["week"]." has feedback for you.";
+                                    echo $message;
+                                    ?>
+                                </a>
+                            </li>
+                        <?php           } ?>
+                    </ul>
+                </div>
+                <div class="info-item info-message">
+                    <a class="info-icon" href="javascript:;"></a>
+                    <?php           if (count($studentQuesViewedAttrs) != 0) { ?>
+                        <span class="info-number"><?php echo count($studentQuesViewedAttrs) ?></span>
+                    <?php           } ?>
+                    <ul class="info-message-list">
+                        <li class="info-message-item">
+                            <?php
+                            for ($i = 0; $i < count($studentQuesViewedAttrs); $i++) { ?>
+                                <a href="messages.php">
+                                    You message about <?php echo $studentQuesViewedAttrs[$i]->Subject ?> has been replied.
+                                </a>
+                            <?php               } ?>
+                        </li>
+                    </ul>
+                </div>
+
+
+                <div class="setting-icon dropdown">
+                    <ul class="dropdown-menu">
+                        <li class="dropdown-item"><a href="settings.php">Settings</a></li>
+                        <li class="dropdown-item"><a href="#">Log out</a></li>
+                    </ul>
+                </div>
+                <a class="setting-text"><?php echo $_SESSION["studentUsername"]?></a>
+            </div>
         </div>
     </div>
+
 
     <div class="content-wrapper">
 
@@ -421,10 +491,11 @@
     </div>
 
     <ul class="sitenav">
+        <li class="sitenav-item sitenav-healthy-recipes"><a href="#"></a></li>
         <li class="sitenav-item sitenav-game-home"><a href="#"></a></li>
-        <li class="sitenav-item sitenav-achievement"><a href="#"></a></li>
-        <li class="sitenav-item sitenav-progress"><a href="#"></a></li>
-        <li class="sitenav-item sitenav-reading-material"><a href="#"></a></li>
+        <li class="sitenav-item sitenav-extra-activities"><a href="extra-activities.php"></a></li>
+        <li class="sitenav-item sitenav-progress"><a href="progress.php"></a></li>
+        <li class="sitenav-item sitenav-reading-material"><a href="reading-material.php"></a></li>
     </ul>
     <div class="footer-wrapper">
         <div class="footer">

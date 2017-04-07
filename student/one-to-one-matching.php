@@ -1,10 +1,8 @@
 <?php
-    //	require_once('student-validation.php');
+    require_once('student-validation.php');
     require_once("../mysql-lib.php");
     require_once("../debug.php");
-    $pageName = "multiple-choice-question";
 
-    /*
     if ($_SERVER["REQUEST_METHOD"] == "GET") {
         if(isset($_GET["quiz_id"])){
             $quizID = $_GET["quiz_id"];
@@ -14,10 +12,6 @@
     } else {
 
     }
-    */
-
-    $quizID = 7;
-    $studentID = 21;
 
     $conn = null;
 
@@ -34,6 +28,13 @@
 
         //check quiz status
         $status = getQuizStatus($conn, $quizID, $studentID);
+
+        //check quiz extra attr
+        if (getQuizExtraAttr($conn, $quizID) == 1) {
+            $backPage = "extra-activities.php?week=".$week;
+        } else {
+            $backPage = "weekly-task.php?week=".$week;
+        }
 
         //get matching questions
         $matchingQuestions = getMatchingBuckets($conn, $quizID);
@@ -112,18 +113,19 @@
 <div class="page-wrapper">
     <div class="header-wrapper">
         <div class="header">
-            <div class="home-link">SNAP</div>
+            <a class="home-link">SNAP</a>
+
             <div class="settings">
                 <div class="setting-icon dropdown">
                     <ul class="dropdown-menu">
+                        <li class="dropdown-item"><a href="setting.php">Setting</a></li>
                         <li class="dropdown-item"><a href="#">Logout</a></li>
                     </ul>
                 </div>
-                <a href="#" class="setting-text">NoButSrsly</a>
+                <a class="setting-text"><?php echo $studentUsername?></a>
             </div>
         </div>
     </div>
-
 
     <div class="content-wrapper">
 
@@ -166,7 +168,7 @@
 
     <ul class="task-operation">
         <li class="cancel-task">
-            <a href="#" title="Cancel Task"></a>
+            <a href="<?php echo $backPage?>" title="Cancel Task"></a>
         </li>
     </ul>
 

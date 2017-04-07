@@ -123,7 +123,7 @@
                 <div class="setting-icon dropdown">
                     <ul class="dropdown-menu">
                         <li class="dropdown-item"><a href="settings.php">Setting</a></li>
-                        <li class="dropdown-item"><a href="logout.php">Logout</a></li>
+                        <li class="dropdown-item"><a href="#">Logout</a></li>
                     </ul>
                 </div>
                 <a class="setting-text"><?php echo $studentUsername?></a>
@@ -148,7 +148,7 @@
 <?php
             switch ($quizType) {
                 case "MCQ": ?>
-                    <a href="" class="material-start">
+                    <a href="multiple-choice-question.php?quiz_id=<?php echo $quizID?>" class="material-start">
                         <span class="material-start-icon"></span>
                         Start
                     </a>
@@ -159,8 +159,15 @@
                         Start
                     </a>
          <?php      break;
-                case "Matching": ?>
-                    <a href="" class="material-start">
+                case "Matching":
+                    $matchingCategory = getMaxMatchingOptionNum($conn, $quizID) > 1 ? 1 : 0;
+
+                    if ($matchingCategory == 1) {
+                        $matchingUrl = "many-to-one-matching.php?quiz_id=".$quizID;
+                    } else {
+                        $matchingUrl = "one-to-one-matching.php?quiz_id=".$quizID;
+                    } ?>
+                    <a href="<?php echo $matchingUrl ?>" class="material-start">
                         <span class="material-start-icon"></span>
                         Start
                     </a>

@@ -27,6 +27,12 @@
             echo '<script>window.location="game-home.php"</script>';
         }
 
+        //get quiz viewed attribute
+        $quizViewedAttrs = getQuizViewdAttr($conn, $studentID);
+
+        //get student question viewed attribute
+        $studentQuesViewedAttrs = getStudentQuesViewedAttr($conn, $studentID);
+
         //get due time for this week
         $dueTime = getStuWeekRecord($conn, $studentID, $week);
 
@@ -122,8 +128,23 @@
         .week-10 .week-img {
             background-image: url("./img/ten_icon.png");
         }
+        .week-11 .week-img {
+            background-image: url("./img/11_icon.png");
+        }
+        .week-12 .week-img {
+            background-image: url("./img/12_icon.png");
+        }
+        .week-13 .week-img {
+            background-image: url("./img/13_icon.png");
+        }
+        .week-14 .week-img {
+            background-image: url("./img/14_icon.png");
+        }
+        .week-15 .week-img {
+            background-image: url("./img/15_icon.png");
+        }
         .week-more .week-img {
-            background-image: url("./img/one_icon.png");
+            background-image: url("./img/extra_week_icon.png");
         }
 
 
@@ -206,7 +227,7 @@
             right: 0;
             text-align: center;
             color: #fcee2d;
-            font-size: 32px;
+            font-size: 20px;
             display: none;
         }
         .game-nav-feedback-animate {
@@ -349,20 +370,78 @@
 <div class="page-wrapper">
     <div class="header-wrapper">
         <div class="header">
-            <a class="home-link" href="welcome.php">SNAP</a>
+            <a class="home-link">SNAP</a>
             <ul class="nav-list">
-                <li class="nav-item"><a  class="nav-link" href="game-home.php">GAME HOME</a></li>
-                <li class="nav-item"><a  class="nav-link" href="http://taobao.com">Snap Facts</a></li>
-                <li class="nav-item"><a  class="nav-link" href="http://taobao.com">Resources</a></li>
+                <li class="nav-item"><a  class="nav-link" href="game-home.php">Snap Change</a></li>
+                <li class="nav-item"><a  class="nav-link" href="snap-facts.php">Snap Facts</a></li>
+                <li class="nav-item"><a  class="nav-link" href="#">Resources</a></li>
             </ul>
             <div class="settings">
-                <div class="setting-icon dropdown">
-                    <ul class="dropdown-menu">
-                        <li class="dropdown-item"><a href="setting.php">Setting</a></li>
-                        <li class="dropdown-item"><a href="logout.php">Logout</a></li>
+                <div class="info-item info-notification">
+                    <a class="info-icon" href="javascript:;"></a>
+                    <?php           if (count($quizViewedAttrs) != 0) { ?>
+                        <span class="info-number"><?php echo count($quizViewedAttrs) ?></span>
+                    <?php           } ?>
+                    <ul class="info-message-list">
+                        <?php           for ($i = 0; $i < count($quizViewedAttrs); $i++) {
+                            if ($quizViewedAttrs[$i]["extraQuiz"] == 0) {
+                                $url = "weekly-task.php?week=".$quizViewedAttrs[$i]["week"];
+                            } else {
+                                $url = "extra-activities.php?week=".$quizViewedAttrs[$i]["week"];
+                            }?>
+                            <li class="info-message-item">
+                                <a href="<?php echo $url ?>">
+                                    <?php
+                                    $message = "A ";
+
+                                    switch($quizViewedAttrs[$i]["quizType"]) {
+                                        case "Video":
+                                            $message = $message."Video task";
+                                            break;
+                                        case "Image":
+                                            $message = $message."Image task";
+                                            break;
+                                        case "SAQ":
+                                            $message = $message."Short Answer Question task";
+                                            break;
+                                        case "Poster":
+                                            $message = $message."Poster task";
+                                            break;
+                                    }
+
+                                    $message = $message." in Week ".$quizViewedAttrs[$i]["week"]." has feedback for you.";
+                                    echo $message;
+                                    ?>
+                                </a>
+                            </li>
+                        <?php           } ?>
                     </ul>
                 </div>
-                <a class="setting-text"><?php echo $studentUsername?></a>
+                <div class="info-item info-message">
+                    <a class="info-icon" href="javascript:;"></a>
+                    <?php           if (count($studentQuesViewedAttrs) != 0) { ?>
+                        <span class="info-number"><?php echo count($studentQuesViewedAttrs) ?></span>
+                    <?php           } ?>
+                    <ul class="info-message-list">
+                        <li class="info-message-item">
+                            <?php
+                            for ($i = 0; $i < count($studentQuesViewedAttrs); $i++) { ?>
+                                <a href="messages.php">
+                                    You message about <?php echo $studentQuesViewedAttrs[$i]->Subject ?> has been replied.
+                                </a>
+                            <?php               } ?>
+                        </li>
+                    </ul>
+                </div>
+
+
+                <div class="setting-icon dropdown">
+                    <ul class="dropdown-menu">
+                        <li class="dropdown-item"><a href="settings.php">Settings</a></li>
+                        <li class="dropdown-item"><a href="#">Log out</a></li>
+                    </ul>
+                </div>
+                <a class="setting-text"><?php echo $_SESSION["studentUsername"]?></a>
             </div>
         </div>
     </div>
@@ -451,13 +530,53 @@
                 </a>
             </div> <?php ;
             break;
-        default: ?>
-            <div class="week-item week-1">
+        case 11: ?>
+            <div class="week-item week-11">
                 <a class="week-link">
                     <span class="week-img"></span>
-                    <span class="week-text">Week 1</span>
+                    <span class="week-text">Week 11</span>
                 </a>
             </div> <?php ;
+            break;
+        case 12: ?>
+            <div class="week-item week-12">
+                <a class="week-link">
+                    <span class="week-img"></span>
+                    <span class="week-text">Week 12</span>
+                </a>
+            </div> <?php ;
+            break;
+        case 13: ?>
+            <div class="week-item week-13">
+                <a class="week-link">
+                    <span class="week-img"></span>
+                    <span class="week-text">Week 13</span>
+                </a>
+            </div> <?php ;
+            break;
+        case 14: ?>
+            <div class="week-item week-14">
+                <a class="week-link">
+                    <span class="week-img"></span>
+                    <span class="week-text">Week 14</span>
+                </a>
+            </div> <?php ;
+            break;
+        case 15: ?>
+            <div class="week-item week-15">
+                <a class="week-link">
+                    <span class="week-img"></span>
+                    <span class="week-text">Week 15</span>
+                </a>
+            </div> <?php ;
+            break;
+        default: ?>
+            <div class="week-item week-more">
+                <a class="week-link">
+                    <span class="week-img"></span>
+                    <span class="week-text">Extra Week</span>
+                </a>
+            </div> <?php
     }   ?>
             <div class="time-remain">
                 <h2 class="time-remain-title">Time remaining:</h2>
@@ -533,7 +652,7 @@
                 switch ($quizzesRes[$i]['QuizType']) {
                     case "MCQ":
                         if (isset($quizzesRes[$i]['Status'])) { ?>
-                            <a href="game-home.php">
+                            <a href="multiple-choice-question.php?quiz_id=<?php echo $quizzesRes[$i]['QuizID']?>">
                                 <div class="game-nav-item game-nav-item-completed game-multiple-choice-quiz" >
                                     <div class="game-nav-logo"></div>
                                     <div class="game-nav-title">Multiple Choice Question</div>
@@ -563,9 +682,13 @@
                                     <div class="game-nav-divider"></div>
                                     <div class="game-nav-desc">Complete Short Answer Question on <?php echo $quizzesRes[$i]['TopicName']?> to receive <?php echo $quizzesRes[$i]['Points']?> points.</div>
                                     <div class="game-nav-status">Completed</div>
-<?php                           if ($quizzesRes[$i]['Status'] == "GRADED") { ?>
+<?php                           if ($quizzesRes[$i]['Status'] == "GRADED") {
+                                    if ($quizzesRes[$i]['Viewed'] == 0) { ?>
                                     <div class="game-nav-feedback game-nav-feedback-animate">Teacher's Feedback Available</div>
-<?php                           } ?>
+<?php                               } else { ?>
+                                    <div class="game-nav-feedback">Feedback Viewed</div>
+<?php                               }
+                                } ?>
                                 </div>
                             </a>
 <?php                       }
@@ -592,8 +715,16 @@
 <?php                   }
                         break;
                 case "Matching":
+                    $matchingCategory = getMaxMatchingOptionNum($conn, $quizzesRes[$i]['QuizID']) > 1 ? 1 : 0;
+
+                    if ($matchingCategory == 1) {
+                        $matchingUrl = "many-to-one-matching.php?quiz_id=".$quizzesRes[$i]['QuizID'];
+                    } else {
+                        $matchingUrl = "one-to-one-matching.php?quiz_id=".$quizzesRes[$i]['QuizID'];
+                    }
+
                     if (isset($quizzesRes[$i]['Status'])) { ?>
-                        <a href="game-home.php">
+                        <a href="<?php echo $matchingUrl ?>">
                             <div class="game-nav-item game-nav-item-completed game-matching">
                                 <div class="game-nav-logo"></div>
                                 <div class="game-nav-title">Matching</div>
@@ -706,7 +837,7 @@
                                 if ($quizzesRes[$i]['Viewed'] == 0) { ?>
                                 <div class="game-nav-feedback game-nav-feedback-animate">Teacher's Feedback Available</div>
 <?php                           } else { ?>
-                                <div class="game-nav-feedback">Teacher's Feedback Available</div>
+                                <div class="game-nav-feedback">Feedback Viewed</div>
 <?php                           }
                            } ?>
                             </div>
@@ -744,11 +875,13 @@
     </div>
 
     <ul class="sitenav">
+        <li class="sitenav-item sitenav-healthy-recipes"><a href="#"></a></li>
         <li class="sitenav-item sitenav-game-home"><a href="#"></a></li>
-        <li class="sitenav-item sitenav-achievement"><a href="#"></a></li>
-        <li class="sitenav-item sitenav-progress"><a href="#"></a></li>
+        <li class="sitenav-item sitenav-extra-activities"><a href="extra-activities.php"></a></li>
+        <li class="sitenav-item sitenav-progress"><a href="progress.php"></a></li>
         <li class="sitenav-item sitenav-reading-material"><a href="reading-material.php"></a></li>
     </ul>
+
     <div class="footer-wrapper">
         <div class="footer">
             <div class="footer-content">

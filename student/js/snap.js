@@ -42,6 +42,9 @@ var snap = {
     confirm: function (opt) {
         opt = $.extend({
             content: 'Missing title!',
+            title: 'Missing Title',
+            confirm: 'OK',
+            cancel: 'Cancel',
             onConfirm: $.noop,
             onCancel: $.noop
         }, opt)
@@ -49,7 +52,8 @@ var snap = {
 '<div class="snap-alert">' +
 '    <div class="snap-alert-mask"></div>' +
 '    <div class="snap-alert-container">' +
-'        <div href="#" class="snap-alert-logo"></div>' +
+'        <a href="#" class="snap-alert-logo"></a>' +
+'        <div class="snap-alert-title">content here</div>' +
 '        <div class="snap-alert-content">content here</div>' +
 '        <div class="snap-alert-operation">' +
 '            <div class="snap-alert-btn snap-alert-confirm">OK</div>' +
@@ -57,8 +61,6 @@ var snap = {
 '        </div>' +
 '    </div>' +
 '</div>';
-
-
 
         if (!this.$confirm) {
             this.$confirm = $(confirmTpl)
@@ -77,7 +79,106 @@ var snap = {
         this.confirm.onConfirm = opt.onConfirm
         this.confirm.onCancel = opt.onCancel
         this.$confirmContent.text(opt.content)
+        this.$confirm.find('.snap-alert-title').text(opt.title)
+        this.$confirm.find('.snap-alert-confirm').text(opt.confirm)
+        this.$confirm.find('.snap-alert-cancel').text(opt.cancel)
         this.$confirm.show()
+    },
+
+    showSendDialog: function (opt) {
+        opt = $.extend({
+            onConfirm: $.noop,
+            onCancel: $.noop
+        }, opt)
+        var confirmTpl =
+'<div class="snap-alert snap-message-dialog">' +
+'    <div class="snap-alert-mask"></div>' +
+'    <div class="snap-alert-container">' +
+'        <a href="#" class="snap-alert-logo"></a>' +
+'        <div class="snap-alert-content">' +
+'            Send us a message.' +
+'            <input type="text" name="title" class="message-title">' +
+'            <textarea cols="20" rows="5" class="message-content"></textarea>' +
+'        </div>' +
+'        <div class="snap-alert-operation">' +
+'            <div class="snap-alert-btn snap-alert-confirm">Send</div>' +
+'            <div class="snap-alert-btn snap-alert-cancel">Cancel</div>' +
+'        </div>' +
+'    </div>' +
+'</div>';
+
+
+
+        if (!this.$sendDialog) {
+            this.$sendDialog = $(confirmTpl)
+            var $body = $('body')
+            $body.append(this.$sendDialog)
+            this.$sendDialogContent = this.$sendDialog.find('.snap-alert-content')
+            this.$sendDialog.on('click', '.snap-alert-confirm', function () {
+                snap.$sendDialog.hide()
+                var title = snap.$sendDialog.find('.message-title').val()
+                var content = snap.$sendDialog.find('.message-content').val()
+                snap.confirm.onConfirm({
+                  title: title,
+                  content: content
+                })
+            })
+            this.$sendDialog.on('click', '.snap-alert-cancel', function () {
+              snap.$sendDialog.hide()
+              snap.confirm.onCancel()
+            })
+        }
+        this.confirm.onConfirm = opt.onConfirm
+        this.confirm.onCancel = opt.onCancel
+        this.$sendDialog.show()
+    },
+
+    showMessageDialog: function (opt) {
+
+        opt = $.extend({
+            content: 'Missing title!',
+            title: 'Missing Title',
+            confirm: 'OK',
+            cancel: 'Cancel',
+            onConfirm: $.noop,
+            onCancel: $.noop
+        }, opt)
+        var confirmTpl =
+'<div class="snap-alert">' +
+'    <div class="snap-alert-mask"></div>' +
+'    <div class="snap-alert-container">' +
+'        <a href="#" class="snap-alert-logo"></a>' +
+'        <div class="snap-alert-title">content here</div>' +
+'        <div class="snap-alert-content">content here</div>' +
+'        <div class="snap-alert-operation">' +
+'            <div class="snap-alert-btn snap-alert-cancel">Close</div>' +
+'        </div>' +
+'    </div>' +
+'</div>';
+
+        if (!this.$confirm) {
+            this.$confirm = $(confirmTpl)
+            var $body = $('body')
+            $body.append(this.$confirm)
+            this.$confirmContent = this.$confirm.find('.snap-alert-content')
+            this.$confirm.on('click', '.snap-alert-confirm', function () {
+                snap.$confirm.hide()
+                snap.confirm.onConfirm()
+            })
+            this.$confirm.on('click', '.snap-alert-cancel', function () {
+              snap.$confirm.hide()
+              snap.confirm.onCancel()
+            })
+        }
+        this.confirm.onConfirm = opt.onConfirm
+        this.confirm.onCancel = opt.onCancel
+        this.$confirmContent.text(opt.content)
+        this.$confirm.find('.snap-alert-title').text(opt.title)
+        this.$confirm.find('.snap-alert-confirm').text(opt.confirm)
+        this.$confirm.find('.snap-alert-cancel').text(opt.cancel)
+        this.$confirm.show()
+
+
     },
 
     enableBackTop: function () {

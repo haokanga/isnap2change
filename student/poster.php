@@ -61,7 +61,7 @@
     <link rel="stylesheet" href="./css/common.css">
     <link href='https://fonts.googleapis.com/css?family=Maitree|Lato:400,900' rel='stylesheet' type='text/css'>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
-    <script src="http://zwibbler.com/zwibbler2.js"></script>
+    <script src="http://zwibbler.com/zwibbler-demo.js"></script>
     <script src="./js/snap.js"></script>
     <style>
         .canvas-title {
@@ -420,7 +420,7 @@
             $(".question-submit").attr("disabled", "disabled");
         }
     }
-
+/*
     function uploadDone(status, result) {
         if (status === "ok") {
             if(result.message == "success"){
@@ -437,7 +437,7 @@
             }
         }
     }
-
+*/
     function upload(form) {
         var progress = new ProgressNotification("Reading file");
         var xhr = new XMLHttpRequest();

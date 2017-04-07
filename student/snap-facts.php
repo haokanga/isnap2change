@@ -1,5 +1,34 @@
 <?php
+    //check login status
+    require_once('./student-validation.php');
 
+    require_once("../mysql-lib.php");
+    require_once("../debug.php");
+    $pageName = "snap-facts";
+
+    $conn = null;
+
+    try {
+        $conn = db_connect();
+
+        //get quiz viewed attribute
+        $quizViewedAttrs = getQuizViewdAttr($conn, $studentID);
+
+        //get student question viewed attribute
+        $studentQuesViewedAttrs = getStudentQuesViewedAttr($conn, $studentID);
+
+    } catch(Exception $e) {
+        if($conn != null) {
+            db_close($conn);
+        }
+
+        debug_err($e);
+        //to do: handle sql error
+        //...
+        exit;
+    }
+
+    db_close($conn);
 ?>
 
 <!DOCTYPE html>
@@ -142,19 +171,76 @@
 <div class="page-wrapper">
     <div class="header-wrapper">
         <div class="header">
-            <a class="home-link" href="#">SNAP</a>
+            <a class="home-link">SNAP</a>
             <ul class="nav-list">
-                <li class="nav-item"><a  class="nav-link" href="http://taobao.com">GAME HOME</a></li>
-                <li class="nav-item"><a  class="nav-link" href="http://taobao.com">Snap Facts</a></li>
-                <li class="nav-item"><a  class="nav-link" href="http://taobao.com">Resources</a></li>
+                <li class="nav-item"><a  class="nav-link" href="game-home.php">Snap Change</a></li>
+                <li class="nav-item"><a  class="nav-link" href="snap-facts.php">Snap Facts</a></li>
+                <li class="nav-item"><a  class="nav-link" href="#">Resources</a></li>
             </ul>
             <div class="settings">
-                <div class="setting-icon dropdown">
-                    <ul class="dropdown-menu">
-                        <li class="dropdown-item"><a href="#">Logout</a></li>
+                <div class="info-item info-notification">
+                    <a class="info-icon" href="javascript:;"></a>
+<?php           if (count($quizViewedAttrs) != 0) { ?>
+                        <span class="info-number"><?php echo count($quizViewedAttrs) ?></span>
+<?php           } ?>
+                    <ul class="info-message-list">
+<?php           for ($i = 0; $i < count($quizViewedAttrs); $i++) {
+                    if ($quizViewedAttrs[$i]["extraQuiz"] == 0) {
+                        $url = "weekly-task.php?week=".$quizViewedAttrs[$i]["week"];
+                    } else {
+                        $url = "extra-activities.php?week=".$quizViewedAttrs[$i]["week"];
+                    }?>
+                        <li class="info-message-item">
+                            <a href="<?php echo $url ?>">
+<?php
+                                    $message = "A ";
+
+                                    switch($quizViewedAttrs[$i]["quizType"]) {
+                                        case "Video":
+                                            $message = $message."Video task";
+                                            break;
+                                        case "Image":
+                                            $message = $message."Image task";
+                                            break;
+                                        case "SAQ":
+                                            $message = $message."Short Answer Question task";
+                                            break;
+                                        case "Poster":
+                                            $message = $message."Poster task";
+                                            break;
+                                    }
+
+                                    $message = $message." in Week ".$quizViewedAttrs[$i]["week"]." has feedback for you.";
+                                    echo $message;
+?>
+                                </a>
+                            </li>
+<?php           } ?>
                     </ul>
                 </div>
-                <a href="#" class="setting-text">NoButSrsly</a>
+                <div class="info-item info-message">
+                    <a class="info-icon" href="javascript:;"></a>
+<?php           if (count($studentQuesViewedAttrs) != 0) { ?>
+                        <span class="info-number"><?php echo count($studentQuesViewedAttrs) ?></span>
+<?php           } ?>
+                    <ul class="info-message-list">
+                        <li class="info-message-item">
+<?php
+                            for ($i = 0; $i < count($studentQuesViewedAttrs); $i++) { ?>
+                                <a href="messages.php">
+                                    You message about <?php echo $studentQuesViewedAttrs[$i]->Subject ?> has been replied.
+                                </a>
+<?php                       } ?>
+                        </li>
+                    </ul>
+                </div>
+                <div class="setting-icon dropdown">
+                    <ul class="dropdown-menu">
+                        <li class="dropdown-item"><a href="settings.php">Settings</a></li>
+                        <li class="dropdown-item"><a href="#">Log out</a></li>
+                    </ul>
+                </div>
+                <a class="setting-text"><?php echo $_SESSION["studentUsername"]?></a>
             </div>
         </div>
     </div>

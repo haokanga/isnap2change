@@ -1,4 +1,4 @@
-<?php
+ <?php
     //check login status
     require_once('student-validation.php');
 
@@ -169,7 +169,7 @@
                 <div class="setting-icon dropdown">
                     <ul class="dropdown-menu">
                         <li class="dropdown-item"><a href="setting.php">Setting</a></li>
-                        <li class="dropdown-item"><a href="logout.php">Logout</a></li>
+                        <li class="dropdown-item"><a href="#">Logout</a></li>
                     </ul>
                 </div>
                 <a class="setting-text"><?php echo $studentUsername?></a>

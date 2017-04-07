@@ -20,6 +20,11 @@
         //get max week
         $maxWeek = getMaxWeek($conn)->WeekNum;
 
+        //get quiz viewed attribute
+        $quizViewedAttrs = getQuizViewdAttr($conn, $studentID);
+
+        //get student question viewed attribute
+        $studentQuesViewedAttrs = getStudentQuesViewedAttr($conn, $studentID);
 
     } catch(Exception $e) {
         if($conn != null) {
@@ -40,7 +45,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="initial-scale=1.0, width=device-width, user-scalable=no">
-    <title>GAME HOME</title>
+    <title>Snap Change</title>
     <link rel="stylesheet" href="./css/common.css">
     <link rel="stylesheet" href="./css/vendor/slick.css">
     <link rel="stylesheet" href="./css/vendor/slick-theme.css">
@@ -56,12 +61,20 @@
             max-width: 1000px;
             margin: 0 auto;
         }
+        .operation-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
         .operation-item {
             display: block;
-            width: 100%;
+            width: 150px;
             text-align: center;
             margin-bottom: 20px;
             font-size: 20px;
+        }
+        .operation-health-recipes {
+            color: #a90505;
         }
         .operation-game {
             color: #00f8cd;
@@ -86,26 +99,6 @@
             margin: 30px 0 50px 0;
             text-align: center;
         }
-        .achievement-showcase h3 {
-            font-size: 14px;
-            text-align: center;
-            margin-bottom: 20px;
-        }
-        .achievement-list {
-            text-align: center;
-        }
-        .achievement-item {
-            display: inline-block;
-            margin:  0 10px;
-        }
-        .achievement-link {
-            display: block;
-        }
-        .achievement-logo {
-            width: 128px;
-            height: 128px;
-        }
-        
         .week-content {
             max-width: 1000px;
             margin: 0 auto;
@@ -226,6 +219,24 @@
         .week-content .slick-dots .slick-active {
             background-color: #faf400;
         }
+        .report-container {
+            margin-top: 40px;
+            margin-bottom: 30px;
+        }
+        .report-title {
+            width: 200px;
+            text-align: center;
+            margin: 0 auto 20px;
+            color: #fcee2d;
+        }
+        .report-icon {
+            cursor: pointer;
+            width: 64px;
+            height: 64px;
+            margin: 0 auto;
+            background-size: 100% 100%;
+            background-image: url("./img/send_icon.png");
+        }
     </style>
 </head>
 <body>
@@ -233,20 +244,78 @@
 <div class="page-wrapper">
     <div class="header-wrapper">
         <div class="header">
-            <a class="home-link" href="#">SNAP</a>
+            <a class="home-link">SNAP</a>
             <ul class="nav-list">
-                <li class="nav-item"><a  class="nav-link" href="game-home.php">GAME HOME</a></li>
-                <li class="nav-item"><a  class="nav-link" href="http://taobao.com">Snap Facts</a></li>
-                <li class="nav-item"><a  class="nav-link" href="http://taobao.com">Resources</a></li>
+                <li class="nav-item"><a  class="nav-link" href="game-home.php">Snap Change</a></li>
+                <li class="nav-item"><a  class="nav-link" href="snap-facts.php">Snap Facts</a></li>
+                <li class="nav-item"><a  class="nav-link" href="#">Resources</a></li>
             </ul>
             <div class="settings">
-                <div class="setting-icon dropdown">
-                    <ul class="dropdown-menu">
-                        <li class="dropdown-item"><a href="settings.php">Setting</a></li>
-                        <li class="dropdown-item"><a href="logout.php">Logout</a></li>
+                <div class="info-item info-notification">
+                    <a class="info-icon" href="javascript:;"></a>
+<?php           if (count($quizViewedAttrs) != 0) { ?>
+                    <span class="info-number"><?php echo count($quizViewedAttrs) ?></span>
+<?php           } ?>
+                    <ul class="info-message-list">
+<?php           for ($i = 0; $i < count($quizViewedAttrs); $i++) {
+                    if ($quizViewedAttrs[$i]["extraQuiz"] == 0) {
+                        $url = "weekly-task.php?week=".$quizViewedAttrs[$i]["week"];
+                    } else {
+                        $url = "extra-activities.php?week=".$quizViewedAttrs[$i]["week"];
+                    }?>
+                        <li class="info-message-item">
+                            <a href="<?php echo $url ?>">
+<?php
+                            $message = "A ";
+
+                            switch($quizViewedAttrs[$i]["quizType"]) {
+                                case "Video":
+                                    $message = $message."Video task";
+                                    break;
+                                case "Image":
+                                    $message = $message."Image task";
+                                    break;
+                                case "SAQ":
+                                    $message = $message."Short Answer Question task";
+                                    break;
+                                case "Poster":
+                                    $message = $message."Poster task";
+                                    break;
+                            }
+
+                            $message = $message." in Week ".$quizViewedAttrs[$i]["week"]." has feedback for you.";
+                            echo $message;
+?>
+                            </a>
+                        </li>
+<?php           } ?>
                     </ul>
                 </div>
-                <a class="setting-text"><?php echo $studentUsername?></a>
+                <div class="info-item info-message">
+                    <a class="info-icon" href="javascript:;"></a>
+<?php           if (count($studentQuesViewedAttrs) != 0) { ?>
+                        <span class="info-number"><?php echo count($studentQuesViewedAttrs) ?></span>
+<?php           } ?>
+                    <ul class="info-message-list">
+                        <li class="info-message-item">
+<?php
+                    for ($i = 0; $i < count($studentQuesViewedAttrs); $i++) { ?>
+                            <a href="messages.php">
+                                You message about <?php echo $studentQuesViewedAttrs[$i]->Subject ?> has been replied.
+                            </a>
+<?php               } ?>
+                        </li>
+                    </ul>
+                </div>
+
+
+                <div class="setting-icon dropdown">
+                    <ul class="dropdown-menu">
+                        <li class="dropdown-item"><a href="settings.php">Settings</a></li>
+                        <li class="dropdown-item"><a href="#">Log out</a></li>
+                    </ul>
+                </div>
+                <a class="setting-text"><?php echo $_SESSION["studentUsername"]?></a>
             </div>
         </div>
     </div>
@@ -280,62 +349,38 @@
 
             </div>
         </div>
-        <div class="main-content">
-            <div class="mini-row">
-                <div class="col-6">
-                    <div class="mini-row">
-                        <div class="col-6">
-                            <a href="#" class="operation-item operation-game">
-                                <img src="./img/game_icon.png" alt="" class="operation-logo">
-                                <span>Games</span>
-                            </a>
-                        </div>
-                        <div class="col-6">
-                            <a href="#" class="operation-item operation-extra-activities">
-                                <img src="./img/extra_activites_icon.png" alt="" class="operation-logo">
-                                <span>Extra Activities</span>
-                            </a>
-                        </div>
-                        <div class="col-6">
-                            <a href="#" class="operation-item operation-progress">
-                                <img src="./img/progress_icon.png" alt="" class="operation-logo">
-                                <span>Progress</span>
-                            </a>
-                        </div>
-                        <div class="col-6">
-                            <a href="reading-material.php" class="operation-item operation-reading-material">
-                                <img src="./img/reading_material_icon.png" alt="" class="operation-logo">
-                                <span>Reading Material</span>
-                            </a>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-6">
-                    <h2 class="achievement-score">Total Score:
-                        <span class="count"><?php echo $studentScore?></span>
-                    </h2>
-                    <div class="achievement-showcase">
-                        <h3>Achievement Showcase</h3>
-                        <ul class="achievement-list">
-                            <li class="achievement-item">
-                                <a href="#" class="achievement-link">
-                                    <img src="./img/achievement_logo.png" class="achievement-logo">
-                                </a>
-                            </li>
-                            <li class="achievement-item">
-                                <a href="#" class="achievement-link">
-                                    <img src="./img/achievement_logo.png" class="achievement-logo">
-                                </a>
-                            </li>
-                            <li class="achievement-item">
-                                <a href="#" class="achievement-link">
-                                    <img src="./img/achievement_logo.png" class="achievement-logo">
-                                </a>
-                            </li>
 
-                        </ul>
-                    </div>
-                </div>
+        <div class="main-content">
+            <h2 class="achievement-score">Total Score:
+                <span class="count"><?php echo $studentScore ?></span>
+            </h2>
+
+            <div class=" operation-container">
+                <a href="#" class="operation-item operation-health-recipes">
+                    <img src="./img/recipe_icon.png" alt="" class="operation-logo">
+                    <span>Healthy Recipes</span>
+                </a>
+                <a href="#" class="operation-item operation-game">
+                    <img src="./img/game_icon.png" alt="" class="operation-logo">
+                    <span>Games</span>
+                </a>
+                <a href="extra-activities.php" class="operation-item operation-extra-activities">
+                    <img src="./img/extra_activites_icon.png" alt="" class="operation-logo">
+                    <span>Extra Activities</span>
+                </a>
+                <a href="progress.php" class="operation-item operation-progress">
+                    <img src="./img/progress_icon.png" alt="" class="operation-logo">
+                    <span>Progress</span>
+                </a>
+                <a href="reading-material.php" class="operation-item operation-reading-material">
+                    <img src="./img/reading_material_icon.png" alt="" class="operation-logo">
+                    <span>Reading Material</span>
+                </a>
+            </div>
+
+            <div class="report-container">
+                <div class="h5 report-title">Do you have a question? Send us a message.</div>
+                <div class="report-icon"></div>
             </div>
         </div>
 
@@ -355,7 +400,7 @@
 
     </div>
 
-
+<script src="./js/snap.js"></script>
 <script>
     $('.week-carousel').slick({
         centerMode: true,
@@ -381,6 +426,68 @@
             }
         });
     });
+
+    $('.report-icon').on('click', function () {
+        snap.showSendDialog({
+            onConfirm: function (data) {
+                console.log(data);
+
+                var sendTime = new Date();
+
+                var dd = sendTime.getDate();
+                var mm = sendTime.getMonth() + 1;
+                var yyyy = sendTime.getFullYear();
+
+                if(dd<10) {
+                    dd="0"+dd;
+                }
+
+                if(mm<10) {
+                    mm="0"+mm;
+                }
+
+                sendTime = yyyy+"-"+mm+"-"+dd+ " " +sendTime.getHours() + ":" + sendTime.getMinutes()+":" + sendTime.getSeconds();
+
+                $.ajax({
+                    url: "student-question-feedback.php",
+                    data: {
+                        student_id: <?php echo $studentID?>,
+                        subject: data.title,
+                        content: data.content,
+                        send_time: sendTime,
+                        action: 'UPDATE'
+                    },
+                    type: "POST",
+                    dataType : "json"
+                })
+
+                    .done(function(feedback) {
+                        parseFeedback(feedback);
+                    })
+
+                    .fail(function( xhr, status, errorThrown ) {
+                        alert( "Sorry, there was a problem!" );
+                        console.log( "Error: " + errorThrown );
+                        console.log( "Status: " + status );
+                        console.dir( xhr );
+                    });
+            }
+        })
+    })
+
+    function parseFeedback(feedback) {
+        if(feedback.message != "success"){
+            snap.alert({
+                content: 'Sorry. Please try again',
+                onClose: function () { }
+            });
+        } else if(feedback.message == "success"){
+            snap.alert({
+                content: 'You have sent a message to the researcher. Please wait for reply',
+                onClose: function () { }
+            });
+        }
+    }
 </script>
 
 </body>

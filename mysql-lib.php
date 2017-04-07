@@ -250,6 +250,24 @@ function getStudents(PDO $conn)
     return $studentResult;
 }
 
+function getStudentsNum(PDO $conn)
+{
+    $studentSql = "SELECT COUNT(*) AS StudentNum FROM Student";
+    $studentQuery = $conn->prepare($studentSql);
+    $studentQuery->execute();
+    $studentResult = $studentQuery->fetch(PDO::FETCH_OBJ);
+    return $studentResult->StudentNum;
+}
+
+function getStudentsNumByClass(PDO $conn, $studentID)
+{
+    $studentSql = "SELECT COUNT(*) AS StudentNum FROM Student WHERE ClassID = (SELECT ClassID FROM Student WHERE StudentID = ?)";
+    $studentQuery = $conn->prepare($studentSql);
+    $studentQuery->execute(array($studentID));
+    $studentResult = $studentQuery->fetch(PDO::FETCH_OBJ);
+    return $studentResult->StudentNum;
+}
+
 function getStudentsRank(PDO $conn)
 {
     $leaderBoardSql = "SELECT Username, Score
@@ -262,6 +280,60 @@ function getStudentsRank(PDO $conn)
     $leaderBoardRes = $leaderBoardQuery->fetchAll(PDO::FETCH_OBJ);
 
     return $leaderBoardRes;
+}
+
+function getStudentRank(PDO $conn, $studentID)
+{
+    $rankSql = "SELECT COUNT(*) FROM (SELECT StudentID, Username, Score, @curRank := @curRank + 1 AS Rank
+                FROM Student, (SELECT @curRank := 0) R
+                ORDER BY Score DESC, SubmissionTime) Class_Rank
+                WHERE StudentID = ?";
+
+    $rankQuery = $conn->prepare($rankSql);
+    $rankQuery->execute(array($studentID));
+
+    if ($rankQuery->fetchColumn() != 1) {
+        throw new Exception("Fail to get student rank in a class.");
+    }
+
+    $rankSql = "SELECT Rank FROM (SELECT StudentID, Username, Score, @curRank := @curRank + 1 AS Rank
+                FROM Student, (SELECT @curRank := 0) R
+                ORDER BY Score DESC, SubmissionTime) Class_Rank
+                WHERE StudentID = ?";
+
+    $rankQuery = $conn->prepare($rankSql);
+    $rankQuery->execute(array($studentID));
+    $rankRes = $rankQuery->fetch(PDO::FETCH_OBJ);
+    return $rankRes->Rank;
+}
+
+function getStudentRankByClass(PDO $conn, $studentID)
+{
+    $rankSql = "SELECT COUNT(*) FROM (SELECT StudentID, Username, Score, @curRank := @curRank + 1 AS Rank
+                FROM Student, (SELECT @curRank := 0) R
+			    WHERE ClassID = (SELECT ClassID FROM Student
+			                     WHERE StudentID = ?)
+                ORDER BY Score DESC, SubmissionTime) Class_Rank
+                WHERE StudentID = ?";
+
+    $rankQuery = $conn->prepare($rankSql);
+    $rankQuery->execute(array($studentID, $studentID));
+
+    if ($rankQuery->fetchColumn() != 1) {
+        throw new Exception("Fail to get student rank in a class.");
+    }
+
+    $rankSql = "SELECT Rank FROM (SELECT StudentID, Username, Score, @curRank := @curRank + 1 AS Rank
+                FROM Student, (SELECT @curRank := 0) R
+			    WHERE ClassID = (SELECT ClassID FROM Student
+			                     WHERE StudentID = ?)
+                ORDER BY Score DESC, SubmissionTime) Class_Rank
+                WHERE StudentID = ?";
+
+    $rankQuery = $conn->prepare($rankSql);
+    $rankQuery->execute(array($studentID, $studentID));
+    $rankRes = $rankQuery->fetch(PDO::FETCH_OBJ);
+    return $rankRes->Rank;
 }
 
 function resetPassword(PDO $conn, $studentID)
@@ -495,7 +567,7 @@ function getQuizExtraAttr($conn, $quizID)
     $quizQuery->execute(array($quizID));
 
     $quizResult = $quizQuery->fetch(PDO::FETCH_OBJ);
-    return $quizResult;
+    return $quizResult->ExtraQuiz;
 }
 
 function getQuiz(PDO $conn, $quizID)
@@ -552,6 +624,54 @@ function getQuizPoints(PDO $conn, $quizID)
     return $points;
 }
 
+function getQuizViewdAttr(PDO $conn, $studentID)
+{
+    $quizSql = "SELECT * 
+                FROM Quiz_Record NATURAL JOIN Quiz LEFT JOIN Learning_Material USING (QuizID)
+                WHERE StudentID = ? AND `Status` = 'GRADED' AND Viewed = 0";
+
+    $quizQuery = $conn->prepare($quizSql);
+    $quizQuery->execute(array($studentID));
+    $quizQueryRes = $quizQuery->fetchAll(PDO::FETCH_OBJ);
+
+    $quizViewedAttrs = array();
+
+    foreach($quizQueryRes as $quizRes) {
+
+        // video, image, saq, poster
+        if ($quizRes->Excluded == EXCLUDED_VIDEO ) {
+            $quizViewedAttr = array();
+            $quizViewedAttr["week"] = $quizRes->Week;
+            $quizViewedAttr["quizType"] = "Video";
+            $quizViewedAttr["extraQuiz"] = $quizRes->ExtraQuiz;
+            array_push($quizViewedAttrs, $quizViewedAttr);
+            continue;
+        } else if ($quizRes->Excluded == EXCLUDED_IMAGE) {
+            $quizViewedAttr = array();
+            $quizViewedAttr["week"] = $quizRes->Week;
+            $quizViewedAttr["quizType"] = "Image";
+            $quizViewedAttr["extraQuiz"] = $quizRes->ExtraQuiz;
+            array_push($quizViewedAttrs, $quizViewedAttr);
+            continue;
+        } else if ($quizRes->QuizType == "SAQ") {
+            $quizViewedAttr = array();
+            $quizViewedAttr["week"] = $quizRes->Week;
+            $quizViewedAttr["quizType"] = "SAQ";
+            $quizViewedAttr["extraQuiz"] = $quizRes->ExtraQuiz;
+            array_push($quizViewedAttrs, $quizViewedAttr);
+            continue;
+        } else if ($quizRes->QuizType == "Poster") {
+            $quizViewedAttr = array();
+            $quizViewedAttr["week"] = $quizRes->Week;
+            $quizViewedAttr["quizType"] = "Poster";
+            $quizViewedAttr["extraQuiz"] = $quizRes->ExtraQuiz;
+            array_push($quizViewedAttrs, $quizViewedAttr);
+            continue;
+        }
+    }
+
+    return $quizViewedAttrs;
+}
 /* Quiz */
 
 /* Topic */
@@ -802,7 +922,7 @@ function updateMCQQuestionRecord(PDO $conn, $MCQID, $studentID, $choice)
     $updateMCQQuesRecordSql = "INSERT INTO MCQ_Question_Record(StudentID, MCQID, Choice)
 							       VALUES (?,?,?) ON DUPLICATE KEY UPDATE Choice = ?;";
     $updateMCQQuesRecordQuery = $conn->prepare($updateMCQQuesRecordSql);
-    $updateMCQQuesRecordQuery->execute(array($studentID, $MCQID, htmlspecialchars($choice), htmlspecialchars($choice)));
+    $updateMCQQuesRecordQuery->execute(array($studentID, $MCQID, $choice, $choice));
 }
 
 function getMCQQuiz(PDO $conn, $quizID)
@@ -1303,6 +1423,22 @@ function calculateStudentScore(PDO $conn, $studentID)
     return $score;
 }
 
+function calculateStudentScoreByTopic(PDO $conn, $studentID, $topicID)
+{
+    $score = 0;
+
+    $quizSql = "SELECT * FROM Quiz NATURAL JOIN Quiz_Record NATURAL JOIN Topic WHERE StudentID = ? AND TopicID = ? AND `Status`='GRADED'";
+    $quizQuery = $conn->prepare($quizSql);
+    $quizQuery->execute(array($studentID, $topicID));
+    $quizResult = $quizQuery->fetchAll(PDO::FETCH_OBJ);
+    for ($i = 0; $i < count($quizResult); $i++) {
+        $score += getStuQuizScore($conn, $quizResult[$i]->QuizID, $studentID);
+    }
+
+    return $score;
+}
+
+
 function getStudentScore(PDO $conn, $studentID)
 {
     $score = 0;
@@ -1354,6 +1490,29 @@ function deleteQuizRecord(PDO $conn, $quizID, $studentID)
     $updateSql = $conn->prepare($updateSql);
     $updateSql->execute(array($quizID, $studentID));
 }
+
+function getQuizNumByTopic(PDO $conn, $topicID)
+{
+    $quizNumSql = "SELECT COUNT(*) AS QuizNum FROM Quiz NATURAL JOIN Topic 
+                   WHERE TopicID = ?";
+    $quizNumQuery = $conn->prepare($quizNumSql);
+    $quizNumQuery->execute(array($topicID));
+    $quizNumResult = $quizNumQuery->fetch(PDO::FETCH_OBJ);
+    return $quizNumResult->QuizNum;
+}
+
+function getQuizCompltdNumByTopic(PDO $conn, $studentID, $topicID)
+{
+    $quizNumSql = "SELECT COUNT(*) AS QuizNum FROM Quiz NATURAL JOIN Quiz_Record
+                   NATURAL JOIN Topic 
+                   WHERE StudentID = ? AND TopicID = ? AND (`Status` = 'GRADED' || `Status` = 'UNGRADED')";
+    $quizNumQuery = $conn->prepare($quizNumSql);
+    $quizNumQuery->execute(array($studentID, $topicID));
+    $quizNumResult = $quizNumQuery->fetch(PDO::FETCH_OBJ);
+    return $quizNumResult->QuizNum;
+}
+
+
 
 function getQuizStatus(PDO $conn, $quizID, $studentID)
 {
@@ -1962,6 +2121,49 @@ function getRecipeSteps(PDO $conn, $recipeID)
 }
 
 /* MCQ */
+
+/* Student Question */
+function updateStudentQuestion(PDO $conn, $studentID, $subject, $content, $sendTime)
+{
+    $updateSql = "INSERT INTO Student_Question(StudentID, Subject, Content, SendTime) VALUES (?,?,?,?)";
+    $updateSql = $conn->prepare($updateSql);
+    $updateSql->execute(array($studentID, htmlspecialchars($subject), htmlspecialchars($content), $sendTime));
+}
+
+function updateStudentQuesViewedStatus(PDO $conn, $questionID)
+{
+    $updateSql = "UPDATE Student_Question
+                  SET Viewed = ?
+                  WHERE QuestionID = ? ";
+    $updateSql = $conn->prepare($updateSql);
+    $updateSql->execute(array(1, $questionID));
+}
+
+function deleteStudentQuestion(PDO $conn, $QuestionID)
+{
+    deleteRecord($conn, $QuestionID, "Student_Question");
+}
+
+function getStudentQuestion(PDO $conn, $studentID)
+{
+    $studentQuesSql = "SELECT * FROM Student_Question WHERE StudentID = ?";
+    $studentQuesQuery = $conn->prepare($studentQuesSql);
+    $studentQuesQuery->execute(array($studentID));
+    $studentQuesRes = $studentQuesQuery->fetchAll(PDO::FETCH_OBJ);
+
+    return $studentQuesRes;
+}
+
+function getStudentQuesViewedAttr(PDO $conn, $studentID)
+{
+    $studentQuesSql = "SELECT * FROM Student_Question WHERE StudentID = ? AND Viewed = ? AND Replied = ?";
+    $studentQuesQuery = $conn->prepare($studentQuesSql);
+    $studentQuesQuery->execute(array($studentID, 0, 1));
+    $studentQuesRes = $studentQuesQuery->fetchAll(PDO::FETCH_OBJ);
+
+    return $studentQuesRes;
+}
+/* Student Question*/
 
 
 /* Log */

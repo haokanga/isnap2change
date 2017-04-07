@@ -34,10 +34,10 @@
 
         //if pass, update database.
         if ($score >= $threshold) {
-
             $feedback["result"] = "pass";
 
             foreach ($answerArr as $mcqID => $answer) {
+
                 //update MCQ_Question_Record
                 updateMCQQuestionRecord($conn, intval($mcqID), $studentID, $answer);
 
@@ -77,7 +77,6 @@
         $feedback["message"] = $e->getMessage();
         echo json_encode($feedback);
         exit;
-
     }
 
     db_close($conn);
