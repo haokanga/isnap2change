@@ -6,6 +6,18 @@ require_once("researcher-lib.php");
 $columnName = array('OptionID', 'Content', 'Explanation', 'Edit');
 
 try {
+    if (isset($_GET['quizID']) && isset($_GET['mcqID'])) {
+        $quizID = $_GET['quizID'];
+        $mcqID = $_GET['mcqID'];
+        $phpSelf = $pageName . '.php?quizID=' . $quizID . '&mcqID=' . $mcqID;
+        $parentPage = 'Location: mcq-editor.php?quizID=' . $quizID;
+    } else
+        throw new Exception('Invalid GET parameters: quizID or mcqID.');
+} catch (Exception $e) {
+    debug_err($e);
+}
+
+try {
     $conn = db_connect();
     if ($_SERVER["REQUEST_METHOD"] == "POST") {
         if (isset($_POST['metadataUpdate'])) {
@@ -45,14 +57,8 @@ try {
 }
 
 try {
-    if (isset($_GET['quizID']) && isset($_GET['mcqID'])) {
-        $quizID = $_GET['quizID'];
-        $mcqID = $_GET['mcqID'];
-        $mcqQuesResult = getMCQQuestion($conn, $mcqID);
-        $optionResult = getOptions($conn, $mcqID);
-        $phpSelf = $pageName . '.php?quizID=' . $quizID . '&mcqID=' . $mcqID;
-        $parentPage = 'Location: mcq-editor.php?quizID=' . $quizID;
-    }
+    $mcqQuesResult = getMCQQuestion($conn, $mcqID);
+    $optionResult = getOptions($conn, $mcqID);
 } catch (Exception $e) {
     debug_err($e);
 }
@@ -107,7 +113,7 @@ db_close($conn);
                             <label for="CorrectChoice">CorrectChoice</label>
                             <select class="form-control" id="CorrectChoice" form="metadata-submission"
                                     name="correctChoice">
-                                <option value='' selected>No Correct Choice Selected</option>
+                                <option value='' disabled selected>No Correct Choice Selected</option>
                                 <?php for ($i = 0; $i < count($optionResult); $i++) { ?>
                                     <option
                                         value="<?php echo $optionResult[$i]->OptionID; ?>"

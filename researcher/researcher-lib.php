@@ -52,27 +52,30 @@ $pageNameForView = getPageNameForView($pageName);
 /* helper function */
 function getPageNameForView($pageName)
 {
-    if ($pageName == 'mcq')
-        $pageNameForView = 'Multiple Choice Quiz';
-    else if ($pageName == 'mcq-editor')
-        $pageNameForView = 'Multiple Choice Quiz Editor';
-    else if (strpos($pageName, 'saq') !== false)
-        $pageNameForView = 'SAQ';
+    $pageNameForView = str_replace('-', ' ', str_replace('editor', '', $pageName));
+    $pageNameForView = str_replace('mcq', 'Multiple Choice Quiz', $pageNameForView);
+
+    if (strpos($pageName, 'saq') !== false) {
+        $pageNameForView = str_replace('saq', 'Short Answer Question Quiz', $pageNameForView);
+        return ucwords($pageNameForView);
+    }
+
     // video, image, video-editor, image-editor
-    else if (defined('SAQ_LIKE_QUIZ_TYPE')) {
+    if (defined('SAQ_LIKE_QUIZ_TYPE')) {
         $pageNameForView = ucfirst(SAQ_LIKE_QUIZ_TYPE) . ' Quiz';
     } // video-grading, image-grading, video-grader, image-grader
     else if (defined('SAQ_LIKE_SUBMISSION_TYPE')) {
         $pageNameForView = ucfirst(SAQ_LIKE_SUBMISSION_TYPE) . ' Grading';
     } // matching, poster, misc
-    else if (in_array(ucwords(str_replace('-', ' ', $pageName)), $GLOBALS['quizTypeArr'])) {
-        $pageNameForView = ucwords(str_replace('-', ' ', $pageName)) . " Quiz";
-    } // school, class, student, snap-fact, verbose-fact
     else
-        $pageNameForView = ucwords(str_replace('-', ' ', $pageName));
 
+        if (in_array(ucwords(str_replace('-', ' ', $pageNameForView)), $GLOBALS['quizTypeArr'])) {
+            $pageNameForView = ucwords(str_replace('-', ' ', $pageNameForView)) . " Quiz";
+        }
 
-    return $pageNameForView;
+    // school, class, student, snap-fact, verbose-fact, recipe
+    // recipe-ingredient/nutrition/step-editor
+    return ucwords($pageNameForView);
 }
 
 /* helper function */

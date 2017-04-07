@@ -2009,12 +2009,12 @@ function updateStudentGameScores(PDO $conn, $gameID, $studentID, $score)
 
 
 /* MCQ */
-function createRecipe(PDO $conn, $cookingTime, $mealType, $preparationTime, $recipeName, $serves, $source)
+function createRecipe(PDO $conn, $cookingTime, $mealType, $preparationTime, $recipeName, $serves)
 {
-    $updateSql = "INSERT INTO Recipe(RecipeName, Source, MealType, PreparationTime, CookingTime, Serves)
-                    VALUES (?,?,?,?,?,?)";
+    $updateSql = "INSERT INTO Recipe(RecipeName, MealType, PreparationTime, CookingTime, Serves)
+                    VALUES (?,?,?,?,?)";
     $updateSql = $conn->prepare($updateSql);
-    $updateSql->execute(array($recipeName, $source, $mealType, $preparationTime, $cookingTime, $serves));
+    $updateSql->execute(array($recipeName, $mealType, $preparationTime, $cookingTime, $serves));
 }
 
 function updateRecipe(PDO $conn, $recipeID, $cookingTime, $mealType, $preparationTime, $recipeName, $serves, $source)
@@ -2058,6 +2058,16 @@ function updateRecipeNutrition(PDO $conn, $nutritionID, $measurementUnit, $nutri
     $updateSql->execute(array(htmlspecialchars($nutritionName), htmlspecialchars($measurementUnit), $nutritionID));
 }
 
+function updateRecipeImage(PDO $conn, $recipeID, $image)
+{
+    $updateSql = "UPDATE Recipe 
+            SET Image = ?
+            WHERE RecipeID = ?";
+    $updateSql = $conn->prepare($updateSql);
+    $updateSql->execute(array($image, $recipeID));
+}
+
+
 function updateRecipeStep(PDO $conn, $stepID, $description)
 {
     $updateSql = "UPDATE Recipe_Step
@@ -2088,10 +2098,16 @@ function getRecipe(PDO $conn, $recipeID)
     return getRecord($conn, $recipeID, 'Recipe');
 }
 
+function getRecipeImage($conn, $recipeID)
+{
+    return getRecipe($conn, $recipeID)->Image;
+}
+
 function getRecipes(PDO $conn)
 {
     return getRecords($conn, 'Recipe');
 }
+
 
 function getRecordsByRecipeID(PDO $conn, $recipeID, $tableName)
 {
@@ -2172,7 +2188,7 @@ function createLog(PDO $conn, $logArr)
     $updateSql = "INSERT INTO Log( ExceptionMessage, ExceptionTrace, PageName, RequestMethod, RequestParameters, SessionDump)
          VALUES (?,?,?,?,?,?)";
     $updateSql = $conn->prepare($updateSql);
-    $updateSql->execute(array_map("htmlspecialchars", $logArr));
+    $updateSql->execute($logArr);
     return $conn->lastInsertId();
 }
 
@@ -2217,6 +2233,20 @@ function getLog(PDO $conn, $logID)
 function getLogs(PDO $conn)
 {
     return getRecords($conn, 'Log');
+}
+
+function getLogNum(PDO $conn)
+{
+    return getRecordNum($conn, 'Log');
+}
+
+function getUnsolvedLogNum(PDO $conn)
+{
+    $tableSql = "SELECT COUNT(*) AS Count FROM Log WHERE Solved = 0";
+    $tableQuery = $conn->prepare($tableSql);
+    $tableQuery->execute();
+    $tableResult = $tableQuery->fetch(PDO::FETCH_OBJ);
+    return $tableResult->Count;
 }
 
 /* Log */
@@ -2273,6 +2303,20 @@ function getRecord(PDO $conn, $recordID, $tableName, array $joinTables = null)
     $tableQuery->execute(array($recordID));
     $tableResult = $tableQuery->fetch(PDO::FETCH_OBJ);
     return $tableResult;
+}
+
+function getRecordNum(PDO $conn, $tableName, array $joinTables = null)
+{
+    $tableSql = "SELECT COUNT(*) AS Count FROM " . $tableName;
+    if ($joinTables != null) {
+        foreach ($joinTables as $joinTable) {
+            $tableSql .= " NATURAL JOIN " . $joinTable;
+        }
+    }
+    $tableQuery = $conn->prepare($tableSql);
+    $tableQuery->execute();
+    $tableResult = $tableQuery->fetch(PDO::FETCH_OBJ);
+    return $tableResult->Count;
 }
 
 function getRecords(PDO $conn, $tableName, array $joinTables = null)

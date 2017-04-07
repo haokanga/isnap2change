@@ -53,11 +53,15 @@ try {
                     <input type="text" class="form-control dialoginput" id="logID" name="logID" style="display:none">
                     <label for="userFeedback">User Feedback</label>
                     <textarea class="form-control dialoginput" id="userFeedback" name="userFeedback"
-                              placeholder="Please describe how you run into this bug and help us catch it!" rows="8" required></textarea>
+                              placeholder="Please describe how you run into this bug and help us catch it!" rows="8"
+                              required></textarea>
                     <br>
                 </form>
             </div>
-            <div class="modal-footer"><button type="button" id="btnSave" class="btn btn-default">Back to Welcome Page</button>
+            <div class="modal-footer">
+                <button type="button" id="btnSave" class="btn btn-default"
+                        onclick="location.href='student/welcome.php';">Back to Welcome Page
+                </button>
                 <button type="button" id="btnSave" class="btn btn-default">Save</button>
             </div>
         </div>
@@ -81,16 +85,28 @@ try {
 <script src="sb-admin/js/sb-admin-2.js"></script>
 
 <!--jQuery Validate plugin-->
+<!--
+Localized:
 <script src="//ajax.aspnetcdn.com/ajax/jquery.validate/1.15.0/jquery.validate.min.js"></script>
+-->
+<script src="bower_components/jquery.validate.min.js"></script>
 
 <!-- DataTables rowsGroup Plugin -->
 <script src="bower_components/datatables-plugins/rowsgroup/dataTables.rowsGroup.js "></script>
 
+<!--
+Localized:
 <link rel="stylesheet" href="//code.jquery.com/ui/1.11.4/themes/ui-lightness/jquery-ui.css"/>
+-->
+<link rel="stylesheet" href="bower_components/jquery-ui.css"/>
+<!--
+Localized:
 <link rel="stylesheet" href="//code.jquery.com/qunit/qunit-1.18.0.css"/>
+-->
+<link rel="stylesheet" href="bower_components/qunit-1.18.0.css"/>
 
 <script>
-    $(window).load(function(){
+    $(window).load(function () {
         $('#dialog').modal('show');
 
         $('#btnSave').on('click', function () {
